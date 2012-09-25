@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+import argparse
+import collections
+import logging
+import os
+
+import nltk
+
+import tacl
+
+
+def main ():
+    parser = generate_parser()
+    args = parser.parse_args()
+    corpus_a_path = args.corpus[0]
+    corpus_b_path = args.corpus[1]
+    ngram_size = args.size
+    logger = logging.getLogger('tacl')
+    log_level = logging.WARN
+    if args.verbose:
+        log_level = logging.DEBUG
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
+    corpus_a = tacl.Corpus(corpus_a_path)
+    corpus_b = tacl.Corpus(corpus_b_path)
+    a_unique = corpus_a.ngrams(ngram_size) - corpus_b.ngrams(ngram_size)
+    print('N-grams of size %d that are unique to the corpus at %s:' %
+          (ngram_size, corpus_a_path))
+    for ngram in a_unique:
+        total = ngram.total_count()
+        if total >= args.minimum:
+            print('%s, %d' % (unicode(ngram), total))
+
+def generate_parser ():
+    parser = argparse.ArgumentParser(description='Analyse corpora')
+    subparsers = parser.add_subparsers(
+        description='valid subcommands', title='sucommands')
+    diff_parser = subparsers.add_parser('diff', help='diff help')
+    diff_parser.add_argument('-s', '--symmetric', action='store_false',
+                             help='output symmetric difference (in either corpus but not both)')
+    parser.add_argument('size', metavar='N', type=int,
+                        help='n-gram size')
+    parser.add_argument('corpus', nargs=2, help='path to corpus for comparison')
+    parser.add_argument('-m', '--minimum', default=2, type=int,
+                        help='minimum occurrences required to list')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='display verbose debugging information')
+    return parser
+
+
+if __name__ == '__main__':
+    main()
