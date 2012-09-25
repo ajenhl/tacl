@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
-import collections
+import cStringIO
+import csv
 import logging
-import os
-
-import nltk
 
 import tacl
 
@@ -13,39 +11,118 @@ import tacl
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
-    corpus_a_path = args.corpus[0]
-    corpus_b_path = args.corpus[1]
-    ngram_size = args.size
+    configure_logging(args.verbose)
+    args.func(args)
+
+def configure_logging (verbose):
     logger = logging.getLogger('tacl')
     log_level = logging.WARN
-    if args.verbose:
+    if verbose:
         log_level = logging.DEBUG
     logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
-    corpus_a = tacl.Corpus(corpus_a_path)
-    corpus_b = tacl.Corpus(corpus_b_path)
-    a_unique = corpus_a.ngrams(ngram_size) - corpus_b.ngrams(ngram_size)
-    print('N-grams of size %d that are unique to the corpus at %s:' %
-          (ngram_size, corpus_a_path))
-    for ngram in a_unique:
-        total = ngram.total_count()
-        if total >= args.minimum:
-            print('%s, %d' % (unicode(ngram), total))
 
 def generate_parser ():
     parser = argparse.ArgumentParser(description='Analyse corpora')
     subparsers = parser.add_subparsers(
         description='valid subcommands', title='sucommands')
-    diff_parser = subparsers.add_parser('diff', help='diff help')
-    diff_parser.add_argument('-s', '--symmetric', action='store_false',
+    diff_parser = subparsers.add_parser('diff', help='list n-grams in one corpus but not the other')
+    diff_parser.add_argument('-s', '--symmetric', action='store_true',
                              help='output symmetric difference (in either corpus but not both)')
-    parser.add_argument('size', metavar='N', type=int,
-                        help='n-gram size')
-    parser.add_argument('corpus', nargs=2, help='path to corpus for comparison')
-    parser.add_argument('-m', '--minimum', default=2, type=int,
-                        help='minimum occurrences required to list')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='display verbose debugging information')
+    diff_parser.set_defaults(func=ngram_diff)
+    intersect_parser = subparsers.add_parser('intersect', help='list n-grams common to both corpora')
+    intersect_parser.set_defaults(func=ngram_intersection)
+    # argparse's handling of subparser's help is unhelpful, since it
+    # doesn't provide the help of the main parser's options. To avoid
+    # this, duplicate the common options on each subparser.
+    diff_parser.add_argument('size', metavar='N', type=int,
+                             help='n-gram size')
+    intersect_parser.add_argument('size', metavar='N', type=int,
+                                  help='n-gram size')
+    diff_parser.add_argument('corpus', nargs=2,
+                             help='path to corpus for comparison')
+    intersect_parser.add_argument('corpus', nargs=2,
+                                  help='path to corpus for comparison')
+    diff_parser.add_argument('-m', '--minimum', default=2, type=int,
+                             help='minimum occurrences required to list')
+    intersect_parser.add_argument('-m', '--minimum', default=2, type=int,
+                                  help='minimum occurrences required to list')
+    diff_parser.add_argument('-t', '--text', action='store_true',
+                             help='output report on individual text frequencies')
+    intersect_parser.add_argument('-t', '--text', action='store_true',
+                                  help='output report on individual text frequencies')
+    diff_parser.add_argument('-v', '--verbose', action='store_true',
+                             help='display verbose debugging information')
+    intersect_parser.add_argument('-v', '--verbose', action='store_true',
+                                  help='display verbose debugging information')
     return parser
+
+def get_corpora (args):
+    corpus_a_path = args.corpus[0]
+    corpus_b_path = args.corpus[1]
+    corpus_a = tacl.Corpus(corpus_a_path)
+    corpus_b = tacl.Corpus(corpus_b_path)
+    return corpus_a, corpus_b
+
+def ngram_diff (args):
+    corpus_a, corpus_b = get_corpora(args)
+    ngram_size = args.size
+    minimum = args.minimum
+    a_ngrams = corpus_a.ngrams(ngram_size)
+    b_ngrams = corpus_b.ngrams(ngram_size)
+    if args.symmetric:
+        ngrams = a_ngrams ^ b_ngrams
+    else:
+        ngrams = a_ngrams - b_ngrams
+    if args.text:
+        output_text_frequencies(ngrams, minimum)
+    else:
+        output_csv(ngrams, minimum)
+
+def ngram_intersection (args):
+    corpus_a, corpus_b = get_corpora(args)
+    ngram_size = args.size
+    minimum = args.minimum
+    a_ngrams = corpus_a.ngrams(ngram_size)
+    b_ngrams = corpus_b.ngrams(ngram_size)
+    output_csv(a_ngrams & b_ngrams, minimum)
+
+def output_csv (ngrams, minimum):
+    """Output `ngrams` in CSV format (ngram, total frequency).
+
+    Exclude n-grams whose total frequency is less than `minimum`.
+
+    :param ngrams: `NGram`\s to output
+    :type ngrams: `set`
+    :param minimum: minimum frequency to include an n-gram
+    :type minimum: `int`
+
+    """
+    output = cStringIO.StringIO()
+    writer = csv.writer(output)
+    for ngram in ngrams:
+        total = ngram.total_count()
+        if total >= minimum:
+            row = (unicode(ngram).encode('utf-8'), total)
+            writer.writerow(row)
+    print(output.getvalue())
+
+def output_text_frequencies (ngrams, minimum):
+    """Output `ngrams` as a report with individual text frequencies.
+
+    Exclude n-grams whose total frequency is less than `minimum`.
+
+    :param ngrams: `NGram`\s to output
+    :type ngrams: `set`
+    :param minimum: minimum frequency to include an n-gram
+    :type minimum: `int`
+
+    """
+    for ngram in ngrams:
+        total = ngram.total_count()
+        if total >= minimum:
+            print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
+            for text, frequency in ngram.text_counts().items():
+                print('   %d: %s' % (frequency, text.path))
 
 
 if __name__ == '__main__':

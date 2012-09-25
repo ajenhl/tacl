@@ -37,3 +37,7 @@ class Corpus (object):
             logging.debug('Generating set of n-grams for text %s' % text.path)
             ngrams = ngrams | text.ngrams(size)
         return ngrams
+
+    @property
+    def path (self):
+        return self._path
