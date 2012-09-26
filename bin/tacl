@@ -14,6 +14,15 @@ def main ():
     configure_logging(args.verbose)
     args.func(args)
 
+def add_ngram_arguments (parser):
+    """Adds common arguments for the n-gram subcommands to `subparser`."""
+    parser.add_argument('size', metavar='N', type=int, help='n-gram size')
+    parser.add_argument('corpus', nargs=2, help='path to corpus for comparison')
+    parser.add_argument('-m', '--minimum', default=2, type=int,
+                        help='minimum occurrences required to list')
+    parser.add_argument('-t', '--text', action='store_true',
+                        help='output report on individual text frequencies')
+
 def configure_logging (verbose):
     logger = logging.getLogger('tacl')
     log_level = logging.WARN
@@ -23,38 +32,36 @@ def configure_logging (verbose):
 
 def generate_parser ():
     parser = argparse.ArgumentParser(description='Analyse corpora')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='display verbose debugging information')
     subparsers = parser.add_subparsers(
         description='valid subcommands', title='sucommands')
-    diff_parser = subparsers.add_parser('diff', help='list n-grams in one corpus but not the other')
-    diff_parser.add_argument('-s', '--symmetric', action='store_true',
-                             help='output symmetric difference (in either corpus but not both)')
-    diff_parser.set_defaults(func=ngram_diff)
-    intersect_parser = subparsers.add_parser('intersect', help='list n-grams common to both corpora')
-    intersect_parser.set_defaults(func=ngram_intersection)
-    # argparse's handling of subparser's help is unhelpful, since it
-    # doesn't provide the help of the main parser's options. To avoid
-    # this, duplicate the common options on each subparser.
-    diff_parser.add_argument('size', metavar='N', type=int,
-                             help='n-gram size')
-    intersect_parser.add_argument('size', metavar='N', type=int,
-                                  help='n-gram size')
-    diff_parser.add_argument('corpus', nargs=2,
-                             help='path to corpus for comparison')
-    intersect_parser.add_argument('corpus', nargs=2,
-                                  help='path to corpus for comparison')
-    diff_parser.add_argument('-m', '--minimum', default=2, type=int,
-                             help='minimum occurrences required to list')
-    intersect_parser.add_argument('-m', '--minimum', default=2, type=int,
-                                  help='minimum occurrences required to list')
-    diff_parser.add_argument('-t', '--text', action='store_true',
-                             help='output report on individual text frequencies')
-    intersect_parser.add_argument('-t', '--text', action='store_true',
-                                  help='output report on individual text frequencies')
-    diff_parser.add_argument('-v', '--verbose', action='store_true',
-                             help='display verbose debugging information')
-    intersect_parser.add_argument('-v', '--verbose', action='store_true',
-                                  help='display verbose debugging information')
+    generate_diff_subparser(subparsers)
+    generate_intersect_subparser(subparsers)
+    generate_strip_subparser(subparsers)
     return parser
+
+def generate_diff_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'diff', help='list n-grams in one corpus but not the other')
+    parser.set_defaults(func=ngram_diff)
+    add_ngram_arguments(parser)
+    parser.add_argument('-s', '--symmetric', action='store_true',
+                        help='output symmetric difference (in either corpus but not both)')
+
+def generate_intersect_subparser (subparsers):
+    parser = subparsers.add_parser('intersect',
+                                   help='list n-grams common to both corpora')
+    parser.set_defaults(func=ngram_intersection)
+    add_ngram_arguments(parser)
+
+def generate_strip_subparser (subparsers):
+    parser = subparsers.add_parser('strip', help='preprocess a corpus by stripping unwanted material from each text')
+    parser.set_defaults(func=strip_texts)
+    parser.add_argument('input', metavar='INPUT',
+                        help='directory containing files to strip')
+    parser.add_argument('output', metavar='OUTPUT',
+                        help='directory to output stripped files to')
 
 def get_corpora (args):
     corpus_a_path = args.corpus[0]
@@ -123,6 +130,10 @@ def output_text_frequencies (ngrams, minimum):
             print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
             for text, frequency in ngram.text_counts().items():
                 print('   %d: %s' % (frequency, text.path))
+
+def strip_texts (args):
+    stripper = tacl.Stripper(args.input, args.output)
+    stripper.strip_files()
 
 
 if __name__ == '__main__':
