@@ -10,14 +10,20 @@ import re
 # ending character(s). In 2682, at least, || is used; this is not
 # handled in the regular expression below.
 line_prefix_re = re.compile(ur'^T[^║:∥]*[║:∥](.*)$')
-char_removal_re = re.compile(ur'[\(\)\? 。]')
+# I do not understand what these are, but the spec called for them not
+# to be used in the n-grams, and it is easier to remove them here than
+# discard them in the tokenisation process, though presumably they are
+# part of the text.
 raw_code_removal_re = re.compile(r'&[^;]*;')
 
 
 class Stripper (object):
 
     """Class used for preprocessing a corpus of texts by stripping out
-    all material that is not the textual material proper."""
+    all material that is not the textual material proper.
+
+    The intention is to keep the stripped text as close in formatting
+    to the original as possible, including whitespace."""
 
     def __init__ (self, input_dir, output_dir):
         self._input_dir = os.path.abspath(input_dir)
@@ -37,13 +43,12 @@ class Stripper (object):
                 for line in input_file:
                     stripped_line = self.strip_line(line.decode('utf-8'))
                     if stripped_line:
-                        output_file.write(stripped_line.encode('utf-8'))
+                        output_file.write(stripped_line.encode('utf-8') + '\n')
 
     def strip_line (self, line):
         new_line = ''
         match = line_prefix_re.search(line)
         if match:
             new_line = match.group(1)
-            new_line = char_removal_re.subn('', new_line)[0]
             new_line = raw_code_removal_re.subn('', new_line)[0]
         return new_line
