@@ -24,16 +24,13 @@ class NGram (object):
         return ''.join(self._ngram)
 
     def add_reference (self, text):
-        """Adds a reference to `text` for this n-gram."""
-        self._refs[text] = self._refs.get(text, 0) + 1
+        """Adds a reference to `text` for this n-gram.
 
-    def text_count (self, text):
-        """Returns the count of references to this ngram in `text`.
-
-        :rtype: `int`
+        :param text: the text referencing this n-gram
+        :type text: `Text`
 
         """
-        return self._refs.get(text, 0)
+        self._refs[text] = self._refs.get(text, 0) + 1
 
     def text_counts (self):
         """Returns the counts for each text that references this ngram.
