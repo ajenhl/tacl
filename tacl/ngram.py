@@ -1,5 +1,7 @@
 class NGram (object):
 
+    __slots__ = ['_initialised', '_ngram', '_refs']
+
     _cache = {}
 
     def __init__ (self, ngram):
