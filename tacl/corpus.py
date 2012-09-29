@@ -6,38 +6,78 @@ from text import Text
 
 class Corpus (object):
 
-    def __init__ (self, path):
-        self._path = os.path.abspath(path)
-        self._texts = self._load_texts(self._path)
+    """A Corpus represents a collection of `Text`\s.
 
-    def _load_texts (self, path):
+    A Corpus is built from a directory that contains the text files
+    that become `Text` objects.
+
+    """
+
+    def __init__ (self, path, manager):
+        self._path = os.path.abspath(path)
+        self._manager = manager
+
+    def _load_texts (self, catalogue):
         """Returns a list of `Text`\s in this corpus.
 
-        :param path: absolute path of the corpus
-        :type path: `str`
+        :param catalogue: catalogue of texts with labels
+        :type catalogue: `Catalogue`
         :rtype: `list`
 
         """
+        logging.debug('Loading the texts for the corpus')
+        catalogue = catalogue or {}
         texts = []
-        for filename in os.listdir(path):
-            file_path = os.path.join(path, filename)
-            texts.append(Text(file_path))
+        for filename in os.listdir(self._path):
+            label = catalogue.get(filename, '')
+            texts.append(Text(filename, self._path, self._manager, label))
         return texts
 
-    def ngrams (self, size):
-        """Returns a set of n-grams of size `size` for this corpus.
+    def diff (self, catalogue, minimum, maximum, occurrences):
+        """Returns the n-gram data for the differences between the
+        sets of texts in `catalogue`.
 
-        :param size: size of the n-gram
-        :type size: `int`
-        :rtype: `set`
+        :param catalogue: association of texts with labels
+        :type catalogue: `Catalogue`
+        :param minimum: minimum n-gram size
+        :type minimum: `int`
+        :param maximum: maximum n-gram size
+        :type maximum: `int`
+        :param occurrences: minimum number of occurrences for an n-gram to be reported
+        :type occurrences: `int`
+        :rtype: `list` of `sqlite3.Row`
 
         """
-        ngrams = set()
-        for text in self._texts:
-            logging.debug('Generating set of n-grams for text %s' % text.path)
-            ngrams = ngrams | text.ngrams(size)
-        return ngrams
+        self.generate_ngrams(minimum, maximum, catalogue)
 
-    @property
-    def path (self):
-        return self._path
+    def generate_ngrams (self, minimum, maximum, catalogue=None):
+        """Generates the n-grams (`minimum` <= n <= `maximum`) for
+        this corpus.
+
+        :param minimum: minimum n-gram size
+        :type minimum: `int`
+        :param maximum: maximum n-gram size
+        :type maximum: `int`
+
+        """
+        logging.debug('Generating n-grams (%d <= n <= %d) for the corpus' %
+                      (minimum, maximum))
+        for text in self._load_texts(catalogue):
+            text.generate_ngrams(minimum, maximum)
+
+    def intersection (self, catalogue, minimum, maximum, occurrences):
+        """Returns the n-gram data for the intersection between the
+        sets of texts in `catalogue`.
+
+        :param catalogue: association of texts with labels
+        :type catalogue: `Catalogue`
+        :param minimum: minimum n-gram size
+        :type minimum: `int`
+        :param maximum: maximum n-gram size
+        :type maximum: `int`
+        :param occurrences: minimum number of occurrences for an n-gram to be reported
+        :type occurrences: `int`
+        :rtype: `list` of `sqlite3.Row`
+
+        """
+        self.generate_ngrams(minimum, maximum, catalogue)

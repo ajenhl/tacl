@@ -14,14 +14,27 @@ def main ():
     configure_logging(args.verbose)
     args.func(args)
 
+def add_common_arguments (parser):
+    """Adds common arguments for all parsers."""
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='display verbose debugging information')
+
 def add_ngram_arguments (parser):
     """Adds common arguments for the n-gram subcommands to `subparser`."""
-    parser.add_argument('size', metavar='N', type=int, help='n-gram size')
-    parser.add_argument('corpus', nargs=2, help='path to corpus for comparison')
-    parser.add_argument('-m', '--minimum', default=2, type=int,
+    parser.add_argument('db', metavar='DATABASE', help='database file')
+    parser.add_argument('corpus', help='path to corpus')
+    parser.add_argument('min_size', metavar='MINIMUM_SIZE', type=int,
+                        help='minimum size of n-gram to generate')
+    parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
+                        help='maximum size of n-gram to generate')
+
+def add_result_arguments (parser):
+    parser.add_argument('-o', '--occurrences', default=2, type=int,
                         help='minimum occurrences required to list')
     parser.add_argument('-t', '--text', action='store_true',
                         help='output report on individual text frequencies')
+    parser.add_argument('catalogue', help='path to catalogue',
+                        metavar='CATALOGUE')
 
 def configure_logging (verbose):
     logger = logging.getLogger('tacl')
@@ -31,86 +44,114 @@ def configure_logging (verbose):
     logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
 def generate_parser ():
-    parser = argparse.ArgumentParser(description='Analyse corpora')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='display verbose debugging information')
-    subparsers = parser.add_subparsers(
-        description='valid subcommands', title='sucommands')
+    parser = argparse.ArgumentParser(description='Analyse the text of corpora in various simple ways.')
+    subparsers = parser.add_subparsers(title='subcommands')
+    generate_catalogue_subparser(subparsers)
     generate_diff_subparser(subparsers)
     generate_intersect_subparser(subparsers)
+    generate_ngrams_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
 
+def generate_catalogue (args):
+    catalogue = tacl.Catalogue()
+    catalogue.generate(args.corpus, args.label)
+    catalogue.save(args.catalogue)
+
+def generate_catalogue_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'catalogue', description='Generate a catalogue file',
+        help='generate a catalogue file')
+    add_common_arguments(parser)
+    parser.set_defaults(func=generate_catalogue)
+    parser.add_argument('corpus', help='path to corpus')
+    parser.add_argument('catalogue', help='path to catalogue file')
+    parser.add_argument('-l', '--label', help='label to use for all texts',
+                        default='')
+
 def generate_diff_subparser (subparsers):
     parser = subparsers.add_parser(
-        'diff', help='list n-grams in one corpus but not the other')
+        'diff', description='List n-grams unique to each sub-corpus.',
+        help='list n-grams in one corpus but not the other')
     parser.set_defaults(func=ngram_diff)
+    add_common_arguments(parser)
     add_ngram_arguments(parser)
-    parser.add_argument('-s', '--symmetric', action='store_true',
-                        help='output symmetric difference (in either corpus but not both)')
+    add_result_arguments(parser)
 
 def generate_intersect_subparser (subparsers):
-    parser = subparsers.add_parser('intersect',
-                                   help='list n-grams common to both corpora')
+    parser = subparsers.add_parser(
+        'intersect', description='List n-grams common to all sub-corpora.',
+        help='list n-grams common to all sub-corpora')
     parser.set_defaults(func=ngram_intersection)
+    add_common_arguments(parser)
+    add_ngram_arguments(parser)
+    add_result_arguments(parser)
+
+def generate_ngrams (args):
+    corpus = get_corpus(args)
+    corpus.generate_ngrams(args.min_size, args.max_size)
+
+def generate_ngrams_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'ngrams', description='Generate n-grams from a corpus.',
+        help='generate n-grams from a corpus')
+    parser.set_defaults(func=generate_ngrams)
+    add_common_arguments(parser)
     add_ngram_arguments(parser)
 
 def generate_strip_subparser (subparsers):
-    parser = subparsers.add_parser('strip', help='preprocess a corpus by stripping unwanted material from each text')
+    parser = subparsers.add_parser('strip', help='preprocess a corpus by stripping unwanted material from each text', description='Preprocess a corpus by stripping unwanted material from each text.')
     parser.set_defaults(func=strip_texts)
+    add_common_arguments(parser)
     parser.add_argument('input', metavar='INPUT',
                         help='directory containing files to strip')
     parser.add_argument('output', metavar='OUTPUT',
                         help='directory to output stripped files to')
 
-def get_corpora (args):
-    corpus_a_path = args.corpus[0]
-    corpus_b_path = args.corpus[1]
-    corpus_a = tacl.Corpus(corpus_a_path)
-    corpus_b = tacl.Corpus(corpus_b_path)
-    return corpus_a, corpus_b
+def get_corpus (args):
+    manager = tacl.DBManager(args.db)
+    corpus = tacl.Corpus(args.corpus, manager)
+    return corpus
+
+def get_catalogue (args):
+    catalogue = tacl.Catalogue()
+    catalogue.load(args.catalogue)
+    return catalogue
 
 def ngram_diff (args):
-    corpus_a, corpus_b = get_corpora(args)
-    ngram_size = args.size
-    minimum = args.minimum
-    a_ngrams = corpus_a.ngrams(ngram_size)
-    b_ngrams = corpus_b.ngrams(ngram_size)
-    if args.symmetric:
-        ngrams = a_ngrams ^ b_ngrams
-    else:
-        ngrams = a_ngrams - b_ngrams
+    corpus = get_corpus(args)
+    catalogue = get_catalogue(args)
+    ngrams = corpus.diff(catalogue, args.min_size, args.max_size,
+                         args.occurrences)
     if args.text:
-        output_text_frequencies(ngrams, minimum)
+        output_text_frequencies(ngrams)
     else:
-        output_csv(ngrams, minimum)
+        output_csv(ngrams)
 
 def ngram_intersection (args):
-    corpus_a, corpus_b = get_corpora(args)
-    ngram_size = args.size
-    minimum = args.minimum
-    a_ngrams = corpus_a.ngrams(ngram_size)
-    b_ngrams = corpus_b.ngrams(ngram_size)
-    output_csv(a_ngrams & b_ngrams, minimum)
+    corpus = get_corpus(args)
+    catalogue = get_catalogue(args)
+    ngrams = corpus.intersection(catalogue, args.min_size, args.max_size,
+                                 args.occurrences)
+    if args.text:
+        output_text_frequencies(ngrams)
+    else:
+        output_csv(ngrams)
 
-def output_csv (ngrams, minimum):
+def output_csv (ngrams):
     """Output `ngrams` in CSV format (ngram, total frequency).
 
     Exclude n-grams whose total frequency is less than `minimum`.
 
-    :param ngrams: `NGram`\s to output
-    :type ngrams: `set`
-    :param minimum: minimum frequency to include an n-gram
-    :type minimum: `int`
+    :param ngrams: n-gram data to output
+    :type ngrams: `list` of `sqlite3.Row`
 
     """
     output = cStringIO.StringIO()
     writer = csv.writer(output)
     for ngram in ngrams:
-        total = ngram.total_count()
-        if total >= minimum:
-            row = (unicode(ngram).encode('utf-8'), total)
-            writer.writerow(row)
+        row = (unicode(ngram).encode('utf-8'), total)
+        writer.writerow(row)
     print(output.getvalue())
 
 def output_text_frequencies (ngrams, minimum):
@@ -118,18 +159,14 @@ def output_text_frequencies (ngrams, minimum):
 
     Exclude n-grams whose total frequency is less than `minimum`.
 
-    :param ngrams: `NGram`\s to output
-    :type ngrams: `set`
-    :param minimum: minimum frequency to include an n-gram
-    :type minimum: `int`
+    :param ngrams: n-gram data to output
+    :type ngrams: `list` of `sqlite3.Row`
 
     """
     for ngram in ngrams:
-        total = ngram.total_count()
-        if total >= minimum:
-            print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
-            for text, frequency in ngram.text_counts().items():
-                print('   %d: %s' % (frequency, text.path))
+        print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
+        for text, frequency in ngram.text_counts().items():
+            print('   %d: %s' % (frequency, text.path))
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
