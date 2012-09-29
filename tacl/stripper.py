@@ -35,9 +35,7 @@ class Stripper (object):
 
     def strip_file (self, filename):
         file_path = os.path.join(self._input_dir, filename)
-        root, ext = os.path.splitext(filename)
-        stripped_file_path = os.path.join(self._output_dir,
-                                          root + '-stripped' + ext)
+        stripped_file_path = os.path.join(self._output_dir, filename)
         with open(file_path, 'rU') as input_file:
             with open(stripped_file_path, 'w') as output_file:
                 for line in input_file:
