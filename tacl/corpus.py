@@ -49,6 +49,8 @@ class Corpus (object):
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
+        labels = catalogue.labels()
+        return self._manager.diff(labels, minimum, maximum, occurrences)
 
     def generate_ngrams (self, minimum, maximum, catalogue=None):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for

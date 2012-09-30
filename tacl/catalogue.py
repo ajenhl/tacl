@@ -18,12 +18,14 @@ class Catalogue (dict):
             self[filename] = label
 
     def labels (self):
-        """Returns a set of the labels used in this catalogue.
+        """Returns a list of the labels used in this catalogue.
 
-        :rtype: `set`
+        :rtype: `list`
 
         """
-        return set(self.values())
+        labels = set(self.values())
+        labels.discard('')
+        return list(labels)
 
     def load (self, path):
         """Loads the data from `path` into the catalogue.

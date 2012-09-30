@@ -70,6 +70,7 @@ class DBManager (object):
             # update the timestamp and corpus at once.
             self._c.execute('UPDATE Text SET timestamp=?, label=? WHERE id=?',
                             (timestamp, corpus_label, text_id))
+        self._conn.commit()
         return text_id
 
     def commit (self):
@@ -108,6 +109,8 @@ class DBManager (object):
                            )''')
         self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextIndexFilename
                            ON Text (filename)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
+                           ON Text (label)''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS NGram (
                                id INTEGER PRIMARY KEY ASC,
                                ngram TEXT UNIQUE NOT NULL,
@@ -123,13 +126,19 @@ class DBManager (object):
         self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextNGramIndex
                            ON TextNGram (text, ngram)''')
 
-    def symmetric_diff (self, labels, minimum, maximum, occurrences):
+    def diff (self, labels, minimum, maximum, occurrences):
         label_params = ('?,' * len(labels)).strip(',')
-        query = '''SELECT Ngram.ngram, SUM(count), Text.filename
+        query = '''SELECT Ngram.ngram, SUM(count) count, Text.label
                    FROM NGram, TextNGram, Text
                    WHERE NGram.id = TextNGram.ngram
                        AND TextNGram.text = Text.id
                        AND Text.label IN (%s)
-                   GROUP BY NGram.ngram, Text.filename
-                   HAVING SUM(count) > ?''' % label_params
-        self._c.execute(query, labels + (occurrences,))
+                       AND NGram.size BETWEEN ? AND ?
+                       AND NGram.ngram NOT IN
+                           (SELECT n.ngram FROM NGram n, TextNGram, Text t
+                            WHERE n.id = NGram.id AND n.id = TextNGram.ngram AND
+                                TextNGram.text = t.id AND t.label != Text.label)
+                   GROUP BY NGram.ngram
+                   HAVING SUM(count) >= ?''' % label_params
+        self._c.execute(query, labels + [minimum, maximum, occurrences])
+        return self._c.fetchall()

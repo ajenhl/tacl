@@ -121,12 +121,12 @@ def get_catalogue (args):
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    ngrams = corpus.diff(catalogue, args.min_size, args.max_size,
-                         args.occurrences)
+    data = corpus.diff(catalogue, args.min_size, args.max_size,
+                       args.occurrences)
     if args.text:
-        output_text_frequencies(ngrams)
+        output_text_frequencies(data)
     else:
-        output_csv(ngrams)
+        output_csv(data)
 
 def ngram_intersection (args):
     corpus = get_corpus(args)
@@ -138,32 +138,28 @@ def ngram_intersection (args):
     else:
         output_csv(ngrams)
 
-def output_csv (ngrams):
-    """Output `ngrams` in CSV format (ngram, total frequency).
+def output_csv (data):
+    """Output `data` in CSV format (ngram, total frequency).
 
-    Exclude n-grams whose total frequency is less than `minimum`.
-
-    :param ngrams: n-gram data to output
-    :type ngrams: `list` of `sqlite3.Row`
+    :param data: n-gram data to output
+    :type data: `list` of `sqlite3.Row`
 
     """
     output = cStringIO.StringIO()
     writer = csv.writer(output)
-    for ngram in ngrams:
-        row = (unicode(ngram).encode('utf-8'), total)
-        writer.writerow(row)
+    for row in data:
+        line = (row['ngram'].encode('utf-8'), row['count'], row['label'])
+        writer.writerow(line)
     print(output.getvalue())
 
-def output_text_frequencies (ngrams, minimum):
-    """Output `ngrams` as a report with individual text frequencies.
+def output_text_frequencies (ngrams):
+    """Output `data` as a report with individual text frequencies.
 
-    Exclude n-grams whose total frequency is less than `minimum`.
-
-    :param ngrams: n-gram data to output
-    :type ngrams: `list` of `sqlite3.Row`
+    :param data: n-gram data to output
+    :type data: `list` of `sqlite3.Row`
 
     """
-    for ngram in ngrams:
+    for row in data:
         print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
         for text, frequency in ngram.text_counts().items():
             print('   %d: %s' % (frequency, text.path))
