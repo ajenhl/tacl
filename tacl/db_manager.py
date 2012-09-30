@@ -134,11 +134,31 @@ class DBManager (object):
                        AND TextNGram.text = Text.id
                        AND Text.label IN (%s)
                        AND NGram.size BETWEEN ? AND ?
-                       AND NGram.ngram NOT IN
+                       AND NOT EXISTS
                            (SELECT n.ngram FROM NGram n, TextNGram, Text t
                             WHERE n.id = NGram.id AND n.id = TextNGram.ngram AND
                                 TextNGram.text = t.id AND t.label != Text.label)
                    GROUP BY NGram.ngram
                    HAVING SUM(count) >= ?''' % label_params
+        self._c.execute(query, labels + [minimum, maximum, occurrences])
+        return self._c.fetchall()
+
+    def intersection (self, labels, minimum, maximum, occurrences):
+        subquery = '''AND EXISTS (SELECT Text.label
+                                  FROM NGram n, TextNGram, Text
+                                  WHERE n.id = NGram.id
+                                      AND n.id = TextNGram.ngram
+                                      AND TextNGram.text = Text.id
+                                      AND Text.label = ?) '''
+        query = '''
+            SELECT Ngram.ngram, SUM(count) count, 'ALL' label
+            FROM NGram, TextNGram, Text
+            WHERE NGram.id = TextNGram.ngram
+                AND TextNGram.text = Text.id
+                AND Text.label != ''
+                %s
+                AND NGram.size BETWEEN ? AND ?
+            GROUP BY NGram.ngram
+            HAVING SUM(count) >= ?''' % (subquery * len(labels))
         self._c.execute(query, labels + [minimum, maximum, occurrences])
         return self._c.fetchall()

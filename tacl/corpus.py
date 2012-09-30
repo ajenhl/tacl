@@ -83,3 +83,5 @@ class Corpus (object):
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
+        labels = catalogue.labels()
+        return self._manager.intersection(labels, minimum, maximum, occurrences)
