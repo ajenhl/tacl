@@ -137,9 +137,12 @@ class DBManager (object):
                        AND NOT EXISTS
                            (SELECT n.ngram FROM NGram n, TextNGram, Text t
                             WHERE n.id = NGram.id AND n.id = TextNGram.ngram AND
-                                TextNGram.text = t.id AND t.label != Text.label)
+                                TextNGram.text = t.id AND t.label != Text.label
+                                AND Text.label != '')
                    GROUP BY NGram.ngram
-                   HAVING SUM(count) >= ?''' % label_params
+                   HAVING SUM(count) >= ?
+                   ORDER BY count DESC
+                   ''' % label_params
         self._c.execute(query, labels + [minimum, maximum, occurrences])
         return self._c.fetchall()
 
@@ -159,6 +162,8 @@ class DBManager (object):
                 %s
                 AND NGram.size BETWEEN ? AND ?
             GROUP BY NGram.ngram
-            HAVING SUM(count) >= ?''' % (subquery * len(labels))
+            HAVING SUM(count) >= ?
+            ORDER BY count DESC
+            ''' % (subquery * len(labels))
         self._c.execute(query, labels + [minimum, maximum, occurrences])
         return self._c.fetchall()
