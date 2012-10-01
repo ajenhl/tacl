@@ -122,7 +122,7 @@ def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
     data = corpus.diff(catalogue, args.min_size, args.max_size,
-                       args.occurrences)
+                       args.occurrences, args.text)
     if args.text:
         output_text_frequencies(data)
     else:
@@ -131,12 +131,12 @@ def ngram_diff (args):
 def ngram_intersection (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    ngrams = corpus.intersection(catalogue, args.min_size, args.max_size,
-                                 args.occurrences)
+    data = corpus.intersection(catalogue, args.min_size, args.max_size,
+                               args.occurrences, args.text)
     if args.text:
-        output_text_frequencies(ngrams)
+        output_text_frequencies(data)
     else:
-        output_csv(ngrams)
+        output_csv(data)
 
 def output_csv (data):
     """Output `data` in CSV format (ngram, total frequency).
@@ -152,17 +152,20 @@ def output_csv (data):
         writer.writerow(line)
     print(output.getvalue())
 
-def output_text_frequencies (ngrams):
+def output_text_frequencies (data):
     """Output `data` as a report with individual text frequencies.
 
     :param data: n-gram data to output
     :type data: `list` of `sqlite3.Row`
 
     """
+    previous_ngram = ''
     for row in data:
-        print('%s, %d' % (unicode(ngram).encode('utf-8'), total))
-        for text, frequency in ngram.text_counts().items():
-            print('   %d: %s' % (frequency, text.path))
+        current_ngram = row['ngram'].encode('utf-8')
+        if current_ngram != previous_ngram:
+            previous_ngram = current_ngram
+            print(current_ngram)
+        print('   %d: %s (%s)' % (row['count'], row['filename'], row['label']))
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)

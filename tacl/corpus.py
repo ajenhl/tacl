@@ -33,7 +33,7 @@ class Corpus (object):
             texts.append(Text(filename, self._path, self._manager, label))
         return texts
 
-    def diff (self, catalogue, minimum, maximum, occurrences):
+    def diff (self, catalogue, minimum, maximum, occurrences, individual):
         """Returns the n-gram data for the differences between the
         sets of texts in `catalogue`.
 
@@ -43,13 +43,19 @@ class Corpus (object):
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
-        :param occurrences: minimum number of occurrences for an n-gram to be reported
+        :param occurrences: minimum number of occurrences for an
+            n-gram to be reported
         :type occurrences: `int`
+        :param individual: whether to report on individual text results
+        :type individual: `bool`
         :rtype: `list` of `sqlite3.Row`
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
         labels = catalogue.labels()
+        if individual:
+            return self._manager.diff_text(labels, minimum, maximum,
+                                           occurrences)
         return self._manager.diff(labels, minimum, maximum, occurrences)
 
     def generate_ngrams (self, minimum, maximum, catalogue=None):
@@ -67,7 +73,8 @@ class Corpus (object):
         for text in self._load_texts(catalogue):
             text.generate_ngrams(minimum, maximum)
 
-    def intersection (self, catalogue, minimum, maximum, occurrences):
+    def intersection (self, catalogue, minimum, maximum, occurrences,
+                      individual):
         """Returns the n-gram data for the intersection between the
         sets of texts in `catalogue`.
 
@@ -79,9 +86,14 @@ class Corpus (object):
         :type maximum: `int`
         :param occurrences: minimum number of occurrences for an n-gram to be reported
         :type occurrences: `int`
+        :param individual: whether to report on individual text results
+        :type individual: `bool`
         :rtype: `list` of `sqlite3.Row`
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
         labels = catalogue.labels()
+        if individual:
+            return self._manager.intersection_text(labels, minimum, maximum,
+                                                   occurrences)
         return self._manager.intersection(labels, minimum, maximum, occurrences)

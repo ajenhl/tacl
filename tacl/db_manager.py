@@ -149,6 +149,30 @@ class DBManager (object):
         self._c.execute(query, labels + [minimum, maximum, occurrences])
         return self._c.fetchall()
 
+    def diff_text (self, labels, minimum, maximum, occurrences):
+        label_params = ('?,' * len(labels)).strip(',')
+        query = '''SELECT Ngram.ngram, count, Text.filename, Text.label
+                   FROM NGram, TextNGram, Text
+                   WHERE NGram.id = TextNGram.ngram
+                       AND TextNGram.text = Text.id
+                       AND Text.label IN (%s)
+                       AND NGram.size BETWEEN ? AND ?
+                       AND NOT EXISTS
+                           (SELECT n.ngram FROM NGram n, TextNGram tn, Text t
+                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
+                                tn.text = t.id AND t.label != Text.label
+                                AND t.label != '')
+                       AND ? <=
+                           (SELECT SUM(count) FROM NGram n, TextNGram tn, Text t
+                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
+                                tn.text = t.id AND t.label IN (%s)
+                            GROUP BY n.ngram)
+                   ORDER BY NGram.ngram, count DESC
+                   ''' % (label_params, label_params)
+        self._c.execute(query, labels + [minimum, maximum, occurrences] +
+                        labels)
+        return self._c.fetchall()
+
     def intersection (self, labels, minimum, maximum, occurrences):
         subquery = '''AND EXISTS (SELECT Text.label
                                   FROM NGram n, TextNGram, Text
@@ -169,4 +193,30 @@ class DBManager (object):
             ORDER BY count DESC
             ''' % (subquery * len(labels))
         self._c.execute(query, labels + [minimum, maximum, occurrences])
+        return self._c.fetchall()
+
+    def intersection_text (self, labels, minimum, maximum, occurrences):
+        label_params = ('?,' * len(labels)).strip(',')
+        subquery = '''AND EXISTS (SELECT t.label
+                                  FROM NGram n, TextNGram tn, Text t
+                                  WHERE n.id = NGram.id
+                                      AND n.id = tn.ngram
+                                      AND tn.text = t.id
+                                      AND t.label = ?) '''
+        query = '''
+            SELECT Ngram.ngram, count, Text.filename, Text.label
+            FROM NGram, TextNGram, Text
+            WHERE NGram.id = TextNGram.ngram
+                AND TextNGram.text = Text.id
+                AND Text.label != ''
+                %s
+                AND NGram.size BETWEEN ? AND ?
+                AND ? <= (SELECT SUM(count) FROM NGram n, TextNGram tn, Text t
+                          WHERE n.id = NGram.id AND n.id = tn.ngram AND
+                              tn.text = t.id AND t.label IN (%s)
+                          GROUP BY n.ngram)
+            ORDER BY Ngram.ngram, count DESC
+            ''' % (subquery * len(labels), label_params)
+        self._c.execute(query, labels + [minimum, maximum, occurrences] +
+                        labels)
         return self._c.fetchall()
