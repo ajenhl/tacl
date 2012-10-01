@@ -135,10 +135,10 @@ class DBManager (object):
                        AND Text.label IN (%s)
                        AND NGram.size BETWEEN ? AND ?
                        AND NOT EXISTS
-                           (SELECT n.ngram FROM NGram n, TextNGram, Text t
-                            WHERE n.id = NGram.id AND n.id = TextNGram.ngram AND
-                                TextNGram.text = t.id AND t.label != Text.label
-                                AND Text.label != '')
+                           (SELECT n.ngram FROM NGram n, TextNGram tn, Text t
+                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
+                                tn.text = t.id AND t.label != Text.label
+                                AND t.label != '')
                    GROUP BY NGram.ngram
                    HAVING SUM(count) >= ?
                    ORDER BY count DESC
