@@ -6,7 +6,10 @@ import sqlite3
 class DBManager (object):
 
     def __init__ (self, db_name):
-        self._db_name = os.path.abspath(db_name)
+        if db_name == ':memory:':
+            self._db_name = db_name
+        else:
+            self._db_name = os.path.abspath(db_name)
         self._conn = sqlite3.connect(self._db_name)
         self._conn.row_factory = sqlite3.Row
         self._c = self._conn.cursor()
