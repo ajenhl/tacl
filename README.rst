@@ -12,7 +12,8 @@ documentation is available at http://tacl.readthedocs.org/en/latest/
 Installation
 ------------
 
-Run ``setup.py install``
+Run ``python setup.py install``. Requires `SQLite`_ and the `Natural
+Language Toolkit`_.
 
 
 Usage
@@ -20,3 +21,7 @@ Usage
 
 Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 <subcommand> -h`` for help on a specific subcommand.
+
+
+.. _SQLite3: http://www.sqlite.org/
+.. _Natural Language Toolkit: http://nltk.org/
