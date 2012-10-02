@@ -23,5 +23,5 @@ Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 <subcommand> -h`` for help on a specific subcommand.
 
 
-.. _SQLite3: http://www.sqlite.org/
+.. _SQLite: http://www.sqlite.org/
 .. _Natural Language Toolkit: http://nltk.org/
