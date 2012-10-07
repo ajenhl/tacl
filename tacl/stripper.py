@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 import re
 
@@ -36,6 +37,8 @@ class Stripper (object):
     def strip_file (self, filename):
         file_path = os.path.join(self._input_dir, filename)
         stripped_file_path = os.path.join(self._output_dir, filename)
+        logging.debug('Stripping file %s into %s' %
+                      (file_path, stripped_file_path))
         with open(file_path, 'rU') as input_file:
             with open(stripped_file_path, 'w') as output_file:
                 for line in input_file:
