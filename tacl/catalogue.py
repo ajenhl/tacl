@@ -49,4 +49,6 @@ class Catalogue (dict):
         """
         with open(path, 'wb') as fh:
             writer = csv.writer(fh, delimiter=' ')
-            writer.writerows(self.items())
+            rows = self.items()
+            rows.sort(key=lambda x: x[0])
+            writer.writerows(rows)
