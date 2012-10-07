@@ -21,16 +21,16 @@ def add_common_arguments (parser):
 
 def add_ngram_arguments (parser):
     """Adds common arguments for the n-gram subcommands to `subparser`."""
-    parser.add_argument('db', metavar='DATABASE', help='database file')
-    parser.add_argument('corpus', help='path to corpus')
+    parser.add_argument('db', metavar='DATABASE', help='path to database file')
+    parser.add_argument('corpus', help='path to corpus', metavar='CORPUS')
     parser.add_argument('min_size', metavar='MINIMUM_SIZE', type=int,
-                        help='minimum size of n-gram to generate')
+                        help='minimum size of n-gram to generate (integer)')
     parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
-                        help='maximum size of n-gram to generate')
+                        help='maximum size of n-gram to generate (integer)')
 
 def add_result_arguments (parser):
     parser.add_argument('-o', '--occurrences', default=2, type=int,
-                        help='minimum occurrences required to list')
+                        help='minimum occurrences required to list (integer)')
     parser.add_argument('-t', '--text', action='store_true',
                         help='output report on individual text frequencies')
     parser.add_argument('catalogue', help='path to catalogue',
