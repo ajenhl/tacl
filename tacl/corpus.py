@@ -70,8 +70,13 @@ class Corpus (object):
         """
         logging.debug('Generating n-grams (%d <= n <= %d) for the corpus' %
                       (minimum, maximum))
-        for text in self._load_texts(catalogue):
+        texts = self._load_texts(catalogue)
+        total = len(texts)
+        count = 1
+        for text in texts:
+            logging.debug('Operating on text %d of %d' % (count, total))
             text.generate_ngrams(minimum, maximum)
+            count = count + 1
 
     def intersection (self, catalogue, minimum, maximum, occurrences,
                       individual):
