@@ -38,41 +38,41 @@ class DBManager (object):
             self._c.execute('UPDATE TextNGRAM SET count=? WHERE rowid=?',
                             (row['count']+1, row['rowid']))
 
-    def add_text (self, filename, timestamp, corpus_label=''):
+    def add_text (self, filename, checksum, corpus_label=''):
         """Returns the database ID of the Text record for the text at
         `text_path`.
 
         This may require creating such a record.
 
-        If `timestamp` does not match an existing record's timestamp,
-        the record's timestamp is updated and all related TextNGram
+        If `checksum` does not match an existing record's checksum,
+        the record's checksum is updated and all related TextNGram
         records are deleted.
 
         """
         # Reuse an existing Text record, or create a new one.
-        self._c.execute('SELECT id, timestamp FROM Text WHERE filename=?',
+        self._c.execute('SELECT id, checksum FROM Text WHERE filename=?',
                         (filename,))
         row = self._c.fetchone()
         if row is None:
             logging.debug('No existing record for text %s; adding one' %
                           filename)
-            self._c.execute('''INSERT INTO Text (filename, timestamp, label)
+            self._c.execute('''INSERT INTO Text (filename, checksum, label)
                                VALUES (?, ?, ?)''',
-                            (filename, timestamp, corpus_label))
+                            (filename, checksum, corpus_label))
             text_id = self._c.lastrowid
         else:
             logging.debug('Reusing existing record for text %s' % filename)
-            # Check that the timestamp matches.
+            # Check that the checksum matches.
             text_id = row['id']
-            if row['timestamp'] != timestamp:
-                logging.debug('Text %s changed since added to database; updating timestamp and deleting NGram references' % filename)
+            if row['checksum'] != checksum:
+                logging.debug('Text %s changed since added to database; updating checksum and deleting NGram references' % filename)
                 self._c.execute('DELETE FROM TextNGram WHERE text=?',
                                 (text_id,))
             # Rather than also check whether the corpus needs to be
             # updated, and potentially do two updates, just always
-            # update the timestamp and corpus at once.
-            self._c.execute('UPDATE Text SET timestamp=?, label=? WHERE id=?',
-                            (timestamp, corpus_label, text_id))
+            # update the checksum and corpus at once.
+            self._c.execute('UPDATE Text SET checksum=?, label=? WHERE id=?',
+                            (checksum, corpus_label, text_id))
         self._conn.commit()
         return text_id
 
@@ -107,7 +107,7 @@ class DBManager (object):
         self._c.execute('''CREATE TABLE IF NOT EXISTS Text (
                                id INTEGER PRIMARY KEY ASC,
                                filename TEXT UNIQUE NOT NULL,
-                               timestamp INTEGER NOT NULL,
+                               checksum INTEGER NOT NULL,
                                label TEXT NOT NULL
                            )''')
         self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextIndexFilename

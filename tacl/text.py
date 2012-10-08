@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import hashlib
 import logging
 import os
 
@@ -18,8 +19,8 @@ class Text (object):
         self._filename = filename
         self._path = os.path.join(corpus_path, filename)
         self._manager = manager
-        timestamp = int(os.stat(self._path).st_mtime)
-        self._id = self._manager.add_text(filename, timestamp, corpus_label)
+        checksum = hashlib.md5(open(self._path, 'rU').read()).hexdigest()
+        self._id = self._manager.add_text(filename, checksum, corpus_label)
 
     def generate_ngrams (self, minimum, maximum):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
