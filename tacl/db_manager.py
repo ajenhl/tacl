@@ -16,6 +16,19 @@ class DBManager (object):
         self._c.execute('PRAGMA synchronous=0')
         self.init_db()
 
+    def add_indices (self):
+        logging.debug('Adding database indices')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
+                           ON Text (label)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS NGramIndexSize
+                           ON NGram (size)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexText
+                           ON TextNGram (text)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexNGram
+                           ON TextNGram (ngram)''')
+        self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextNGramIndex
+                           ON TextNGram (text, ngram)''')
+
     def add_ngram (self, text_id, ngram, size, count):
         """Adds a TextNGram row specifying the `count` of `ngram`
         appearing in `text_id`.
@@ -86,6 +99,14 @@ class DBManager (object):
     def commit (self):
         self._conn.commit()
 
+    def drop_indices (self):
+        logging.debug('Dropping database indices')
+        self._c.execute('DROP INDEX IF EXISTS TextIndexLabel')
+        self._c.execute('DROP INDEX IF EXISTS NGramIndexSize')
+        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexNgram')
+        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexText')
+        self._c.execute('DROP INDEX IF EXISTS TextNGramIndex')
+
     def has_ngrams (self, text_id, size):
         """Returns True if there is at least one TextNGram record
         linking `text_id` with an NGram of size `size`.
@@ -117,24 +138,16 @@ class DBManager (object):
                                checksum INTEGER NOT NULL,
                                label TEXT NOT NULL
                            )''')
-        self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextIndexFilename
-                           ON Text (filename)''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
-                           ON Text (label)''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS NGram (
                                id INTEGER PRIMARY KEY ASC,
                                ngram TEXT UNIQUE NOT NULL,
                                size INTEGER NOT NULL
                            )''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS NGramIndexSize
-                           ON NGram (size)''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS TextNGram (
             text INTEGER NOT NULL REFERENCES Text (id),
             ngram INTEGER NOT NULL REFERENCES NGram (id),
             count INTEGER NOT NULL
             )''')
-        self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextNGramIndex
-                           ON TextNGram (text, ngram)''')
 
     def diff (self, labels, minimum, maximum, occurrences):
         label_params = ('?,' * len(labels)).strip(',')
@@ -227,3 +240,7 @@ class DBManager (object):
         self._c.execute(query, labels + [minimum, maximum, occurrences] +
                         labels)
         return self._c.fetchall()
+
+    def vacuum (self):
+        logging.debug('Vacuuming the database')
+        self._c.execute('VACUUM')

@@ -68,6 +68,8 @@ class Corpus (object):
         :type maximum: `int`
 
         """
+        if catalogue is None:
+            self._manager.drop_indices()
         logging.debug('Generating n-grams (%d <= n <= %d) for the corpus' %
                       (minimum, maximum))
         texts = self._load_texts(catalogue)
@@ -77,6 +79,9 @@ class Corpus (object):
             logging.debug('Operating on text %d of %d' % (count, total))
             text.generate_ngrams(minimum, maximum)
             count = count + 1
+        self._manager.add_indices()
+        if catalogue is None:
+            self._manager.vacuum()
 
     def intersection (self, catalogue, minimum, maximum, occurrences,
                       individual):
