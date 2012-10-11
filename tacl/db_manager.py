@@ -16,27 +16,34 @@ class DBManager (object):
         self._c.execute('PRAGMA synchronous=0')
         self.init_db()
 
-    def add_ngram (self, text_id, ngram, size):
+    def add_ngram (self, text_id, ngram, size, count):
+        """Adds a TextNGram row specifying the `count` of `ngram`
+        appearing in `text_id`.
+
+        Also creates an NGram record if one does not already exist.
+
+        :param text_id: database ID of the Text
+        :type text_id: `int`
+        :param ngram: n-gram to be added
+        :type ngram: `unicode`
+        :param size: size of `ngram`
+        :type size: `int`
+        :param count: number of occurrences of `ngram` in the Text
+        :type count: `int`
+
+        """
         # Reuse an existing NGram record, or create a new one.
         self._c.execute('SELECT id FROM NGram WHERE ngram=?', (ngram,))
         row = self._c.fetchone()
         if row is None:
             self._c.execute('INSERT INTO NGram (ngram, size) VALUES (?, ?)',
-                      (ngram, size))
+                            (ngram, size))
             ngram_id = self._c.lastrowid
         else:
             ngram_id = row['id']
-        # Add a new TextNGram record, or increment the count of an
-        # existing one.
-        self._c.execute('''SELECT rowid, count FROM TextNGram
-                           WHERE text=? AND ngram=?''', (text_id, ngram_id))
-        row = self._c.fetchone()
-        if row is None:
-            self._c.execute('''INSERT INTO TextNGram (text, ngram, count)
-                               VALUES (?, ?, 1)''', (text_id, ngram_id))
-        else:
-            self._c.execute('UPDATE TextNGRAM SET count=? WHERE rowid=?',
-                            (row['count']+1, row['rowid']))
+        # Add a new TextNGram record.
+        self._c.execute('''INSERT INTO TextNGram (text, ngram, count)
+                           VALUES (?, ?, ?)''', (text_id, ngram_id, count))
 
     def add_text (self, filename, checksum, corpus_label=''):
         """Returns the database ID of the Text record for the text at

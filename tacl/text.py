@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import collections
 import hashlib
 import logging
 import os
@@ -36,14 +37,15 @@ class Text (object):
                       (minimum, maximum, self._filename))
         with open(self._path, 'rU') as fh:
             text = fh.read().decode('utf-8')
+        tokens = self.tokenizer.tokenize(text)
         for size in range(minimum, maximum+1):
-            self._generate_ngrams(text, size)
+            self._generate_ngrams(tokens, size)
 
-    def _generate_ngrams (self, text, size):
+    def _generate_ngrams (self, tokens, size):
         """Generates the n-grams of size `size` from `text`.
 
-        :param text: text to generate n-grams from
-        :type text: `unicode`
+        :param tokens: tokens to generate n-grams from
+        :type tokens: `list`
         :param size: size of the n-gram
         :type size: `int`
 
@@ -56,7 +58,7 @@ class Text (object):
                           (self._filename, size))
         else:
             logging.debug('Generating %d-grams for %s' % (size, self._filename))
-            tokens = self.tokenizer.tokenize(text)
-            for ngram in nltk.util.ingrams(tokens, size):
-                self._manager.add_ngram(self._id, ''.join(ngram), size)
+            counts = collections.Counter(nltk.util.ingrams(tokens, size))
+            for ngram, count in counts.items():
+                self._manager.add_ngram(self._id, ''.join(ngram), size, count)
             self._manager.commit()
