@@ -13,7 +13,11 @@ class DBManager (object):
         self._conn = sqlite3.connect(self._db_name)
         self._conn.row_factory = sqlite3.Row
         self._c = self._conn.cursor()
-        self._c.execute('PRAGMA synchronous=0')
+        self._c.execute('PRAGMA cache_size=10000')
+        self._c.execute('PRAGMA count_changes=OFF')
+        self._c.execute('PRAGMA locking_mode=EXCLUSIVE')
+        self._c.execute('PRAGMA synchronous=OFF')
+        self._c.execute('PRAGMA temp_store=MEMORY')
         self.init_db()
 
     def add_indices (self):
@@ -118,10 +122,11 @@ class DBManager (object):
         :rtype: `bool`
 
         """
-        self._c.execute('''SELECT COUNT(*) FROM TextNGram, NGram
-            WHERE text=? AND TextNGram.ngram=NGram.id AND NGram.size=?''',
-                        (text_id, size))
-        if self._c.fetchone()[0] > 0:
+        self._c.execute('''SELECT id FROM TextNGram, NGram
+                           WHERE text=? AND TextNGram.ngram=NGram.id
+                               AND NGram.size=?
+                           LIMIT 1''', (text_id, size))
+        if self._c.fetchone():
             return True
         return False
 
