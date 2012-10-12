@@ -49,7 +49,23 @@ class DBManager (object):
         :type count: `int`
 
         """
-        # Reuse an existing NGram record, or create a new one.
+        ngram_id = self._get_ngram_id(ngram, size)
+        # Add a new TextNGram record.
+        self._c.execute('''INSERT INTO TextNGram (text, ngram, count)
+                           VALUES (?, ?, ?)''', (text_id, ngram_id, count))
+
+    def _get_ngram_id (self, ngram, size):
+        """Returns the database ID of `ngram`.
+
+        Reuses an existing NGram record, or creates a new one.
+
+        :param ngram: n-gram to get the ID of
+        :type ngram: `unicode`
+        :param size: size of `ngram`
+        :type size: `int`
+        :rtype: `int`
+
+        """
         self._c.execute('SELECT id FROM NGram WHERE ngram=?', (ngram,))
         row = self._c.fetchone()
         if row is None:
@@ -58,9 +74,7 @@ class DBManager (object):
             ngram_id = self._c.lastrowid
         else:
             ngram_id = row['id']
-        # Add a new TextNGram record.
-        self._c.execute('''INSERT INTO TextNGram (text, ngram, count)
-                           VALUES (?, ?, ?)''', (text_id, ngram_id, count))
+        return ngram_id
 
     def add_text (self, filename, checksum, corpus_label=''):
         """Returns the database ID of the Text record for the text at
