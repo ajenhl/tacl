@@ -20,7 +20,7 @@ class TestStrip (unittest.TestCase):
             (u'T1023_.19.0715a04∥尼經', u'尼經'),
             )
         for input_line, expected_output in data:
-            actual_output = stripper._strip_line(input_line)
+            actual_output = stripper.strip_line(input_line)
             self.assertEqual(actual_output, expected_output)
 
 if __name__ == '__main__':
