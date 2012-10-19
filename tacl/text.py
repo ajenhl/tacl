@@ -58,6 +58,7 @@ class Text (object):
                           (self._filename, size))
         else:
             logging.debug('Generating %d-grams for %s' % (size, self._filename))
+            self._manager.add_text_ngram(self._id, size)
             counts = collections.Counter(nltk.util.ingrams(tokens, size))
             logging.debug('There are %d unique %d-grams' % (len(counts), size))
             for ngram, count in counts.items():

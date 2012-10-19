@@ -91,6 +91,11 @@ class DBManager (object):
         self._conn.commit()
         return text_id
 
+    def add_text_ngram (self, text_id, size):
+        """Adds a TextHasNGram row for `text_id` and `size`."""
+        self._c.execute('INSERT INTO TextHasNGram (text, size) VALUES (?, ?)',
+                        (text_id, size))
+
     def commit (self):
         self._conn.commit()
 
@@ -103,8 +108,8 @@ class DBManager (object):
         self._c.execute('DROP INDEX IF EXISTS TextNGramIndex')
 
     def has_ngrams (self, text_id, size):
-        """Returns True if there is at least one TextNGram record
-        linking `text_id` with an NGram of size `size`.
+        """Returns True if there the Text with `text_id` has n-grams
+        of size `size`.
 
         :param text_id: database ID of the Text
         :type text_id: `int`
@@ -113,16 +118,9 @@ class DBManager (object):
         :rtype: `bool`
 
         """
-        self._c.execute('''SELECT id FROM TextNGram, NGram
-                           WHERE text=? AND TextNGram.ngram=NGram.id
-                               AND NGram.size=?
-                           LIMIT 1''', (text_id, size))
-        if self._c.fetchone():
-            return True
-        self._c.execute('''SELECT text FROM TextNGram
-                           WHERE text=? AND size=?
-                           LIMIT 1''', (text_id, size))
-        if self._c.fetchone():
+        self._c.execute('''SELECT * FROM TextHasNGram
+                           WHERE text = ? AND size = ?''', (text_id, size))
+        if self._c.fetchone() is not None:
             return True
         return False
 
@@ -150,6 +148,12 @@ class DBManager (object):
             size INTEGER,
             count INTEGER NOT NULL
             )''')
+        self._c.execute('''CREATE TABLE IF NOT EXISTS TextHasNGram (
+                               text INTEGER NOT NULL REFERENCES Text (id),
+                               size INTEGER NOT NULL
+                           )''')
+        self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextHasNGramIndex
+                           ON TextHasNGram (text, size)''')
 
     def normalise (self):
         """Normalises the data in the database."""
