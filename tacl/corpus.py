@@ -79,6 +79,7 @@ class Corpus (object):
             logging.debug('Operating on text %d of %d' % (count, total))
             text.generate_ngrams(minimum, maximum)
             count = count + 1
+        self._manager.normalise()
         self._manager.add_indices()
         if catalogue is None:
             self._manager.vacuum()

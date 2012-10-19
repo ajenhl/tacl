@@ -37,8 +37,6 @@ class DBManager (object):
         """Adds a TextNGram row specifying the `count` of `ngram`
         appearing in `text_id`.
 
-        Also creates an NGram record if one does not already exist.
-
         :param text_id: database ID of the Text
         :type text_id: `int`
         :param ngram: n-gram to be added
@@ -49,32 +47,11 @@ class DBManager (object):
         :type count: `int`
 
         """
-        ngram_id = self._get_ngram_id(ngram, size)
         # Add a new TextNGram record.
-        self._c.execute('''INSERT INTO TextNGram (text, ngram, count)
-                           VALUES (?, ?, ?)''', (text_id, ngram_id, count))
-
-    def _get_ngram_id (self, ngram, size):
-        """Returns the database ID of `ngram`.
-
-        Reuses an existing NGram record, or creates a new one.
-
-        :param ngram: n-gram to get the ID of
-        :type ngram: `unicode`
-        :param size: size of `ngram`
-        :type size: `int`
-        :rtype: `int`
-
-        """
-        self._c.execute('SELECT id FROM NGram WHERE ngram=?', (ngram,))
-        row = self._c.fetchone()
-        if row is None:
-            self._c.execute('INSERT INTO NGram (ngram, size) VALUES (?, ?)',
-                            (ngram, size))
-            ngram_id = self._c.lastrowid
-        else:
-            ngram_id = row['id']
-        return ngram_id
+        self._c.execute('''INSERT INTO TextNGram
+                               (text, ngram, chars, size, count)
+                           VALUES (?, '', ?, ?, ?)''',
+                        (text_id, ngram, size, count))
 
     def add_text (self, filename, checksum, corpus_label=''):
         """Returns the database ID of the Text record for the text at
@@ -147,10 +124,9 @@ class DBManager (object):
     def init_db (self):
         """Creates the database.
 
-        Will not create tables and indices that already exist.
+        Will not create tables that already exist.
 
         """
-        self._c = self._conn.cursor()
         self._c.execute('''CREATE TABLE IF NOT EXISTS Text (
                                id INTEGER PRIMARY KEY ASC,
                                filename TEXT UNIQUE NOT NULL,
@@ -164,9 +140,40 @@ class DBManager (object):
                            )''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS TextNGram (
             text INTEGER NOT NULL REFERENCES Text (id),
-            ngram INTEGER NOT NULL REFERENCES NGram (id),
+            ngram INTEGER REFERENCES NGram (id),
+            chars TEXT,
+            size INTEGER,
             count INTEGER NOT NULL
             )''')
+
+    def normalise (self):
+        """Normalises the data in the database."""
+        logging.debug('Normalising the data')
+        # First make use of any existing NGram IDs in normalising
+        # TextNGram, to avoid trying to create NGram rows that already
+        # exist.
+        self._normalise_text_ngram()
+        # Create any NGram rows that are needed.
+        query = "SELECT DISTINCT chars, size FROM TextNGram WHERE chars != ''"
+        self._c.execute(query)
+        row = self._c.fetchone()
+        cursor = self._conn.cursor()
+        while row is not None:
+            query = 'INSERT INTO NGram (ngram, size) VALUES (?, ?)'
+            cursor.execute(query, (row['chars'], row['size']))
+            row = self._c.fetchone()
+        # Repeat the normalisation of TextNGram, now that there are
+        # NGram rows for the remaining unnomralised TextNGram rows.
+        self._normalise_text_ngram()
+
+    def _normalise_text_ngram (self):
+        query = """UPDATE TextNGram SET ngram = (
+                       SELECT NGram.id FROM NGram
+                           WHERE NGram.ngram = TextNGram.chars)
+                   WHERE chars != ''"""
+        self._c.execute(query)
+        query = "UPDATE TextNGram SET chars = '', size = '' WHERE ngram != ''"
+        self._c.execute(query)
 
     def diff (self, labels, minimum, maximum, occurrences):
         label_params = ('?,' * len(labels)).strip(',')
