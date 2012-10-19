@@ -83,6 +83,8 @@ class DBManager (object):
                 logging.debug('Text %s changed since added to database; updating checksum and deleting NGram references' % filename)
                 self._c.execute('DELETE FROM TextNGram WHERE text=?',
                                 (text_id,))
+                self._c.execute('DELETE FROM TextHasNGram WHERE text=?',
+                                (text_id,))
             # Rather than also check whether the corpus needs to be
             # updated, and potentially do two updates, just always
             # update the checksum and corpus at once.
