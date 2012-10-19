@@ -41,7 +41,7 @@ def configure_logging (verbose):
     log_level = logging.WARN
     if verbose:
         log_level = logging.DEBUG
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log_level)
 
 def generate_parser ():
     parser = argparse.ArgumentParser(description='Analyse the text of corpora in various simple ways.')
