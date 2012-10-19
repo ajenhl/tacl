@@ -119,6 +119,11 @@ class DBManager (object):
                            LIMIT 1''', (text_id, size))
         if self._c.fetchone():
             return True
+        self._c.execute('''SELECT text FROM TextNGram
+                           WHERE text=? AND size=?
+                           LIMIT 1''', (text_id, size))
+        if self._c.fetchone():
+            return True
         return False
 
     def init_db (self):
