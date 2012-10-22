@@ -13,8 +13,9 @@ class DBManager (object):
         self._conn = sqlite3.connect(self._db_name)
         self._conn.row_factory = sqlite3.Row
         self._c = self._conn.cursor()
-        self._c.execute('PRAGMA cache_size=10000')
+        self._c.execute('PRAGMA cache_size=2000000')
         self._c.execute('PRAGMA count_changes=OFF')
+        self._c.execute('PRAGMA foreign_keys=ON')
         self._c.execute('PRAGMA locking_mode=EXCLUSIVE')
         self._c.execute('PRAGMA synchronous=OFF')
         self._c.execute('PRAGMA temp_store=MEMORY')
@@ -23,15 +24,10 @@ class DBManager (object):
     def add_indices (self):
         logging.debug('Adding database indices')
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
-                           ON Text (label)''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS NGramIndexSize
-                           ON NGram (size)''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexText
-                           ON TextNGram (text)''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexNGram
-                           ON TextNGram (ngram)''')
-        self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextNGramIndex
-                           ON TextNGram (text, ngram)''')
+                           ON Text (id, label)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndex
+                           ON TextNGram (ngram, size, text)''')
+        logging.debug('Indices added')
 
     def add_ngram (self, text_id, ngram, size, count):
         """Adds a TextNGram row specifying the `count` of `ngram`
@@ -48,9 +44,8 @@ class DBManager (object):
 
         """
         # Add a new TextNGram record.
-        self._c.execute('''INSERT INTO TextNGram
-                               (text, ngram, chars, size, count)
-                           VALUES (?, '', ?, ?, ?)''',
+        self._c.execute('''INSERT INTO TextNGram (text, ngram, size, count)
+                           VALUES (?, ?, ?, ?)''',
                         (text_id, ngram, size, count))
 
     def add_text (self, filename, checksum, corpus_label=''):
@@ -80,7 +75,7 @@ class DBManager (object):
             # Check that the checksum matches.
             text_id = row['id']
             if row['checksum'] != checksum:
-                logging.debug('Text %s changed since added to database; updating checksum and deleting NGram references' % filename)
+                logging.debug('Text %s changed since added to database; updating checksum and deleting n-grams' % filename)
                 self._c.execute('DELETE FROM TextNGram WHERE text=?',
                                 (text_id,))
                 self._c.execute('DELETE FROM TextHasNGram WHERE text=?',
@@ -103,10 +98,6 @@ class DBManager (object):
 
     def drop_indices (self):
         logging.debug('Dropping database indices')
-        self._c.execute('DROP INDEX IF EXISTS TextIndexLabel')
-        self._c.execute('DROP INDEX IF EXISTS NGramIndexSize')
-        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexNgram')
-        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexText')
         self._c.execute('DROP INDEX IF EXISTS TextNGramIndex')
 
     def has_ngrams (self, text_id, size):
@@ -135,19 +126,13 @@ class DBManager (object):
         self._c.execute('''CREATE TABLE IF NOT EXISTS Text (
                                id INTEGER PRIMARY KEY ASC,
                                filename TEXT UNIQUE NOT NULL,
-                               checksum INTEGER NOT NULL,
+                               checksum TEXT NOT NULL,
                                label TEXT NOT NULL
-                           )''')
-        self._c.execute('''CREATE TABLE IF NOT EXISTS NGram (
-                               id INTEGER PRIMARY KEY ASC,
-                               ngram TEXT UNIQUE NOT NULL,
-                               size INTEGER NOT NULL
                            )''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS TextNGram (
             text INTEGER NOT NULL REFERENCES Text (id),
-            ngram INTEGER REFERENCES NGram (id),
-            chars TEXT,
-            size INTEGER,
+            ngram TEXT NOT NULL,
+            size INTEGER NOT NULL,
             count INTEGER NOT NULL
             )''')
         self._c.execute('''CREATE TABLE IF NOT EXISTS TextHasNGram (
@@ -157,127 +142,95 @@ class DBManager (object):
         self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextHasNGramIndex
                            ON TextHasNGram (text, size)''')
 
-    def normalise (self):
-        """Normalises the data in the database."""
-        logging.debug('Normalising the data')
-        # First make use of any existing NGram IDs in normalising
-        # TextNGram, to avoid trying to create NGram rows that already
-        # exist.
-        self._normalise_text_ngram()
-        # Create any NGram rows that are needed.
-        query = "SELECT DISTINCT chars, size FROM TextNGram WHERE chars != ''"
-        self._c.execute(query)
-        row = self._c.fetchone()
-        cursor = self._conn.cursor()
-        while row is not None:
-            query = 'INSERT INTO NGram (ngram, size) VALUES (?, ?)'
-            cursor.execute(query, (row['chars'], row['size']))
-            row = self._c.fetchone()
-        # Repeat the normalisation of TextNGram, now that there are
-        # NGram rows for the remaining unnomralised TextNGram rows.
-        self._normalise_text_ngram()
-
-    def _normalise_text_ngram (self):
-        query = """UPDATE TextNGram SET ngram = (
-                       SELECT NGram.id FROM NGram
-                           WHERE NGram.ngram = TextNGram.chars)
-                   WHERE chars != ''"""
-        self._c.execute(query)
-        query = "UPDATE TextNGram SET chars = '', size = '' WHERE ngram != ''"
-        self._c.execute(query)
-
     def diff (self, labels, minimum, maximum, occurrences):
+        logging.debug('Running diff query')
         label_params = ('?,' * len(labels)).strip(',')
-        query = '''SELECT Ngram.ngram, SUM(count) count, Text.label
-                   FROM NGram, TextNGram, Text
-                   WHERE NGram.id = TextNGram.ngram
+        query = '''SELECT TextNGram.ngram, SUM(TextNGram.count) count,
+                       Text.label
+                   FROM TextNGram, Text
+                   WHERE Text.label IN (%s)
                        AND TextNGram.text = Text.id
-                       AND Text.label IN (%s)
-                       AND NGram.size BETWEEN ? AND ?
+                       AND TextNGram.size BETWEEN ? AND ?
                        AND NOT EXISTS
-                           (SELECT n.ngram FROM NGram n, TextNGram tn, Text t
-                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
-                                tn.text = t.id AND t.label != Text.label
-                                AND t.label != '')
-                   GROUP BY NGram.ngram
+                           (SELECT tn.ngram
+                            FROM TextNGram tn, Text t
+                            WHERE t.label != Text.label
+                                AND t.label != ''
+                                AND tn.text = t.id
+                                AND TextNGram.ngram = tn.ngram)
+                   GROUP BY TextNGram.ngram
                    HAVING SUM(count) >= ?
                    ORDER BY count DESC
                    ''' % label_params
         self._c.execute(query, labels + [minimum, maximum, occurrences])
+        logging.debug('Diff query executed')
         return self._c.fetchall()
 
     def diff_text (self, labels, minimum, maximum, occurrences):
+        logging.debug('Running diff text query')
         label_params = ('?,' * len(labels)).strip(',')
-        query = '''SELECT Ngram.ngram, count, Text.filename, Text.label
-                   FROM NGram, TextNGram, Text
-                   WHERE NGram.id = TextNGram.ngram
+        query = '''SELECT TextNGram.ngram, TextNGram.count, Text.filename,
+                       Text.label
+                   FROM TextNGram, Text
+                   WHERE Text.label IN (%s)
+                       AND TextNGram.size BETWEEN ? AND ?
                        AND TextNGram.text = Text.id
-                       AND Text.label IN (%s)
-                       AND NGram.size BETWEEN ? AND ?
                        AND NOT EXISTS
-                           (SELECT n.ngram FROM NGram n, TextNGram tn, Text t
-                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
-                                tn.text = t.id AND t.label != Text.label
-                                AND t.label != '')
-                       AND ? <=
-                           (SELECT SUM(count) FROM NGram n, TextNGram tn, Text t
-                            WHERE n.id = NGram.id AND n.id = tn.ngram AND
-                                tn.text = t.id AND t.label IN (%s)
-                            GROUP BY n.ngram)
-                   ORDER BY NGram.ngram, count DESC
-                   ''' % (label_params, label_params)
-        self._c.execute(query, labels + [minimum, maximum, occurrences] +
-                        labels)
+                           (SELECT tn.ngram
+                            FROM TextNGram tn, Text t
+                            WHERE t.label != Text.label
+                                AND t.label != ''
+                                AND tn.text = t.id
+                                AND tn.ngram = TextNGram.ngram)
+                   ORDER BY TextNGram.ngram, count DESC
+                   ''' % label_params
+        self._c.execute(query, labels + [minimum, maximum])
+        logging.debug('Diff text query executed')
         return self._c.fetchall()
 
     def intersection (self, labels, minimum, maximum, occurrences):
-        subquery = '''AND EXISTS (SELECT Text.label
-                                  FROM NGram n, TextNGram, Text
-                                  WHERE n.id = NGram.id
-                                      AND n.id = TextNGram.ngram
-                                      AND TextNGram.text = Text.id
-                                      AND Text.label = ?) '''
+        logging.debug('Running intersection query')
+        subquery = '''AND EXISTS (SELECT t.label
+                                  FROM TextNGram tn, Text t
+                                  WHERE t.label = ?
+                                      AND tn.text = t.id
+                                      AND tn.ngram = TextNGram.ngram) '''
         query = '''
-            SELECT Ngram.ngram, SUM(count) count, 'ALL' label
-            FROM NGram, TextNGram, Text
-            WHERE NGram.id = TextNGram.ngram
-                AND TextNGram.text = Text.id
+            SELECT TextNGram.ngram, SUM(TextNGram.count) count, 'ALL' label
+            FROM TextNGram, Text
+            WHERE TextNGram.text = Text.id
                 AND Text.label != ''
+                AND TextNGram.size BETWEEN ? AND ?
                 %s
-                AND NGram.size BETWEEN ? AND ?
-            GROUP BY NGram.ngram
+            GROUP BY TextNGram.ngram
             HAVING SUM(count) >= ?
             ORDER BY count DESC
             ''' % (subquery * len(labels))
-        self._c.execute(query, labels + [minimum, maximum, occurrences])
+        self._c.execute(query, [minimum, maximum] + labels + [occurrences])
+        logging.debug('Intersection query executed')
         return self._c.fetchall()
 
     def intersection_text (self, labels, minimum, maximum, occurrences):
-        label_params = ('?,' * len(labels)).strip(',')
+        logging.debug('Running intersection text query')
         subquery = '''AND EXISTS (SELECT t.label
-                                  FROM NGram n, TextNGram tn, Text t
-                                  WHERE n.id = NGram.id
-                                      AND n.id = tn.ngram
+                                  FROM TextNGram tn, Text t
+                                  WHERE t.label = ?
                                       AND tn.text = t.id
-                                      AND t.label = ?) '''
+                                      AND tn.ngram = TextNGram.ngram) '''
         query = '''
-            SELECT Ngram.ngram, count, Text.filename, Text.label
-            FROM NGram, TextNGram, Text
-            WHERE NGram.id = TextNGram.ngram
+            SELECT TextNgram.ngram, TextNGram.count, Text.filename, Text.label
+            FROM TextNGram, Text
+            WHERE Text.label != ''
+                AND TextNGram.size BETWEEN ? AND ?
                 AND TextNGram.text = Text.id
-                AND Text.label != ''
                 %s
-                AND NGram.size BETWEEN ? AND ?
-                AND ? <= (SELECT SUM(count) FROM NGram n, TextNGram tn, Text t
-                          WHERE n.id = NGram.id AND n.id = tn.ngram AND
-                              tn.text = t.id AND t.label IN (%s)
-                          GROUP BY n.ngram)
-            ORDER BY Ngram.ngram, count DESC
-            ''' % (subquery * len(labels), label_params)
-        self._c.execute(query, labels + [minimum, maximum, occurrences] +
-                        labels)
+            ORDER BY TextNGram.ngram, count DESC
+            ''' % (subquery * len(labels))
+        self._c.execute(query, [minimum, maximum] + labels)
+        logging.debug('Intersection text query executed')
         return self._c.fetchall()
 
     def vacuum (self):
         logging.debug('Vacuuming the database')
         self._c.execute('VACUUM')
+        logging.debug('Vacuuming complete')

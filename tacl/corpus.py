@@ -27,10 +27,14 @@ class Corpus (object):
         """
         logging.debug('Loading the texts for the corpus')
         catalogue = catalogue or {}
+        keep_unlabelled = True
+        if catalogue:
+            keep_unlabelled = False
         texts = []
         for filename in os.listdir(self._path):
             label = catalogue.get(filename, '')
-            texts.append(Text(filename, self._path, self._manager, label))
+            if label or keep_unlabelled:
+                texts.append(Text(filename, self._path, self._manager, label))
         return texts
 
     def diff (self, catalogue, minimum, maximum, occurrences, individual):
@@ -68,8 +72,6 @@ class Corpus (object):
         :type maximum: `int`
 
         """
-        if catalogue is None:
-            self._manager.drop_indices()
         logging.debug('Generating n-grams (%d <= n <= %d) for the corpus' %
                       (minimum, maximum))
         texts = self._load_texts(catalogue)
@@ -79,7 +81,6 @@ class Corpus (object):
             logging.debug('Operating on text %d of %d' % (count, total))
             text.generate_ngrams(minimum, maximum)
             count = count + 1
-        self._manager.normalise()
         self._manager.add_indices()
         if catalogue is None:
             self._manager.vacuum()

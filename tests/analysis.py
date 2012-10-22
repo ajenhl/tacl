@@ -15,44 +15,38 @@ class TestAnalysis (unittest.TestCase):
         # 3.txt: "that"
         # 4.txt: "hense"
         # 5.txt: "well"
-        id1 = manager.add_text('1.txt', 1, 'A')
-        id2 = manager.add_text('2.txt', 1, 'B')
-        id3 = manager.add_text('3.txt', 1, 'C')
-        id4 = manager.add_text('4.txt', 1, '')
-        id5 = manager.add_text('5.txt', 1, 'A')
-        manager.add_ngram(id1, 'th', 2)
-        manager.add_ngram(id1, 'he', 2)
-        manager.add_ngram(id1, 'en', 2)
-        manager.add_ngram(id1, 'n ', 2)
-        manager.add_ngram(id1, ' w', 2)
-        manager.add_ngram(id1, 'we', 2)
-        manager.add_ngram(id1, 'e ', 2)
-        manager.add_ngram(id1, ' w', 2)
-        manager.add_ngram(id1, 'we', 2)
-        manager.add_ngram(id1, 'en', 2)
-        manager.add_ngram(id1, 'nt', 2)
-        manager.add_ngram(id2, 'th', 2)
-        manager.add_ngram(id2, 'he', 2)
-        manager.add_ngram(id2, 'es', 2)
-        manager.add_ngram(id2, 'se', 2)
-        manager.add_ngram(id2, 'e ', 2)
-        manager.add_ngram(id2, ' h', 2)
-        manager.add_ngram(id2, 'he', 2)
-        manager.add_ngram(id2, 'e ', 2)
-        manager.add_ngram(id2, ' s', 2)
-        manager.add_ngram(id2, 'se', 2)
-        manager.add_ngram(id2, 'en', 2)
-        manager.add_ngram(id2, 'nt', 2)
-        manager.add_ngram(id3, 'th', 2)
-        manager.add_ngram(id3, 'ha', 2)
-        manager.add_ngram(id3, 'at', 2)
-        manager.add_ngram(id4, 'he', 2)
-        manager.add_ngram(id4, 'en', 2)
-        manager.add_ngram(id4, 'ns', 2)
-        manager.add_ngram(id4, 'se', 2)
-        manager.add_ngram(id5, 'we', 2)
-        manager.add_ngram(id5, 'el', 2)
-        manager.add_ngram(id5, 'll', 2)
+        id1 = manager.add_text('1.txt', '1', 'A')
+        id2 = manager.add_text('2.txt', '1', 'B')
+        id3 = manager.add_text('3.txt', '1', 'C')
+        id4 = manager.add_text('4.txt', '1', '')
+        id5 = manager.add_text('5.txt', '1', 'A')
+        manager.add_ngram(id1, 'th', 2, 1)
+        manager.add_ngram(id1, 'he', 2, 1)
+        manager.add_ngram(id1, 'en', 2, 2)
+        manager.add_ngram(id1, 'n ', 2, 1)
+        manager.add_ngram(id1, ' w', 2, 2)
+        manager.add_ngram(id1, 'we', 2, 2)
+        manager.add_ngram(id1, 'e ', 2, 1)
+        manager.add_ngram(id1, 'nt', 2, 1)
+        manager.add_ngram(id2, 'th', 2, 1)
+        manager.add_ngram(id2, 'he', 2, 2)
+        manager.add_ngram(id2, 'es', 2, 1)
+        manager.add_ngram(id2, 'se', 2, 2)
+        manager.add_ngram(id2, 'e ', 2, 2)
+        manager.add_ngram(id2, ' h', 2, 1)
+        manager.add_ngram(id2, ' s', 2, 1)
+        manager.add_ngram(id2, 'en', 2, 1)
+        manager.add_ngram(id2, 'nt', 2, 1)
+        manager.add_ngram(id3, 'th', 2, 1)
+        manager.add_ngram(id3, 'ha', 2, 1)
+        manager.add_ngram(id3, 'at', 2, 1)
+        manager.add_ngram(id4, 'he', 2, 1)
+        manager.add_ngram(id4, 'en', 2, 1)
+        manager.add_ngram(id4, 'ns', 2, 1)
+        manager.add_ngram(id4, 'se', 2, 1)
+        manager.add_ngram(id5, 'we', 2, 1)
+        manager.add_ngram(id5, 'el', 2, 1)
+        manager.add_ngram(id5, 'll', 2, 1)
         manager.add_ngram
         manager.commit()
         # Do not use sqlite3.Row in results, because it makes the
@@ -95,7 +89,7 @@ class TestAnalysis (unittest.TestCase):
         # to the method. This is not an issue in normal usage, since
         # all texts are updated with the labels from the catalogue
         # file, which are then passed to the method.
-        self._update_text('3.txt', 1, '')
+        self._update_text('3.txt', '1', '')
         actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 1)
         expected_rows = [(u'th', 2, u'ALL'), (u'he', 3, u'ALL'),
                          (u'en', 3, u'ALL'), (u'e ', 3, u'ALL'),
@@ -105,7 +99,7 @@ class TestAnalysis (unittest.TestCase):
         expected_rows = [(u'he', 3, u'ALL'), (u'en', 3, u'ALL'),
                          (u'e ', 3, u'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
-        self._update_text('3.txt', 1, 'C')
+        self._update_text('3.txt', '1', 'C')
         actual_rows = self._manager.intersection(['A', 'B', 'C'], 2, 2, 1)
         expected_rows = [(u'th', 3, u'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
@@ -116,7 +110,7 @@ class TestAnalysis (unittest.TestCase):
         # to the method. This is not an issue in normal usage, since
         # all texts are updated with the labels from the catalogue
         # file, which are then passed to the method.
-        self._update_text('3.txt', 1, '')
+        self._update_text('3.txt', '1', '')
         actual_rows = self._manager.intersection_text(['A', 'B'], 2, 2, 1)
         expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
                          (u'he', 1, u'1.txt', u'A'), (u'he', 2, u'2.txt', u'B'),
@@ -129,7 +123,7 @@ class TestAnalysis (unittest.TestCase):
                          (u'en', 2, u'1.txt', u'A'), (u'en', 1, u'2.txt', u'B'),
                          (u'e ', 1, u'1.txt', u'A'), (u'e ', 2, u'2.txt', u'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
-        self._update_text('3.txt', 1, 'C')
+        self._update_text('3.txt', '1', 'C')
         actual_rows = self._manager.intersection_text(['A', 'B', 'C'], 2, 2, 1)
         expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
                          (u'th', 1, u'3.txt', u'C')]
