@@ -26,7 +26,7 @@ class DBManager (object):
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
                            ON Text (id, label)''')
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndex
-                           ON TextNGram (ngram, size, text)''')
+                           ON TextNGram (text, ngram, size)''')
         logging.debug('Indices added')
 
     def add_ngram (self, text_id, ngram, size, count):
@@ -92,6 +92,9 @@ class DBManager (object):
         """Adds a TextHasNGram row for `text_id` and `size`."""
         self._c.execute('INSERT INTO TextHasNGram (text, size) VALUES (?, ?)',
                         (text_id, size))
+
+    def analyse (self):
+        self._c.execute('ANALYZE')
 
     def commit (self):
         self._conn.commit()

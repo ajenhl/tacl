@@ -84,6 +84,7 @@ class Corpus (object):
         self._manager.add_indices()
         if catalogue is None:
             self._manager.vacuum()
+        self._manager.analyse()
 
     def intersection (self, catalogue, minimum, maximum, occurrences,
                       individual):
