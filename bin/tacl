@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import cStringIO
-import csv
 import logging
 
 import tacl
@@ -29,10 +27,11 @@ def add_ngram_arguments (parser):
                         help='maximum size of n-gram to generate (integer)')
 
 def add_result_arguments (parser):
-    parser.add_argument('-o', '--occurrences', default=2, type=int,
-                        help='minimum occurrences required to list (integer)')
-    parser.add_argument('-t', '--text', action='store_true',
-                        help='output report on individual text frequencies')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-o', '--occurrences', default=2, type=int,
+                       help='minimum occurrences required to list (integer)')
+    group.add_argument('-t', '--text', action='store_true',
+                       help='output report on individual text frequencies')
     parser.add_argument('catalogue', help='path to catalogue',
                         metavar='CATALOGUE')
 
@@ -139,24 +138,21 @@ def ngram_intersection (args):
         output_csv(data)
 
 def output_csv (data):
-    """Output `data` in CSV format (ngram, total frequency).
+    """Output `data` in faux CSV format (ngram, total frequency, corpus label).
 
     :param data: n-gram data to output
-    :type data: `list` of `sqlite3.Row`
+    :type data: `sqlite3.Cursor`
 
     """
-    output = cStringIO.StringIO()
-    writer = csv.writer(output)
     for row in data:
-        line = (row['ngram'].encode('utf-8'), row['count'], row['label'])
-        writer.writerow(line)
-    print(output.getvalue())
+        print('%s, %s, %s' % (row['ngram'].encode('utf-8'), row['freq_count'],
+                              row['label'].encode('utf-8')))
 
 def output_text_frequencies (data):
     """Output `data` as a report with individual text frequencies.
 
     :param data: n-gram data to output
-    :type data: `list` of `sqlite3.Row`
+    :type data: `sqlite3.Cursor`
 
     """
     previous_ngram = ''
@@ -165,7 +161,8 @@ def output_text_frequencies (data):
         if current_ngram != previous_ngram:
             previous_ngram = current_ngram
             print(current_ngram)
-        print('   %d: %s (%s)' % (row['count'], row['filename'], row['label']))
+        print('   %d: %s (%s)' % (row['freq_count'], row['filename'],
+                                  row['label']))
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)

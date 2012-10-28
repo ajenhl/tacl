@@ -53,6 +53,8 @@ class TestAnalysis (unittest.TestCase):
         # comparison of result rows harder.
         manager._conn.row_factory = None
         manager._c = manager._conn.cursor()
+        manager.add_indices()
+        manager.analyse()
         self._manager = manager
 
     def test_diff (self):
@@ -67,20 +69,13 @@ class TestAnalysis (unittest.TestCase):
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_text (self):
-        actual_rows = self._manager.diff_text(['A', 'B', 'C'], 2, 2, 1)
+        actual_rows = self._manager.diff_text(['A', 'B', 'C'], 2, 2)
         expected_rows = [(u'n ', 1, u'1.txt', u'A'), (u' w', 2, u'1.txt', u'A'),
                          (u'we', 2, u'1.txt', u'A'), (u'we', 1, u'5.txt', u'A'),
                          (u'el', 1, u'5.txt', u'A'), (u'll', 1, u'5.txt', u'A'),
                          (u'es', 1, u'2.txt', u'B'), (u'se', 2, u'2.txt', u'B'),
                          (u' h', 1, u'2.txt', u'B'), (u' s', 1, u'2.txt', u'B'),
                          (u'ha', 1, u'3.txt', u'C'), (u'at', 1, u'3.txt', u'C')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-        actual_rows = self._manager.diff_text(['A', 'B', 'C'], 2, 2, 2)
-        expected_rows = [(u' w', 2, u'1.txt', u'A'), (u'we', 2, u'1.txt', u'A'),
-                         (u'we', 1, u'5.txt', u'A'), (u'se', 2, u'2.txt', u'B')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-        actual_rows = self._manager.diff_text(['A', 'B', 'C'], 2, 2, 3)
-        expected_rows = [(u'we', 2, u'1.txt', u'A'), (u'we', 1, u'5.txt', u'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_intersection (self):
@@ -111,24 +106,15 @@ class TestAnalysis (unittest.TestCase):
         # all texts are updated with the labels from the catalogue
         # file, which are then passed to the method.
         self._update_text('3.txt', '1', '')
-        actual_rows = self._manager.intersection_text(['A', 'B'], 2, 2, 1)
+        actual_rows = self._manager.intersection_text(['A', 'B'], 2, 2)
         expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
                          (u'he', 1, u'1.txt', u'A'), (u'he', 2, u'2.txt', u'B'),
                          (u'en', 2, u'1.txt', u'A'), (u'en', 1, u'2.txt', u'B'),
                          (u'e ', 1, u'1.txt', u'A'), (u'e ', 2, u'2.txt', u'B'),
                          (u'nt', 1, u'1.txt', u'A'), (u'nt', 1, u'2.txt', u'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
-        actual_rows = self._manager.intersection_text(['A', 'B'], 2, 2, 3)
-        expected_rows = [(u'he', 1, u'1.txt', u'A'), (u'he', 2, u'2.txt', u'B'),
-                         (u'en', 2, u'1.txt', u'A'), (u'en', 1, u'2.txt', u'B'),
-                         (u'e ', 1, u'1.txt', u'A'), (u'e ', 2, u'2.txt', u'B')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
         self._update_text('3.txt', '1', 'C')
-        actual_rows = self._manager.intersection_text(['A', 'B', 'C'], 2, 2, 1)
-        expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
-                         (u'th', 1, u'3.txt', u'C')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-        actual_rows = self._manager.intersection_text(['A', 'B', 'C'], 2, 2, 3)
+        actual_rows = self._manager.intersection_text(['A', 'B', 'C'], 2, 2)
         expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
                          (u'th', 1, u'3.txt', u'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))

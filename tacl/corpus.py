@@ -52,15 +52,16 @@ class Corpus (object):
         :type occurrences: `int`
         :param individual: whether to report on individual text results
         :type individual: `bool`
-        :rtype: `list` of `sqlite3.Row`
+        :rtype: `sqlite3.Cursor`
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
         labels = catalogue.labels()
         if individual:
-            return self._manager.diff_text(labels, minimum, maximum,
-                                           occurrences)
-        return self._manager.diff(labels, minimum, maximum, occurrences)
+            cursor = self._manager.diff_text(labels, minimum, maximum)
+        else:
+            cursor = self._manager.diff(labels, minimum, maximum, occurrences)
+        return cursor
 
     def generate_ngrams (self, minimum, maximum, catalogue=None):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
@@ -83,8 +84,10 @@ class Corpus (object):
             count = count + 1
         self._manager.add_indices()
         if catalogue is None:
+            self._analyze()
             self._manager.vacuum()
-        self._manager.analyse()
+        else:
+            self._manager.analyse('Text')
 
     def intersection (self, catalogue, minimum, maximum, occurrences,
                       individual):
@@ -97,16 +100,19 @@ class Corpus (object):
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
-        :param occurrences: minimum number of occurrences for an n-gram to be reported
+        :param occurrences: minimum number of occurrences for an
+          n-gram to be reported
         :type occurrences: `int`
         :param individual: whether to report on individual text results
         :type individual: `bool`
-        :rtype: `list` of `sqlite3.Row`
+        :rtype: `sqlite3.Cursor`
 
         """
         self.generate_ngrams(minimum, maximum, catalogue)
         labels = catalogue.labels()
         if individual:
-            return self._manager.intersection_text(labels, minimum, maximum,
-                                                   occurrences)
-        return self._manager.intersection(labels, minimum, maximum, occurrences)
+            cursor = self._manager.intersection_text(labels, minimum, maximum)
+        else:
+            cursor = self._manager.intersection(labels, minimum, maximum,
+                                                occurrences)
+        return cursor
