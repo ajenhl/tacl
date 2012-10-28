@@ -29,6 +29,7 @@ class Corpus (object):
         catalogue = catalogue or {}
         keep_unlabelled = True
         if catalogue:
+            self._manager.clear_labels()
             keep_unlabelled = False
         texts = []
         for filename in os.listdir(self._path):

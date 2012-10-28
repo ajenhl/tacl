@@ -100,6 +100,10 @@ class DBManager (object):
         self._c.execute('ANALYZE %s' % table)
         logging.debug('Analysis of database complete')
 
+    def clear_labels (self):
+        """Clears the labels from all texts."""
+        self._c.execute("UPDATE Text SET label=''")
+
     def commit (self):
         self._conn.commit()
 
