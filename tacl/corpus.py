@@ -85,7 +85,7 @@ class Corpus (object):
             count = count + 1
         self._manager.add_indices()
         if catalogue is None:
-            self._analyze()
+            self._manager.analyse()
             self._manager.vacuum()
         else:
             self._manager.analyse('Text')
