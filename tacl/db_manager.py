@@ -170,9 +170,49 @@ class DBManager (object):
                                 AND tn.text = t.id
                                 AND TextNGram.ngram = tn.ngram)
                    GROUP BY TextNGram.size, TextNGram.ngram
-                   HAVING SUM(count) >= ?
+                   HAVING freq_count >= ?
                    ''' % label_params
         return self._c.execute(query, labels + [minimum, maximum, occurrences])
+
+    def diff_asymmetric (self, label, minimum, maximum, occurrences):
+        logging.debug('Running asymmetric diff query')
+        query = '''SELECT TextNGram.ngram, SUM(TextNGram.count) freq_count,
+                       Text.label
+                   FROM TextNGram, Text
+                   WHERE Text.label = ?
+                       AND TextNGram.text = Text.id
+                       AND TextNGram.size BETWEEN ? AND ?
+                       AND NOT EXISTS
+                           (SELECT tn.ngram
+                            FROM TextNGram tn, Text t
+                            WHERE t.label != ?
+                                AND t.label != ''
+                                AND tn.text = t.id
+                                AND TextNGram.ngram = tn.ngram)
+                   GROUP BY TextNGram.size, TextNGram.ngram
+                   HAVING freq_count >= ?
+                   '''
+        return self._c.execute(query, [label, minimum, maximum, label,
+                                       occurrences])
+
+    def diff_asymmetric_text (self, label, minimum, maximum):
+        logging.debug('Running asymmetric diff text query')
+        query = '''SELECT TextNGram.ngram, TextNGram.count freq_count,
+                       Text.filename, Text.label
+                   FROM TextNGram, Text
+                   WHERE Text.label = ?
+                       AND TextNGram.text = Text.id
+                       AND TextNGram.size BETWEEN ? AND ?
+                       AND NOT EXISTS
+                           (SELECT tn.ngram
+                            FROM TextNGram tn, Text t
+                            WHERE t.label != ?
+                                AND t.label != ''
+                                AND tn.text = t.id
+                                AND TextNGram.ngram = tn.ngram)
+                   ORDER BY TextNGram.size, TextNGram.ngram
+                   '''
+        return self._c.execute(query, [label, minimum, maximum, label])
 
     def diff_text (self, labels, minimum, maximum):
         logging.debug('Running diff text query')
@@ -211,7 +251,7 @@ class DBManager (object):
                 AND TextNGram.size BETWEEN ? AND ?
                 %s
             GROUP BY TextNGram.size, TextNGram.ngram
-            HAVING freq_count >= ?
+            HAVING freq_count <= ?
             ''' % (label_params, subquery * len(labels))
         return self._c.execute(query, labels + [minimum, maximum] + labels +
                                [occurrences])

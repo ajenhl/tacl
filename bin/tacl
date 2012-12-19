@@ -26,10 +26,17 @@ def add_ngram_arguments (parser):
     parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
                         help='maximum size of n-gram to generate (integer)')
 
-def add_result_arguments (parser):
+def add_result_arguments (parser, o_is_min):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-o', '--occurrences', default=2, type=int,
-                       help='minimum occurrences required to list (integer)')
+    if o_is_min:
+        default = 2
+        help_text = 'minimum occurrences required to list (integer); default %d'
+    else:
+        default = 30
+        help_text = 'maximum occurrences required to list (integer); default %d'
+    help_text = help_text % default
+    group.add_argument('-o', '--occurrences', default=default, type=int,
+                           help=help_text)
     group.add_argument('-t', '--text', action='store_true',
                        help='output report on individual text frequencies')
     parser.add_argument('catalogue', help='path to catalogue',
@@ -73,9 +80,11 @@ def generate_diff_subparser (subparsers):
         'diff', description='List n-grams unique to each sub-corpus.',
         help='list n-grams in one corpus but not the other')
     parser.set_defaults(func=ngram_diff)
+    parser.add_argument('-a', '--asymmetric', metavar='LABEL',
+                        help='perform asymmetric diff on LABEL')
     add_common_arguments(parser)
     add_ngram_arguments(parser)
-    add_result_arguments(parser)
+    add_result_arguments(parser, True)
 
 def generate_intersect_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -84,7 +93,7 @@ def generate_intersect_subparser (subparsers):
     parser.set_defaults(func=ngram_intersection)
     add_common_arguments(parser)
     add_ngram_arguments(parser)
-    add_result_arguments(parser)
+    add_result_arguments(parser, False)
 
 def generate_ngrams (args):
     corpus = get_corpus(args)
@@ -120,8 +129,13 @@ def get_catalogue (args):
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    data = corpus.diff(catalogue, args.min_size, args.max_size,
-                       args.occurrences, args.text)
+    if args.asymmetric:
+        data = corpus.diff_asymmetric(
+            catalogue, args.asymmetric, args.min_size, args.max_size,
+            args.occurrences, args.text)
+    else:
+        data = corpus.diff(catalogue, args.min_size, args.max_size,
+                           args.occurrences, args.text)
     if args.text:
         output_text_frequencies(data)
     else:

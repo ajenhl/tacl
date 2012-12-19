@@ -78,6 +78,36 @@ class TestAnalysis (unittest.TestCase):
                          (u'ha', 1, u'3.txt', u'C'), (u'at', 1, u'3.txt', u'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_diff_asymmetric (self):
+        actual_rows = self._manager.diff_asymmetric('A', 2, 2, 1)
+        expected_rows = [(u'n ', 1, u'A'), (u' w', 2, u'A'), (u'we', 3, u'A'),
+                         (u'el', 1, u'A'), (u'll', 1, u'A')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+        actual_rows = self._manager.diff_asymmetric('B', 2, 2, 1)
+        expected_rows = [(u'es', 1, u'B'), (u'se', 2, u'B'), (u' h', 1, u'B'),
+                         (u' s', 1, u'B')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+        actual_rows = self._manager.diff_asymmetric('C', 2, 2, 1)
+        expected_rows = [(u'ha', 1, u'C'), (u'at', 1, u'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+        actual_rows = self._manager.diff_asymmetric('A', 2, 2, 2)
+        expected_rows = [(u' w', 2, u'A'), (u'we', 3, u'A')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_diff_asymmetric_text (self):
+        actual_rows = self._manager.diff_asymmetric_text('A', 2, 2)
+        expected_rows = [(u'n ', 1, u'1.txt', u'A'), (u' w', 2, u'1.txt', u'A'),
+                         (u'we', 2, u'1.txt', u'A'), (u'we', 1, u'5.txt', u'A'),
+                         (u'el', 1, u'5.txt', u'A'), (u'll', 1, u'5.txt', u'A')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+        actual_rows = self._manager.diff_asymmetric_text('B', 2, 2)
+        expected_rows = [(u'es', 1, u'2.txt', u'B'), (u'se', 2, u'2.txt', u'B'),
+                         (u' h', 1, u'2.txt', u'B'), (u' s', 1, u'2.txt', u'B')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+        actual_rows = self._manager.diff_asymmetric_text('C', 2, 2)
+        expected_rows = [(u'ha', 1, u'3.txt', u'C'), (u'at', 1, u'3.txt', u'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_intersection (self):
         # Intersection will give incorrect results if there are
         # labelled texts that are not referenced in the labels passed
@@ -85,17 +115,16 @@ class TestAnalysis (unittest.TestCase):
         # all texts are updated with the labels from the catalogue
         # file, which are then passed to the method.
         self._update_text('3.txt', '1', '')
-        actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 1)
+        actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 4)
         expected_rows = [(u'th', 2, u'ALL'), (u'he', 3, u'ALL'),
                          (u'en', 3, u'ALL'), (u'e ', 3, u'ALL'),
                          (u'nt', 2, u'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
-        actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 3)
-        expected_rows = [(u'he', 3, u'ALL'), (u'en', 3, u'ALL'),
-                         (u'e ', 3, u'ALL')]
+        actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 2)
+        expected_rows = [(u'th', 2, u'ALL'), (u'nt', 2, u'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         self._update_text('3.txt', '1', 'C')
-        actual_rows = self._manager.intersection(['A', 'B', 'C'], 2, 2, 1)
+        actual_rows = self._manager.intersection(['A', 'B', 'C'], 2, 2, 3)
         expected_rows = [(u'th', 3, u'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 

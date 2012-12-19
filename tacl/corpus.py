@@ -64,6 +64,16 @@ class Corpus (object):
             cursor = self._manager.diff(labels, minimum, maximum, occurrences)
         return cursor
 
+    def diff_asymmetric (self, catalogue, label, minimum, maximum,
+                         occurrences, individual):
+        self.generate_ngrams(minimum, maximum, catalogue)
+        if individual:
+            cursor = self._manager.diff_asymmetric_text(label, minimum, maximum)
+        else:
+            cursor = self._manager.diff_asymmetric(label, minimum, maximum,
+                                                   occurrences)
+        return cursor
+
     def generate_ngrams (self, minimum, maximum, catalogue=None):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
         this corpus.
