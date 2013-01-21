@@ -10,5 +10,5 @@ setup(name='tacl',
       author_email='jamie@artefact.org.nz',
       packages=['tacl'],
       scripts=['bin/tacl'],
-      requires=['nltk'],
+      requires=['lxml', 'nltk'],
       )
