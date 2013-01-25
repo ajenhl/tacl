@@ -9,7 +9,7 @@ Welcome to TACL's documentation!
 Requirements
 ------------
 
-* `Natural Language Toolkit`_
+* `lxml`_
 * `SQLite3`_
 
 Process
@@ -47,6 +47,6 @@ analysis of the corpus:
    as defined in a catalogue file.
 
 
-.. _Natural Language Toolkit: http://nltk.org/
+.. _lxml: http://lxml.de/
 .. _SQLite3: http://www.sqlite.org/
 .. _n-grams: http://en.wikipedia.org/wiki/N-gram
