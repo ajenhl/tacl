@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sqlite3
 import unittest
 
@@ -59,53 +61,53 @@ class TestAnalysis (unittest.TestCase):
 
     def test_diff (self):
         actual_rows = self._manager.diff(['A', 'B', 'C'], 2, 2, 1)
-        expected_rows = [(u'n ', 1, u'A'), (u' w', 2, u'A'), (u'we', 3, u'A'),
-                         (u'el', 1, u'A'), (u'll', 1, u'A'), (u'es', 1, u'B'),
-                         (u'se', 2, u'B'), (u' h', 1, u'B'), (u' s', 1, u'B'),
-                         (u'ha', 1, u'C'), (u'at', 1, u'C')]
+        expected_rows = [('n ', 1, 'A'), (' w', 2, 'A'), ('we', 3, 'A'),
+                         ('el', 1, 'A'), ('ll', 1, 'A'), ('es', 1, 'B'),
+                         ('se', 2, 'B'), (' h', 1, 'B'), (' s', 1, 'B'),
+                         ('ha', 1, 'C'), ('at', 1, 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff(['A', 'B', 'C'], 2, 2, 2)
-        expected_rows = [(u' w', 2, u'A'), (u'we', 3, u'A'), (u'se', 2, u'B')]
+        expected_rows = [(' w', 2, 'A'), ('we', 3, 'A'), ('se', 2, 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_text (self):
         actual_rows = self._manager.diff_text(['A', 'B', 'C'], 2, 2)
-        expected_rows = [(u'n ', 1, u'1.txt', u'A'), (u' w', 2, u'1.txt', u'A'),
-                         (u'we', 2, u'1.txt', u'A'), (u'we', 1, u'5.txt', u'A'),
-                         (u'el', 1, u'5.txt', u'A'), (u'll', 1, u'5.txt', u'A'),
-                         (u'es', 1, u'2.txt', u'B'), (u'se', 2, u'2.txt', u'B'),
-                         (u' h', 1, u'2.txt', u'B'), (u' s', 1, u'2.txt', u'B'),
-                         (u'ha', 1, u'3.txt', u'C'), (u'at', 1, u'3.txt', u'C')]
+        expected_rows = [('n ', 1, '1.txt', 'A'), (' w', 2, '1.txt', 'A'),
+                         ('we', 2, '1.txt', 'A'), ('we', 1, '5.txt', 'A'),
+                         ('el', 1, '5.txt', 'A'), ('ll', 1, '5.txt', 'A'),
+                         ('es', 1, '2.txt', 'B'), ('se', 2, '2.txt', 'B'),
+                         (' h', 1, '2.txt', 'B'), (' s', 1, '2.txt', 'B'),
+                         ('ha', 1, '3.txt', 'C'), ('at', 1, '3.txt', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_asymmetric (self):
         actual_rows = self._manager.diff_asymmetric('A', 2, 2, 1)
-        expected_rows = [(u'n ', 1, u'A'), (u' w', 2, u'A'), (u'we', 3, u'A'),
-                         (u'el', 1, u'A'), (u'll', 1, u'A')]
+        expected_rows = [('n ', 1, 'A'), (' w', 2, 'A'), ('we', 3, 'A'),
+                         ('el', 1, 'A'), ('ll', 1, 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff_asymmetric('B', 2, 2, 1)
-        expected_rows = [(u'es', 1, u'B'), (u'se', 2, u'B'), (u' h', 1, u'B'),
-                         (u' s', 1, u'B')]
+        expected_rows = [('es', 1, 'B'), ('se', 2, 'B'), (' h', 1, 'B'),
+                         (' s', 1, 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff_asymmetric('C', 2, 2, 1)
-        expected_rows = [(u'ha', 1, u'C'), (u'at', 1, u'C')]
+        expected_rows = [('ha', 1, 'C'), ('at', 1, 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff_asymmetric('A', 2, 2, 2)
-        expected_rows = [(u' w', 2, u'A'), (u'we', 3, u'A')]
+        expected_rows = [(' w', 2, 'A'), ('we', 3, 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_asymmetric_text (self):
         actual_rows = self._manager.diff_asymmetric_text('A', 2, 2)
-        expected_rows = [(u'n ', 1, u'1.txt', u'A'), (u' w', 2, u'1.txt', u'A'),
-                         (u'we', 2, u'1.txt', u'A'), (u'we', 1, u'5.txt', u'A'),
-                         (u'el', 1, u'5.txt', u'A'), (u'll', 1, u'5.txt', u'A')]
+        expected_rows = [('n ', 1, '1.txt', 'A'), (' w', 2, '1.txt', 'A'),
+                         ('we', 2, '1.txt', 'A'), ('we', 1, '5.txt', 'A'),
+                         ('el', 1, '5.txt', 'A'), ('ll', 1, '5.txt', 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff_asymmetric_text('B', 2, 2)
-        expected_rows = [(u'es', 1, u'2.txt', u'B'), (u'se', 2, u'2.txt', u'B'),
-                         (u' h', 1, u'2.txt', u'B'), (u' s', 1, u'2.txt', u'B')]
+        expected_rows = [('es', 1, '2.txt', 'B'), ('se', 2, '2.txt', 'B'),
+                         (' h', 1, '2.txt', 'B'), (' s', 1, '2.txt', 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.diff_asymmetric_text('C', 2, 2)
-        expected_rows = [(u'ha', 1, u'3.txt', u'C'), (u'at', 1, u'3.txt', u'C')]
+        expected_rows = [('ha', 1, '3.txt', 'C'), ('at', 1, '3.txt', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_intersection (self):
@@ -116,16 +118,15 @@ class TestAnalysis (unittest.TestCase):
         # file, which are then passed to the method.
         self._update_text('3.txt', '1', '')
         actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 4)
-        expected_rows = [(u'th', 2, u'ALL'), (u'he', 3, u'ALL'),
-                         (u'en', 3, u'ALL'), (u'e ', 3, u'ALL'),
-                         (u'nt', 2, u'ALL')]
+        expected_rows = [('th', 2, 'ALL'), ('he', 3, 'ALL'), ('en', 3, 'ALL'),
+                         ('e ', 3, 'ALL'), ('nt', 2, 'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._manager.intersection(['A', 'B'], 2, 2, 2)
-        expected_rows = [(u'th', 2, u'ALL'), (u'nt', 2, u'ALL')]
+        expected_rows = [('th', 2, 'ALL'), ('nt', 2, 'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         self._update_text('3.txt', '1', 'C')
         actual_rows = self._manager.intersection(['A', 'B', 'C'], 2, 2, 3)
-        expected_rows = [(u'th', 3, u'ALL')]
+        expected_rows = [('th', 3, 'ALL')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_intersection_text (self):
@@ -136,16 +137,16 @@ class TestAnalysis (unittest.TestCase):
         # file, which are then passed to the method.
         self._update_text('3.txt', '1', '')
         actual_rows = self._manager.intersection_text(['A', 'B'], 2, 2)
-        expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
-                         (u'he', 1, u'1.txt', u'A'), (u'he', 2, u'2.txt', u'B'),
-                         (u'en', 2, u'1.txt', u'A'), (u'en', 1, u'2.txt', u'B'),
-                         (u'e ', 1, u'1.txt', u'A'), (u'e ', 2, u'2.txt', u'B'),
-                         (u'nt', 1, u'1.txt', u'A'), (u'nt', 1, u'2.txt', u'B')]
+        expected_rows = [('th', 1, '1.txt', 'A'), ('th', 1, '2.txt', 'B'),
+                         ('he', 1, '1.txt', 'A'), ('he', 2, '2.txt', 'B'),
+                         ('en', 2, '1.txt', 'A'), ('en', 1, '2.txt', 'B'),
+                         ('e ', 1, '1.txt', 'A'), ('e ', 2, '2.txt', 'B'),
+                         ('nt', 1, '1.txt', 'A'), ('nt', 1, '2.txt', 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
         self._update_text('3.txt', '1', 'C')
         actual_rows = self._manager.intersection_text(['A', 'B', 'C'], 2, 2)
-        expected_rows = [(u'th', 1, u'1.txt', u'A'), (u'th', 1, u'2.txt', u'B'),
-                         (u'th', 1, u'3.txt', u'C')]
+        expected_rows = [('th', 1, '1.txt', 'A'), ('th', 1, '2.txt', 'B'),
+                         ('th', 1, '3.txt', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def _update_text (self, filename, timestamp, label):

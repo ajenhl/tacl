@@ -34,11 +34,10 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        with open(path, 'rb') as fh:
-            reader = csv.reader(fh, delimiter=' ', skipinitialspace=True)
-            for row in reader:
-                if len(row) == 2:
-                    self[row[0]] = row[1]
+        reader = csv.reader(open(path), delimiter=' ', skipinitialspace=True)
+        for row in reader:
+            if len(row) == 2:
+                self[row[0]] = row[1]
 
     def save (self, path):
         """Saves this catalogue's data to `path`.
@@ -47,8 +46,7 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        with open(path, 'wb') as fh:
-            writer = csv.writer(fh, delimiter=' ')
-            rows = self.items()
-            rows.sort(key=lambda x: x[0])
-            writer.writerows(rows)
+        writer = csv.writer(open(path, 'w'), delimiter=' ')
+        rows = list(self.items())
+        rows.sort(key=lambda x: x[0])
+        writer.writerows(rows)

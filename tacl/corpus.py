@@ -1,7 +1,7 @@
 import logging
 import os
 
-from text import Text
+from .text import Text
 
 
 class Corpus (object):

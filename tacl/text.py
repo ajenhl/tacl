@@ -18,9 +18,9 @@ class Tokenizer (object):
     def __init__ (self, pattern, flags=re.UNICODE | re.MULTILINE | re.DOTALL):
         try:
             self._regexp = re.compile(pattern, flags)
-        except re.error, e:
+        except re.error as err:
             raise ValueError('Error in regular expression %r: %s' %
-                             (pattern, e))
+                             (pattern, err))
 
     def tokenize (self, text):
         return self._regexp.findall(text)
@@ -31,13 +31,13 @@ class Text (object):
     # A token is either a workaround (anything in square brackets, as
     # a whole), or a single character that is not a Chinese full stop,
     # parentheses, question mark, or whitespace character.
-    tokenizer = Tokenizer(ur'\[[^]]*\]|[^。\(\)\?\s]')
+    tokenizer = Tokenizer(r'\[[^]]*\]|[^。\(\)\?\s]')
 
     def __init__ (self, filename, corpus_path, manager, corpus_label):
         self._filename = filename
         self._path = os.path.join(corpus_path, filename)
         self._manager = manager
-        checksum = hashlib.md5(open(self._path, 'rU').read()).hexdigest()
+        checksum = hashlib.md5(open(self._path, 'rb').read()).hexdigest()
         self._id = self._manager.add_text(filename, checksum, corpus_label)
 
     def generate_ngrams (self, minimum, maximum):
@@ -52,8 +52,8 @@ class Text (object):
         """
         logging.debug('Generating n-grams (%d <= n <= %d) for %s' %
                       (minimum, maximum, self._filename))
-        with open(self._path, 'rU') as fh:
-            text = fh.read().decode('utf-8')
+        with open(self._path, encoding='utf-8') as fh:
+            text = fh.read()
         tokens = self.tokenizer.tokenize(text)
         for size in range(minimum, maximum+1):
             self._generate_ngrams(tokens, size)
@@ -98,7 +98,7 @@ class Text (object):
         sequence = iter(sequence)
         history = []
         while n > 1:
-            history.append(sequence.next())
+            history.append(next(sequence))
             n -= 1
         for item in sequence:
             history.append(item)

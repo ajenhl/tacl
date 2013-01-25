@@ -189,7 +189,7 @@ class Stripper (object):
         `filename`, in the hopes that this will make it not cause a
         validation failure."""
         entity_filename = '%s.ent' % filename.split('_')[0]
-        with open(entity_filename, 'rU') as input_file:
+        with open(entity_filename, 'r') as input_file:
             text = input_file.read()
         with open(entity_filename, 'w') as output_file:
             output_file.write(text)
@@ -214,19 +214,19 @@ class Stripper (object):
         if not os.path.exists(self._output_dir):
             try:
                 os.makedirs(self._output_dir)
-            except OSError, e:
-                logging.error('Could not create output directory: %s' % e)
-                sys.exit('Could not create output directory: %s' % e)
+            except OSError as err:
+                logging.error('Could not create output directory: %s' % err)
+                sys.exit('Could not create output directory: %s' % err)
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
                     self.strip_file(os.path.join(dirpath, filename))
         for text in self._texts:
-            parts = self._texts[text].keys()
+            parts = list(self._texts[text].keys())
             parts.sort()
-            with open(text, 'w') as output_file:
+            with open(text, 'wb') as output_file:
                 for part in parts:
-                    output_file.write(self._texts[text][part])
+                    output_file.write(self._texts[text][part].encode('utf-8'))
 
     def strip_file (self, filename, tried=False):
         file_path = os.path.join(self._input_dir, filename)
