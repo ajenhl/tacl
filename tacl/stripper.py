@@ -23,8 +23,12 @@ STRIP_XSLT = '''
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output encoding="UTF-8" method="text" />
   <xsl:strip-space elements="*" />
-  <xsl:template match="teiHeader" />
-  <xsl:template match="note[@place != 'inline']" />
+
+  <xsl:template match="div1|div2|lg|list|p">
+    <xsl:call-template name="add_blank_line" />
+    <xsl:apply-templates select="node()" />
+  </xsl:template>
+
   <xsl:template match="gaiji">
     <xsl:choose>
       <xsl:when test="@des">
@@ -46,28 +50,46 @@ STRIP_XSLT = '''
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template match="head[@type='no']" />
+
   <xsl:template match="item">
     <xsl:text>   </xsl:text>
     <xsl:apply-templates select="node()" />
   </xsl:template>
+
   <xsl:template match="l">
     <xsl:text>   </xsl:text>
     <xsl:apply-templates select="node()" />
   </xsl:template>
+
   <xsl:template match="lb[not(local-name(following-sibling::node()[1])='lb')]">
-    <xsl:text>
-</xsl:text>
+    <xsl:call-template name="add_blank_line" />
   </xsl:template>
-  <xsl:template match="div|lg|p|list">
-    <xsl:text>
-</xsl:text>
+
+  <xsl:template match="note" />
+
+  <xsl:template match="note[@place = 'inline']">
     <xsl:apply-templates select="node()" />
   </xsl:template>
+
   <xsl:template match="rdg" />
+
+  <xsl:template match="teiHeader" />
+
   <xsl:template match="text()">
     <xsl:value-of select="normalize-space()" />
   </xsl:template>
+
+  <xsl:template match="tt">
+    <xsl:apply-templates select=".//lb" />
+  </xsl:template>
+
+  <xsl:template name="add_blank_line">
+    <xsl:text>
+</xsl:text>
+  </xsl:template>
+
   <!-- The following functions are by Aristotle Pagaltzis, at
        http://plasmasturm.org/log/386/ -->
   <fn:function name="my:hex2num">
