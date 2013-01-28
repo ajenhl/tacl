@@ -9,6 +9,7 @@ Welcome to TACL's documentation!
 Requirements
 ------------
 
+* `Python 3`_
 * `lxml`_
 * `SQLite3`_
 
@@ -47,6 +48,7 @@ analysis of the corpus:
    as defined in a catalogue file.
 
 
+.. _Python 3: http://www.python.org/
 .. _lxml: http://lxml.de/
 .. _SQLite3: http://www.sqlite.org/
 .. _n-grams: http://en.wikipedia.org/wiki/N-gram

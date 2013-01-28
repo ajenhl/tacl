@@ -13,8 +13,8 @@ documentation is available at http://tacl.readthedocs.org/en/latest/
 Installation
 ------------
 
-Run ``python setup.py install``. Requires `SQLite`_ and `lxml`_ XML
-library.
+Using `Python 3`_\, run ``python setup.py install``. Requires
+`SQLite`_ and `lxml`_ XML library.
 
 
 Usage
@@ -25,5 +25,6 @@ Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 
 
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/
+.. _Python 3: http://www.python.org
 .. _SQLite: http://www.sqlite.org/
 .. _lxml: http://lxml.de/
