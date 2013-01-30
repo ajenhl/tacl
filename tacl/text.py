@@ -7,6 +7,9 @@ import os
 import re
 
 
+IGNORED_CHARACTERS = r'。\(\)\?、《「」『』；！，：？\s'
+
+
 class Tokenizer (object):
 
     """A tokenizer that splits a string using a regular expression.
@@ -31,7 +34,7 @@ class Text (object):
     # A token is either a workaround (anything in square brackets, as
     # a whole), or a single character that is not a Chinese full stop,
     # parentheses, question mark, or whitespace character.
-    tokenizer = Tokenizer(r'\[[^]]*\]|[^。\(\)\?\s]')
+    tokenizer = Tokenizer(r'\[[^]]*\]|[^{0}]'.format(IGNORED_CHARACTERS))
 
     def __init__ (self, filename, corpus_path, manager, corpus_label):
         self._filename = filename
