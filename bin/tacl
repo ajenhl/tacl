@@ -165,6 +165,7 @@ def output_csv (data):
             count=row['freq_count'], label=row['label'],
             ngram=row['ngram']).encode('utf-8')
         sys.stdout.buffer.write(line + b'\n')
+    logging.debug('Finished outputting query results')
 
 def output_text_frequencies (data):
     """Output `data` as a report with individual text frequencies.
@@ -183,6 +184,7 @@ def output_text_frequencies (data):
             count=row['freq_count'], filename=row['filename'],
             label=row['label']).encode('utf-8')
         sys.stdout.buffer.write(line + b'\n')
+    logging.debug('Finished outputting query results')
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
