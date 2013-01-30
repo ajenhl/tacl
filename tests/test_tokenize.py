@@ -14,6 +14,7 @@ class TestTokenize (unittest.TestCase):
             ('黎(二)恥', ['黎', '二', '恥']),
             ('地[口*梨](十一)阿', ['地', '[口*梨]', '十', '一', '阿']),
             ('「導師化眾生！」', ['導', '師', '化', '眾', '生']),
+            ('無,童子：[二+梨]！', ['無', '童', '子', '[二+梨]']),
             )
         for input_text, expected_tokens in data:
             actual_tokens = tacl.Text.tokenizer.tokenize(input_text)
