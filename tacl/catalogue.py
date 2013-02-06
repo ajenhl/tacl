@@ -36,7 +36,7 @@ class Catalogue (dict):
         """
         reader = csv.reader(open(path), delimiter=' ', skipinitialspace=True)
         for row in reader:
-            if len(row) == 2:
+            if len(row) > 1:
                 self[row[0]] = row[1]
 
     def save (self, path):
