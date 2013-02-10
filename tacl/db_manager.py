@@ -22,14 +22,14 @@ class DBManager (object):
         self.init_db()
 
     def add_indices (self):
-        logging.debug('Adding database indices')
+        logging.info('Adding database indices')
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndex
                            ON Text (id, label)''')
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexSize
                            ON TextNGram (size, ngram)''')
         self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexNGram
                            ON TextNGram (ngram)''')
-        logging.debug('Indices added')
+        logging.info('Indices added')
 
     def add_ngram (self, text_id, ngram, size, count):
         """Adds a TextNGram row specifying the `count` of `ngram`
@@ -66,18 +66,18 @@ class DBManager (object):
                         (filename,))
         row = self._c.fetchone()
         if row is None:
-            logging.debug('No existing record for text %s; adding one' %
+            logging.info('No existing record for text %s; adding one' %
                           filename)
             self._c.execute('''INSERT INTO Text (filename, checksum, label)
                                VALUES (?, ?, ?)''',
                             (filename, checksum, corpus_label))
             text_id = self._c.lastrowid
         else:
-            logging.debug('Reusing existing record for text %s' % filename)
+            logging.info('Reusing existing record for text %s' % filename)
             # Check that the checksum matches.
             text_id = row['id']
             if row['checksum'] != checksum:
-                logging.debug('Text %s changed since added to database; updating checksum and deleting n-grams' % filename)
+                logging.info('Text %s changed since added to database; updating checksum and deleting n-grams' % filename)
                 self._c.execute('DELETE FROM TextNGram WHERE text=?',
                                 (text_id,))
                 self._c.execute('DELETE FROM TextHasNGram WHERE text=?',
@@ -96,9 +96,9 @@ class DBManager (object):
                         (text_id, size))
 
     def analyse (self, table=''):
-        logging.debug('Starting analysis of database')
+        logging.info('Starting analysis of database')
         self._c.execute('ANALYZE %s' % table)
-        logging.debug('Analysis of database complete')
+        logging.info('Analysis of database complete')
 
     def clear_labels (self):
         """Clears the labels from all texts."""
@@ -108,7 +108,7 @@ class DBManager (object):
         self._conn.commit()
 
     def drop_indices (self):
-        logging.debug('Dropping database indices')
+        logging.info('Dropping database indices')
         self._c.execute('DROP INDEX IF EXISTS TextNGramIndex')
 
     def has_ngrams (self, text_id, size):
@@ -154,7 +154,7 @@ class DBManager (object):
                            ON TextHasNGram (text, size)''')
 
     def diff (self, labels, minimum, maximum, occurrences):
-        logging.debug('Running diff query')
+        logging.info('Running diff query')
         label_params = ('?,' * len(labels)).strip(',')
         query = '''SELECT TextNGram.ngram, SUM(TextNGram.count) freq_count,
                        Text.label
@@ -172,10 +172,12 @@ class DBManager (object):
                    GROUP BY TextNGram.size, TextNGram.ngram
                    HAVING freq_count >= ?
                    ''' % label_params
+        logging.debug('Query:\n{query}\nLabels: {labels}'.format(
+                query=query, labels=labels))
         return self._c.execute(query, labels + [minimum, maximum, occurrences])
 
     def diff_asymmetric (self, label, minimum, maximum, occurrences):
-        logging.debug('Running asymmetric diff query')
+        logging.info('Running asymmetric diff query')
         query = '''SELECT TextNGram.ngram, SUM(TextNGram.count) freq_count,
                        Text.label
                    FROM TextNGram, Text
@@ -192,11 +194,13 @@ class DBManager (object):
                    GROUP BY TextNGram.size, TextNGram.ngram
                    HAVING freq_count >= ?
                    '''
+        logging.debug('Query:\n{query}\nLabel: {label}'.format(
+                query=query, label=label))
         return self._c.execute(query, [label, minimum, maximum, label,
                                        occurrences])
 
     def diff_asymmetric_text (self, label, minimum, maximum):
-        logging.debug('Running asymmetric diff text query')
+        logging.info('Running asymmetric diff text query')
         query = '''SELECT TextNGram.ngram, TextNGram.count freq_count,
                        Text.filename, Text.label
                    FROM TextNGram, Text
@@ -212,10 +216,12 @@ class DBManager (object):
                                 AND TextNGram.ngram = tn.ngram)
                    ORDER BY TextNGram.size, TextNGram.ngram
                    '''
+        logging.debug('Query:\n{query}\nLabel: {label}'.format(
+                query=query, label=label))
         return self._c.execute(query, [label, minimum, maximum, label])
 
     def diff_text (self, labels, minimum, maximum):
-        logging.debug('Running diff text query')
+        logging.info('Running diff text query')
         label_params = ('?,' * len(labels)).strip(',')
         query = '''SELECT TextNGram.ngram, TextNGram.count freq_count,
                        Text.filename, Text.label
@@ -232,10 +238,12 @@ class DBManager (object):
                                 AND tn.ngram = TextNGram.ngram)
                    ORDER BY TextNGram.size, TextNGram.ngram
                    ''' % label_params
+        logging.debug('Query:\n{query}\nLabels: {labels}'.format(
+                query=query, labels=labels))
         return self._c.execute(query, labels + [minimum, maximum])
 
     def intersection (self, labels, minimum, maximum, occurrences):
-        logging.debug('Running intersection query')
+        logging.info('Running intersection query')
         label_params = ('?,' * len(labels)).strip(',')
         subquery = '''AND EXISTS (SELECT t.label
                                   FROM Text t, TextNGram tn
@@ -253,11 +261,13 @@ class DBManager (object):
             GROUP BY TextNGram.size, TextNGram.ngram
             HAVING freq_count <= ?
             ''' % (label_params, subquery * len(labels))
+        logging.debug('Query:\n{query}\nLabels: {labels}'.format(
+                query=query, labels=labels))
         return self._c.execute(query, labels + [minimum, maximum] + labels +
                                [occurrences])
 
     def intersection_text (self, labels, minimum, maximum):
-        logging.debug('Running intersection text query')
+        logging.info('Running intersection text query')
         label_params = ('?,' * len(labels)).strip(',')
         subquery = '''AND EXISTS (SELECT t.label
                                   FROM Text t, TextNGram tn
@@ -274,9 +284,11 @@ class DBManager (object):
                 %s
             ORDER BY TextNGram.size, TextNGram.ngram
             ''' % (label_params, subquery * len(labels))
+        logging.debug('Query:\n{query}\nLabels: {labels}'.format(
+                query=query, labels=labels))
         return self._c.execute(query, labels + [minimum, maximum] + labels)
 
     def vacuum (self):
-        logging.debug('Vacuuming the database')
+        logging.info('Vacuuming the database')
         self._c.execute('VACUUM')
-        logging.debug('Vacuuming complete')
+        logging.info('Vacuuming complete')

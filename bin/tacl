@@ -15,8 +15,8 @@ def main ():
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='display verbose debugging information')
+    help = 'display debug information; multiple -v options increase the verbosity'
+    parser.add_argument('-v', '--verbose', action='count', help=help)
 
 def add_ngram_arguments (parser):
     """Adds common arguments for the n-gram subcommands to `subparser`."""
@@ -45,8 +45,11 @@ def add_result_arguments (parser, o_is_min):
 
 def configure_logging (verbose):
     logger = logging.getLogger('tacl')
-    log_level = logging.WARN
-    if verbose:
+    if not verbose:
+        log_level = logging.WARNING
+    elif verbose == 1:
+        log_level = logging.INFO
+    else:
         log_level = logging.DEBUG
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log_level)
 
@@ -165,7 +168,7 @@ def output_csv (data):
             count=row['freq_count'], label=row['label'],
             ngram=row['ngram']).encode('utf-8')
         sys.stdout.buffer.write(line + b'\n')
-    logging.debug('Finished outputting query results')
+    logging.info('Finished outputting query results')
 
 def output_text_frequencies (data):
     """Output `data` as a report with individual text frequencies.
@@ -184,7 +187,7 @@ def output_text_frequencies (data):
             count=row['freq_count'], filename=row['filename'],
             label=row['label']).encode('utf-8')
         sys.stdout.buffer.write(line + b'\n')
-    logging.debug('Finished outputting query results')
+    logging.info('Finished outputting query results')
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)

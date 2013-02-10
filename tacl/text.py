@@ -50,7 +50,7 @@ class Text (object):
         :type maximum: `int`
 
         """
-        logging.debug('Generating n-grams (%d <= n <= %d) for %s' %
+        logging.info('Generating n-grams (%d <= n <= %d) for %s' %
                       (minimum, maximum, self._filename))
         with open(self._path, encoding='utf-8') as fh:
             text = fh.read()
@@ -71,13 +71,13 @@ class Text (object):
         # database, in which case there is no need to generate them
         # again.
         if self._manager.has_ngrams(self._id, size):
-            logging.debug('%s already has %d-grams; not regenerating' %
+            logging.info('%s already has %d-grams; not regenerating' %
                           (self._filename, size))
         else:
-            logging.debug('Generating %d-grams for %s' % (size, self._filename))
+            logging.info('Generating %d-grams for %s' % (size, self._filename))
             self._manager.add_text_ngram(self._id, size)
             counts = collections.Counter(self._ingrams(tokens, size))
-            logging.debug('There are %d unique %d-grams' % (len(counts), size))
+            logging.info('There are %d unique %d-grams' % (len(counts), size))
             for ngram, count in counts.items():
                 self._manager.add_ngram(self._id, ''.join(ngram), size, count)
             self._manager.commit()

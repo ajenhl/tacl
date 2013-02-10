@@ -257,7 +257,7 @@ class Stripper (object):
             logging.warn('Skipping file "%s"' % filename)
             return
         stripped_file_path = os.path.join(self._output_dir, text_name)
-        logging.debug('Stripping file %s into %s' %
+        logging.info('Stripping file %s into %s' %
                       (file_path, stripped_file_path))
         try:
             text = str(self._transform(etree.parse(file_path)))

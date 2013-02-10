@@ -25,7 +25,7 @@ class Corpus (object):
         :rtype: `list`
 
         """
-        logging.debug('Loading the texts for the corpus')
+        logging.info('Loading the texts for the corpus')
         catalogue = catalogue or {}
         keep_unlabelled = True
         if catalogue:
@@ -84,13 +84,13 @@ class Corpus (object):
         :type maximum: `int`
 
         """
-        logging.debug('Generating n-grams (%d <= n <= %d) for the corpus' %
+        logging.info('Generating n-grams (%d <= n <= %d) for the corpus' %
                       (minimum, maximum))
         texts = self._load_texts(catalogue)
         total = len(texts)
         count = 1
         for text in texts:
-            logging.debug('Operating on text %d of %d' % (count, total))
+            logging.info('Operating on text %d of %d' % (count, total))
             text.generate_ngrams(minimum, maximum)
             count = count + 1
         self._manager.add_indices()
