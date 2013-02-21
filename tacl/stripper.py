@@ -8,11 +8,6 @@ from lxml import etree
 
 text_name_pattern = re.compile(
     r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<text>[^_\.]+)_(?P<part>\d+)$')
-# I do not understand what these are, but the spec called for them not
-# to be used in the n-grams, and it is easier to remove them here than
-# discard them in the tokenisation process, though presumably they are
-# part of the text.
-raw_code_removal_re = re.compile(r'&[^;]*;')
 
 STRIP_XSLT = '''
 <xsl:stylesheet extension-element-prefixes="fn my str"
@@ -34,7 +29,7 @@ STRIP_XSLT = '''
       <xsl:when test="@des">
         <xsl:value-of select="@des" />
       </xsl:when>
-      <xsl:when test="@udia">
+      <xsl:when test="@udia and @sdchar">
         <xsl:value-of select="@sdchar" />
       </xsl:when>
       <xsl:when test="@uni">
@@ -81,9 +76,7 @@ STRIP_XSLT = '''
     <xsl:value-of select="normalize-space()" />
   </xsl:template>
 
-  <xsl:template match="tt">
-    <xsl:apply-templates select=".//lb" />
-  </xsl:template>
+  <xsl:template match="t[not(@lang='chi')]" />
 
   <xsl:template name="add_blank_line">
     <xsl:text>
