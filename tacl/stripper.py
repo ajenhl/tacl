@@ -1,7 +1,8 @@
+"""Module containing the Stripper class."""
+
 import logging
 import os
 import re
-import sys
 
 from lxml import etree
 
@@ -29,16 +30,11 @@ STRIP_XSLT = '''
       <xsl:when test="@des">
         <xsl:value-of select="@des" />
       </xsl:when>
-      <xsl:when test="@udia and @sdchar">
-        <xsl:value-of select="@sdchar" />
-      </xsl:when>
       <xsl:when test="@uni">
         <xsl:value-of select="my:decode-codepoint(@uni)" />
       </xsl:when>
-      <xsl:when test="@cb">
-        <xsl:text>[</xsl:text>
-        <xsl:value-of select="@cb" />
-        <xsl:text>]</xsl:text>
+      <xsl:when test="@udia">
+        <xsl:value-of select="@udia" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>GAIJI WITHOUT REPRESENTATION</xsl:text>
@@ -203,7 +199,7 @@ class Stripper (object):
         """Adds an unused entity declaration to the entity file for
         `filename`, in the hopes that this will make it not cause a
         validation failure."""
-        entity_filename = '%s.ent' % filename.split('_')[0]
+        entity_filename = '{}.ent'.format(filename.split('_')[0])
         with open(entity_filename, 'r') as input_file:
             text = input_file.read()
         with open(entity_filename, 'w') as output_file:
@@ -220,9 +216,10 @@ class Stripper (object):
         basename = os.path.splitext(os.path.basename(filename))[0]
         match = text_name_pattern.search(basename)
         if match is None:
-            logging.warn('Found an anomalous filename "%s"' % filename)
+            logging.warn('Found an anomalous filename "{}"'.format(filename))
             return None, None
-        text_name = '%s%s.txt' % (match.group('prefix'), match.group('text'))
+        text_name = '{}{}.txt'.format(match.group('prefix'),
+                                      match.group('text'))
         return text_name, int(match.group('part'))
 
     def strip_files (self):
@@ -230,8 +227,9 @@ class Stripper (object):
             try:
                 os.makedirs(self._output_dir)
             except OSError as err:
-                logging.error('Could not create output directory: %s' % err)
-                sys.exit('Could not create output directory: %s' % err)
+                logging.error('Could not create output directory: {}'.format(
+                        err))
+                raise
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
@@ -247,15 +245,15 @@ class Stripper (object):
         file_path = os.path.join(self._input_dir, filename)
         text_name, part_number = self.extract_text_name(filename)
         if text_name is None:
-            logging.warn('Skipping file "%s"' % filename)
+            logging.warn('Skipping file "{}"'.format(filename))
             return
         stripped_file_path = os.path.join(self._output_dir, text_name)
-        logging.info('Stripping file %s into %s' %
-                      (file_path, stripped_file_path))
+        logging.info('Stripping file {} into {}'.format(
+                file_path, stripped_file_path))
         try:
             text = str(self._transform(etree.parse(file_path)))
         except etree.XMLSyntaxError:
-            logging.warn('XML file "%s" is invalid' % filename)
+            logging.warn('XML file "{}" is invalid'.format(filename))
             if tried:
                 return
             logging.warn('Retrying after modifying entity file')

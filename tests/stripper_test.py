@@ -17,8 +17,8 @@ class StripTestCase (unittest.TestCase):
         gaiji_data = (
             ('''<gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/>''', 'Ā'),
             ('''<gaiji uniflag='0' cb='CB00006' des='[(王*巨)/木]' uni='249B2' nor='璩' mojikyo='M021123' mofont='Mojikyo M104' mochar='6E82'/>''', '[(王*巨)/木]'),
-            ('''<gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/>''', '一'),
-            ('''<gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/>''', '[RJ-CEBD]'),
+            ('''<gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/>''', 'ka'),
+            ('''<gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/>''', 'yā'),
             )
         for input_xml, expected_output in gaiji_data:
             actual_output = str(self.transform(etree.XML(input_xml)))
