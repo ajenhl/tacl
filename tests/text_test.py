@@ -5,7 +5,20 @@ import unittest
 import tacl
 
 
-class TestTokenize (unittest.TestCase):
+class TextTestCase (unittest.TestCase):
+
+    def test_ingrams (self):
+        text = '''阿闍世[(禾*尤)/上/日]首佛足。敬
+強耶。又'''
+        tokens = tacl.Text.tokenizer.tokenize(text)
+        expected_ngrams = [
+            '阿闍世', '闍世[(禾*尤)/上/日]', '世[(禾*尤)/上/日]首',
+            '[(禾*尤)/上/日]首佛', '首佛足', '佛足敬', '足敬強', '敬強耶',
+            '強耶又'
+            ]
+        actual_ngrams = [''.join(ngram) for ngram in tacl.Text.ingrams(
+                tokens, 3)]
+        self.assertEqual(expected_ngrams, actual_ngrams)
 
     def test_tokenize (self):
         data = (

@@ -1,3 +1,5 @@
+"""Module containing the Corpus class."""
+
 import logging
 import os
 
@@ -17,64 +19,33 @@ class Corpus (object):
         self._path = os.path.abspath(path)
         self._manager = manager
 
-    def _load_texts (self, catalogue):
-        """Returns a list of `Text`\s in this corpus.
+    def counts (self, catalogue):
+        """Returns the n-gram totals by size and text for the labelled
+        texts in `catalogue`.
 
-        :param catalogue: catalogue of texts with labels
+        :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `list`
+        :rtype: `sqlite3.Cursor`
 
         """
-        logging.info('Loading the texts for the corpus')
-        catalogue = catalogue or {}
-        keep_unlabelled = True
-        if catalogue:
-            self._manager.clear_labels()
-            keep_unlabelled = False
-        texts = []
-        for filename in os.listdir(self._path):
-            label = catalogue.get(filename, '')
-            if label or keep_unlabelled:
-                texts.append(Text(filename, self._path, self._manager, label))
-        return texts
+        self._manager.clear_labels()
+        labels = self._set_labels(catalogue)
+        return self._manager.counts(labels)
 
-    def diff (self, catalogue, minimum, maximum, occurrences, individual):
+    def diff (self, catalogue):
         """Returns the n-gram data for the differences between the
         sets of texts in `catalogue`.
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :param minimum: minimum n-gram size
-        :type minimum: `int`
-        :param maximum: maximum n-gram size
-        :type maximum: `int`
-        :param occurrences: minimum number of occurrences for an
-            n-gram to be reported
-        :type occurrences: `int`
-        :param individual: whether to report on individual text results
-        :type individual: `bool`
         :rtype: `sqlite3.Cursor`
 
         """
-        self.generate_ngrams(minimum, maximum, catalogue)
-        labels = catalogue.labels()
-        if individual:
-            cursor = self._manager.diff_text(labels, minimum, maximum)
-        else:
-            cursor = self._manager.diff(labels, minimum, maximum, occurrences)
-        return cursor
+        self._manager.clear_labels()
+        labels = self._set_labels(catalogue)
+        return self._manager.diff(labels)
 
-    def diff_asymmetric (self, catalogue, label, minimum, maximum,
-                         occurrences, individual):
-        self.generate_ngrams(minimum, maximum, catalogue)
-        if individual:
-            cursor = self._manager.diff_asymmetric_text(label, minimum, maximum)
-        else:
-            cursor = self._manager.diff_asymmetric(label, minimum, maximum,
-                                                   occurrences)
-        return cursor
-
-    def generate_ngrams (self, minimum, maximum, catalogue=None):
+    def generate_ngrams (self, minimum, maximum, index):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
         this corpus.
 
@@ -82,48 +53,66 @@ class Corpus (object):
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
+        :param index: whether to drop indices before adding n-grams
+        :type index: `bool`
 
         """
-        logging.info('Generating n-grams (%d <= n <= %d) for the corpus' %
-                      (minimum, maximum))
-        texts = self._load_texts(catalogue)
-        total = len(texts)
+        logging.info('Generating n-grams ({} <= n <= {}) for the corpus'.format(
+                minimum, maximum))
+        filenames = os.listdir(self._path)
+        total = len(filenames)
         count = 1
-        for text in texts:
-            logging.info('Operating on text %d of %d' % (count, total))
+        if index and filenames:
+            self._manager.drop_indices()
+        for filename in filenames:
+            logging.info('Operating on text {} of {}'.format(count, total))
+            text = self._open_text(filename)
             text.generate_ngrams(minimum, maximum)
             count = count + 1
         self._manager.add_indices()
-        if catalogue is None:
-            self._manager.analyse()
-            self._manager.vacuum()
-        else:
-            self._manager.analyse('Text')
+        self._manager.analyse()
+        self._manager.vacuum()
 
-    def intersection (self, catalogue, minimum, maximum, occurrences,
-                      individual):
+    def intersection (self, catalogue):
         """Returns the n-gram data for the intersection between the
         sets of texts in `catalogue`.
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :param minimum: minimum n-gram size
-        :type minimum: `int`
-        :param maximum: maximum n-gram size
-        :type maximum: `int`
-        :param occurrences: minimum number of occurrences for an
-          n-gram to be reported
-        :type occurrences: `int`
-        :param individual: whether to report on individual text results
-        :type individual: `bool`
         :rtype: `sqlite3.Cursor`
 
         """
-        self.generate_ngrams(minimum, maximum, catalogue)
-        labels = catalogue.labels()
-        if individual:
-            cursor = self._manager.intersection_text(labels, minimum, maximum)
-        else:
-            cursor = self._manager.intersection(labels, minimum, maximum,
-                                                occurrences)
-        return cursor
+        self._manager.clear_labels()
+        labels = self._set_labels(catalogue)
+        return self._manager.intersection(labels)
+
+    def _open_text (self, filename):
+        """Returns a `Text` object for `filename`.
+
+        :rtype: `tacl.Text`
+
+        """
+        path = os.path.join(self._path, filename)
+        try:
+            content = open(path, 'rb').read()
+            text = Text(filename, content, self._manager)
+        except IOError:
+            logging.error('Text {} does not exist in the corpus'.format(
+                    filename))
+            raise
+        return text
+
+    def _set_labels (self, catalogue):
+        """Returns the labels from `catalogue`, and sets them in the
+        database.
+
+        :rtype: `list`
+
+        """
+        labels = set()
+        for filename, label in catalogue.items():
+            if label != '':
+                labels.add(label)
+                text = self._open_text(filename)
+                text.add_label(label)
+        return list(labels)

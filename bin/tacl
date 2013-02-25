@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
+import csv
+import io
 import logging
 import sys
 
@@ -11,35 +13,27 @@ def main ():
     parser = generate_parser()
     args = parser.parse_args()
     configure_logging(args.verbose)
-    args.func(args)
+    try:
+        args.func(args)
+    except Exception as err:
+        print('Error: {0}'.format(err))
+        sys.exit(1)
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
     help = 'display debug information; multiple -v options increase the verbosity'
     parser.add_argument('-v', '--verbose', action='count', help=help)
 
-def add_ngram_arguments (parser):
-    """Adds common arguments for the n-gram subcommands to `subparser`."""
+def add_db_arguments (parser):
+    """Adds common arguments for the database subcommands to `parser`."""
+    parser.add_argument('-m', '--memory', action='store_true',
+                        help='Use RAM for temporary database storage')
+    parser.add_argument('-r', '--ram', default=3, type=int,
+                        help='Number of gigabytes of RAM to use')
     parser.add_argument('db', metavar='DATABASE', help='path to database file')
     parser.add_argument('corpus', help='path to corpus', metavar='CORPUS')
-    parser.add_argument('min_size', metavar='MINIMUM_SIZE', type=int,
-                        help='minimum size of n-gram to generate (integer)')
-    parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
-                        help='maximum size of n-gram to generate (integer)')
 
-def add_result_arguments (parser, o_is_min):
-    group = parser.add_mutually_exclusive_group()
-    if o_is_min:
-        default = 2
-        help_text = 'minimum occurrences required to list (integer); default %d'
-    else:
-        default = 30
-        help_text = 'maximum occurrences required to list (integer); default %d'
-    help_text = help_text % default
-    group.add_argument('-o', '--occurrences', default=default, type=int,
-                           help=help_text)
-    group.add_argument('-t', '--text', action='store_true',
-                       help='output report on individual text frequencies')
+def add_query_arguments (parser):
     parser.add_argument('catalogue', help='path to catalogue',
                         metavar='CATALOGUE')
 
@@ -51,16 +45,19 @@ def configure_logging (verbose):
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=log_level)
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                        level=log_level)
 
 def generate_parser ():
     parser = argparse.ArgumentParser(
         description='Analyse the text of corpora in various simple ways.')
     subparsers = parser.add_subparsers(title='subcommands')
     generate_catalogue_subparser(subparsers)
+    generate_counts_subparser(subparsers)
     generate_diff_subparser(subparsers)
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
+    generate_report_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
 
@@ -80,16 +77,23 @@ def generate_catalogue_subparser (subparsers):
     parser.add_argument('-l', '--label', help='label to use for all texts',
                         default='')
 
+def generate_counts_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'counts', description='List counts of n-grams in each labelled text',
+        help='list counts of n-grams in each labelled text, by size')
+    parser.set_defaults(func=ngram_counts)
+    add_common_arguments(parser)
+    add_db_arguments(parser)
+    add_query_arguments(parser)
+
 def generate_diff_subparser (subparsers):
     parser = subparsers.add_parser(
         'diff', description='List n-grams unique to each sub-corpus.',
         help='list n-grams in one corpus but not the other')
     parser.set_defaults(func=ngram_diff)
-    parser.add_argument('-a', '--asymmetric', metavar='LABEL',
-                        help='perform asymmetric diff on LABEL')
     add_common_arguments(parser)
-    add_ngram_arguments(parser)
-    add_result_arguments(parser, True)
+    add_db_arguments(parser)
+    add_query_arguments(parser)
 
 def generate_intersect_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -97,12 +101,12 @@ def generate_intersect_subparser (subparsers):
         help='list n-grams common to all sub-corpora')
     parser.set_defaults(func=ngram_intersection)
     add_common_arguments(parser)
-    add_ngram_arguments(parser)
-    add_result_arguments(parser, False)
+    add_db_arguments(parser)
+    add_query_arguments(parser)
 
 def generate_ngrams (args):
     corpus = get_corpus(args)
-    corpus.generate_ngrams(args.min_size, args.max_size)
+    corpus.generate_ngrams(args.min_size, args.max_size, args.index)
 
 def generate_ngrams_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -110,10 +114,45 @@ def generate_ngrams_subparser (subparsers):
         help='generate n-grams from a corpus')
     parser.set_defaults(func=generate_ngrams)
     add_common_arguments(parser)
-    add_ngram_arguments(parser)
+    add_db_arguments(parser)
+    parser.add_argument('-i', '--index', action='store_true',
+                        help='drop indices before adding n-grams')
+    parser.add_argument('min_size', metavar='MINIMUM_SIZE', type=int,
+                        help='minimum size of n-gram to generate (integer)')
+    parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
+                        help='maximum size of n-gram to generate (integer)')
+
+def generate_report (args):
+    report = tacl.Report(args.results)
+    if args.remove:
+        report.remove_label(args.remove)
+    if args.min or args.max:
+        report.prune(args.min, args.max)
+    if args.reduce:
+        report.reduce()
+    sys.stdout.buffer.write(report.csv().getvalue().encode('utf-8'))
+
+def generate_report_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'report', description='Generate a report on a query results file',
+        help='generate a report on a query results file')
+    add_common_arguments(parser)
+    parser.set_defaults(func=generate_report)
+    parser.add_argument('--min', metavar='MINIMUM_COUNT', type=int,
+                        help='minimum count (across all texts) of n-grams to include')
+    parser.add_argument('--max', metavar='MAXIMUM_COUNT', type=int,
+                        help='maximum count (across all texts) of n-grams to include')
+    parser.add_argument('--reduce', action='store_true',
+                        help='remove n-grams that are contained in larger n-grams')
+    parser.add_argument('--remove', metavar='LABEL', type=str,
+                        help='Remove labelled results')
+    parser.add_argument('results', metavar='RESULTS', help='CSV results file',
+                        type=argparse.FileType('r'))
 
 def generate_strip_subparser (subparsers):
-    parser = subparsers.add_parser('strip', help='preprocess a corpus by stripping unwanted material from each text', description='Preprocess a corpus by stripping unwanted material from each text.')
+    help='preprocess a corpus by stripping unwanted material from each text'
+    description='Preprocess a corpus by stripping unwanted material from each text.'
+    parser = subparsers.add_parser('strip', description=description, help=help)
     parser.set_defaults(func=strip_texts)
     add_common_arguments(parser)
     parser.add_argument('input', metavar='INPUT',
@@ -122,7 +161,7 @@ def generate_strip_subparser (subparsers):
                         help='directory to output stripped files to')
 
 def get_corpus (args):
-    manager = tacl.DBManager(args.db)
+    manager = tacl.DBManager(args.db, args.memory, args.ram)
     corpus = tacl.Corpus(args.corpus, manager)
     return corpus
 
@@ -131,62 +170,38 @@ def get_catalogue (args):
     catalogue.load(args.catalogue)
     return catalogue
 
+def ngram_counts (args):
+    corpus = get_corpus(args)
+    catalogue = get_catalogue(args)
+    fields = ['filename', 'size', 'total', 'label']
+    output_csv(corpus.counts(catalogue), fields)
+
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    if args.asymmetric:
-        data = corpus.diff_asymmetric(
-            catalogue, args.asymmetric, args.min_size, args.max_size,
-            args.occurrences, args.text)
-    else:
-        data = corpus.diff(catalogue, args.min_size, args.max_size,
-                           args.occurrences, args.text)
-    if args.text:
-        output_text_frequencies(data)
-    else:
-        output_csv(data)
+    fields = ['ngram', 'size', 'filename', 'count', 'label']
+    output_csv(corpus.diff(catalogue), fields)
 
 def ngram_intersection (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    data = corpus.intersection(catalogue, args.min_size, args.max_size,
-                               args.occurrences, args.text)
-    if args.text:
-        output_text_frequencies(data)
-    else:
-        output_csv(data)
+    fields = ['ngram', 'size', 'filename', 'count', 'label']
+    output_csv(corpus.intersection(catalogue), fields)
 
-def output_csv (data):
-    """Output `data` in faux CSV format (ngram, total frequency, corpus label).
+def output_csv (data, fields):
+    """Output `data` in CSV format.
+
+    The fields are n-gram, filename, frequency count, corpus label.
 
     :param data: n-gram data to output
     :type data: `sqlite3.Cursor`
 
     """
+    output_fh = io.StringIO(newline='')
+    writer = csv.writer(output_fh)
     for row in data:
-        line = '{ngram}, {count}, {label}'.format(
-            count=row['freq_count'], label=row['label'],
-            ngram=row['ngram']).encode('utf-8')
-        sys.stdout.buffer.write(line + b'\n')
-    logging.info('Finished outputting query results')
-
-def output_text_frequencies (data):
-    """Output `data` as a report with individual text frequencies.
-
-    :param data: n-gram data to output
-    :type data: `sqlite3.Cursor`
-
-    """
-    previous_ngram = ''
-    for row in data:
-        current_ngram = row['ngram']
-        if current_ngram != previous_ngram:
-            previous_ngram = current_ngram
-            sys.stdout.buffer.write(current_ngram.encode('utf-8') + b'\n')
-        line = '   {count}: {filename} ({label})'.format(
-            count=row['freq_count'], filename=row['filename'],
-            label=row['label']).encode('utf-8')
-        sys.stdout.buffer.write(line + b'\n')
+        writer.writerow([row[field] for field in fields])
+    sys.stdout.buffer.write(output_fh.getvalue().encode('utf-8'))
     logging.info('Finished outputting query results')
 
 def strip_texts (args):

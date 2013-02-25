@@ -17,16 +17,6 @@ class Catalogue (dict):
         for filename in os.listdir(path):
             self[filename] = label
 
-    def labels (self):
-        """Returns a list of the labels used in this catalogue.
-
-        :rtype: `list`
-
-        """
-        labels = set(self.values())
-        labels.discard('')
-        return list(labels)
-
     def load (self, path):
         """Loads the data from `path` into the catalogue.
 
