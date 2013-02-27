@@ -127,12 +127,13 @@ class DBManager (object):
         label_params = ('?,' * len(labels)).strip(',')
         query = '''SELECT Text.filename, TextNGram.size,
                        COUNT(TextNGram.ngram) as total, Text.label
-                   FROM Text, TextNGram
+                   FROM Text CROSS JOIN TextNGram
                    WHERE Text.id = TextNGram.text
                        AND Text.label IN ({})
                    GROUP BY TextNGram.text, TextNGram.size
                    ORDER BY Text.filename, TextNGram.size'''.format(
             label_params)
+        logging.debug('Query:\n{}\nLabels: {}'.format(query, labels))
         return self._c.execute(query, labels)
 
     def diff (self, labels):
