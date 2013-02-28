@@ -1,3 +1,5 @@
+"""Module containing the Report class."""
+
 import csv
 import io
 import logging
@@ -29,7 +31,24 @@ class Report:
         return output_fh
 
     def prune (self, minimum=None, maximum=None):
-        pass
+        """Removes results rows who n-gram size are outside the range
+        specified by `minimum` and `maximum`.
+
+        :param minimum: minimum n-gram size
+        :type minimum: `int`
+        :param maximum: maximum n-gram size
+        :type maximum: `int`
+
+        """
+        new_rows = []
+        for row in self._rows:
+            size = int(row[SIZE_INDEX])
+            if minimum and size < minimum:
+                continue
+            if maximum and size > maximum:
+                continue
+            new_rows.append(row)
+        self._rows = new_rows
 
     def _reduce_ngram (self, data, ngram, size):
         """Lowers the counts of `ngram` in `data` if it forms part of
@@ -52,8 +71,8 @@ class Report:
                     data[size][ngram][filename] -= count
 
     def reduce (self):
-        """Removes from `ngrams_data` those n-grams that are contained
-        in larger n-grams."""
+        """Removes results rows whose n-grams are contained in larger
+        n-grams."""
         logging.info('Reducing the n-grams')
         data = {}
         labels = {}
