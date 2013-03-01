@@ -53,7 +53,7 @@ class Report:
             substrings.extend(ngrams)
         return substrings
 
-    def prune (self, minimum=None, maximum=None):
+    def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows who n-gram size are outside the range
         specified by `minimum` and `maximum`.
 

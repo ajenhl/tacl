@@ -24,14 +24,14 @@ class ReportTestCase (unittest.TestCase):
             rows.add(tuple(row))
         return rows
 
-    def test_prune (self):
+    def test_prune_by_ngram_size (self):
         input_data = (
             ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],
             ['ABD', '3', 'a', '1', 'A'], ['ABCD', '4', 'a', '2', 'A'],
             ['AB', '2', 'b', '2', 'A'], ['ABC', '3', 'b', '2', 'A'])
         fh = self._create_csv(input_data)
         report = tacl.Report(fh)
-        report.prune(minimum=3)
+        report.prune_by_ngram_size(minimum=3)
         expected_rows = set((
             ('ABC', '3', 'a', '2', 'A'), ('ABD', '3', 'a', '1', 'A'),
             ('ABCD', '4', 'a', '2', 'A'), ('ABC', '3', 'b', '2', 'A')))
@@ -39,7 +39,7 @@ class ReportTestCase (unittest.TestCase):
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
-        report.prune(maximum=3)
+        report.prune_by_ngram_size(maximum=3)
         expected_rows = set((
                 ('AB', '2', 'a', '4', 'A'), ('ABC', '3', 'a', '2', 'A'),
                 ('ABD', '3', 'a', '1', 'A'), ('AB', '2', 'b', '2', 'A'),
@@ -48,7 +48,7 @@ class ReportTestCase (unittest.TestCase):
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
-        report.prune(minimum=3, maximum=3)
+        report.prune_by_ngram_size(minimum=3, maximum=3)
         expected_rows = set((
                 ('ABC', '3', 'a', '2', 'A'), ('ABD', '3', 'a', '1', 'A'),
                 ('ABC', '3', 'b', '2', 'A')))

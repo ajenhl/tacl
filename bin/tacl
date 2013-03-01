@@ -128,7 +128,7 @@ def generate_report (args):
     if args.reduce:
         report.reduce()
     if args.min or args.max:
-        report.prune(args.min, args.max)
+        report.prune_by_ngram_size(args.min, args.max)
     output(report.csv())
 
 def generate_report_subparser (subparsers):
@@ -137,10 +137,10 @@ def generate_report_subparser (subparsers):
         help='generate a report on a query results file')
     add_common_arguments(parser)
     parser.set_defaults(func=generate_report)
-    parser.add_argument('--min', metavar='MINIMUM_COUNT', type=int,
-                        help='minimum count (across all texts) of n-grams to include')
-    parser.add_argument('--max', metavar='MAXIMUM_COUNT', type=int,
-                        help='maximum count (across all texts) of n-grams to include')
+    parser.add_argument('--min-size', metavar='MINIMUM_COUNT', type=int,
+                        help='minimum size of n-grams to include')
+    parser.add_argument('--max-size', metavar='MAXIMUM_COUNT', type=int,
+                        help='maximum size of n-grams to include')
     parser.add_argument('--reduce', action='store_true',
                         help='remove n-grams that are contained in larger n-grams')
     parser.add_argument('--remove', metavar='LABEL', type=str,
