@@ -58,7 +58,6 @@ def generate_parser ():
     generate_ngrams_subparser(subparsers)
     generate_report_subparser(subparsers)
     generate_strip_subparser(subparsers)
-    generate_test_subparser(subparsers)
     return parser
 
 def generate_catalogue (args):
