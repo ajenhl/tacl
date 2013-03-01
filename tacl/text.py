@@ -1,35 +1,13 @@
-"""Module containing the Text and Tokenizer classes."""
+"""Module containing the Text class."""
 
 import collections
 import hashlib
 import logging
-import re
 
-
-class Tokenizer (object):
-
-    """A tokenizer that splits a string using a regular expression.
-
-    Based on the RegexpTokenizer from the Natural Language Toolkit.
-
-    """
-
-    def __init__ (self, pattern, flags=re.UNICODE | re.MULTILINE | re.DOTALL):
-        try:
-            self._regexp = re.compile(pattern, flags)
-        except re.error as err:
-            raise ValueError('Error in regular expression %r: %s' %
-                             (pattern, err))
-
-    def tokenize (self, text):
-        return self._regexp.findall(text)
+from .tokenizer import tokenizer
 
 
 class Text (object):
-
-    # A token is either a workaround (anything in square brackets, as
-    # a whole), or a single word character.
-    tokenizer = Tokenizer(r'\[[^]]*\]|\w')
 
     def __init__ (self, filename, content, manager):
         self._filename = filename
@@ -54,7 +32,7 @@ class Text (object):
         logging.info('Generating n-grams ({} <= n <= {}) for {}'.format(
                 minimum, maximum, self._filename))
         text_id = self._manager.add_text(self._filename, self._checksum)
-        tokens = self.tokenizer.tokenize(self._content.decode('utf-8'))
+        tokens = tokenizer.tokenize(self._content.decode('utf-8'))
         for size in range(minimum, maximum + 1):
             self._generate_ngrams(tokens, size, text_id)
 

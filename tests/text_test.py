@@ -10,7 +10,7 @@ class TextTestCase (unittest.TestCase):
     def test_ingrams (self):
         text = '''阿闍世[(禾*尤)/上/日]首佛足。敬
 強耶。又'''
-        tokens = tacl.Text.tokenizer.tokenize(text)
+        tokens = tacl.tokenizer.tokenize(text)
         expected_ngrams = [
             '阿闍世', '闍世[(禾*尤)/上/日]', '世[(禾*尤)/上/日]首',
             '[(禾*尤)/上/日]首佛', '首佛足', '佛足敬', '足敬強', '敬強耶',
@@ -30,7 +30,7 @@ class TextTestCase (unittest.TestCase):
             ('無,\t\r\n童 子：[二+梨 ]！', ['無', '童', '子', '[二+梨 ]']),
             )
         for input_text, expected_tokens in data:
-            actual_tokens = tacl.Text.tokenizer.tokenize(input_text)
+            actual_tokens = tacl.tokenizer.tokenize(input_text)
             self.assertEqual(actual_tokens, expected_tokens)
 
 
