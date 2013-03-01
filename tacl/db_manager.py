@@ -126,7 +126,8 @@ class DBManager (object):
         logging.info('Running counts query')
         label_params = ('?,' * len(labels)).strip(',')
         query = '''SELECT Text.filename, TextNGram.size,
-                       COUNT(TextNGram.ngram) as total, Text.label
+                       COUNT(TextNGram.ngram) as total,
+                       SUM(TextNGram.count) as count, Text.label
                    FROM Text CROSS JOIN TextNGram
                    WHERE Text.id = TextNGram.text
                        AND Text.label IN ({})

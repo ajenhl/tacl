@@ -1,5 +1,7 @@
 """Module containing the Corpus class."""
 
+import csv
+import io
 import logging
 import os
 
@@ -23,27 +25,62 @@ class Corpus (object):
         """Returns the n-gram totals by size and text for the labelled
         texts in `catalogue`.
 
+        The CSV format has the columns:
+
+            filename
+            size (of n-gram)
+            total (number of unique n-grams of this size)
+            count (number of individual n-grams of this size)
+            label
+
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `sqlite3.Cursor`
+        :rtype: `io.StringIO`
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        return self._manager.counts(labels)
+        fields = ['filename', 'size', 'total', 'count', 'label']
+        return self._csv(self._manager.counts(labels), fields)
+
+    def _csv (self, cursor, fields):
+        """Return the rows of `cursor` as a CSV format StringIO.
+
+        :param cursor: database cursor containing data to be be output
+        :type cursor: `sqlite3.Cursor`
+        :param fields: row headings
+        :type fields: `list`
+        :rtype: `io.StringIO`
+
+        """
+        fh = io.StringIO(newline='')
+        writer = csv.writer(fh)
+        for row in cursor:
+            writer.writerow([row[field] for field in fields])
+        fh.seek(0)
+        return fh
 
     def diff (self, catalogue):
         """Returns the n-gram data for the differences between the
         sets of texts in `catalogue`.
 
+        The CSV format has the columns:
+
+            n-gram
+            size (of n-gram)
+            filename
+            count (of instances of n-gram)
+            label
+
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `sqlite3.Cursor`
+        :rtype: `io.StringIO`
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        return self._manager.diff(labels)
+        fields = ['ngram', 'size', 'filename', 'count', 'label']
+        return self._csv(self._manager.diff(labels), fields)
 
     def generate_ngrams (self, minimum, maximum, index):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
@@ -77,14 +114,23 @@ class Corpus (object):
         """Returns the n-gram data for the intersection between the
         sets of texts in `catalogue`.
 
+        The CSV format has the columns:
+
+            n-gram
+            size (of n-gram)
+            filename
+            count (of instances of n-gram)
+            label
+
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `sqlite3.Cursor`
+        :rtype: `io.StringIO`
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        return self._manager.intersection(labels)
+        fields = ['ngram', 'size', 'filename', 'count', 'label']
+        return self._csv(self._manager.intersection(labels), fields)
 
     def _open_text (self, filename):
         """Returns a `Text` object for `filename`.

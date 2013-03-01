@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import csv
 import io
 import logging
 import sys
@@ -59,6 +58,7 @@ def generate_parser ():
     generate_ngrams_subparser(subparsers)
     generate_report_subparser(subparsers)
     generate_strip_subparser(subparsers)
+    generate_test_subparser(subparsers)
     return parser
 
 def generate_catalogue (args):
@@ -126,11 +126,11 @@ def generate_report (args):
     report = tacl.Report(args.results)
     if args.remove:
         report.remove_label(args.remove)
-    if args.min or args.max:
-        report.prune(args.min, args.max)
     if args.reduce:
         report.reduce()
-    sys.stdout.buffer.write(report.csv().getvalue().encode('utf-8'))
+    if args.min or args.max:
+        report.prune(args.min, args.max)
+    output(report.csv())
 
 def generate_report_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -173,36 +173,27 @@ def get_catalogue (args):
 def ngram_counts (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    fields = ['filename', 'size', 'total', 'label']
-    output_csv(corpus.counts(catalogue), fields)
+    output(corpus.counts(catalogue))
 
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    fields = ['ngram', 'size', 'filename', 'count', 'label']
-    output_csv(corpus.diff(catalogue), fields)
+    output(corpus.diff(catalogue))
 
 def ngram_intersection (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    fields = ['ngram', 'size', 'filename', 'count', 'label']
-    output_csv(corpus.intersection(catalogue), fields)
+    output(corpus.intersection(catalogue))
 
-def output_csv (data, fields):
-    """Output `data` in CSV format.
+def output (fh):
+    """Output the content of `fh` to stdout.
 
-    The fields are n-gram, filename, frequency count, corpus label.
-
-    :param data: n-gram data to output
-    :type data: `sqlite3.Cursor`
+    :param fh: filehandle containing data
+    :type data: `io.StringIO`
 
     """
-    output_fh = io.StringIO(newline='')
-    writer = csv.writer(output_fh)
-    for row in data:
-        writer.writerow([row[field] for field in fields])
-    sys.stdout.buffer.write(output_fh.getvalue().encode('utf-8'))
-    logging.info('Finished outputting query results')
+    sys.stdout.buffer.write(fh.getvalue().encode('utf-8'))
+    logging.info('Finished outputting results')
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)

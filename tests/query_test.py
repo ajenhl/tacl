@@ -63,11 +63,11 @@ class QueryTestCase (unittest.TestCase):
 
     def test_counts (self):
         actual_rows = self._manager.counts(['A', 'B', 'C'])
-        expected_rows = [('1.txt', 2, 8, 'A'), ('2.txt', 2, 9, 'B'),
-                         ('3.txt', 2, 3, 'C'), ('5.txt', 2, 3, 'A')]
+        expected_rows = [('1.txt', 2, 8, 11, 'A'), ('2.txt', 2, 9, 12, 'B'),
+                         ('3.txt', 2, 3, 3, 'C'), ('5.txt', 2, 3, 3, 'A')]
         self.assertEqual(list(actual_rows), expected_rows)
         actual_rows = self._manager.counts(['A'])
-        expected_rows = [('1.txt', 2, 8, 'A'), ('5.txt', 2, 3, 'A')]
+        expected_rows = [('1.txt', 2, 8, 11, 'A'), ('5.txt', 2, 3, 3, 'A')]
         self.assertEqual(list(actual_rows), expected_rows)
 
     def test_diff (self):
