@@ -53,8 +53,37 @@ class Report:
             substrings.extend(ngrams)
         return substrings
 
+    def prune_by_ngram_count (self, minimum=None, maximum=None):
+        """Removes results rows whose total n-gram count (across all
+        texts bearing this n-gram) is outside the range specified by
+        `minimum` and `maximum`.
+
+        :param minimum: minimum n-gram count
+        :type minimum: `int`
+        :param maximum: maximum n-gram count
+        :type maximum: `int`
+
+        """
+        logging.info('Pruning results by n-gram count')
+        new_rows = []
+        data = {}
+        for row in self._rows:
+            ngram = row[NGRAM_INDEX]
+            count = data.setdefault(ngram, 0)
+            count += int(row[COUNT_INDEX])
+            data[ngram] = count
+        ngrams = []
+        for ngram, count in data.items():
+            if minimum and count < minimum:
+                continue
+            if maximum and count > maximum:
+                continue
+            ngrams.append(ngram)
+        new_rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
+        self._rows = new_rows
+
     def prune_by_ngram_size (self, minimum=None, maximum=None):
-        """Removes results rows whose n-gram size are outside the
+        """Removes results rows whose n-gram size is outside the
         range specified by `minimum` and `maximum`.
 
         :param minimum: minimum n-gram size

@@ -24,6 +24,33 @@ class ReportTestCase (unittest.TestCase):
             rows.add(tuple(row))
         return rows
 
+    def test_prune_by_ngram_count (self):
+        input_data = (
+            ['AB', '2', 'a', '7', 'A'], ['BA', '2', 'a', '1', 'A'],
+            ['BA', '2', 'b', '3', 'B'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh)
+        report.prune_by_ngram_count(minimum=3)
+        expected_rows = set(
+            (('AB', '2', 'a', '7', 'A'), ('BA', '2', 'a', '1', 'A'),
+             ('BA', '2', 'b', '3', 'B')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh)
+        report.prune_by_ngram_count(maximum=4)
+        expected_rows = set(
+            (('BA', '2', 'a', '1', 'A'), ('BA', '2', 'b', '3', 'B')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh)
+        report.prune_by_ngram_count(minimum=4, maximum=5)
+        expected_rows = set(
+            (('BA', '2', 'a', '1', 'A'), ('BA', '2', 'b', '3', 'B')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_prune_by_ngram_size (self):
         input_data = (
             ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],
