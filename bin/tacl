@@ -122,15 +122,19 @@ def generate_ngrams_subparser (subparsers):
                         help='maximum size of n-gram to generate (integer)')
 
 def generate_report (args):
-    report = tacl.Report(args.results)
+    if args.results == '-':
+        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', newline='')
+    else:
+        results = open(args.results, 'r', encoding='utf-8', newline='')
+    report = tacl.Report(results)
     if args.remove:
         report.remove_label(args.remove)
-    if args.min_size or args.max_size:
-        report.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_texts or args.max_texts:
         report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.reduce:
         report.reduce()
+    if args.min_size or args.max_size:
+        report.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
         report.prune_by_ngram_count(args.min_count, args.max_count)
     output(report.csv())
@@ -161,8 +165,8 @@ def generate_report_subparser (subparsers):
                         help='remove n-grams that are contained in larger n-grams')
     parser.add_argument('--remove', metavar='LABEL', type=str,
                         help='Remove labelled results')
-    parser.add_argument('results', metavar='RESULTS', help='CSV results file',
-                        type=argparse.FileType('r'))
+    parser.add_argument('results', metavar='RESULTS',
+                        help='path to CSV results; use - for stdin')
 
 def generate_strip_subparser (subparsers):
     help='preprocess a corpus by stripping unwanted material from each text'
