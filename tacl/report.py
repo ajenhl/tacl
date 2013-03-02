@@ -54,8 +54,8 @@ class Report:
         return substrings
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
-        """Removes results rows who n-gram size are outside the range
-        specified by `minimum` and `maximum`.
+        """Removes results rows whose n-gram size are outside the
+        range specified by `minimum` and `maximum`.
 
         :param minimum: minimum n-gram size
         :type minimum: `int`
@@ -63,7 +63,7 @@ class Report:
         :type maximum: `int`
 
         """
-        logging.info('Pruning the n-grams')
+        logging.info('Pruning results by n-gram size')
         new_rows = []
         for row in self._rows:
             size = int(row[SIZE_INDEX])
@@ -72,6 +72,35 @@ class Report:
             if maximum and size > maximum:
                 continue
             new_rows.append(row)
+        self._rows = new_rows
+
+    def prune_by_text_count (self, minimum=None, maximum=None):
+        """Removes results rows for n-grams that are not attested in a
+        number of texts in the range specified by `minimum` and
+        `maximum`.
+
+        :param minimum: minimum number of texts
+        :type minimum: `int`
+        :param maximum: maximum number of texts
+        :type maximum: `int`
+
+        """
+        logging.info('Pruning results by text count')
+        new_rows = []
+        data = {}
+        for row in self._rows:
+            ngram = row[NGRAM_INDEX]
+            text_count = data.setdefault(ngram, 0)
+            text_count += 1
+            data[ngram] = text_count
+        ngrams = []
+        for ngram, count in data.items():
+            if minimum and count < minimum:
+                continue
+            if maximum and count > maximum:
+                continue
+            ngrams.append(ngram)
+        new_rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
         self._rows = new_rows
 
     def _reduce_by_ngram (self, data, ngram):

@@ -125,10 +125,12 @@ def generate_report (args):
     report = tacl.Report(args.results)
     if args.remove:
         report.remove_label(args.remove)
+    if args.min_texts or args.max_texts:
+        report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.reduce:
         report.reduce()
-    if args.min or args.max:
-        report.prune_by_ngram_size(args.min, args.max)
+    if args.min_size or args.max_size:
+        report.prune_by_ngram_size(args.min_size, args.max_size)
     output(report.csv())
 
 def generate_report_subparser (subparsers):
@@ -137,10 +139,16 @@ def generate_report_subparser (subparsers):
         help='generate a report on a query results file')
     add_common_arguments(parser)
     parser.set_defaults(func=generate_report)
-    parser.add_argument('--min-size', metavar='MINIMUM_COUNT', type=int,
-                        help='minimum size of n-grams to include')
-    parser.add_argument('--max-size', metavar='MAXIMUM_COUNT', type=int,
-                        help='maximum size of n-grams to include')
+    parser.add_argument('--min-size', dest='min_size', metavar='MINIMUM_SIZE',
+                        type=int, help='minimum size of n-grams to include')
+    parser.add_argument('--max-size', dest='max_size', metavar='MAXIMUM_SIZE',
+                        type=int, help='maximum size of n-grams to include')
+    parser.add_argument('--min-texts', dest='min_texts',
+                        metavar='MINIMUM_TEXT_COUNT', type=int,
+                        help='minimum count of texts containing n-gram to include')
+    parser.add_argument('--max-texts', dest='max_texts',
+                        metavar='MAXIMUM_TEXT_COUNT', type=int,
+                        help='maximum count of texts containing n-gram to include')
     parser.add_argument('--reduce', action='store_true',
                         help='remove n-grams that are contained in larger n-grams')
     parser.add_argument('--remove', metavar='LABEL', type=str,

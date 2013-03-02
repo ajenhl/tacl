@@ -55,6 +55,39 @@ class ReportTestCase (unittest.TestCase):
         actual_rows = self._get_rows_from_csv(report.csv())
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_prune_by_text_count (self):
+        input_data = (
+            ['AB', '2', 'a', '4', 'A'], ['AB', '2', 'b', '7', 'A'],
+            ['AB', '2', 'c', '1', 'A'], ['AB', '2', 'd', '3', 'A'],
+            ['ABC', '3', 'a', '3', 'A'], ['ABC', '3', 'b', '5', 'A'],
+            ['ABC', '3', 'c', '1', 'A'], ['BA', '2', 'a', '6', 'A'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh)
+        report.prune_by_text_count(minimum=3)
+        expected_rows = set(
+            (('AB', '2', 'a', '4', 'A'), ('AB', '2', 'b', '7', 'A'),
+             ('AB', '2', 'c', '1', 'A'), ('AB', '2', 'd', '3', 'A'),
+             ('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
+             ('ABC', '3', 'c', '1', 'A')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh)
+        report.prune_by_text_count(maximum=3)
+        expected_rows = set(
+            (('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
+             ('ABC', '3', 'c', '1', 'A'), ('BA', '2', 'a', '6', 'A')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh)
+        report.prune_by_text_count(minimum=2, maximum=3)
+        expected_rows = set(
+            (('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
+             ('ABC', '3', 'c', '1', 'A')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_reduce (self):
         input_data = (
             ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],
