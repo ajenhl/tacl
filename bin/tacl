@@ -129,6 +129,8 @@ def generate_report (args):
     report = tacl.Report(results)
     if args.reduce:
         report.reduce()
+    if args.reciprocal:
+        report.reciprocal_remove()
     if args.min_texts or args.max_texts:
         report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.min_size or args.max_size:
@@ -161,6 +163,8 @@ def generate_report_subparser (subparsers):
     parser.add_argument('--max-texts', dest='max_texts',
                         metavar='MAXIMUM_TEXT_COUNT', type=int,
                         help='maximum count of texts containing n-gram to include')
+    parser.add_argument('--reciprocal', action='store_true',
+                        help='remove n-grams that are not attested by at least one text in each labelled set of texts')
     parser.add_argument('--reduce', action='store_true',
                         help='remove n-grams that are contained in larger n-grams')
     parser.add_argument('--remove', metavar='LABEL', type=str,

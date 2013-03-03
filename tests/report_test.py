@@ -115,6 +115,38 @@ class ReportTestCase (unittest.TestCase):
         actual_rows = self._get_rows_from_csv(report.csv())
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_reciprocal_remove (self):
+        input_data = (
+            ['AB', '2', 'a', '5', 'A'], ['ABCDEF', '6', 'a', '7', 'A'],
+            ['DEF', '3', 'a', '2', 'A'], ['GHIJ', '4', 'a', '3', 'A'],
+            ['ABCDEF', '6', 'b', '3', 'B'], ['GHIJ', '4', 'b', '2', 'B'],
+            ['KLM', '3', 'b', '17', 'B'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh)
+        report.reciprocal_remove()
+        expected_rows = set(
+            (('ABCDEF', '6', 'a', '7', 'A'), ('GHIJ', '4', 'a', '3', 'A'),
+             ('ABCDEF', '6', 'b', '3', 'B'), ('GHIJ', '4', 'b', '2', 'B')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+        # More than two labels, and more than one text per label.
+        input_data = (
+            ['AB', '2', 'a', '5', 'A'], ['ABCDEF', '6', 'a', '7', 'A'],
+            ['DEF', '3', 'a', '2', 'A'], ['AB', '2', 'b', '6', 'A'],
+            ['GHIJ', '4', 'b', '3', 'A'], ['ABCDEF', '6', 'c', '3', 'B'],
+            ['KLM', '3', 'c', '17', 'B'], ['GHIJ', '4', 'd', '2', 'B'],
+            ['KLM', '3', 'e', '3', 'C'], ['GHIJ', '4', 'f', '11', 'C'],
+            ['ABCDEF', '6', 'g', '8', 'C'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh)
+        report.reciprocal_remove()
+        expected_rows = set(
+            (('ABCDEF', '6', 'a', '7', 'A'), ('GHIJ', '4', 'b', '3', 'A'),
+             ('ABCDEF', '6', 'c', '3', 'B'), ('GHIJ', '4', 'd', '2', 'B'),
+             ('GHIJ', '4', 'f', '11', 'C'), ('ABCDEF', '6', 'g', '8', 'C')))
+        actual_rows = self._get_rows_from_csv(report.csv())
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_reduce (self):
         input_data = (
             ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],

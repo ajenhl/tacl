@@ -155,6 +155,23 @@ class Report:
             else:
                 substring_data['count'] -= count
 
+    def reciprocal_remove (self):
+        """Removes results rows for which the n-gram is not present in
+        at least one text in each labelled set of texts."""
+        logging.info('Removing n-grams that are not attested in all labels')
+        labels = set()
+        data = {}
+        for row in self._rows:
+            ngram = row[NGRAM_INDEX]
+            label = row[LABEL_INDEX]
+            ngram_labels = data.setdefault(ngram, set())
+            ngram_labels.add(label)
+            data[ngram] = ngram_labels
+            labels.add(label)
+        new_rows = [row for row in self._rows
+                    if data[row[NGRAM_INDEX]] == labels]
+        self._rows = new_rows
+
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
         n-grams."""
