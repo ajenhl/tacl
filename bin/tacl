@@ -127,16 +127,16 @@ def generate_report (args):
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
     report = tacl.Report(results)
-    if args.remove:
-        report.remove_label(args.remove)
-    if args.min_texts or args.max_texts:
-        report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.reduce:
         report.reduce()
+    if args.min_texts or args.max_texts:
+        report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.min_size or args.max_size:
         report.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
         report.prune_by_ngram_count(args.min_count, args.max_count)
+    if args.remove:
+        report.remove_label(args.remove)
     output(report.csv())
 
 def generate_report_subparser (subparsers):
