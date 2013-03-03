@@ -26,9 +26,9 @@ def add_common_arguments (parser):
 def add_db_arguments (parser):
     """Adds common arguments for the database subcommands to `parser`."""
     parser.add_argument('-m', '--memory', action='store_true',
-                        help='Use RAM for temporary database storage')
+                        help='use RAM for temporary database storage')
     parser.add_argument('-r', '--ram', default=3, type=int,
-                        help='Number of gigabytes of RAM to use')
+                        help='number of gigabytes of RAM to use')
     parser.add_argument('db', metavar='DATABASE', help='path to database file')
     parser.add_argument('corpus', help='path to corpus', metavar='CORPUS')
 
@@ -164,7 +164,7 @@ def generate_report_subparser (subparsers):
     parser.add_argument('--reduce', action='store_true',
                         help='remove n-grams that are contained in larger n-grams')
     parser.add_argument('--remove', metavar='LABEL', type=str,
-                        help='Remove labelled results')
+                        help='remove labelled results')
     parser.add_argument('results', metavar='RESULTS',
                         help='path to CSV results; use - for stdin')
 
