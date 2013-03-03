@@ -27,12 +27,6 @@ analysis of the corpus:
    the corpus for the remaining steps.
 2. Generate the n-grams that will be used in the analysis (``tacl
    ngrams``). This is the slowest part of the entire process.
-
-   This step is optional; the following analysis commands will
-   generate the required n-grams if they have not already been
-   generated. Explicitly generating them has the advantage of allowing
-   all of the n-grams for multiple future analyses to be generated at
-   once.
 3. Categorise some or all of the texts in the corpus into two or more
    groups. These groups (identified by arbitrary, user-chosen labels)
    are defined in a catalogue file that is initially generated from
@@ -46,6 +40,13 @@ analysis of the corpus:
 4. Analyse the n-grams to find either the difference between (``tacl
    diff``) or intersection of (``tacl intersect``) the groups of texts
    as defined in a catalogue file.
+5. Optionally perform functions on the results of a difference or
+   intersection query, to limit the scope of the results (``tacl
+   report``).
+
+Another script, ``tacl-helper``, can be used to create sets of
+catalogue files and prepare batches of commands for particular sets of
+queries.
 
 
 .. _Python 3: http://www.python.org/
