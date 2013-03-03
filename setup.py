@@ -9,6 +9,6 @@ setup(name='tacl',
       author='Jamie Norrish',
       author_email='jamie@artefact.org.nz',
       packages=['tacl'],
-      scripts=['bin/tacl'],
+      scripts=['bin/tacl', 'bin/tacl-helper'],
       requires=['lxml'],
       )
