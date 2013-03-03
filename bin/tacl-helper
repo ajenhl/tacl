@@ -60,7 +60,7 @@ def generate_parser ():
 def generate_text_against_corpus_subparser (subparsers):
     description='Generate a script to compare each text of a corpus against all the texts in another corpus'
     help='generate a script to compare each text of a corpus against all the texts in another corpus'
-    parser = subparsers.add_parser('text_against_corpus',
+    parser = subparsers.add_parser('text-against-corpus',
                                    description=description, help=help)
     parser.set_defaults(func=text_against_corpus)
     add_common_arguments(parser)
@@ -78,7 +78,7 @@ def generate_text_against_corpus_subparser (subparsers):
 def generate_text_in_corpus_subparser (subparsers):
     description='Generate a script to compare each text of a corpus with all the other texts of that corpus'
     help='generate a script to compare each text of a corpus with all the other texts of that corpus'
-    parser = subparsers.add_parser('text_in_corpus', description=description,
+    parser = subparsers.add_parser('text-in-corpus', description=description,
                                    help=help)
     parser.set_defaults(func=text_in_corpus)
     add_common_arguments(parser)
