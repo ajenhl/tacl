@@ -65,7 +65,6 @@ class Report:
 
         """
         logging.info('Pruning results by n-gram count')
-        new_rows = []
         data = {}
         for row in self._rows:
             ngram = row[NGRAM_INDEX]
@@ -79,8 +78,7 @@ class Report:
             if maximum and count > maximum:
                 continue
             ngrams.append(ngram)
-        new_rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
-        self._rows = new_rows
+        self._rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
@@ -115,7 +113,6 @@ class Report:
 
         """
         logging.info('Pruning results by text count')
-        new_rows = []
         data = {}
         for row in self._rows:
             ngram = row[NGRAM_INDEX]
@@ -129,8 +126,7 @@ class Report:
             if maximum and count > maximum:
                 continue
             ngrams.append(ngram)
-        new_rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
-        self._rows = new_rows
+        self._rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
 
     def _reduce_by_ngram (self, data, ngram):
         """Lowers the counts of all n-grams in `data` that are
@@ -168,9 +164,8 @@ class Report:
             ngram_labels.add(label)
             data[ngram] = ngram_labels
             labels.add(label)
-        new_rows = [row for row in self._rows
-                    if data[row[NGRAM_INDEX]] == labels]
-        self._rows = new_rows
+        self._rows = [row for row in self._rows
+                      if data[row[NGRAM_INDEX]] == labels]
 
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
