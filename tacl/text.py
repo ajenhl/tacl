@@ -61,8 +61,8 @@ class Text (object):
             logging.info('There are {} unique {}-grams'.format(
                     len(counts), size))
             for ngram, count in counts.items():
-                self._manager.add_ngram(text_id, ''.join(ngram), size, count)
-            self._manager.commit()
+                self._manager.add_ngram(text_id, ngram, size, count)
+            self._manager.add_ngrams()
 
     @staticmethod
     def ingrams (sequence, degree):
@@ -85,5 +85,5 @@ class Text (object):
             degree -= 1
         for item in sequence:
             history.append(item)
-            yield tuple(history)
+            yield ''.join(''.join(history).split())
             del history[0]
