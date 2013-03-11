@@ -12,9 +12,6 @@ LABEL_INDEX = 4
 NGRAM_INDEX = 0
 SIZE_INDEX = 1
 
-HOMOGENOUS_KEY = 'homogenous'
-FILENAMES_KEY = 'filenames'
-
 
 class Report:
 
