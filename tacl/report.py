@@ -1,7 +1,6 @@
 """Module containing the Report class."""
 
 import csv
-import io
 import logging
 
 from .tokenizer import tokenizer
@@ -22,18 +21,18 @@ class Report:
     def __init__ (self, results):
         self._rows = [row for row in csv.reader(results)]
 
-    def csv (self):
-        """Returns the report data in CSV format.
+    def csv (self, fh):
+        """Writes the report data to `fh` in CSV format and returns it.
 
-        :rtype: `io.StringIO`
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
 
         """
-        output_fh = io.StringIO(newline='')
-        writer = csv.writer(output_fh)
+        writer = csv.writer(fh)
         for row in self._rows:
             writer.writerow(row)
-        output_fh.seek(0)
-        return output_fh
+        return fh
 
     def _generate_substrings (self, ngram, size):
         """Returns a list of all substrings of `ngram`.

@@ -139,7 +139,7 @@ def generate_report (args):
         report.prune_by_ngram_count(args.min_count, args.max_count)
     if args.remove:
         report.remove_label(args.remove)
-    output(report.csv())
+    report.csv(sys.stdout)
 
 def generate_report_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -196,17 +196,17 @@ def get_catalogue (args):
 def ngram_counts (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    output(corpus.counts(catalogue))
+    corpus.counts(catalogue, sys.stdout)
 
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    output(corpus.diff(catalogue))
+    corpus.diff(catalogue, sys.stdout)
 
 def ngram_intersection (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    output(corpus.intersection(catalogue))
+    corpus.intersection(catalogue, sys.stdout)
 
 def output (fh):
     """Output the content of `fh` to stdout.

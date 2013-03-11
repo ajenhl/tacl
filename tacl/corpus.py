@@ -1,7 +1,6 @@
 """Module containing the Corpus class."""
 
 import csv
-import io
 import logging
 import os
 
@@ -21,9 +20,9 @@ class Corpus (object):
         self._path = os.path.abspath(path)
         self._manager = manager
 
-    def counts (self, catalogue):
-        """Returns the n-gram totals by size and text for the labelled
-        texts in `catalogue`.
+    def counts (self, catalogue, fh):
+        """Writes the n-gram totals by size and text for the labelled
+        texts in `catalogue` to `fh` and returns it.
 
         The CSV format has the columns:
 
@@ -35,34 +34,37 @@ class Corpus (object):
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `io.StringIO`
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
         fields = ['filename', 'size', 'total', 'count', 'label']
-        return self._csv(self._manager.counts(labels), fields)
+        return self._csv(self._manager.counts(labels), fields, fh)
 
-    def _csv (self, cursor, fields):
-        """Return the rows of `cursor` as a CSV format StringIO.
+    def _csv (self, cursor, fields, fh):
+        """Writes the rows of `cursor` in CSV format to `fh` and
+        returns it.
 
         :param cursor: database cursor containing data to be be output
         :type cursor: `sqlite3.Cursor`
         :param fields: row headings
         :type fields: `list`
-        :rtype: `io.StringIO`
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
 
         """
-        fh = io.StringIO(newline='')
         writer = csv.writer(fh)
         for row in cursor:
             writer.writerow([row[field] for field in fields])
-        fh.seek(0)
         return fh
 
-    def diff (self, catalogue):
-        """Returns the n-gram data for the differences between the
-        sets of texts in `catalogue`.
+    def diff (self, catalogue, fh):
+        """Writes the n-gram data for the differences between the sets
+        of texts in `catalogue` to `fh` and returns it.
 
         The CSV format has the columns:
 
@@ -74,13 +76,15 @@ class Corpus (object):
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `io.StringIO`
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
         fields = ['ngram', 'size', 'filename', 'count', 'label']
-        return self._csv(self._manager.diff(labels), fields)
+        return self._csv(self._manager.diff(labels), fields, fh)
 
     def generate_ngrams (self, minimum, maximum, index):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
@@ -110,9 +114,9 @@ class Corpus (object):
         self._manager.analyse()
         self._manager.vacuum()
 
-    def intersection (self, catalogue):
-        """Returns the n-gram data for the intersection between the
-        sets of texts in `catalogue`.
+    def intersection (self, catalogue, fh):
+        """Writes the n-gram data for the intersection between the
+        sets of texts in `catalogue` to `fh`.
 
         The CSV format has the columns:
 
@@ -124,13 +128,15 @@ class Corpus (object):
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :rtype: `io.StringIO`
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
         fields = ['ngram', 'size', 'filename', 'count', 'label']
-        return self._csv(self._manager.intersection(labels), fields)
+        return self._csv(self._manager.intersection(labels), fields, fh)
 
     def _open_text (self, filename):
         """Returns a `Text` object for `filename`.
@@ -161,4 +167,5 @@ class Corpus (object):
                 labels.add(label)
                 text = self._open_text(filename)
                 text.add_label(label)
+        self._manager.analyse('Text')
         return list(labels)

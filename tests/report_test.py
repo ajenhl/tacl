@@ -19,6 +19,7 @@ class ReportTestCase (unittest.TestCase):
 
     def _get_rows_from_csv (self, fh):
         rows = set()
+        fh.seek(0)
         reader = csv.reader(fh)
         for row in reader:
             rows.add(tuple(row))
@@ -34,21 +35,24 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set(
             (('AB', '2', 'a', '7', 'A'), ('BA', '2', 'a', '1', 'A'),
              ('BA', '2', 'b', '3', 'B')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
         report.prune_by_ngram_count(maximum=4)
         expected_rows = set(
             (('BA', '2', 'a', '1', 'A'), ('BA', '2', 'b', '3', 'B')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
         report.prune_by_ngram_count(minimum=4, maximum=5)
         expected_rows = set(
             (('BA', '2', 'a', '1', 'A'), ('BA', '2', 'b', '3', 'B')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_ngram_size (self):
@@ -62,7 +66,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set((
             ('ABC', '3', 'a', '2', 'A'), ('ABD', '3', 'a', '1', 'A'),
             ('ABCD', '4', 'a', '2', 'A'), ('ABC', '3', 'b', '2', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
@@ -71,7 +76,8 @@ class ReportTestCase (unittest.TestCase):
                 ('AB', '2', 'a', '4', 'A'), ('ABC', '3', 'a', '2', 'A'),
                 ('ABD', '3', 'a', '1', 'A'), ('AB', '2', 'b', '2', 'A'),
                 ('ABC', '3', 'b', '2', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
@@ -79,7 +85,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set((
                 ('ABC', '3', 'a', '2', 'A'), ('ABD', '3', 'a', '1', 'A'),
                 ('ABC', '3', 'b', '2', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_text_count (self):
@@ -96,7 +103,8 @@ class ReportTestCase (unittest.TestCase):
              ('AB', '2', 'c', '1', 'A'), ('AB', '2', 'd', '3', 'A'),
              ('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
              ('ABC', '3', 'c', '1', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
@@ -104,7 +112,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set(
             (('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
              ('ABC', '3', 'c', '1', 'A'), ('BA', '2', 'a', '6', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         report = tacl.Report(fh)
@@ -112,7 +121,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set(
             (('ABC', '3', 'a', '3', 'A'), ('ABC', '3', 'b', '5', 'A'),
              ('ABC', '3', 'c', '1', 'A')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
     def test_reciprocal_remove (self):
@@ -127,7 +137,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set(
             (('ABCDEF', '6', 'a', '7', 'A'), ('GHIJ', '4', 'a', '3', 'A'),
              ('ABCDEF', '6', 'b', '3', 'B'), ('GHIJ', '4', 'b', '2', 'B')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
         # More than two labels, and more than one text per label.
         input_data = (
@@ -144,7 +155,8 @@ class ReportTestCase (unittest.TestCase):
             (('ABCDEF', '6', 'a', '7', 'A'), ('GHIJ', '4', 'b', '3', 'A'),
              ('ABCDEF', '6', 'c', '3', 'B'), ('GHIJ', '4', 'd', '2', 'B'),
              ('GHIJ', '4', 'f', '11', 'C'), ('ABCDEF', '6', 'g', '8', 'C')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
     def test_reduce (self):
@@ -223,7 +235,7 @@ class ReportTestCase (unittest.TestCase):
         fh = self._create_csv(input_data)
         report = tacl.Report(fh)
         report.reduce()
-        return self._get_rows_from_csv(report.csv())
+        return self._get_rows_from_csv(report.csv(io.StringIO(newline='')))
 
     def test_remove_label (self):
         input_data = (
@@ -236,7 +248,8 @@ class ReportTestCase (unittest.TestCase):
         expected_rows = set(
             (('AB', '2', 'a', '4', 'A'), ('ABC', '3', 'a', '2', 'A'),
              ('AB', '2', 'b', '2', 'AB'), ('ABC', '3', 'b', '2', 'AB')))
-        actual_rows = self._get_rows_from_csv(report.csv())
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
     def test_sort (self):
@@ -248,14 +261,13 @@ class ReportTestCase (unittest.TestCase):
         fh = self._create_csv(input_data)
         report = tacl.Report(fh)
         report.sort()
-        expected_rows = [['ABCD', '4', 'a', '2', 'B'],
-                         ['ABC', '3', 'c', '3', 'A'],
-                         ['ABC', '3', 'a', '2', 'A'],
-                         ['ABC', '3', 'b', '2', 'AB'],
-                         ['ABD', '3', 'a', '1', 'B'],
-                         ['AB', '2', 'a', '4', 'A'],
-                         ['AB', '2', 'b', '2', 'AB']]
-        actual_rows = [row for row in csv.reader(report.csv())]
+        expected_rows = set(
+            (('ABCD', '4', 'a', '2', 'B'), ('ABC', '3', 'c', '3', 'A'),
+             ('ABC', '3', 'a', '2', 'A'), ('ABC', '3', 'b', '2', 'AB'),
+             ('ABD', '3', 'a', '1', 'B'), ('AB', '2', 'a', '4', 'A'),
+             ('AB', '2', 'b', '2', 'AB')))
+        actual_rows = self._get_rows_from_csv(report.csv(
+                io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
 
