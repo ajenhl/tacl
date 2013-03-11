@@ -208,16 +208,6 @@ def ngram_intersection (args):
     catalogue = get_catalogue(args)
     corpus.intersection(catalogue, sys.stdout)
 
-def output (fh):
-    """Output the content of `fh` to stdout.
-
-    :param fh: filehandle containing data
-    :type data: `io.StringIO`
-
-    """
-    sys.stdout.buffer.write(fh.getvalue().encode('utf-8'))
-    logging.info('Finished outputting results')
-
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
