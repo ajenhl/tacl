@@ -151,8 +151,7 @@ class DBManager (object):
                            WHERE Text.id = TextNGram.text
                                AND Text.label IN ({})
                            GROUP BY TextNGram.ngram
-                           HAVING COUNT(DISTINCT Text.label) = 1)
-                   ORDER BY TextNGram.size, TextNGram.ngram'''.format(
+                           HAVING COUNT(DISTINCT Text.label) = 1)'''.format(
             label_params, label_params)
         logging.debug('Query:\n{}\nLabels: {}'.format(query, labels))
         return self._c.execute(query, labels + labels)
