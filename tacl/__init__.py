@@ -1,3 +1,4 @@
+from . import constants
 from .catalogue import Catalogue
 from .corpus import Corpus
 from .db_manager import DBManager

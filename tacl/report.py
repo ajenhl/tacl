@@ -3,20 +3,14 @@
 import csv
 import logging
 
+from . import constants
 from .tokenizer import tokenizer
-
-
-COUNT_INDEX = 3
-FILENAME_INDEX = 2
-LABEL_INDEX = 4
-NGRAM_INDEX = 0
-SIZE_INDEX = 1
 
 
 class Report:
 
     def __init__ (self, results):
-        self._rows = [row for row in csv.reader(results)]
+        self._rows = [row for row in csv.DictReader(results)]
 
     def csv (self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
@@ -26,7 +20,8 @@ class Report:
         :rtype: file object
 
         """
-        writer = csv.writer(fh)
+        writer = csv.DictWriter(fh, fieldnames=constants.QUERY_FIELDNAMES)
+        writer.writeheader()
         for row in self._rows:
             writer.writerow(row)
         return fh
@@ -63,9 +58,9 @@ class Report:
         logging.info('Pruning results by n-gram count')
         data = {}
         for row in self._rows:
-            ngram = row[NGRAM_INDEX]
+            ngram = row[constants.NGRAM_FIELDNAME]
             count = data.setdefault(ngram, 0)
-            count += int(row[COUNT_INDEX])
+            count += int(row[constants.COUNT_FIELDNAME])
             data[ngram] = count
         ngrams = []
         for ngram, count in data.items():
@@ -74,7 +69,8 @@ class Report:
             if maximum and count > maximum:
                 continue
             ngrams.append(ngram)
-        self._rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
+        self._rows = [row for row in self._rows
+                      if row[constants.NGRAM_FIELDNAME] in ngrams]
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
@@ -89,7 +85,7 @@ class Report:
         logging.info('Pruning results by n-gram size')
         new_rows = []
         for row in self._rows:
-            size = int(row[SIZE_INDEX])
+            size = int(row[constants.SIZE_FIELDNAME])
             if minimum and size < minimum:
                 continue
             if maximum and size > maximum:
@@ -111,7 +107,7 @@ class Report:
         logging.info('Pruning results by text count')
         data = {}
         for row in self._rows:
-            ngram = row[NGRAM_INDEX]
+            ngram = row[constants.NGRAM_FIELDNAME]
             text_count = data.setdefault(ngram, 0)
             text_count += 1
             data[ngram] = text_count
@@ -122,7 +118,8 @@ class Report:
             if maximum and count > maximum:
                 continue
             ngrams.append(ngram)
-        self._rows = [row for row in self._rows if row[NGRAM_INDEX] in ngrams]
+        self._rows = [row for row in self._rows
+                      if row[constants.NGRAM_FIELDNAME] in ngrams]
 
     def _reduce_by_ngram (self, data, ngram):
         """Lowers the counts of all n-grams in `data` that are
@@ -154,14 +151,14 @@ class Report:
         labels = set()
         data = {}
         for row in self._rows:
-            ngram = row[NGRAM_INDEX]
-            label = row[LABEL_INDEX]
+            ngram = row[constants.NGRAM_FIELDNAME]
+            label = row[constants.LABEL_FIELDNAME]
             ngram_labels = data.setdefault(ngram, set())
             ngram_labels.add(label)
             data[ngram] = ngram_labels
             labels.add(label)
         self._rows = [row for row in self._rows
-                      if data[row[NGRAM_INDEX]] == labels]
+                      if data[row[constants.NGRAM_FIELDNAME]] == labels]
 
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
@@ -171,12 +168,12 @@ class Report:
         labels = {}
         # Derive a convenient data structure from the rows.
         for row in self._rows:
-            filename = row[FILENAME_INDEX]
-            labels[filename] = row[LABEL_INDEX]
+            filename = row[constants.FILENAME_FIELDNAME]
+            labels[filename] = row[constants.LABEL_FIELDNAME]
             text_data = data.setdefault(filename, {})
-            text_data[row[NGRAM_INDEX]] = {
-                'count': int(row[COUNT_INDEX]),
-                'size': int(row[SIZE_INDEX])}
+            text_data[row[constants.NGRAM_FIELDNAME]] = {
+                'count': int(row[constants.COUNT_FIELDNAME]),
+                'size': int(row[constants.SIZE_FIELDNAME])}
         for filename, text_data in data.items():
             ngrams = list(text_data.keys())
             ngrams.sort(key=lambda ngram: text_data[ngram]['size'],
@@ -191,15 +188,18 @@ class Report:
                 count = ngram_data['count']
                 if count > 0:
                     self._rows.append(
-                        [ngram, ngram_data['size'], filename, count,
-                         labels[filename]])
+                        {constants.NGRAM_FIELDNAME: ngram,
+                         constants.SIZE_FIELDNAME: ngram_data['size'],
+                         constants.FILENAME_FIELDNAME: filename,
+                         constants.COUNT_FIELDNAME: count,
+                         constants.LABEL_FIELDNAME: labels[filename]})
 
     def remove_label (self, label):
         logging.info('Removing label "{}"'.format(label))
         new_rows = []
         count = 0
         for row in self._rows:
-            if row[LABEL_INDEX] == label:
+            if row[constants.LABEL_FIELDNAME] == label:
                 count += 1
             else:
                 new_rows.append(row)
@@ -208,5 +208,8 @@ class Report:
 
     def sort (self):
         self._rows.sort(key=lambda row: (
-                -int(row[SIZE_INDEX]), row[NGRAM_INDEX], -int(row[COUNT_INDEX]),
-                 row[LABEL_INDEX], row[FILENAME_INDEX]))
+                -int(row[constants.SIZE_FIELDNAME]),
+                 row[constants.NGRAM_FIELDNAME],
+                 -int(row[constants.COUNT_FIELDNAME]),
+                 row[constants.LABEL_FIELDNAME],
+                 row[constants.FILENAME_FIELDNAME]))

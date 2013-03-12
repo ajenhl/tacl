@@ -4,6 +4,7 @@ import csv
 import logging
 import os
 
+from . import constants
 from .text import Text
 
 
@@ -41,25 +42,26 @@ class Corpus (object):
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        fields = ['filename', 'size', 'total', 'count', 'label']
-        return self._csv(self._manager.counts(labels), fields, fh)
+        return self._csv(self._manager.counts(labels),
+                         constants.COUNTS_FIELDNAMES, fh)
 
-    def _csv (self, cursor, fields, fh):
+    def _csv (self, cursor, fieldnames, fh):
         """Writes the rows of `cursor` in CSV format to `fh` and
         returns it.
 
         :param cursor: database cursor containing data to be be output
         :type cursor: `sqlite3.Cursor`
-        :param fields: row headings
-        :type fields: `list`
+        :param fieldnames: row headings
+        :type fieldnames: `list`
         :param fh: file to write data to
         :type fh: file object
         :rtype: file object
 
         """
         writer = csv.writer(fh)
+        writer.writerow(fieldnames)
         for row in cursor:
-            writer.writerow([row[field] for field in fields])
+            writer.writerow([row[fieldname] for fieldname in fieldnames])
         return fh
 
     def diff (self, catalogue, fh):
@@ -83,8 +85,8 @@ class Corpus (object):
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        fields = ['ngram', 'size', 'filename', 'count', 'label']
-        return self._csv(self._manager.diff(labels), fields, fh)
+        return self._csv(self._manager.diff(labels),
+                         constants.QUERY_FIELDNAMES, fh)
 
     def generate_ngrams (self, minimum, maximum, index):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
@@ -135,8 +137,8 @@ class Corpus (object):
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        fields = ['ngram', 'size', 'filename', 'count', 'label']
-        return self._csv(self._manager.intersection(labels), fields, fh)
+        return self._csv(self._manager.intersection(labels),
+                         constants.QUERY_FIELDNAMES, fh)
 
     def _open_text (self, filename):
         """Returns a `Text` object for `filename`.
