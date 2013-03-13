@@ -58,6 +58,7 @@ class Corpus (object):
         :rtype: file object
 
         """
+        logging.info('Finished query; outputting results in CSV format')
         writer = csv.writer(fh)
         writer.writerow(fieldnames)
         for row in cursor:
