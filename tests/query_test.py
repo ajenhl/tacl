@@ -48,11 +48,11 @@ class QueryTestCase (unittest.TestCase):
         manager.add_ngram(id5, 'we', 2, 1)
         manager.add_ngram(id5, 'el', 2, 1)
         manager.add_ngram(id5, 'll', 2, 1)
+        manager.add_ngrams()
         manager.add_label('1.txt', 'A', '1')
         manager.add_label('2.txt', 'B', '1')
         manager.add_label('3.txt', 'C', '1')
         manager.add_label('5.txt', 'A', '1')
-        manager.commit()
         # Do not use sqlite3.Row in results, because it makes the
         # comparison of result rows harder.
         manager._conn.row_factory = None
