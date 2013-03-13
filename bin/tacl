@@ -3,9 +3,12 @@
 import argparse
 import io
 import logging
+import re
 import sys
+import textwrap
 
 import tacl
+from tacl import constants
 
 
 def main ():
@@ -20,20 +23,22 @@ def main ():
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
-    help = 'display debug information; multiple -v options increase the verbosity'
-    parser.add_argument('-v', '--verbose', action='count', help=help)
+    parser.add_argument('-v', '--verbose', action='count',
+                        help=constants.VERBOSE_HELP)
 
 def add_db_arguments (parser):
     """Adds common arguments for the database subcommands to `parser`."""
     parser.add_argument('-m', '--memory', action='store_true',
-                        help='use RAM for temporary database storage')
-    parser.add_argument('-r', '--ram', default=3, type=int,
-                        help='number of gigabytes of RAM to use')
-    parser.add_argument('db', metavar='DATABASE', help='path to database file')
-    parser.add_argument('corpus', help='path to corpus', metavar='CORPUS')
+                        help=constants.DB_MEMORY_HELP)
+    parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
+                        type=int)
+    parser.add_argument('db', help=constants.DB_DATABASE_HELP,
+                        metavar='DATABASE')
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
 
 def add_query_arguments (parser):
-    parser.add_argument('catalogue', help='path to catalogue',
+    parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
                         metavar='CATALOGUE')
 
 def configure_logging (verbose):
@@ -49,7 +54,8 @@ def configure_logging (verbose):
 
 def generate_parser ():
     parser = argparse.ArgumentParser(
-        description='Analyse the text of corpora in various simple ways.')
+        description=constants.TACL_DESCRIPTION,
+        formatter_class=ParagraphFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
     generate_catalogue_subparser(subparsers)
     generate_counts_subparser(subparsers)
@@ -67,19 +73,21 @@ def generate_catalogue (args):
 
 def generate_catalogue_subparser (subparsers):
     parser = subparsers.add_parser(
-        'catalogue', description='Generate a catalogue file',
-        help='generate a catalogue file')
+        'catalogue', description=constants.CATALOGUE_DESCRIPTION,
+        epilog=constants.CATALOGUE_EPILOG,
+        formatter_class=ParagraphFormatter, help=constants.CATALOGUE_HELP)
     add_common_arguments(parser)
     parser.set_defaults(func=generate_catalogue)
-    parser.add_argument('corpus', help='path to corpus')
-    parser.add_argument('catalogue', help='path to catalogue file')
-    parser.add_argument('-l', '--label', help='label to use for all texts',
-                        default='')
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
+    add_query_arguments(parser)
+    parser.add_argument('-l', '--label', default='',
+                        help=constants.CATALOGUE_LABEL_HELP)
 
 def generate_counts_subparser (subparsers):
     parser = subparsers.add_parser(
-        'counts', description='List counts of n-grams in each labelled text',
-        help='list counts of n-grams in each labelled text, by size')
+        'counts', description=constants.COUNTS_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.COUNTS_HELP)
     parser.set_defaults(func=ngram_counts)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -87,8 +95,8 @@ def generate_counts_subparser (subparsers):
 
 def generate_diff_subparser (subparsers):
     parser = subparsers.add_parser(
-        'diff', description='List n-grams unique to each sub-corpus.',
-        help='list n-grams in one corpus but not the other')
+        'diff', description=constants.DIFF_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.DIFF_HELP)
     parser.set_defaults(func=ngram_diff)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -96,8 +104,8 @@ def generate_diff_subparser (subparsers):
 
 def generate_intersect_subparser (subparsers):
     parser = subparsers.add_parser(
-        'intersect', description='List n-grams common to all sub-corpora.',
-        help='list n-grams common to all sub-corpora')
+        'intersect', description=constants.INTERSECT_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.INTERSECT_HELP)
     parser.set_defaults(func=ngram_intersection)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -109,21 +117,22 @@ def generate_ngrams (args):
 
 def generate_ngrams_subparser (subparsers):
     parser = subparsers.add_parser(
-        'ngrams', description='Generate n-grams from a corpus.',
-        help='generate n-grams from a corpus')
+        'ngrams', description=constants.NGRAMS_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.NGRAMS_HELP)
     parser.set_defaults(func=generate_ngrams)
     add_common_arguments(parser)
     add_db_arguments(parser)
     parser.add_argument('-i', '--index', action='store_true',
-                        help='drop indices before adding n-grams')
-    parser.add_argument('min_size', metavar='MINIMUM_SIZE', type=int,
-                        help='minimum size of n-gram to generate (integer)')
-    parser.add_argument('max_size', metavar='MAXIMUM_SIZE', type=int,
-                        help='maximum size of n-gram to generate (integer)')
+                        help=constants.NGRAMS_INDEX_HELP)
+    parser.add_argument('min_size', help=constants.NGRAMS_MINIMUM_HELP,
+                        metavar='SIZE', type=int)
+    parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
+                        metavar='SIZE', type=int)
 
 def generate_report (args):
     if args.results == '-':
-        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', newline='')
+        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
+                                   newline='')
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
     report = tacl.Report(results)
@@ -143,45 +152,48 @@ def generate_report (args):
 
 def generate_report_subparser (subparsers):
     parser = subparsers.add_parser(
-        'report', description='Generate a report on a query results file',
-        help='generate a report on a query results file')
+        'report', description=constants.REPORT_DESCRIPTION,
+        epilog=constants.REPORT_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.REPORT_HELP)
     add_common_arguments(parser)
     parser.set_defaults(func=generate_report)
     parser.add_argument('--min-count', dest='min_count',
-                        metavar='MINIMUM_COUNT', type=int,
-                        help='minimum total count of n-gram to include')
+                        help=constants.REPORT_MINIMUM_COUNT_HELP,
+                        metavar='COUNT', type=int)
     parser.add_argument('--max-count', dest='max_count',
-                        metavar='MAXIMUM_COUNT', type=int,
-                        help='maximum total count of n-gram to include')
-    parser.add_argument('--min-size', dest='min_size', metavar='MINIMUM_SIZE',
-                        type=int, help='minimum size of n-grams to include')
-    parser.add_argument('--max-size', dest='max_size', metavar='MAXIMUM_SIZE',
-                        type=int, help='maximum size of n-grams to include')
+                        help=constants.REPORT_MAXIMUM_COUNT_HELP,
+                        metavar='COUNT', type=int)
+    parser.add_argument('--min-size', dest='min_size',
+                        help=constants.REPORT_MINIMUM_SIZE_HELP, metavar='SIZE',
+                        type=int)
+    parser.add_argument('--max-size', dest='max_size',
+                        help=constants.REPORT_MAXIMUM_SIZE_HELP, metavar='SIZE',
+                        type=int)
     parser.add_argument('--min-texts', dest='min_texts',
-                        metavar='MINIMUM_TEXT_COUNT', type=int,
-                        help='minimum count of texts containing n-gram to include')
+                        help=constants.REPORT_MINIMUM_TEXT_HELP,
+                        metavar='COUNT', type=int)
     parser.add_argument('--max-texts', dest='max_texts',
-                        metavar='MAXIMUM_TEXT_COUNT', type=int,
-                        help='maximum count of texts containing n-gram to include')
+                        help=constants.REPORT_MAXIMUM_TEXT_HELP,
+                        metavar='COUNT', type=int)
     parser.add_argument('--reciprocal', action='store_true',
-                        help='remove n-grams that are not attested by at least one text in each labelled set of texts')
+                        help=constants.REPORT_RECIPROCAL_HELP)
     parser.add_argument('--reduce', action='store_true',
-                        help='remove n-grams that are contained in larger n-grams')
-    parser.add_argument('--remove', metavar='LABEL', type=str,
-                        help='remove labelled results')
-    parser.add_argument('results', metavar='RESULTS',
-                        help='path to CSV results; use - for stdin')
+                        help=constants.REPORT_REDUCE_HELP)
+    parser.add_argument('--remove', help=constants.REPORT_REMOVE_HELP,
+                        metavar='LABEL', type=str)
+    parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
+                        metavar='RESULTS')
 
 def generate_strip_subparser (subparsers):
-    help='preprocess a corpus by stripping unwanted material from each text'
-    description='Preprocess a corpus by stripping unwanted material from each text.'
-    parser = subparsers.add_parser('strip', description=description, help=help)
+    parser = subparsers.add_parser(
+        'strip', description=constants.STRIP_DESCRIPTION,
+        epilog=constants.STRIP_EPILOG, help=constants.STRIP_HELP)
     parser.set_defaults(func=strip_texts)
     add_common_arguments(parser)
-    parser.add_argument('input', metavar='INPUT',
-                        help='directory containing files to strip')
-    parser.add_argument('output', metavar='OUTPUT',
-                        help='directory to output stripped files to')
+    parser.add_argument('input', help=constants.STRIP_INPUT_HELP,
+                        metavar='INPUT')
+    parser.add_argument('output', help=constants.STRIP_OUTPUT_HELP,
+                        metavar='OUTPUT')
 
 def get_corpus (args):
     manager = tacl.DBManager(args.db, args.memory, args.ram)
@@ -211,6 +223,83 @@ def ngram_intersection (args):
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
+
+
+class ParagraphFormatter (argparse.HelpFormatter):
+
+    """argparse formatter to maintain paragraph breaks in text, while
+    wrapping those blocks.
+
+    Code minimally adapted from the patch at
+    http://bugs.python.org/file28091, authored by rurpy2.
+
+    """
+
+    def _split_lines (self, text, width):
+        return self._para_reformat(text, width, multiline=True)
+
+    def _fill_text (self, text, width, indent):
+        lines = self._para_reformat(text, width, indent, True)
+        return '\n'.join(lines)
+
+    def _para_reformat (self, text, width, indent='', multiline=False):
+        new_lines = list()
+        main_indent = len(re.match(r'( *)',text).group(1))
+
+        def blocker (text):
+            """On each call yields 2-tuple consisting of a boolean and
+            the next block of text from 'text'.  A block is either a
+            single line, or a group of contiguous lines.  The former
+            is returned when not in multiline mode, the text in the
+            line was indented beyond the indentation of the first
+            line, or it was a blank line (the latter two jointly
+            referred to as "no-wrap" lines).  A block of concatenated
+            text lines up to the next no-wrap line is returned when
+            in multiline mode.  The boolean value indicates whether
+            text wrapping should be done on the returned text."""
+            block = list()
+            for line in text.splitlines():
+                line_indent = len(re.match(r'( *)',line).group(1))
+                isindented = line_indent - main_indent > 0
+                isblank = re.match(r'\s*$', line)
+                if isblank or isindented:
+                    # A no-wrap line.
+                    if block:
+                        # Yield previously accumulated block of text
+                        # if any, for wrapping.
+                        yield True, ''.join(block)
+                        block = list()
+                    # And now yield our no-wrap line.
+                    yield False, line
+                else:
+                    # We have a regular text line.
+                    if multiline:
+                        # In multiline mode accumulate it.
+                        block.append(line)
+                    else:
+                        # Not in multiline mode, yield it for
+                        # wrapping.
+                        yield True, line
+            if block:
+                # Yield any text block left over.
+                yield (True, ''.join(block))
+
+        for wrap, line in blocker(text):
+            if wrap:
+                # We have either a single line or a group of
+                # concatented lines.  Either way, we treat them as a
+                # block of text and wrap them (after reducing multiple
+                # whitespace to just single space characters).
+                line = self._whitespace_matcher.sub(' ', line).strip()
+                # Textwrap will do all the hard work for us.
+                new_lines.extend(textwrap.wrap(text=line, width=width,
+                                               initial_indent=indent,
+                                               subsequent_indent=indent))
+            else:
+                # The line was a no-wrap one so leave the formatting
+                # alone.
+                new_lines.append(line[main_indent:])
+        return new_lines
 
 
 if __name__ == '__main__':

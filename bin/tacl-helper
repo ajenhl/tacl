@@ -5,6 +5,7 @@ import logging
 import os
 
 import tacl
+from tacl import constants
 
 
 def main ():
@@ -15,17 +16,19 @@ def main ():
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
-    help = 'display debug information; multiple -v options increase the verbosity'
-    parser.add_argument('-v', '--verbose', action='count', help=help)
+    parser.add_argument('-v', '--verbose', action='count',
+                        help=constants.VERBOSE_HELP)
 
 def add_db_arguments (parser):
     """Adds common arguments for the database subcommands to `parser`."""
     parser.add_argument('-m', '--memory', action='store_true',
-                        help='use RAM for temporary database storage')
-    parser.add_argument('-r', '--ram', default=3, type=int,
-                        help='number of gigabytes of RAM to use')
-    parser.add_argument('db', metavar='DATABASE', help='path to database file')
-    parser.add_argument('corpus', help='path to corpus', metavar='CORPUS')
+                        help=constants.DB_MEMORY_HELP)
+    parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
+                        type=int)
+    parser.add_argument('db', help=constants.DB_DATABASE_HELP,
+                        metavar='DATABASE')
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
 
 def configure_logging (verbose):
     logger = logging.getLogger('tacl-helper')
@@ -51,42 +54,39 @@ def _copy_options (args):
 
 def generate_parser ():
     parser = argparse.ArgumentParser(
-        description='Perform helpful but non-essential tacl-related functions')
+        description=constants.TACL_HELPER_DESCRIPTION)
     subparsers = parser.add_subparsers(title='subcommands')
     generate_text_against_corpus_subparser(subparsers)
     generate_text_in_corpus_subparser(subparsers)
     return parser
 
 def generate_text_against_corpus_subparser (subparsers):
-    description='Generate a script to compare each text of a corpus against all the texts in another corpus'
-    help='generate a script to compare each text of a corpus against all the texts in another corpus'
-    parser = subparsers.add_parser('text-against-corpus',
-                                   description=description, help=help)
+    parser = subparsers.add_parser(
+        'text-against-corpus',
+        description=constants.TACL_HELPER_AGAINST_DESCRIPTION,
+        help=constants.TACL_HELPER_AGAINST_HELP)
     parser.set_defaults(func=text_against_corpus)
     add_common_arguments(parser)
     add_db_arguments(parser)
-    a_texts_help = 'file containing text names to compare (one per line)'
-    b_texts_help = 'file containing corpus text names to be compared against (one per line)'
-    parser.add_argument('a_texts', help=a_texts_help, metavar='FILES_LIST',
+    parser.add_argument('a_texts', help=constants.TACL_HELPER_AGAINST_A_HELP,
+                        metavar='FILES_LIST', type=argparse.FileType('r'))
+    parser.add_argument('b_texts', help=constants.TACL_HELPER_AGAINST_B_HELP,
+                        metavar='CORPUS_FILES_LIST',
                         type=argparse.FileType('r'))
-    parser.add_argument(
-        'b_texts', help=b_texts_help, metavar='CORPUS_FILES_LIST',
-        type=argparse.FileType('r'))
-    parser.add_argument('output_dir',
-                        help='output directory for script and catalogue files')
+    parser.add_argument('output_dir', help=constants.TACL_HELPER_OUTPUT,
+                        metavar='OUTPUT_DIR')
 
 def generate_text_in_corpus_subparser (subparsers):
-    description='Generate a script to compare each text of a corpus with all the other texts of that corpus'
-    help='generate a script to compare each text of a corpus with all the other texts of that corpus'
-    parser = subparsers.add_parser('text-in-corpus', description=description,
-                                   help=help)
+    parser = subparsers.add_parser(
+        'text-in-corpus', description=constants.TACL_HELPER_IN_DESCRIPTION,
+        help=constants.TACL_HELPER_IN_HELP)
     parser.set_defaults(func=text_in_corpus)
     add_common_arguments(parser)
     add_db_arguments(parser)
-    texts_help = 'file containing text names to examine (one per line)'
-    parser.add_argument('texts', help=texts_help, type=argparse.FileType('r'))
-    parser.add_argument('output_dir',
-                        help='output directory for script and catalogue files')
+    parser.add_argument('texts', help=constants.TACL_HELPER_IN_TEXTS_HELP,
+                        metavar='FILE_LIST', type=argparse.FileType('r'))
+    parser.add_argument('output_dir', help=constants.TACL_HELPER_OUTPUT,
+                        metavar='OUTPUT_DIR')
 
 def text_against_corpus (args):
     a_texts = args.a_texts.read().strip().split()
