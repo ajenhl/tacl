@@ -35,16 +35,22 @@ Process
 
 The TACL suite of tools operates on a corpus of texts via an analysis
 of their `n-grams`_. There are several steps in the preparation and
-analysis of the corpus:
+analysis of the corpus, as listed with example commands:
 
 1. Preprocess the texts in the corpus in order to remove material that
    is not relevant to the analysis (the :doc:`tacl strip
    </scripts/tacl-strip>` command). This creates modified files in a
    separate directory, and it is this directory and these files that
-   are the considered the corpus for the remaining steps.
+   are the considered the corpus for the remaining steps. ::
+
+       tacl strip path/XML/dir path/stripped/dir
+
 2. Generate the n-grams that will be used in the analysis (:doc:`tacl
-   ngrams </scripts/tacl-ngrams>`). This is the slowest part of the
-   entire process.
+   ngrams </scripts/tacl-ngrams>`). This is typically the slowest part
+   of the entire process. ::
+
+       tacl ngrams path/db/file path/stripped/dir 2 10
+
 3. Categorise some or all of the texts in the corpus into two or more
    groups. These groups (identified by arbitrary, user-chosen labels)
    are defined in a catalogue file that is initially generated from
@@ -54,14 +60,24 @@ analysis of the corpus:
    own line, followed optionally by whitespace and the label. If the
    label contains a space, it must be quoted.
 
-   Texts that have no label are not used in an analysis.
+   Texts that have no label are not used in an analysis. ::
+
+       tacl catalogue -l "base" path/stripped/dir path/catalogue/file
+
 4. Analyse the n-grams to find either the difference between
    (:doc:`tacl diff <scripts/tacl-diff>`) or intersection of
    (:doc:`tacl intersect </scripts/tacl-intersect>`) the groups of
-   texts as defined in a catalogue file.
+   texts as defined in a catalogue file. ::
+
+       tacl diff path/db/file path/stripped/dir path/catalogue/file > diff-results.csv
+
+       tacl intersect path/db/file path/stripped/dir path/catalogue/file > intersect-results.csv
+
 5. Optionally perform functions on the results of a difference or
    intersection query, to limit the scope of the results (:doc:`tacl
-   report </scripts/tacl-report>`).
+   report </scripts/tacl-report>`). ::
+
+       tacl report --reduce --min-count 5 diff-results.csv > reduced-diff-results.csv
 
 Another script, :doc:`tacl-helper </scripts/tacl-helper>`, can be used
 to create sets of catalogue files and prepare batches of commands for
