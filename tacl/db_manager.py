@@ -24,6 +24,7 @@ class DBManager (object):
         self._c.execute('PRAGMA foreign_keys=ON')
         self._c.execute('PRAGMA locking_mode=EXCLUSIVE')
         self._c.execute('PRAGMA synchronous=OFF')
+        self._parameters = []
         self.init_db()
 
     def add_indices (self):
@@ -62,9 +63,14 @@ class DBManager (object):
 
         """
         # Add a new TextNGram record.
-        self._c.execute('''INSERT INTO TextNGram (text, ngram, size, count)
-                           VALUES (?, ?, ?, ?)''',
-                        (text_id, ngram, size, count))
+        self._parameters.append((text_id, ngram, size, count))
+
+    def add_ngrams (self):
+        self._conn.executemany(
+            '''INSERT INTO TextNGram (text, ngram, size, count)
+               VALUES (?, ?, ?, ?)''', self._parameters)
+        self._conn.commit()
+        self._parameters = []
 
     def add_text (self, filename, checksum):
         """Returns the database ID of the Text record for the text at
@@ -117,9 +123,6 @@ class DBManager (object):
     def clear_labels (self):
         """Clears the labels from all texts."""
         self._c.execute("UPDATE Text SET label=''")
-
-    def commit (self):
-        self._conn.commit()
 
     def counts (self, labels):
         """Returns cursor of n-gram totals by size and text."""
