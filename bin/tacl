@@ -87,7 +87,8 @@ def generate_catalogue_subparser (subparsers):
 def generate_counts_subparser (subparsers):
     parser = subparsers.add_parser(
         'counts', description=constants.COUNTS_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.COUNTS_HELP)
+        epilog=constants.COUNTS_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.COUNTS_HELP)
     parser.set_defaults(func=ngram_counts)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -96,7 +97,8 @@ def generate_counts_subparser (subparsers):
 def generate_diff_subparser (subparsers):
     parser = subparsers.add_parser(
         'diff', description=constants.DIFF_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.DIFF_HELP)
+        epilog=constants.DIFF_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.DIFF_HELP)
     parser.set_defaults(func=ngram_diff)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -105,7 +107,8 @@ def generate_diff_subparser (subparsers):
 def generate_intersect_subparser (subparsers):
     parser = subparsers.add_parser(
         'intersect', description=constants.INTERSECT_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.INTERSECT_HELP)
+        epilog=constants.INTERSECT_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.INTERSECT_HELP)
     parser.set_defaults(func=ngram_intersection)
     add_common_arguments(parser)
     add_db_arguments(parser)

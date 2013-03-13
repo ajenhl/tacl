@@ -14,6 +14,10 @@ COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME, TOTAL_FIELDNAME,
                      COUNT_FIELDNAME, LABEL_FIELDNAME]
 
 # Command-line documentation strings.
+ENCODING_EPILOG = '''\
+    Due to encoding issues, you may need to set the environment
+    variable PYTHONIOENCODING to "utf-8".'''
+
 CATALOGUE_CATALOGUE_HELP = 'path to catalogue file'
 CATALOGUE_DESCRIPTION = 'Generate a catalogue file.'
 CATALOGUE_EPILOG = '''\
@@ -23,6 +27,7 @@ CATALOGUE_HELP = 'generate a catalogue file'
 CATALOGUE_LABEL_HELP = 'label to use for all texts'
 
 COUNTS_DESCRIPTION = 'List counts of n-grams in each labelled text.'
+COUNTS_EPILOG = ENCODING_EPILOG
 COUNTS_HELP = 'list counts of n-grams in each labelled text'
 
 DB_CORPUS_HELP = 'path to corpus'
@@ -31,9 +36,11 @@ DB_MEMORY_HELP = 'use RAM for temporary database storage'
 DB_RAM_HELP = 'number of gigabytes of RAM to use'
 
 DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
+DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'list n-grams unique to each sub-corpus'
 
 INTERSECT_DESCRIPTION = 'List n-grams common to all sub-corpora.'
+INTERSECT_EPILOG = ENCODING_EPILOG
 INTERSECT_HELP = 'list n-grams common to all sub-corpora'
 
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
@@ -55,7 +62,9 @@ REPORT_EPILOG = '''\
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
-        tacl report --recriprocal results.csv | tacl report --reduce -'''
+        tacl report --recriprocal results.csv | tacl report --reduce -
+
+    {}'''.format(ENCODING_EPILOG)
 REPORT_HELP = 'modify a query results file'
 REPORT_MINIMUM_COUNT_HELP = 'minimum total count of n-gram to include'
 REPORT_MAXIMUM_COUNT_HELP = 'maximum total count of n-gram to include'
