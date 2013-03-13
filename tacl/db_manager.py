@@ -49,8 +49,8 @@ class DBManager (object):
                             (label, row['id']))
 
     def add_ngram (self, text_id, ngram, size, count):
-        """Adds a TextNGram row specifying the `count` of `ngram`
-        appearing in `text_id`.
+        """Stores parameter values for inserting a TextNGram row
+        specifying the `count` of `ngram` appearing in `text_id`.
 
         :param text_id: database ID of the Text
         :type text_id: `int`
@@ -62,10 +62,10 @@ class DBManager (object):
         :type count: `int`
 
         """
-        # Add a new TextNGram record.
         self._parameters.append((text_id, ngram, size, count))
 
     def add_ngrams (self):
+        """Adds TextNGram rows using the stored parameter values."""
         self._conn.executemany(
             '''INSERT INTO TextNGram (text, ngram, size, count)
                VALUES (?, ?, ?, ?)''', self._parameters)
