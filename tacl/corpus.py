@@ -63,6 +63,7 @@ class Corpus (object):
         writer.writerow(fieldnames)
         for row in cursor:
             writer.writerow([row[fieldname] for fieldname in fieldnames])
+        logging.info('Finished outputting results')
         return fh
 
     def diff (self, catalogue, fh):
