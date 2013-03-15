@@ -29,10 +29,8 @@ class DBManager (object):
 
     def add_indices (self):
         logging.info('Adding database indices')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexText
-                           ON TextNGram (text)''')
-        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexNGram
-                           ON TextNGram (ngram)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextNGramIndexTextNGram
+                           ON TextNGram (text, ngram)''')
         logging.info('Indices added')
 
     def add_label (self, filename, label, checksum):
@@ -145,7 +143,7 @@ class DBManager (object):
         label_params = ('?,' * len(labels)).strip(',')
         query = '''SELECT TextNGram.ngram, TextNGram.size, TextNGram.count,
                        Text.filename, Text.label
-                   FROM TextNGram, Text
+                   FROM Text CROSS JOIN TextNGram
                    WHERE Text.label IN ({})
                        AND TextNGram.text = Text.id
                        AND TextNGram.ngram IN (
@@ -161,8 +159,8 @@ class DBManager (object):
 
     def drop_indices (self):
         logging.info('Dropping database indices')
-        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexNGram')
-        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexText')
+        self._c.execute('DROP INDEX IF EXISTS TextNGramIndexTextNGram')
+        logging.info('Finished dropping database indices')
 
     def has_ngrams (self, text_id, size):
         """Returns True if there the Text with `text_id` has n-grams
@@ -205,6 +203,8 @@ class DBManager (object):
                            )''')
         self._c.execute('''CREATE UNIQUE INDEX IF NOT EXISTS TextHasNGramIndex
                            ON TextHasNGram (text, size)''')
+        self._c.execute('''CREATE INDEX IF NOT EXISTS TextIndexLabel
+                           ON Text (label)''')
 
     def intersection (self, labels):
         logging.info('Running intersection text query')
@@ -217,7 +217,7 @@ class DBManager (object):
         subqueries = ' INTERSECT '.join([subquery] * number_labels)
         query = '''SELECT TextNgram.ngram, TextNGram.size, TextNGram.count,
                        Text.filename, Text.label
-                   FROM TextNGram, Text
+                   FROM Text CROSS JOIN TextNGram
                    WHERE Text.label IN ({})
                        AND Text.id = TextNGram.text
                        AND TextNGram.ngram IN ({})'''.format(
