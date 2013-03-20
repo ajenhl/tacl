@@ -15,11 +15,12 @@ def main ():
     parser = generate_parser()
     args = parser.parse_args()
     configure_logging(args.verbose)
-    try:
-        args.func(args)
-    except Exception as err:
-        print('Error: {0}'.format(err))
-        sys.exit(1)
+    args.func(args)
+    #try:
+    #    args.func(args)
+    #except Exception as err:
+    #    print('Error: {0}'.format(err))
+    #    sys.exit(1)
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
@@ -36,6 +37,10 @@ def add_db_arguments (parser):
                         metavar='DATABASE')
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
+
+def add_input_arguments (parser):
+    parser.add_argument('-i', '--input', help=constants.INPUT_RESULTS_HELP,
+                        metavar='INPUT_RESULTS')
 
 def add_query_arguments (parser):
     parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
@@ -100,6 +105,7 @@ def generate_diff_subparser (subparsers):
         epilog=constants.DIFF_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.DIFF_HELP)
     parser.set_defaults(func=ngram_diff)
+    add_input_arguments(parser)
     add_common_arguments(parser)
     add_db_arguments(parser)
     add_query_arguments(parser)
@@ -110,6 +116,7 @@ def generate_intersect_subparser (subparsers):
         epilog=constants.INTERSECT_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.INTERSECT_HELP)
     parser.set_defaults(func=ngram_intersection)
+    add_input_arguments(parser)
     add_common_arguments(parser)
     add_db_arguments(parser)
     add_query_arguments(parser)
@@ -208,6 +215,12 @@ def get_catalogue (args):
     catalogue.load(args.catalogue)
     return catalogue
 
+def get_input_fh (args):
+    input_fh = None
+    if args.input:
+        input_fh = open(args.input, 'r', newline='')
+    return input_fh
+
 def ngram_counts (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
@@ -216,12 +229,14 @@ def ngram_counts (args):
 def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    corpus.diff(catalogue, sys.stdout)
+    input_fh = get_input_fh(args)
+    corpus.diff(catalogue, sys.stdout, input_fh)
 
 def ngram_intersection (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    corpus.intersection(catalogue, sys.stdout)
+    input_fh = get_input_fh(args)
+    corpus.intersection(catalogue, sys.stdout, input_fh)
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)

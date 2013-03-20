@@ -52,6 +52,7 @@ class QueryTestCase (unittest.TestCase):
         manager.add_label('1.txt', 'A', '1')
         manager.add_label('2.txt', 'B', '1')
         manager.add_label('3.txt', 'C', '1')
+        manager.add_label('4.txt', 'D', '1')
         manager.add_label('5.txt', 'A', '1')
         # Do not use sqlite3.Row in results, because it makes the
         # comparison of result rows harder.
@@ -80,6 +81,19 @@ class QueryTestCase (unittest.TestCase):
                          ('ha', 2, 1, '3.txt', 'C'), ('at', 2, 1, '3.txt', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_diff_supplied (self):
+        # Test (A AND B) XOR C.
+        supplied_labels = ['A', 'B']
+        input_rows = self._manager.intersection(supplied_labels)
+        ngrams = [row[0] for row in input_rows]
+        actual_rows = self._manager.diff_supplied(
+            ['C'], ngrams, supplied_labels)
+        expected_rows = [('he', 2, 1, '1.txt', 'A'), ('he', 2, 2, '2.txt', 'B'),
+                         ('en', 2, 2, '1.txt', 'A'), ('en', 2, 1, '2.txt', 'B'),
+                         ('e ', 2, 1, '1.txt', 'A'), ('e ', 2, 2, '2.txt', 'B'),
+                         ('nt', 2, 1, '1.txt', 'A'), ('nt', 2, 1, '2.txt', 'B')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_intersection (self):
         actual_rows = self._manager.intersection(['A', 'B'])
         expected_rows = [('th', 2, 1, '1.txt', 'A'), ('th', 2, 1, '2.txt', 'B'),
@@ -91,6 +105,16 @@ class QueryTestCase (unittest.TestCase):
         actual_rows = self._manager.intersection(['A', 'B', 'C'])
         expected_rows = [('th', 2, 1, '1.txt', 'A'), ('th', 2, 1, '2.txt', 'B'),
                          ('th', 2, 1, '3.txt', 'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_intersection_supplied (self):
+        # Test (A XOR B) AND D.
+        supplied_labels = ['A', 'B']
+        input_rows = self._manager.diff(supplied_labels)
+        ngrams = [row[0] for row in input_rows]
+        actual_rows = self._manager.intersection_supplied(
+            ['D'], ngrams, supplied_labels)
+        expected_rows = [('se', 2, 2, '2.txt', 'B'), ('se', 2, 1, '4.txt', 'D')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 

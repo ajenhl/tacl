@@ -39,6 +39,8 @@ DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'list n-grams unique to each sub-corpus'
 
+INPUT_RESULTS_HELP = 'path to results file to restrict query to'
+
 INTERSECT_DESCRIPTION = 'List n-grams common to all sub-corpora.'
 INTERSECT_EPILOG = ENCODING_EPILOG
 INTERSECT_HELP = 'list n-grams common to all sub-corpora'

@@ -70,6 +70,12 @@ class DBManager (object):
         self._conn.commit()
         self._parameters = []
 
+    def _add_temporary_ngrams (self, ngrams):
+        """Adds `ngrams` to a temporary table."""
+        self._c.execute('CREATE TEMPORARY TABLE InputNGram (ngram Text)')
+        self._c.executemany('INSERT INTO temp.InputNGram (ngram) VALUES (?)',
+                            [(ngram,) for ngram in ngrams])
+
     def add_text (self, filename, checksum):
         """Returns the database ID of the Text record for the text at
         `text_path`.
@@ -125,7 +131,7 @@ class DBManager (object):
     def counts (self, labels):
         """Returns cursor of n-gram totals by size and text."""
         logging.info('Running counts query')
-        label_params = ('?,' * len(labels)).strip(',')
+        label_placeholders = self._get_placeholders(labels)
         query = '''SELECT Text.filename, TextNGram.size,
                        COUNT(TextNGram.ngram) as total,
                        SUM(TextNGram.count) as count, Text.label
@@ -134,18 +140,18 @@ class DBManager (object):
                        AND Text.label IN ({})
                    GROUP BY TextNGram.text, TextNGram.size
                    ORDER BY Text.filename, TextNGram.size'''.format(
-            label_params)
+            label_placeholders)
         logging.debug('Query:\n{}\nLabels: {}'.format(query, labels))
         return self._c.execute(query, labels)
 
     def diff (self, labels):
         logging.info('Running diff text query')
-        label_params = ('?,' * len(labels)).strip(',')
+        label_placeholders = self._get_placeholders(labels)
         query = '''SELECT TextNGram.ngram, TextNGram.size, TextNGram.count,
                        Text.filename, Text.label
                    FROM Text CROSS JOIN TextNGram
                    WHERE Text.label IN ({})
-                       AND TextNGram.text = Text.id
+                       AND Text.id = TextNGram.text
                        AND TextNGram.ngram IN (
                            SELECT TextNGram.ngram
                            FROM Text CROSS JOIN TextNGram
@@ -153,14 +159,61 @@ class DBManager (object):
                                AND Text.label IN ({})
                            GROUP BY TextNGram.ngram
                            HAVING COUNT(DISTINCT Text.label) = 1)'''.format(
-            label_params, label_params)
+            label_placeholders, label_placeholders)
         logging.debug('Query:\n{}\nLabels: {}'.format(query, labels))
         return self._c.execute(query, labels + labels)
+
+    def diff_supplied (self, labels, ngrams, supplied_labels):
+        """Returns the results of running a diff query restricted to
+        the supplied n-grams.
+
+        Note that no n-grams associated with `labels` that are not in
+        `ngrams` will be returned; this is an asymmetric diff.
+
+        :param labels: labels of texts to diff against
+        :type labels: `list` of `str`
+        :param ngrams: n-grams to restrict the diff to
+        :type ngrams: `list` of `str`
+        :param supplied_labels: labels associated with `ngrams`
+        :rtype: `sqlite3.Cursor`
+
+        """
+        logging.info('Running diff text query with supplied n-grams')
+        all_labels = labels + supplied_labels
+        label_placeholders = self._get_placeholders(labels)
+        all_label_placeholders = self._get_placeholders(all_labels)
+        self._add_temporary_ngrams(ngrams)
+        query = '''SELECT TextNGram.ngram, TextNGram.size, TextNGram.count,
+                       Text.filename, Text.label
+                   FROM Text CROSS JOIN TextNGram
+                   WHERE Text.label IN ({})
+                       AND Text.id = TextNGram.text
+                       AND TextNGram.ngram IN (
+                           SELECT ngram FROM temp.InputNGram)
+                       AND NOT EXISTS (
+                           SELECT tn.ngram
+                           FROM Text t CROSS JOIN TextNGram tn
+                           WHERE t.id = tn.text
+                               AND t.label IN ({})
+                               AND tn.ngram = TextNGram.ngram)'''.format(
+            all_label_placeholders, label_placeholders)
+        return self._c.execute(query, all_labels + labels)
 
     def drop_indices (self):
         logging.info('Dropping database indices')
         self._c.execute('DROP INDEX IF EXISTS TextNGramIndexTextNGram')
         logging.info('Finished dropping database indices')
+
+    def _get_placeholders (self, items):
+        """Returns a string of placeholders, one for each item in
+        `items`.
+
+        :param items: items to create placeholders for
+        :type items: `list`
+        :rtype: `str`
+
+        """
+        return ('?,' * len(items)).strip(',')
 
     def has_ngrams (self, text_id, size):
         """Returns True if there the Text with `text_id` has n-grams
@@ -208,23 +261,54 @@ class DBManager (object):
 
     def intersection (self, labels):
         logging.info('Running intersection text query')
-        number_labels = len(labels)
-        label_params = ('?,' * number_labels).strip(',')
+        label_placeholders = self._get_placeholders(labels)
         subquery = '''SELECT TextNGram.ngram
                       FROM Text CROSS JOIN TextNGram
                       WHERE Text.label = ?
                           AND Text.id = TextNGram.text'''
-        subqueries = ' INTERSECT '.join([subquery] * number_labels)
+        subqueries = ' INTERSECT '.join([subquery] * len(labels))
         query = '''SELECT TextNgram.ngram, TextNGram.size, TextNGram.count,
                        Text.filename, Text.label
                    FROM Text CROSS JOIN TextNGram
                    WHERE Text.label IN ({})
                        AND Text.id = TextNGram.text
                        AND TextNGram.ngram IN ({})'''.format(
-            label_params, subqueries)
+            label_placeholders, subqueries)
         logging.debug('Query:\n{query}\nLabels: {labels}'.format(
                 query=query, labels=labels))
         return self._c.execute(query, labels*2)
+
+    def intersection_supplied (self, labels, ngrams, supplied_labels):
+        """Returns the results of running an intersection query
+        restricted to the supplied n-grams.
+
+        :param labels: labels of texts to intersect with
+        :type labels: `list` of `str`
+        :param ngrams: n-grams to restrict the intersection to
+        :type ngrams: `list` of `str`
+        :param supplied_labels: labels associated with `ngrams`
+        :rtype: `sqlite3.Cursor`
+
+        """
+        logging.info('Running intersection text query with supplied n-grams.')
+        all_labels = labels + supplied_labels
+        all_label_placeholders = self._get_placeholders(all_labels)
+        self._add_temporary_ngrams(ngrams)
+        subquery = '''SELECT TextNGram.ngram
+                      FROM Text CROSS JOIN TextNGram
+                      WHERE Text.label = ?
+                          AND Text.id = TextNGram.text'''
+        subqueries = ' INTERSECT '.join([subquery] * len(labels))
+        query = '''SELECT TextNgram.ngram, TextNGram.size, TextNGram.count,
+                       Text.filename, Text.label
+                   FROM Text CROSS JOIN TextNGram
+                   WHERE Text.label IN ({})
+                       AND Text.id = TextNGram.text
+                       AND TextNGram.ngram IN (
+                           SELECT ngram FROM temp.InputNGram)
+                       AND TextNGram.ngram IN ({})'''.format(
+            all_label_placeholders, subqueries)
+        return self._c.execute(query, all_labels + labels)
 
     def vacuum (self):
         logging.info('Vacuuming the database')

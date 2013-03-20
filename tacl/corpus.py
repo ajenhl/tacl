@@ -66,7 +66,7 @@ class Corpus (object):
         logging.info('Finished outputting results')
         return fh
 
-    def diff (self, catalogue, fh):
+    def diff (self, catalogue, output_fh, input_fh=None):
         """Writes the n-gram data for the differences between the sets
         of texts in `catalogue` to `fh` and returns it.
 
@@ -80,15 +80,24 @@ class Corpus (object):
 
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
-        :param fh: file to write data to
-        :type fh: file object
+        :param output_fh: file to write data to
+        :type output_fh: file object
+        :param input_fh: file to read data from
+        :type input_fh: file object
         :rtype: file object
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        return self._csv(self._manager.diff(labels),
-                         constants.QUERY_FIELDNAMES, fh)
+        if input_fh:
+            input_ngrams, input_labels = self.process_supplied_results(
+                input_fh)
+            labels = [label for label in labels if label not in input_labels]
+            cursor = self._manager.diff_supplied(labels, input_ngrams,
+                                                 input_labels)
+        else:
+            cursor = self._manager.diff(labels)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def generate_ngrams (self, minimum, maximum, index):
         """Generates the n-grams (`minimum` <= n <= `maximum`) for
@@ -118,7 +127,7 @@ class Corpus (object):
         self._manager.analyse()
         self._manager.vacuum()
 
-    def intersection (self, catalogue, fh):
+    def intersection (self, catalogue, fh, input_fh=None):
         """Writes the n-gram data for the intersection between the
         sets of texts in `catalogue` to `fh`.
 
@@ -134,13 +143,22 @@ class Corpus (object):
         :type catalogue: `Catalogue`
         :param fh: file to write data to
         :type fh: file object
+        :param input_fh: file to read data from
+        :type input_fh: file object
         :rtype: file object
 
         """
         self._manager.clear_labels()
         labels = self._set_labels(catalogue)
-        return self._csv(self._manager.intersection(labels),
-                         constants.QUERY_FIELDNAMES, fh)
+        if input_fh:
+            input_ngrams, input_labels = self.process_supplied_results(
+                input_fh)
+            labels = [label for label in labels if label not in input_labels]
+            cursor = self._manager.intersection_supplied(labels, input_ngrams,
+                                                         input_labels)
+        else:
+            cursor = self._manager.intersection(labels)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
 
     def _open_text (self, filename):
         """Returns a `Text` object for `filename`.
@@ -157,6 +175,23 @@ class Corpus (object):
                     filename))
             raise
         return text
+
+    def process_supplied_results (self, input_csv):
+        """Returns the (unique) n-grams and labels used in
+        `input_csv`.
+
+        :param input_csv: query results in CSV format
+        :type input_csv: file-like object
+        :rtype: `tuple` of `list` of `str`
+
+        """
+        reader = csv.DictReader(input_csv)
+        ngrams = set()
+        labels = set()
+        for row in reader:
+            ngrams.add(row[constants.NGRAM_FIELDNAME])
+            labels.add(row[constants.LABEL_FIELDNAME])
+        return list(ngrams), list(labels)
 
     def _set_labels (self, catalogue):
         """Returns the labels from `catalogue`, and sets them in the
