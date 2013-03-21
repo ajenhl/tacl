@@ -81,6 +81,13 @@ class QueryTestCase (unittest.TestCase):
                          ('ha', 2, 1, '3.txt', 'C'), ('at', 2, 1, '3.txt', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_diff_asymmetric (self):
+        actual_rows = self._manager.diff_asymmetric(['A', 'B', 'C'], 'A')
+        expected_rows = [('n ', 2, 1, '1.txt', 'A'), (' w', 2, 2, '1.txt', 'A'),
+                         ('we', 2, 2, '1.txt', 'A'), ('we', 2, 1, '5.txt', 'A'),
+                         ('el', 2, 1, '5.txt', 'A'), ('ll', 2, 1, '5.txt', 'A')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_diff_supplied (self):
         # Test (A AND B) XOR C.
         supplied_labels = ['A', 'B']

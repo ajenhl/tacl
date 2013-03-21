@@ -105,7 +105,10 @@ def generate_diff_subparser (subparsers):
         epilog=constants.DIFF_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.DIFF_HELP)
     parser.set_defaults(func=ngram_diff)
-    add_input_arguments(parser)
+    group = parser.add_mutually_exclusive_group()
+    add_input_arguments(group)
+    group.add_argument('-a', '--asymmetric', help=constants.ASYMMETRIC_HELP,
+                       metavar='LABEL')
     add_common_arguments(parser)
     add_db_arguments(parser)
     add_query_arguments(parser)
@@ -230,7 +233,7 @@ def ngram_diff (args):
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
     input_fh = get_input_fh(args)
-    corpus.diff(catalogue, sys.stdout, input_fh)
+    corpus.diff(catalogue, sys.stdout, input_fh, args.asymmetric)
 
 def ngram_intersection (args):
     corpus = get_corpus(args)

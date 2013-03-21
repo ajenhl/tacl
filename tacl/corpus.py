@@ -66,7 +66,7 @@ class Corpus (object):
         logging.info('Finished outputting results')
         return fh
 
-    def diff (self, catalogue, output_fh, input_fh=None):
+    def diff (self, catalogue, output_fh, input_fh=None, prime_label=None):
         """Writes the n-gram data for the differences between the sets
         of texts in `catalogue` to `fh` and returns it.
 
@@ -78,12 +78,20 @@ class Corpus (object):
             count (of instances of n-gram)
             label
 
+        If `input_fh` is not None, the CSV results it contains are
+        used to restrict the results of the query.
+
+        If `prime_label` is not None, the diff query is asymmetric,
+        with results only being associated with that label.
+
         :param catalogue: association of texts with labels
         :type catalogue: `Catalogue`
         :param output_fh: file to write data to
         :type output_fh: file object
         :param input_fh: file to read data from
         :type input_fh: file object
+        :param prime_label: label of sub-corpus to restrict results to
+        :type prime_label: `str`
         :rtype: file object
 
         """
@@ -95,6 +103,8 @@ class Corpus (object):
             labels = [label for label in labels if label not in input_labels]
             cursor = self._manager.diff_supplied(labels, input_ngrams,
                                                  input_labels)
+        elif prime_label:
+            cursor = self._manager.diff_asymmetric(labels, prime_label)
         else:
             cursor = self._manager.diff(labels)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)

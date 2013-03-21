@@ -145,6 +145,7 @@ class DBManager (object):
         return self._c.execute(query, labels)
 
     def diff (self, labels):
+        """Returns the results of running a diff query."""
         logging.info('Running diff text query')
         label_placeholders = self._get_placeholders(labels)
         query = '''SELECT TextNGram.ngram, TextNGram.size, TextNGram.count,
@@ -162,6 +163,27 @@ class DBManager (object):
             label_placeholders, label_placeholders)
         logging.debug('Query:\n{}\nLabels: {}'.format(query, labels))
         return self._c.execute(query, labels + labels)
+
+    def diff_asymmetric (self, labels, prime_label):
+        """Returns the results of running an asymmetric diff query."""
+        logging.info('Running asymmetric diff text query')
+        label_placeholders = self._get_placeholders(labels)
+        query = '''SELECT TextNGram.ngram, TextNGram.size, TextNGram.count,
+                       Text.filename, Text.label
+                   FROM Text CROSS JOIN TextNGram
+                   WHERE Text.label IN (?)
+                       AND Text.id = TextNGram.text
+                       AND TextNGram.ngram IN (
+                           SELECT TextNGram.ngram
+                           FROM Text CROSS JOIN TextNGram
+                           WHERE Text.id = TextNGram.text
+                               AND Text.label IN ({})
+                           GROUP BY TextNGram.ngram
+                           HAVING COUNT(DISTINCT Text.label) = 1)'''.format(
+            label_placeholders)
+        logging.debug('Query:\n{}\nLabels: {}\nPrime label: {}'.format(
+                query, labels, prime_label))
+        return self._c.execute(query, [prime_label] + labels)
 
     def diff_supplied (self, labels, ngrams, supplied_labels):
         """Returns the results of running a diff query restricted to

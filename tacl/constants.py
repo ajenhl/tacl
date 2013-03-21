@@ -18,6 +18,8 @@ ENCODING_EPILOG = '''\
     Due to encoding issues, you may need to set the environment
     variable PYTHONIOENCODING to "utf-8".'''
 
+ASYMMETRIC_HELP = 'label of sub-corpus to restrict results to'
+
 CATALOGUE_CATALOGUE_HELP = 'path to catalogue file'
 CATALOGUE_DESCRIPTION = 'Generate a catalogue file.'
 CATALOGUE_EPILOG = '''\
