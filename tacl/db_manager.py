@@ -190,7 +190,9 @@ class DBManager (object):
         the supplied n-grams.
 
         Note that no n-grams associated with `labels` that are not in
-        `ngrams` will be returned; this is an asymmetric diff.
+        `ngrams` will be returned; this is an asymmetric diff, and the
+        supplied n-grams are treated as if they are all associated
+        with a single label.
 
         :param labels: labels of texts to diff against
         :type labels: `list` of `str`
@@ -303,6 +305,9 @@ class DBManager (object):
     def intersection_supplied (self, labels, ngrams, supplied_labels):
         """Returns the results of running an intersection query
         restricted to the supplied n-grams.
+
+        Note that the supplied n-grams are treated as if they are all
+        associated with a single label.
 
         :param labels: labels of texts to intersect with
         :type labels: `list` of `str`
