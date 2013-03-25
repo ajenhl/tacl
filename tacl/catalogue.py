@@ -37,7 +37,7 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        writer = csv.writer(open(path, 'w'), delimiter=' ')
+        writer = csv.writer(open(path, 'w', newline=''), delimiter=' ')
         rows = list(self.items())
         rows.sort(key=lambda x: x[0])
         writer.writerows(rows)
