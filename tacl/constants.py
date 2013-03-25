@@ -53,7 +53,6 @@ INTERSECT_HELP = 'list n-grams common to all sub-corpora'
 
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
 NGRAMS_HELP = 'generate n-grams from a corpus'
-NGRAMS_INDEX_HELP = 'drop indices before adding n-grams'
 NGRAMS_MAXIMUM_HELP = 'maximum size of n-gram to generate (integer)'
 NGRAMS_MINIMUM_HELP = 'minimum size of n-gram to generate (integer)'
 
