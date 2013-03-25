@@ -20,8 +20,3 @@ class Tokenizer (object):
 
     def tokenize (self, text):
         return self._regexp.findall(text)
-
-
-# A token is either a workaround (anything in square brackets, as
-# a whole), or a single word character.
-tokenizer = Tokenizer(r'\[[^]]*\]|\w')

@@ -4,13 +4,14 @@ import csv
 import logging
 
 from . import constants
-from .tokenizer import tokenizer
+from .tokenizer import Tokenizer
 
 
 class Report:
 
     def __init__ (self, results):
         self._rows = [row for row in csv.DictReader(results)]
+        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
     def csv (self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
@@ -37,7 +38,7 @@ class Report:
 
         """
         substrings = []
-        tokens = tokenizer.tokenize(ngram)
+        tokens = self._tokenizer.tokenize(ngram)
         for n in range(1, size):
             count = max(0, len(tokens) - n + 1)
             ngrams = [''.join(tokens[i:i+n]) for i in range(count)]

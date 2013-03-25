@@ -1,6 +1,7 @@
 import csv
 import io
 import unittest
+import unittest.mock
 
 import tacl
 
@@ -15,6 +16,12 @@ class TaclTestCase (unittest.TestCase):
             writer.writerow(row)
         fh.seek(0)
         return fh
+
+    def _create_patch (self, name, spec=True):
+        patcher = unittest.mock.patch(name, autospec=spec, spec_set=spec)
+        thing = patcher.start()
+        self.addCleanup(patcher.stop)
+        return thing
 
     def _get_rows_from_csv (self, fh):
         rows = []

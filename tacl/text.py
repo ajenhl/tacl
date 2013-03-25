@@ -2,88 +2,76 @@
 
 import collections
 import hashlib
-import logging
 
-from .tokenizer import tokenizer
+from . import constants
+from .tokenizer import Tokenizer
 
 
 class Text (object):
 
-    def __init__ (self, filename, content, manager):
+    _tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
+
+    def __init__ (self, filename, content):
         self._filename = filename
         self._content = content
-        self._manager = manager
-        self._checksum = hashlib.md5(content).hexdigest()
 
-    def add_label (self, label):
-        """Adds `label` to the record of this text in the database."""
-        self._manager.add_label(self._filename, label, self._checksum)
+    def get_checksum (self):
+        """Returns the checksum for the content of this text.
 
-    def generate_ngrams (self, minimum, maximum):
-        """Generates the n-grams (`minimum` <= n <= `maximum`) for
-        this text.
+        :rtype: `str`
+
+        """
+        return hashlib.md5(self._content.encode('utf-8')).hexdigest()
+
+    def get_filename (self):
+        """Returns the filename of this text.
+
+        :rtype: `str`
+
+        """
+        return self._filename
+
+    def get_ngrams (self, minimum, maximum):
+        """Returns a generator supplying the n-grams (`minimum` <= n
+        <= `maximum`) for this text.
+
+        Each iteration of the generator supplies a tuple consisting of
+        the size of the n-grams and a `collections.Counter` of the
+        n-grams.
 
         :param minimum: minimum n-gram size
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
+        :rtype: `generator`
 
         """
-        logging.info('Generating n-grams ({} <= n <= {}) for {}'.format(
-                minimum, maximum, self._filename))
-        text_id = self._manager.add_text(self._filename, self._checksum)
-        tokens = tokenizer.tokenize(self._content.decode('utf-8'))
+        tokens = self.get_tokens()
         for size in range(minimum, maximum + 1):
-            self._generate_ngrams(tokens, size, text_id)
+            ngrams = collections.Counter(self.ngrams(tokens, size))
+            yield (size, ngrams)
 
-    def _generate_ngrams (self, tokens, size, text_id):
-        """Generates the n-grams of size `size` from `text`.
-
-        :param tokens: tokens to generate n-grams from
-        :type tokens: `list`
-        :param size: size of the n-gram
-        :type size: `int`
-        :param text_id: id of text in database
-        :type text_id: `int`
-
-        """
-        # Check that there aren't already n-grams of this size in the
-        # database, in which case there is no need to generate them
-        # again.
-        if self._manager.has_ngrams(text_id, size):
-            logging.info('{} already has {}-grams; not regenerating'.format(
-                    self._filename, size))
-        else:
-            logging.info('Generating {}-grams for {}'.format(
-                    size, self._filename))
-            self._manager.add_text_ngram(text_id, size)
-            counts = collections.Counter(self.ingrams(tokens, size))
-            logging.info('There are {} unique {}-grams'.format(
-                    len(counts), size))
-            for ngram, count in counts.items():
-                self._manager.add_ngram(text_id, ngram, size, count)
-            self._manager.add_ngrams()
+    def get_tokens (self):
+        """Returns a list of tokens in this text."""
+        return self._tokenizer.tokenize(self._content)
 
     @staticmethod
-    def ingrams (sequence, degree):
-        """Returns the n-grams generated from `sequence`, as an
-        iterator.
+    def ngrams (sequence, degree):
+        """Returns the n-grams generated from `sequence`.
 
-        Base on the ingrams function from the Natural Language
+        Based on the ngrams function from the Natural Language
         Toolkit.
 
+        Each n-gram in the returned list is a string with whitespace
+        removed.
+
         :param sequence: the source data to be converted into n-grams
-        :type sequence: sequence or iter
+        :type sequence: sequence
         :param degree: the degree of the n-grams
         :type degree: int
+        :rtype: `list` of `str`
 
         """
-        sequence = iter(sequence)
-        history = []
-        while degree > 1:
-            history.append(next(sequence))
-            degree -= 1
-        for item in sequence:
-            history.append(item)
-            yield ''.join(''.join(history).split())
-            del history[0]
+        count = max(0, len(sequence) - degree + 1)
+        return [''.join(''.join(sequence[i:i+degree]).split())
+                for i in range(count)]

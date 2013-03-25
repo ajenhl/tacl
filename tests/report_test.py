@@ -4,7 +4,7 @@ import io
 import unittest
 
 import tacl
-from tacl_test_case import TaclTestCase
+from .tacl_test_case import TaclTestCase
 
 
 class ReportTestCase (TaclTestCase):

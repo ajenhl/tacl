@@ -15,12 +15,11 @@ def main ():
     parser = generate_parser()
     args = parser.parse_args()
     configure_logging(args.verbose)
-    args.func(args)
-    #try:
-    #    args.func(args)
-    #except Exception as err:
-    #    print('Error: {0}'.format(err))
-    #    sys.exit(1)
+    try:
+        args.func(args)
+    except Exception as err:
+        print('Error: {0}'.format(err))
+        sys.exit(1)
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
@@ -125,8 +124,9 @@ def generate_intersect_subparser (subparsers):
     add_query_arguments(parser)
 
 def generate_ngrams (args):
+    store = get_data_store(args)
     corpus = get_corpus(args)
-    corpus.generate_ngrams(args.min_size, args.max_size, args.index)
+    store.add_ngrams(corpus, args.min_size, args.max_size)
 
 def generate_ngrams_subparser (subparsers):
     parser = subparsers.add_parser(
@@ -135,8 +135,6 @@ def generate_ngrams_subparser (subparsers):
     parser.set_defaults(func=generate_ngrams)
     add_common_arguments(parser)
     add_db_arguments(parser)
-    parser.add_argument('-i', '--index', action='store_true',
-                        help=constants.NGRAMS_INDEX_HELP)
     parser.add_argument('min_size', help=constants.NGRAMS_MINIMUM_HELP,
                         metavar='SIZE', type=int)
     parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
@@ -209,9 +207,7 @@ def generate_strip_subparser (subparsers):
                         metavar='OUTPUT')
 
 def get_corpus (args):
-    manager = tacl.DBManager(args.db, args.memory, args.ram)
-    corpus = tacl.Corpus(args.corpus, manager)
-    return corpus
+    return tacl.Corpus(args.corpus)
 
 def get_catalogue (args):
     catalogue = tacl.Catalogue()
@@ -224,22 +220,39 @@ def get_input_fh (args):
         input_fh = open(args.input, 'r', newline='')
     return input_fh
 
+def get_data_store (args):
+    return tacl.DataStore(args.db, args.memory, args.ram)
+
 def ngram_counts (args):
+    store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    corpus.counts(catalogue, sys.stdout)
+    store.validate(corpus, catalogue)
+    store.counts(catalogue, sys.stdout)
 
 def ngram_diff (args):
+    store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
     input_fh = get_input_fh(args)
-    corpus.diff(catalogue, sys.stdout, input_fh, args.asymmetric)
+    store.validate(corpus, catalogue)
+    if input_fh:
+        store.diff_supplied(catalogue, input_fh, sys.stdout)
+    elif args.asymmetric:
+        store.diff_asymmetric(catalogue, args.asymmetric, sys.stdout)
+    else:
+        store.diff(catalogue, sys.stdout)
 
 def ngram_intersection (args):
+    store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
     input_fh = get_input_fh(args)
-    corpus.intersection(catalogue, sys.stdout, input_fh)
+    store.validate(corpus, catalogue)
+    if input_fh:
+        corpus.intersection_supplied(catalogue, input_fh, sys.stdout)
+    else:
+        corpus.intersection(catalogue, sys.stdout)
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
