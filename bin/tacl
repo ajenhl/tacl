@@ -136,9 +136,9 @@ def generate_ngrams_subparser (subparsers):
     add_common_arguments(parser)
     add_db_arguments(parser)
     parser.add_argument('min_size', help=constants.NGRAMS_MINIMUM_HELP,
-                        metavar='SIZE', type=int)
+                        metavar='MINIMUM', type=int)
     parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
-                        metavar='SIZE', type=int)
+                        metavar='MAXIMUM', type=int)
 
 def generate_report (args):
     if args.results == '-':
