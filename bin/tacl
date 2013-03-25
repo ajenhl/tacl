@@ -250,9 +250,9 @@ def ngram_intersection (args):
     input_fh = get_input_fh(args)
     store.validate(corpus, catalogue)
     if input_fh:
-        corpus.intersection_supplied(catalogue, input_fh, sys.stdout)
+        store.intersection_supplied(catalogue, input_fh, sys.stdout)
     else:
-        corpus.intersection(catalogue, sys.stdout)
+        store.intersection(catalogue, sys.stdout)
 
 def strip_texts (args):
     stripper = tacl.Stripper(args.input, args.output)
