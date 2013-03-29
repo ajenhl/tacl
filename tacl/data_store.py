@@ -10,6 +10,13 @@ from . import constants
 
 class DataStore (object):
 
+    """Class representing the data store for text data.
+
+    It provides an interface to the underlying database, with methods
+    to add and query data.
+
+    """
+
     def __init__ (self, db_name, use_memory=True, ram=0):
         if db_name == ':memory:':
             self._db_name = db_name
@@ -103,11 +110,9 @@ class DataStore (object):
 
         """
         if self._has_ngrams(text_id, size):
-            logging.info('{}-grams are already in the database'.format(
-                    size))
+            logging.info('{}-grams are already in the database'.format(size))
         else:
-            logging.info('Adding {} unique {}-grams'.format(
-                    len(ngrams), size))
+            logging.info('Adding {} unique {}-grams'.format(len(ngrams), size))
             parameters = [[text_id, ngram, size, count]
                           for ngram, count in ngrams.items()]
             self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
@@ -126,14 +131,14 @@ class DataStore (object):
         self._conn.execute(constants.ANALYSE_SQL.format(table))
         logging.info('Analysis of database complete')
 
-    def counts (self, catalogue, fh):
-        """Returns `fh` populated with CSV results giving n-gram
-        counts of the texts in `catalogue`.
+    def counts (self, catalogue, output_fh):
+        """Returns `output_fh` populated with CSV results giving
+        n-gram counts of the texts in `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -143,31 +148,33 @@ class DataStore (object):
         logging.info('Running counts query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
         cursor = self._conn.execute(query, labels)
-        return self._csv(cursor, constants.COUNTS_FIELDNAMES, fh)
+        return self._csv(cursor, constants.COUNTS_FIELDNAMES, output_fh)
 
-    def _csv (self, cursor, fieldnames, fh):
-        """Writes the rows of `cursor` in CSV format to `fh` and
-        returns it.
+    @staticmethod
+    def _csv (cursor, fieldnames, output_fh):
+        """Writes the rows of `cursor` in CSV format to `output_fh`
+        and returns it.
 
         :param cursor: database cursor containing data to be be output
         :type cursor: `sqlite3.Cursor`
         :param fieldnames: row headings
         :type fieldnames: `list`
-        :param fh: file to write data to
-        :type fh: file object
+        :param output_fh: file to write data to
+        :type output_fh: file object
         :rtype: file object
 
         """
         logging.info('Finished query; outputting results in CSV format')
-        writer = csv.writer(fh)
+        writer = csv.writer(output_fh)
         writer.writerow(fieldnames)
         for row in cursor:
             writer.writerow([row[fieldname] for fieldname in fieldnames])
         logging.info('Finished outputting results')
-        return fh
+        return output_fh
 
     def _delete_text_ngrams (self, text_id):
-        """Deletes all n-grams associated with `text_id` from the data store.
+        """Deletes all n-grams associated with `text_id` from the data
+        store.
 
         :param text_id: database ID of text
         :type text_id: `int`
@@ -177,15 +184,15 @@ class DataStore (object):
         self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
         self._conn.commit()
 
-    def diff (self, catalogue, fh):
-        """Returns `fh` populated with CSV results giving the
+    def diff (self, catalogue, output_fh):
+        """Returns `output_fh` populated with CSV results giving the
         symmetric difference in n-grams between the labelled sets of
         texts in `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -196,10 +203,10 @@ class DataStore (object):
         logging.info('Running diff query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
         cursor = self._conn.execute(query, labels + labels)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def diff_asymmetric (self, catalogue, prime_label, fh):
-        """Returns `fh` populated with CSV results giving the
+    def diff_asymmetric (self, catalogue, prime_label, output_fh):
+        """Returns `output_fh` populated with CSV results giving the
         difference in n-grams between the labelled sets of texts in
         `catalogue`, limited to those texts labelled with
         `prime_label`.
@@ -208,8 +215,8 @@ class DataStore (object):
         :type catalogue: `Catalogue`
         :param prime_label: label to limit results to
         :type prime_label: `str`
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -220,10 +227,10 @@ class DataStore (object):
         logging.debug('Query: {}\nLabels: {}\nPrime label: {}'.format(
                 query, labels, prime_label))
         cursor = self._conn.execute(query, [prime_label] + labels)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def diff_supplied (self, catalogue, supplied, fh):
-        """Returns `fh` populated with CSV results giving the
+    def diff_supplied (self, catalogue, supplied, output_fh):
+        """Returns `output_fh` populated with CSV results giving the
         difference in n-grams between the labelled sets of texts in
         `catalogue`, limited to those results present in `supplied`.
 
@@ -231,8 +238,8 @@ class DataStore (object):
         :type catalogue: `Catalogue`
         :param supplied: CSV results used to limit query
         :type supplied: file-like object
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -250,7 +257,7 @@ class DataStore (object):
         logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
                 query, all_labels, labels))
         cursor = self._conn.execute(query, all_labels + labels)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def _drop_indices (self):
         """Drops the database indices relating to n-grams."""
@@ -258,7 +265,8 @@ class DataStore (object):
         self._conn.execute(constants.DROP_TEXTNGRAM_INDEX_SQL)
         logging.info('Finished dropping database indices')
 
-    def _get_placeholders (self, items):
+    @staticmethod
+    def _get_placeholders (items):
         """Returns a string of placeholders, one for each item in
         `items`.
 
@@ -291,8 +299,8 @@ class DataStore (object):
         else:
             text_id = text_record['id']
             if text_record['checksum'] != text.get_checksum():
-                logging.info('Text {} has changed since it was added to the ' \
-                                 'database'.format(filename))
+                logging.info('Text {} has changed since it was added to the '
+                             'database'.format(filename))
                 self._update_text_record(text, text_id)
                 logging.info('Deleting potentially out-of-date n-grams')
                 self._delete_text_ngrams(text_id)
@@ -328,15 +336,15 @@ class DataStore (object):
         self._conn.execute(constants.CREATE_INDEX_TEXTHASNGRAM_SQL)
         self._conn.execute(constants.CREATE_INDEX_TEXT_SQL)
 
-    def intersection (self, catalogue, fh):
-        """Returns `fh` populated with CSV results giving the
+    def intersection (self, catalogue, output_fh):
+        """Returns `output_fh` populated with CSV results giving the
         intersection in n-grams of the labelled sets of texts in
         `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -349,10 +357,10 @@ class DataStore (object):
         logging.info('Running intersection query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
         cursor = self._conn.execute(query, labels * 2)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def intersection_supplied (self, catalogue, supplied, fh):
-        """Returns `fh` populated with CSV results giving the
+    def intersection_supplied (self, catalogue, supplied, output_fh):
+        """Returns `output_fh` populated with CSV results giving the
         intersection in n-grams between the labelled sets of texts in
         `catalogue`, limited to those results present in `supplied`.
 
@@ -360,8 +368,8 @@ class DataStore (object):
         :type catalogue: `Catalogue`
         :param supplied: CSV results used to limit query
         :type supplied: file-like object
-        :param fh: object to output results to
-        :type fh: file-like object
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
         :rtype: file-like object
 
         """
@@ -380,9 +388,10 @@ class DataStore (object):
         logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
                 query, all_labels, labels))
         cursor = self._conn.execute(query, all_labels + labels)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, fh)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def _process_supplied_results (self, input_csv):
+    @staticmethod
+    def _process_supplied_results (input_csv):
         """Returns the unique n-grams and labels used in `input_csv`.
 
         :param input_csv: query results in CSV format
@@ -453,12 +462,12 @@ class DataStore (object):
         for filename in catalogue:
             try:
                 checksum = corpus.get_text(filename).get_checksum()
-            except FileNotFoundError as err:
+            except FileNotFoundError:
                 logging.error('Catalogue references {} that does not exist in '
                               'the corpus'.format(filename))
                 raise
             row = self._conn.execute(constants.SELECT_TEXT_SQL,
-                                              [filename]).fetchone()
+                                     [filename]).fetchone()
             if row is None:
                 is_valid = False
                 logging.warning('No record (or n-grams) exists for {} in the '

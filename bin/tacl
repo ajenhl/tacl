@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+"""Command-line script to perform n-gram analysis of a corpus of
+texts."""
+
 import argparse
 import io
 import logging
@@ -27,7 +30,8 @@ def add_common_arguments (parser):
                         help=constants.VERBOSE_HELP)
 
 def add_db_arguments (parser):
-    """Adds common arguments for the database subcommands to `parser`."""
+    """Adds common arguments for the database sub-commands to
+    `parser`."""
     parser.add_argument('-m', '--memory', action='store_true',
                         help=constants.DB_MEMORY_HELP)
     parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
@@ -38,15 +42,18 @@ def add_db_arguments (parser):
                         metavar='CORPUS')
 
 def add_input_arguments (parser):
+    """Adds common arguments for queries that allow a supplied results
+    file."""
     parser.add_argument('-i', '--input', help=constants.INPUT_RESULTS_HELP,
                         metavar='INPUT_RESULTS')
 
 def add_query_arguments (parser):
+    """Adds common arguments for query sub-commonads to `parser`."""
     parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
                         metavar='CATALOGUE')
 
 def configure_logging (verbose):
-    logger = logging.getLogger('tacl')
+    """Configures the logging used."""
     if not verbose:
         log_level = logging.WARNING
     elif verbose == 1:
@@ -57,6 +64,7 @@ def configure_logging (verbose):
                         level=log_level)
 
 def generate_parser ():
+    """Returns a parser configured with sub-commands and arguments."""
     parser = argparse.ArgumentParser(
         description=constants.TACL_DESCRIPTION,
         formatter_class=ParagraphFormatter)
@@ -71,11 +79,14 @@ def generate_parser ():
     return parser
 
 def generate_catalogue (args):
+    """Generates and saves a catalogue file."""
     catalogue = tacl.Catalogue()
     catalogue.generate(args.corpus, args.label)
     catalogue.save(args.catalogue)
 
 def generate_catalogue_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to generate and save
+    a catalogue file."""
     parser = subparsers.add_parser(
         'catalogue', description=constants.CATALOGUE_DESCRIPTION,
         epilog=constants.CATALOGUE_EPILOG,
@@ -89,6 +100,8 @@ def generate_catalogue_subparser (subparsers):
                         help=constants.CATALOGUE_LABEL_HELP)
 
 def generate_counts_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to make a counts
+    query."""
     parser = subparsers.add_parser(
         'counts', description=constants.COUNTS_DESCRIPTION,
         epilog=constants.COUNTS_EPILOG, formatter_class=ParagraphFormatter,
@@ -99,6 +112,8 @@ def generate_counts_subparser (subparsers):
     add_query_arguments(parser)
 
 def generate_diff_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to make a diff
+    query."""
     parser = subparsers.add_parser(
         'diff', description=constants.DIFF_DESCRIPTION,
         epilog=constants.DIFF_EPILOG, formatter_class=ParagraphFormatter,
@@ -113,6 +128,8 @@ def generate_diff_subparser (subparsers):
     add_query_arguments(parser)
 
 def generate_intersect_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to make an
+    intersection query."""
     parser = subparsers.add_parser(
         'intersect', description=constants.INTERSECT_DESCRIPTION,
         epilog=constants.INTERSECT_EPILOG, formatter_class=ParagraphFormatter,
@@ -124,11 +141,14 @@ def generate_intersect_subparser (subparsers):
     add_query_arguments(parser)
 
 def generate_ngrams (args):
+    """Adds n-grams data to the data store."""
     store = get_data_store(args)
     corpus = get_corpus(args)
     store.add_ngrams(corpus, args.min_size, args.max_size)
 
 def generate_ngrams_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to add n-grams data
+    to the data store."""
     parser = subparsers.add_parser(
         'ngrams', description=constants.NGRAMS_DESCRIPTION,
         formatter_class=ParagraphFormatter, help=constants.NGRAMS_HELP)
@@ -162,6 +182,8 @@ def generate_report (args):
     report.csv(sys.stdout)
 
 def generate_report_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to manipulate CSV
+    results data."""
     parser = subparsers.add_parser(
         'report', description=constants.REPORT_DESCRIPTION,
         epilog=constants.REPORT_EPILOG, formatter_class=ParagraphFormatter,
@@ -196,6 +218,8 @@ def generate_report_subparser (subparsers):
                         metavar='RESULTS')
 
 def generate_strip_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to process original
+    texts for use with the tacl ngrams command."""
     parser = subparsers.add_parser(
         'strip', description=constants.STRIP_DESCRIPTION,
         epilog=constants.STRIP_EPILOG, help=constants.STRIP_HELP)
@@ -207,23 +231,29 @@ def generate_strip_subparser (subparsers):
                         metavar='OUTPUT')
 
 def get_corpus (args):
+    """Returns a `tacl.Corpus`."""
     return tacl.Corpus(args.corpus)
 
 def get_catalogue (args):
+    """Returns a `tacl.Catalogue`."""
     catalogue = tacl.Catalogue()
     catalogue.load(args.catalogue)
     return catalogue
 
 def get_input_fh (args):
+    """Returns an open file of CSV results data, or None if no such
+    file is specified in `args`."""
     input_fh = None
     if args.input:
         input_fh = open(args.input, 'r', newline='')
     return input_fh
 
 def get_data_store (args):
+    """Returns a `tacl.DataStore`."""
     return tacl.DataStore(args.db, args.memory, args.ram)
 
 def ngram_counts (args):
+    """Outputs the results of performing a counts query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
@@ -231,6 +261,7 @@ def ngram_counts (args):
     store.counts(catalogue, sys.stdout)
 
 def ngram_diff (args):
+    """Outputs the results of performing a diff query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
@@ -244,6 +275,7 @@ def ngram_diff (args):
         store.diff(catalogue, sys.stdout)
 
 def ngram_intersection (args):
+    """Outputs the results of performing an intersection query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
@@ -255,6 +287,7 @@ def ngram_intersection (args):
         store.intersection(catalogue, sys.stdout)
 
 def strip_texts (args):
+    """Processes texts for use with the tacl ngrams command."""
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
 
@@ -278,7 +311,7 @@ class ParagraphFormatter (argparse.HelpFormatter):
 
     def _para_reformat (self, text, width, indent='', multiline=False):
         new_lines = list()
-        main_indent = len(re.match(r'( *)',text).group(1))
+        main_indent = len(re.match(r'( *)', text).group(1))
 
         def blocker (text):
             """On each call yields 2-tuple consisting of a boolean and
@@ -293,7 +326,7 @@ class ParagraphFormatter (argparse.HelpFormatter):
             text wrapping should be done on the returned text."""
             block = list()
             for line in text.splitlines():
-                line_indent = len(re.match(r'( *)',line).group(1))
+                line_indent = len(re.match(r'( *)', line).group(1))
                 isindented = line_indent - main_indent > 0
                 isblank = re.match(r'\s*$', line)
                 if isblank or isindented:
