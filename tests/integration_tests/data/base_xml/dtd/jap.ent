@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="big5" ?>
+<!-- 日文內碼  -->
+
+<!-- 平假名  big5=【】-->
+<!ENTITY M062301 "<gaiji des='【a】' nor='【a】' uniflag='1' uni='3041' mojikyo='M062301'/>" ><!--拼音=【a】內碼=【C6E7】big5=【ゃ】-->
+<!ENTITY M062302 "<gaiji des='【a】' nor='【a】' uniflag='1' uni='3042' mojikyo='M062302'/>" ><!--拼音=【a】內碼=【C6E8】big5=【や】-->
+<!ENTITY M062303 "<gaiji des='【i】' nor='【i】' uniflag='1' uni='3043' mojikyo='M062303'/>" ><!--拼音=【i】內碼=【C6E9】big5=【ゅ】-->
+<!ENTITY M062304 "<gaiji des='【i】' nor='【i】' uniflag='1' uni='3044' mojikyo='M062304'/>" ><!--拼音=【i】內碼=【C6EA】big5=【ゆ】-->
+<!ENTITY M062305 "<gaiji des='【u】' nor='【u】' uniflag='1' uni='3045' mojikyo='M062305'/>" ><!--拼音=【u】內碼=【C6EB】big5=【ょ】-->
+<!ENTITY M062306 "<gaiji des='【u】' nor='【u】' uniflag='1' uni='3046' mojikyo='M062306'/>" ><!--拼音=【u】內碼=【C6EC】big5=【よ】-->
+<!ENTITY M062307 "<gaiji des='【e】' nor='【e】' uniflag='1' uni='3047' mojikyo='M062307'/>" ><!--拼音=【e】內碼=【C6ED】big5=【ら】-->
+<!ENTITY M062308 "<gaiji des='【e】' nor='【e】' uniflag='1' uni='3048' mojikyo='M062308'/>" ><!--拼音=【e】內碼=【C6EE】big5=【り】-->
+<!ENTITY M062309 "<gaiji des='【o】' nor='【o】' uniflag='1' uni='3049' mojikyo='M062309'/>" ><!--拼音=【o】內碼=【C6EF】big5=【る】-->
+<!ENTITY M062310 "<gaiji des='【o】' nor='【o】' uniflag='1' uni='304A' mojikyo='M062310'/>" ><!--拼音=【o】內碼=【C6F0】big5=【れ】-->
+<!ENTITY M062311 "<gaiji des='【ka】' nor='【ka】' uniflag='1' uni='304B' mojikyo='M062311'/>" ><!--拼音=【ka】內碼=【C6F1】big5=【ろ】-->
+<!ENTITY M062312 "<gaiji des='【ga】' nor='【ga】' uniflag='1' uni='304C' mojikyo='M062312'/>" ><!--拼音=【ga】內碼=【C6F2】big5=【ゎ】-->
+<!ENTITY M062313 "<gaiji des='【ki】' nor='【ki】' uniflag='1' uni='304D' mojikyo='M062313'/>" ><!--拼音=【ki】內碼=【C6F3】big5=【わ】-->
+<!ENTITY M062314 "<gaiji des='【gi】' nor='【gi】' uniflag='1' uni='304E' mojikyo='M062314'/>" ><!--拼音=【gi】內碼=【C6F4】big5=【ゐ】-->
+<!ENTITY M062315 "<gaiji des='【ku】' nor='【ku】' uniflag='1' uni='304F' mojikyo='M062315'/>" ><!--拼音=【ku】內碼=【C6F5】big5=【ゑ】-->
+<!ENTITY M062316 "<gaiji des='【gu】' nor='【gu】' uniflag='1' uni='3050' mojikyo='M062316'/>" ><!--拼音=【gu】內碼=【C6F6】big5=【を】-->
+<!ENTITY M062317 "<gaiji des='【ke】' nor='【ke】' uniflag='1' uni='3051' mojikyo='M062317'/>" ><!--拼音=【ke】內碼=【C6F7】big5=【ん】-->
+<!ENTITY M062318 "<gaiji des='【ge】' nor='【ge】' uniflag='1' uni='3052' mojikyo='M062318'/>" ><!--拼音=【ge】內碼=【C6F8】big5=【ァ】-->
+<!ENTITY M062319 "<gaiji des='【ko】' nor='【ko】' uniflag='1' uni='3053' mojikyo='M062319'/>" ><!--拼音=【ko】內碼=【C6F9】big5=【ア】-->
+<!ENTITY M062320 "<gaiji des='【go】' nor='【go】' uniflag='1' uni='3054' mojikyo='M062320'/>" ><!--拼音=【go】內碼=【C6FA】big5=【ィ】-->
+<!ENTITY M062321 "<gaiji des='【sa】' nor='【sa】' uniflag='1' uni='3055' mojikyo='M062321'/>" ><!--拼音=【sa】內碼=【C6FB】big5=【イ】-->
+<!ENTITY M062322 "<gaiji des='【za】' nor='【za】' uniflag='1' uni='3056' mojikyo='M062322'/>" ><!--拼音=【za】內碼=【C6FC】big5=【ゥ】-->
+<!ENTITY M062323 "<gaiji des='【shi】' nor='【shi】' uniflag='1' uni='3057' mojikyo='M062323'/>" ><!--拼音=【shi】內碼=【C6FD】big5=【ウ】-->
+<!ENTITY M062324 "<gaiji des='【zi】' nor='【zi】' uniflag='1' uni='3058' mojikyo='M062324'/>" ><!--拼音=【zi】內碼=【C6FE】big5=【ェ】-->
+<!ENTITY M062325 "<gaiji des='【su】' nor='【su】' uniflag='1' uni='3059' mojikyo='M062325'/>" ><!--拼音=【su】內碼=【C740】big5=【エ】-->
+<!ENTITY M062326 "<gaiji des='【zu】' nor='【zu】' uniflag='1' uni='305A' mojikyo='M062326'/>" ><!--拼音=【zu】內碼=【C741】big5=【ォ】-->
+<!ENTITY M062327 "<gaiji des='【se】' nor='【se】' uniflag='1' uni='305B' mojikyo='M062327'/>" ><!--拼音=【se】內碼=【C742】big5=【オ】-->
+<!ENTITY M062328 "<gaiji des='【ze】' nor='【ze】' uniflag='1' uni='305C' mojikyo='M062328'/>" ><!--拼音=【ze】內碼=【C743】big5=【カ】-->
+<!ENTITY M062329 "<gaiji des='【so】' nor='【so】' uniflag='1' uni='305D' mojikyo='M062329'/>" ><!--拼音=【so】內碼=【C744】big5=【ガ】-->
+<!ENTITY M062330 "<gaiji des='【zo】' nor='【zo】' uniflag='1' uni='305E' mojikyo='M062330'/>" ><!--拼音=【zo】內碼=【C745】big5=【キ】-->
+<!ENTITY M062331 "<gaiji des='【ta】' nor='【ta】' uniflag='1' uni='305F' mojikyo='M062331'/>" ><!--拼音=【ta 】內碼=【C746】big5=【ギ】-->
+<!ENTITY M062332 "<gaiji des='【da】' nor='【da】' uniflag='1' uni='3060' mojikyo='M062332'/>" ><!--拼音=【da】內碼=【C747】big5=【ク】-->
+<!ENTITY M062333 "<gaiji des='【chi】' nor='【chi】' uniflag='1' uni='3061' mojikyo='M062333'/>" ><!--拼音=【chi】內碼=【C748】big5=【グ】-->
+<!ENTITY M062334 "<gaiji des='【di】' nor='【di】' uniflag='1' uni='3062' mojikyo='M062334'/>" ><!--拼音=【di】內碼=【C749】big5=【ケ】-->
+<!ENTITY M062335 "<gaiji des='【tsu】' nor='【tsu】' uniflag='1' uni='3063' mojikyo='M062335'/>" ><!--拼音=【tsu】內碼=【C74A】big5=【ゲ】-->
+<!ENTITY M062336 "<gaiji des='【tsu】' nor='【tsu】' uniflag='1' uni='3064' mojikyo='M062336'/>" ><!--拼音=【tsu】內碼=【C74B】big5=【コ】-->
+<!ENTITY M062337 "<gaiji des='【du】' nor='【du】' uniflag='1' uni='3065' mojikyo='M062337'/>" ><!--拼音=【du】內碼=【C74C】big5=【ゴ】-->
+<!ENTITY M062338 "<gaiji des='【te】' nor='【te】' uniflag='1' uni='3066' mojikyo='M062338'/>" ><!--拼音=【te 】內碼=【C74D】big5=【サ】-->
+<!ENTITY M062339 "<gaiji des='【de】' nor='【de】' uniflag='1' uni='3067' mojikyo='M062339'/>" ><!--拼音=【de】內碼=【C74E】big5=【ザ】-->
+<!ENTITY M062340 "<gaiji des='【to】' nor='【to】' uniflag='1' uni='3068' mojikyo='M062340'/>" ><!--拼音=【to 】內碼=【C74F】big5=【シ】-->
+<!ENTITY M062341 "<gaiji des='【do】' nor='【do】' uniflag='1' uni='3069' mojikyo='M062341'/>" ><!--拼音=【do】內碼=【C750】big5=【ジ】-->
+<!ENTITY M062342 "<gaiji des='【na】' nor='【na】' uniflag='1' uni='306A' mojikyo='M062342'/>" ><!--拼音=【na】內碼=【C751】big5=【ス】-->
+<!ENTITY M062343 "<gaiji des='【ni】' nor='【ni】' uniflag='1' uni='306B' mojikyo='M062343'/>" ><!--拼音=【ni】內碼=【C752】big5=【ズ】-->
+<!ENTITY M062344 "<gaiji des='【nu】' nor='【nu】' uniflag='1' uni='306C' mojikyo='M062344'/>" ><!--拼音=【nu】內碼=【C753】big5=【セ】-->
+<!ENTITY M062345 "<gaiji des='【ne】' nor='【ne】' uniflag='1' uni='306D' mojikyo='M062345'/>" ><!--拼音=【ne】內碼=【C754】big5=【ゼ】-->
+<!ENTITY M062346 "<gaiji des='【no】' nor='【no】' uniflag='1' uni='306E' mojikyo='M062346'/>" ><!--拼音=【no】內碼=【C755】big5=【ソ】-->
+<!ENTITY M062347 "<gaiji des='【ha】' nor='【ha】' uniflag='1' uni='306F' mojikyo='M062347'/>" ><!--拼音=【ha】內碼=【C756】big5=【ゾ】-->
+<!ENTITY M062348 "<gaiji des='【ba】' nor='【ba】' uniflag='1' uni='3070' mojikyo='M062348'/>" ><!--拼音=【ba】內碼=【C757】big5=【タ】-->
+<!ENTITY M062349 "<gaiji des='【pa】' nor='【pa】' uniflag='1' uni='3071' mojikyo='M062349'/>" ><!--拼音=【pa】內碼=【C758】big5=【ダ】-->
+<!ENTITY M062350 "<gaiji des='【hi】' nor='【hi】' uniflag='1' uni='3072' mojikyo='M062350'/>" ><!--拼音=【hi】內碼=【C759】big5=【チ】-->
+<!ENTITY M062351 "<gaiji des='【bi】' nor='【bi】' uniflag='1' uni='3073' mojikyo='M062351'/>" ><!--拼音=【bi】內碼=【C75A】big5=【ヂ】-->
+<!ENTITY M062352 "<gaiji des='【pi】' nor='【pi】' uniflag='1' uni='3074' mojikyo='M062352'/>" ><!--拼音=【pi】內碼=【C75B】big5=【ッ】-->
+<!ENTITY M062353 "<gaiji des='【hu】' nor='【hu】' uniflag='1' uni='3075' mojikyo='M062353'/>" ><!--拼音=【hu】內碼=【C75C】big5=【ツ】-->
+<!ENTITY M062354 "<gaiji des='【bu】' nor='【bu】' uniflag='1' uni='3076' mojikyo='M062354'/>" ><!--拼音=【bu】內碼=【C75D】big5=【ヅ】-->
+<!ENTITY M062355 "<gaiji des='【pu】' nor='【pu】' uniflag='1' uni='3077' mojikyo='M062355'/>" ><!--拼音=【pu】內碼=【C75E】big5=【テ】-->
+<!ENTITY M062356 "<gaiji des='【he】' nor='【he】' uniflag='1' uni='3078' mojikyo='M062356'/>" ><!--拼音=【he】內碼=【C75F】big5=【デ】-->
+<!ENTITY M062357 "<gaiji des='【be】' nor='【be】' uniflag='1' uni='3079' mojikyo='M062357'/>" ><!--拼音=【be】內碼=【C760】big5=【ト】-->
+<!ENTITY M062358 "<gaiji des='【pe】' nor='【pe】' uniflag='1' uni='307A' mojikyo='M062358'/>" ><!--拼音=【pe】內碼=【C761】big5=【ド】-->
+<!ENTITY M062359 "<gaiji des='【ho】' nor='【ho】' uniflag='1' uni='307B' mojikyo='M062359'/>" ><!--拼音=【ho】內碼=【C762】big5=【ナ】-->
+<!ENTITY M062360 "<gaiji des='【bo】' nor='【bo】' uniflag='1' uni='307C' mojikyo='M062360'/>" ><!--拼音=【bo】內碼=【C763】big5=【ニ】-->
+<!ENTITY M062361 "<gaiji des='【po】' nor='【po】' uniflag='1' uni='307D' mojikyo='M062361'/>" ><!--拼音=【po】內碼=【C764】big5=【ヌ】-->
+<!ENTITY M062362 "<gaiji des='【ma】' nor='【ma】' uniflag='1' uni='307E' mojikyo='M062362'/>" ><!--拼音=【ma】內碼=【C765】big5=【ネ】-->
+<!ENTITY M062363 "<gaiji des='【mi】' nor='【mi】' uniflag='1' uni='307F' mojikyo='M062363'/>" ><!--拼音=【mi】內碼=【C766】big5=【ノ】-->
+<!ENTITY M062364 "<gaiji des='【mu】' nor='【mu】' uniflag='1' uni='3080' mojikyo='M062364'/>" ><!--拼音=【mu】內碼=【C767】big5=【ハ】-->
+<!ENTITY M062365 "<gaiji des='【me】' nor='【me】' uniflag='1' uni='3081' mojikyo='M062365'/>" ><!--拼音=【me】內碼=【C768】big5=【バ】-->
+<!ENTITY M062366 "<gaiji des='【mo】' nor='【mo】' uniflag='1' uni='3082' mojikyo='M062366'/>" ><!--拼音=【mo】內碼=【C769】big5=【パ】-->
+<!ENTITY M062367 "<gaiji des='【ya】' nor='【ya】' uniflag='1' uni='3083' mojikyo='M062367'/>" ><!--拼音=【ya】內碼=【C76A】big5=【ヒ】-->
+<!ENTITY M062368 "<gaiji des='【ya】' nor='【ya】' uniflag='1' uni='3084' mojikyo='M062368'/>" ><!--拼音=【ya】內碼=【C76B】big5=【ビ】-->
+<!ENTITY M062369 "<gaiji des='【yu】' nor='【yu】' uniflag='1' uni='3085' mojikyo='M062369'/>" ><!--拼音=【yu】內碼=【C76C】big5=【ピ】-->
+<!ENTITY M062370 "<gaiji des='【yu】' nor='【yu】' uniflag='1' uni='3086' mojikyo='M062370'/>" ><!--拼音=【yu】內碼=【C76D】big5=【フ】-->
+<!ENTITY M062371 "<gaiji des='【yo】' nor='【yo】' uniflag='1' uni='3087' mojikyo='M062371'/>" ><!--拼音=【yo】內碼=【C76E】big5=【ブ】-->
+<!ENTITY M062372 "<gaiji des='【yo】' nor='【yo】' uniflag='1' uni='3088' mojikyo='M062372'/>" ><!--拼音=【yo】內碼=【C76F】big5=【プ】-->
+<!ENTITY M062373 "<gaiji des='【ra】' nor='【ra】' uniflag='1' uni='3089' mojikyo='M062373'/>" ><!--拼音=【ra】內碼=【C770】big5=【ヘ】-->
+<!ENTITY M062374 "<gaiji des='【ri】' nor='【ri】' uniflag='1' uni='308A' mojikyo='M062374'/>" ><!--拼音=【ri】內碼=【C771】big5=【ベ】-->
+<!ENTITY M062375 "<gaiji des='【ru】' nor='【ru】' uniflag='1' uni='308B' mojikyo='M062375'/>" ><!--拼音=【ru】內碼=【C772】big5=【ペ】-->
+<!ENTITY M062376 "<gaiji des='【re】' nor='【re】' uniflag='1' uni='308C' mojikyo='M062376'/>" ><!--拼音=【re】內碼=【C773】big5=【ホ】-->
+<!ENTITY M062377 "<gaiji des='【ro】' nor='【ro】' uniflag='1' uni='308D' mojikyo='M062377'/>" ><!--拼音=【ro】內碼=【C774】big5=【ボ】-->
+<!ENTITY M062378 "<gaiji des='【wa】' nor='【wa】' uniflag='1' uni='308E' mojikyo='M062378'/>" ><!--拼音=【wa】內碼=【C775】big5=【ポ】-->
+<!ENTITY M062379 "<gaiji des='【wa】' nor='【wa】' uniflag='1' uni='308F' mojikyo='M062379'/>" ><!--拼音=【wa】內碼=【C776】big5=【マ】-->
+<!ENTITY M062380 "<gaiji des='【wi】' nor='【wi】' uniflag='1' uni='3090' mojikyo='M062380'/>" ><!--拼音=【wi】內碼=【C777】big5=【ミ】-->
+<!ENTITY M062381 "<gaiji des='【we】' nor='【we】' uniflag='1' uni='3091' mojikyo='M062381'/>" ><!--拼音=【we】內碼=【C778】big5=【ム】-->
+<!ENTITY M062382 "<gaiji des='【wo】' nor='【wo】' uniflag='1' uni='3092' mojikyo='M062382'/>" ><!--拼音=【wo】內碼=【C779】big5=【メ】-->
+<!ENTITY M062383 "<gaiji des='【n】' nor='【n】' uniflag='1' uni='3093' mojikyo='M062383'/>" ><!--拼音=【n】內碼=【C77A】big5=【モ】-->
+
+<!-- 片假名  big5=【】-->
+
+<!ENTITY M062401 "<gaiji des='【A】' nor='【A】' uniflag='1' uni='30A1' mojikyo='M062401'/>" ><!--拼音=【A】內碼=【C77B】big5=【ャ】-->
+<!ENTITY M062402 "<gaiji des='【A】' nor='【A】' uniflag='1' uni='30A2' mojikyo='M062402'/>" ><!--拼音=【A】內碼=【C77C】big5=【ヤ】-->
+<!ENTITY M062403 "<gaiji des='【I】' nor='【I】' uniflag='1' uni='30A3' mojikyo='M062403'/>" ><!--拼音=【I】內碼=【C77D】big5=【ュ】-->
+<!ENTITY M062404 "<gaiji des='【I】' nor='【I】' uniflag='1' uni='30A4' mojikyo='M062404'/>" ><!--拼音=【I】內碼=【C77E】big5=【ユ】-->
+<!ENTITY M062405 "<gaiji des='【U】' nor='【U】' uniflag='1' uni='30A5' mojikyo='M062405'/>" ><!--拼音=【U】內碼=【C7A1】big5=【ョ】-->
+<!ENTITY M062406 "<gaiji des='【U】' nor='【U】' uniflag='1' uni='30A6' mojikyo='M062406'/>" ><!--拼音=【U】內碼=【C7A2】big5=【ヨ】-->
+<!ENTITY M062407 "<gaiji des='【E】' nor='【E】' uniflag='1' uni='30A7' mojikyo='M062407'/>" ><!--拼音=【E】內碼=【C7A3】big5=【ラ】-->
+<!ENTITY M062408 "<gaiji des='【E】' nor='【E】' uniflag='1' uni='30A8' mojikyo='M062408'/>" ><!--拼音=【E】內碼=【C7A4】big5=【リ】-->
+<!ENTITY M062409 "<gaiji des='【O】' nor='【O】' uniflag='1' uni='30A9' mojikyo='M062409'/>" ><!--拼音=【O】內碼=【C7A5】big5=【ル】-->
+<!ENTITY M062410 "<gaiji des='【O】' nor='【O】' uniflag='1' uni='30AA' mojikyo='M062410'/>" ><!--拼音=【O】內碼=【C7A6】big5=【レ】-->
+<!ENTITY M062411 "<gaiji des='【KA】' nor='【KA】' uniflag='1' uni='30AB' mojikyo='M062411'/>" ><!--拼音=【KA】內碼=【C7A7】big5=【ロ】-->
+<!ENTITY M062412 "<gaiji des='【GA】' nor='【GA】' uniflag='1' uni='30AC' mojikyo='M062412'/>" ><!--拼音=【GA】內碼=【C7A8】big5=【ヮ】-->
+<!ENTITY M062413 "<gaiji des='【KI】' nor='【KI】' uniflag='1' uni='30AD' mojikyo='M062413'/>" ><!--拼音=【KI】內碼=【C7A9】big5=【ワ】-->
+<!ENTITY M062414 "<gaiji des='【GI】' nor='【GI】' uniflag='1' uni='30AE' mojikyo='M062414'/>" ><!--拼音=【GI】內碼=【C7AA】big5=【ヰ】-->
+<!ENTITY M062415 "<gaiji des='【KU】' nor='【KU】' uniflag='1' uni='30AF' mojikyo='M062415'/>" ><!--拼音=【KU】內碼=【C7AB】big5=【ヱ】-->
+<!ENTITY M062416 "<gaiji des='【GU】' nor='【GU】' uniflag='1' uni='30B0' mojikyo='M062416'/>" ><!--拼音=【GU】內碼=【C7AC】big5=【ヲ】-->
+<!ENTITY M062417 "<gaiji des='【KE】' nor='【KE】' uniflag='1' uni='30B1' mojikyo='M062417'/>" ><!--拼音=【KE】內碼=【C7AD】big5=【ン】-->
+<!ENTITY M062418 "<gaiji des='【GE】' nor='【GE】' uniflag='1' uni='30B2' mojikyo='M062418'/>" ><!--拼音=【GE】內碼=【C7AE】big5=【ヴ】-->
+<!ENTITY M062419 "<gaiji des='【KO】' nor='【KO】' uniflag='1' uni='30B3' mojikyo='M062419'/>" ><!--拼音=【KO】內碼=【C7AF】big5=【ヵ】-->
+<!ENTITY M062420 "<gaiji des='【GO】' nor='【GO】' uniflag='1' uni='30B4' mojikyo='M062420'/>" ><!--拼音=【GO】內碼=【C7B0】big5=【ヶ】-->
+<!ENTITY M062421 "<gaiji des='【SA】' nor='【SA】' uniflag='1' uni='30B5' mojikyo='M062421'/>" ><!--拼音=【SA】內碼=【C7B1】big5=【Д】-->
+<!ENTITY M062422 "<gaiji des='【ZA】' nor='【ZA】' uniflag='1' uni='30B6' mojikyo='M062422'/>" ><!--拼音=【ZA】內碼=【C7B2】big5=【Е】-->
+<!ENTITY M062423 "<gaiji des='【SHI】' nor='【SHI】' uniflag='1' uni='30B7' mojikyo='M062423'/>" ><!--拼音=【SHI】內碼=【C7B3】big5=【Ё】-->
+<!ENTITY M062424 "<gaiji des='【ZI】' nor='【ZI】' uniflag='1' uni='30B8' mojikyo='M062424'/>" ><!--拼音=【ZI】內碼=【C7B4】big5=【Ж】-->
+<!ENTITY M062425 "<gaiji des='【SU】' nor='【SU】' uniflag='1' uni='30B9' mojikyo='M062425'/>" ><!--拼音=【SU】內碼=【C7B5】big5=【З】-->
+<!ENTITY M062426 "<gaiji des='【ZU】' nor='【ZU】' uniflag='1' uni='30BA' mojikyo='M062426'/>" ><!--拼音=【ZU】內碼=【C7B6】big5=【И】-->
+<!ENTITY M062427 "<gaiji des='【SE】' nor='【SE】' uniflag='1' uni='30BB' mojikyo='M062427'/>" ><!--拼音=【SE】內碼=【C7B7】big5=【Й】-->
+<!ENTITY M062428 "<gaiji des='【ZE】' nor='【ZE】' uniflag='1' uni='30BC' mojikyo='M062428'/>" ><!--拼音=【ZE】內碼=【C7B8】big5=【К】-->
+<!ENTITY M062429 "<gaiji des='【SO】' nor='【SO】' uniflag='1' uni='30BD' mojikyo='M062429'/>" ><!--拼音=【SO】內碼=【C7B9】big5=【Л】-->
+<!ENTITY M062430 "<gaiji des='【ZO】' nor='【ZO】' uniflag='1' uni='30BE' mojikyo='M062430'/>" ><!--拼音=【ZO】內碼=【C7BA】big5=【М】-->
+<!ENTITY M062431 "<gaiji des='【TA】' nor='【TA】' uniflag='1' uni='30BF' mojikyo='M062431'/>" ><!--拼音=【TA】內碼=【C7BB】big5=【У】-->
+<!ENTITY M062432 "<gaiji des='【DA】' nor='【DA】' uniflag='1' uni='30C0' mojikyo='M062432'/>" ><!--拼音=【DA】內碼=【C7BC】big5=【Ф】-->
+<!ENTITY M062433 "<gaiji des='【CHI】' nor='【CHI】' uniflag='1' uni='30C1' mojikyo='M062433'/>" ><!--拼音=【CHI】內碼=【C7BD】big5=【Х】-->
+<!ENTITY M062434 "<gaiji des='【DI】' nor='【DI】' uniflag='1' uni='30C2' mojikyo='M062434'/>" ><!--拼音=【DI】內碼=【C7BE】big5=【Ц】-->
+<!ENTITY M062435 "<gaiji des='【TSU】' nor='【TSU】' uniflag='1' uni='30C3' mojikyo='M062435'/>" ><!--拼音=【TSU】內碼=【C7BF】big5=【Ч】-->
+<!ENTITY M062436 "<gaiji des='【TSU】' nor='【TSU】' uniflag='1' uni='30C4' mojikyo='M062436'/>" ><!--拼音=【TSU】內碼=【C7C0】big5=【Ш】-->
+<!ENTITY M062437 "<gaiji des='【DU】' nor='【DU】' uniflag='1' uni='30C5' mojikyo='M062437'/>" ><!--拼音=【DU】內碼=【C7C1】big5=【Щ】-->
+<!ENTITY M062438 "<gaiji des='【TE】' nor='【TE】' uniflag='1' uni='30C6' mojikyo='M062438'/>" ><!--拼音=【TE】內碼=【C7C2】big5=【Ъ】-->
+<!ENTITY M062439 "<gaiji des='【DE】' nor='【DE】' uniflag='1' uni='30C7' mojikyo='M062439'/>" ><!--拼音=【DE】內碼=【C7C3】big5=【Ы】-->
+<!ENTITY M062440 "<gaiji des='【TO】' nor='【TO】' uniflag='1' uni='30C8' mojikyo='M062440'/>" ><!--拼音=【TO】內碼=【C7C4】big5=【Ь】-->
+<!ENTITY M062441 "<gaiji des='【DO】' nor='【DO】' uniflag='1' uni='30C9' mojikyo='M062441'/>" ><!--拼音=【DO】內碼=【C7C5】big5=【Э】-->
+<!ENTITY M062442 "<gaiji des='【NA】' nor='【NA】' uniflag='1' uni='30CA' mojikyo='M062442'/>" ><!--拼音=【NA】內碼=【C7C6】big5=【Ю】-->
+<!ENTITY M062443 "<gaiji des='【NI】' nor='【NI】' uniflag='1' uni='30CB' mojikyo='M062443'/>" ><!--拼音=【NI】內碼=【C7C7】big5=【Я】-->
+<!ENTITY M062444 "<gaiji des='【NU】' nor='【NU】' uniflag='1' uni='30CC' mojikyo='M062444'/>" ><!--拼音=【NU】內碼=【C7C8】big5=【а】-->
+<!ENTITY M062445 "<gaiji des='【NE】' nor='【NE】' uniflag='1' uni='30CD' mojikyo='M062445'/>" ><!--拼音=【NE】內碼=【C7C9】big5=【б】-->
+<!ENTITY M062446 "<gaiji des='【NO】' nor='【NO】' uniflag='1' uni='30CE' mojikyo='M062446'/>" ><!--拼音=【NO】內碼=【C7CA】big5=【в】-->
+<!ENTITY M062447 "<gaiji des='【HA】' nor='【HA】' uniflag='1' uni='30CF' mojikyo='M062447'/>" ><!--拼音=【HA】內碼=【C7CB】big5=【г】-->
+<!ENTITY M062448 "<gaiji des='【BA】' nor='【BA】' uniflag='1' uni='30D0' mojikyo='M062448'/>" ><!--拼音=【BA】內碼=【C7CC】big5=【д】-->
+<!ENTITY M062449 "<gaiji des='【PA】' nor='【PA】' uniflag='1' uni='30D1' mojikyo='M062449'/>" ><!--拼音=【PA】內碼=【C7CD】big5=【е】-->
+<!ENTITY M062450 "<gaiji des='【HI】' nor='【HI】' uniflag='1' uni='30D2' mojikyo='M062450'/>" ><!--拼音=【HI】內碼=【C7CE】big5=【ё】-->
+<!ENTITY M062451 "<gaiji des='【BI】' nor='【BI】' uniflag='1' uni='30D3' mojikyo='M062451'/>" ><!--拼音=【BI】內碼=【C7CF】big5=【ж】-->
+<!ENTITY M062452 "<gaiji des='【PI】' nor='【PI】' uniflag='1' uni='30D4' mojikyo='M062452'/>" ><!--拼音=【PI】內碼=【C7D0】big5=【з】-->
+<!ENTITY M062453 "<gaiji des='【HU】' nor='【HU】' uniflag='1' uni='30D5' mojikyo='M062453'/>" ><!--拼音=【HU】內碼=【C7D1】big5=【и】-->
+<!ENTITY M062454 "<gaiji des='【BU】' nor='【BU】' uniflag='1' uni='30D6' mojikyo='M062454'/>" ><!--拼音=【BU】內碼=【C7D2】big5=【й】-->
+<!ENTITY M062455 "<gaiji des='【PU】' nor='【PU】' uniflag='1' uni='30D7' mojikyo='M062455'/>" ><!--拼音=【PU】內碼=【C7D3】big5=【к】-->
+<!ENTITY M062456 "<gaiji des='【HE】' nor='【HE】' uniflag='1' uni='30D8' mojikyo='M062456'/>" ><!--拼音=【HE】內碼=【C7D4】big5=【л】-->
+<!ENTITY M062457 "<gaiji des='【BE】' nor='【BE】' uniflag='1' uni='30D9' mojikyo='M062457'/>" ><!--拼音=【BE】內碼=【C7D5】big5=【м】-->
+<!ENTITY M062458 "<gaiji des='【PE】' nor='【PE】' uniflag='1' uni='30DA' mojikyo='M062458'/>" ><!--拼音=【PE】內碼=【C7D6】big5=【н】-->
+<!ENTITY M062459 "<gaiji des='【HO】' nor='【HO】' uniflag='1' uni='30DB' mojikyo='M062459'/>" ><!--拼音=【HO】內碼=【C7D7】big5=【о】-->
+<!ENTITY M062460 "<gaiji des='【BO】' nor='【BO】' uniflag='1' uni='30DC' mojikyo='M062460'/>" ><!--拼音=【BO】內碼=【C7D8】big5=【п】-->
+<!ENTITY M062461 "<gaiji des='【PO】' nor='【PO】' uniflag='1' uni='30DD' mojikyo='M062461'/>" ><!--拼音=【PO】內碼=【C7D9】big5=【р】-->
+<!ENTITY M062462 "<gaiji des='【MA】' nor='【MA】' uniflag='1' uni='30DE' mojikyo='M062462'/>" ><!--拼音=【MA】內碼=【C7DA】big5=【с】-->
+<!ENTITY M062463 "<gaiji des='【MI】' nor='【MI】' uniflag='1' uni='30DF' mojikyo='M062463'/>" ><!--拼音=【MI】內碼=【C7DB】big5=【т】-->
+<!ENTITY M062464 "<gaiji des='【MU】' nor='【MU】' uniflag='1' uni='30E0' mojikyo='M062464'/>" ><!--拼音=【MU】內碼=【C7DC】big5=【у】-->
+<!ENTITY M062465 "<gaiji des='【ME】' nor='【ME】' uniflag='1' uni='30E1' mojikyo='M062465'/>" ><!--拼音=【ME】內碼=【C7DD】big5=【ф】-->
+<!ENTITY M062466 "<gaiji des='【MO】' nor='【MO】' uniflag='1' uni='30E2' mojikyo='M062466'/>" ><!--拼音=【MO】內碼=【C7DE】big5=【х】-->
+<!ENTITY M062467 "<gaiji des='【YA】' nor='【YA】' uniflag='1' uni='30E3' mojikyo='M062467'/>" ><!--拼音=【YA】內碼=【C7DF】big5=【ц】-->
+<!ENTITY M062468 "<gaiji des='【YA】' nor='【YA】' uniflag='1' uni='30E4' mojikyo='M062468'/>" ><!--拼音=【YA】內碼=【C7E0】big5=【ч】-->
+<!ENTITY M062469 "<gaiji des='【YU】' nor='【YU】' uniflag='1' uni='30E5' mojikyo='M062469'/>" ><!--拼音=【YU】內碼=【C7E1】big5=【ш】-->
+<!ENTITY M062470 "<gaiji des='【YU】' nor='【YU】' uniflag='1' uni='30E6' mojikyo='M062470'/>" ><!--拼音=【YU】內碼=【C7E2】big5=【щ】-->
+<!ENTITY M062471 "<gaiji des='【YO】' nor='【YO】' uniflag='1' uni='30E7' mojikyo='M062471'/>" ><!--拼音=【YO】內碼=【C7E3】big5=【ъ】-->
+<!ENTITY M062472 "<gaiji des='【YO】' nor='【YO】' uniflag='1' uni='30E8' mojikyo='M062472'/>" ><!--拼音=【YO】內碼=【C7E4】big5=【ы】-->
+<!ENTITY M062473 "<gaiji des='【RA】' nor='【RA】' uniflag='1' uni='30E9' mojikyo='M062473'/>" ><!--拼音=【RA】內碼=【C7E5】big5=【ь】-->
+<!ENTITY M062474 "<gaiji des='【RI】' nor='【RI】' uniflag='1' uni='30EA' mojikyo='M062474'/>" ><!--拼音=【RI】內碼=【C7E6】big5=【э】-->
+<!ENTITY M062475 "<gaiji des='【RU】' nor='【RU】' uniflag='1' uni='30EB' mojikyo='M062475'/>" ><!--拼音=【RU】內碼=【C7E7】big5=【ю】-->
+<!ENTITY M062476 "<gaiji des='【RE】' nor='【RE】' uniflag='1' uni='30EC' mojikyo='M062476'/>" ><!--拼音=【RE】內碼=【C7E8】big5=【я】-->
+<!ENTITY M062477 "<gaiji des='【RO】' nor='【RO】' uniflag='1' uni='30ED' mojikyo='M062477'/>" ><!--拼音=【RO】內碼=【C7E9】big5=【①】-->
+<!ENTITY M062478 "<gaiji des='【WA】' nor='【WA】' uniflag='1' uni='30EE' mojikyo='M062478'/>" ><!--拼音=【WA】內碼=【C7EA】big5=【②】-->
+<!ENTITY M062479 "<gaiji des='【WA】' nor='【WA】' uniflag='1' uni='30EF' mojikyo='M062479'/>" ><!--拼音=【WA】內碼=【C7EB】big5=【③】-->
+<!ENTITY M062480 "<gaiji des='【WI】' nor='【WI】' uniflag='1' uni='30F0' mojikyo='M062480'/>" ><!--拼音=【WI】內碼=【C7EC】big5=【④】-->
+<!ENTITY M062481 "<gaiji des='【WE】' nor='【WE】' uniflag='1' uni='30F1' mojikyo='M062481'/>" ><!--拼音=【WE】內碼=【C7ED】big5=【⑤】-->
+<!ENTITY M062482 "<gaiji des='【WO】' nor='【WO】' uniflag='1' uni='30F2' mojikyo='M062482'/>" ><!--拼音=【WO】內碼=【C7EE】big5=【⑥】-->
+<!ENTITY M062483 "<gaiji des='【N】' nor='【N】' uniflag='1' uni='30F3' mojikyo='M062483'/>" ><!--拼音=【N】內碼=【C7EF】big5=【⑦】-->
+<!ENTITY M062484 "<gaiji des='【VU】' nor='【VU】' uniflag='1' uni='30F4' mojikyo='M062484'/>" ><!--拼音=【VU】內碼=【C7F0】big5=【⑧】-->
+<!ENTITY M062485 "<gaiji des='【KA】' nor='【KA】' uniflag='1' uni='30F5' mojikyo='M062485'/>" ><!--拼音=【KA】內碼=【C7F1】big5=【⑨】-->
+<!ENTITY M062486 "<gaiji des='【KE】' nor='【KE】' uniflag='1' uni='30F6' mojikyo='M062486'/>" ><!--拼音=【KE】內碼=【C7F2】big5=【⑩】-->
+
+<!-- 拗音 -->
+
+<!ENTITY M062313M062367 "<gaiji des='【kya】' nor='【kya】' uni='304D3083' mojikyo='M062313M062367'/>" ><!--拼音=【kya】內碼=【C6F3】【C76A】big5=【わヒ】-->
+<!ENTITY M062313M062369 "<gaiji des='【kyu】' nor='【kyu】' uni='304D3085' mojikyo='M062313M062369'/>" ><!--拼音=【kyu】內碼=【C6F3】【C76C】big5=【わピ】-->
+<!ENTITY M062313M062371 "<gaiji des='【kyo】' nor='【kyo】' uni='304D3087' mojikyo='M062313M062371'/>" ><!--拼音=【kyo】內碼=【C6F3】【C76E】big5=【わブ】-->
+
+<!ENTITY M062323M062367 "<gaiji des='【sha】' nor='【sha】' uni='30573083' mojikyo='M062323M062367'/>" ><!--拼音=【sha】內碼=【C6FD】【C76A】big5=【ウヒ】-->
+<!ENTITY M062323M062369 "<gaiji des='【shu】' nor='【shu】' uni='30573085' mojikyo='M062323M062369'/>" ><!--拼音=【shu】內碼=【C6FD】【C76C】big5=【ウピ】-->
+<!ENTITY M062323M062371 "<gaiji des='【sho】' nor='【sho】' uni='30573087' mojikyo='M062323M062371'/>" ><!--拼音=【sho】內碼=【C6FD】【C76E】big5=【ウブ】-->
+
+<!ENTITY M062333M062367 "<gaiji des='【cha】' nor='【cha】' uni='30613083' mojikyo='M062333M062367'/>" ><!--拼音=【cha】內碼=【C748】【C76A】big5=【グヒ】-->
+<!ENTITY M062333M062369 "<gaiji des='【chu】' nor='【chu】' uni='30613085' mojikyo='M062333M062369'/>" ><!--拼音=【chu】內碼=【C748】【C76C】big5=【グピ】-->
+<!ENTITY M062333M062371 "<gaiji des='【cho】' nor='【cho】' uni='30613087' mojikyo='M062333M062371'/>" ><!--拼音=【cho】內碼=【C748】【C76E】big5=【グブ】-->
+
+<!ENTITY M062343M062367 "<gaiji des='【nya】' nor='【nya】' uni='306B3083' mojikyo='M062343M062367'/>" ><!--拼音=【nya】內碼=【C752】【C76A】big5=【ズヒ】-->
+<!ENTITY M062343M062369 "<gaiji des='【nyu】' nor='【nyu】' uni='306B3085' mojikyo='M062343M062369'/>" ><!--拼音=【nyu】內碼=【C752】【C76C】big5=【ズピ】-->
+<!ENTITY M062343M062371 "<gaiji des='【nyo】' nor='【nyo】' uni='306B3087' mojikyo='M062343M062371'/>" ><!--拼音=【nyo】內碼=【C752】【C76E】big5=【ズブ】-->
+
+<!ENTITY M062350M062367 "<gaiji des='【hya】' nor='【hya】' uni='30723083' mojikyo='M062350M062367'/>" ><!--拼音=【hya】內碼=【C759】【C76A】big5=【チヒ】-->
+<!ENTITY M062350M062369 "<gaiji des='【hyu】' nor='【hyu】' uni='30723085' mojikyo='M062350M062369'/>" ><!--拼音=【hyu】內碼=【C759】【C76C】big5=【チピ】-->
+<!ENTITY M062350M062371 "<gaiji des='【hyo】' nor='【hyo】' uni='30723087' mojikyo='M062350M062371'/>" ><!--拼音=【hyo】內碼=【C759】【C76E】big5=【チブ】-->
+
+<!ENTITY M062363M062367 "<gaiji des='【mya】' nor='【mya】' uni='307F3083' mojikyo='M062363M062367'/>" ><!--拼音=【mya】內碼=【C766】【C76A】big5=【ノヒ】-->
+<!ENTITY M062363M062369 "<gaiji des='【myu】' nor='【myu】' uni='307F3085' mojikyo='M062363M062369'/>" ><!--拼音=【myu】內碼=【C766】【C76C】big5=【ノピ】-->
+<!ENTITY M062363M062371 "<gaiji des='【myo】' nor='【myo】' uni='307F3087' mojikyo='M062363M062371'/>" ><!--拼音=【myo】內碼=【C766】【C76E】big5=【ノブ】-->
+
+<!ENTITY M062374M062367 "<gaiji des='【rya】' nor='【rya】' uni='308A3083' mojikyo='M062374M062367'/>" ><!--拼音=【rya】內碼=【C771】【C76A】big5=【ベヒ】-->
+<!ENTITY M062374M062369 "<gaiji des='【ryu】' nor='【ryu】' uni='308A3085' mojikyo='M062374M062369'/>" ><!--拼音=【ryu】內碼=【C771】【C76C】big5=【ベピ】-->
+<!ENTITY M062374M062371 "<gaiji des='【ryo】' nor='【ryo】' uni='308A3087' mojikyo='M062374M062371'/>" ><!--拼音=【ryo】內碼=【C771】【C76E】big5=【ベブ】-->
+
+<!ENTITY M062314M062367 "<gaiji des='【gya】' nor='【gya】' uni='304E3083' mojikyo='M062314M062367'/>" ><!--拼音=【gya】內碼=【C6F4】【C76A】big5=【ゐヒ】-->
+<!ENTITY M062314M062369 "<gaiji des='【gyu】' nor='【gyu】' uni='304E3085' mojikyo='M062314M062369'/>" ><!--拼音=【gyu】內碼=【C6F4】【C76C】big5=【ゐピ】-->
+<!ENTITY M062314M062371 "<gaiji des='【gyo】' nor='【gyo】' uni='304E3087' mojikyo='M062314M062371'/>" ><!--拼音=【gyo】內碼=【C6F4】【C76E】big5=【ゐブ】-->
+
+<!ENTITY M062324M062367 "<gaiji des='【zya】' nor='【zya】' uni='30583083' mojikyo='M062324M062367'/>" ><!--拼音=【zya】內碼=【C6FE】【C76A】big5=【ェヒ】-->
+<!ENTITY M062324M062369 "<gaiji des='【zyu】' nor='【zyu】' uni='30583085' mojikyo='M062324M062369'/>" ><!--拼音=【zyu】內碼=【C6FE】【C76C】big5=【ェピ】-->
+<!ENTITY M062324M062371 "<gaiji des='【zyo】' nor='【zyo】' uni='30583087' mojikyo='M062324M062371'/>" ><!--拼音=【zyo】內碼=【C6FE】【C76E】big5=【ェブ】-->
+
+<!ENTITY M062334M062367 "<gaiji des='【ja】' nor='【ja】' uni='30623083' mojikyo='M062334M062367'/>" ><!--拼音=【ja】內碼=【C749】【C76A】big5=【ケヒ】-->
+<!ENTITY M062334M062369 "<gaiji des='【ju】' nor='【ju】' uni='30623085' mojikyo='M062334M062369'/>" ><!--拼音=【ju】內碼=【C749】【C76C】big5=【ケピ】-->
+<!ENTITY M062334M062371 "<gaiji des='【jo】' nor='【jo】' uni='30623087' mojikyo='M062334M062371'/>" ><!--拼音=【jo】內碼=【C749】【C76E】big5=【ケブ】-->
+
+<!ENTITY M062351M062367 "<gaiji des='【bya】' nor='【bya】' uni='30733083' mojikyo='M062351M062367'/>" ><!--拼音=【bya】內碼=【C75A】【C76A】big5=【ヂヒ】-->
+<!ENTITY M062351M062369 "<gaiji des='【byu】' nor='【byu】' uni='30733085' mojikyo='M062351M062369'/>" ><!--拼音=【byu】內碼=【C75A】【C76C】big5=【ヂピ】-->
+<!ENTITY M062351M062371 "<gaiji des='【byo】' nor='【byo】' uni='30733087' mojikyo='M062351M062371'/>" ><!--拼音=【byo】內碼=【C75A】【C76E】big5=【ヂブ】-->
+
+<!ENTITY M062352M062367 "<gaiji des='【pya】' nor='【pya】' uni='30743083' mojikyo='M062352M062367'/>" ><!--拼音=【pya】內碼=【C75B】【C76A】big5=【ッヒ】-->
+<!ENTITY M062352M062369 "<gaiji des='【pyu】' nor='【pyu】' uni='30743085' mojikyo='M062352M062369'/>" ><!--拼音=【pyu】內碼=【C75B】【C76C】big5=【ッピ】-->
+<!ENTITY M062352M062371 "<gaiji des='【pyo】' nor='【pyo】' uni='30743087' mojikyo='M062352M062371'/>" ><!--拼音=【pyo】內碼=【C75B】【C76E】big5=【ッブ】-->
+
+<!ENTITY M062413M062467 "<gaiji des='【KYA】' nor='【KYA】' uni='30AD30e3' mojikyo='M062413M062467'/>" ><!--拼音=【KYA】內碼=【C7A9】【C7DF】big5=【ワц】-->
+<!ENTITY M062413M062469 "<gaiji des='【KYU】' nor='【KYU】' uni='30AD30e5' mojikyo='M062413M062469'/>" ><!--拼音=【KYU】內碼=【C7A9】【C7E1】big5=【ワш】-->
+<!ENTITY M062413M062471 "<gaiji des='【KYO】' nor='【KYO】' uni='30AD30e7' mojikyo='M062413M062471'/>" ><!--拼音=【KYO】內碼=【C7A9】【C7E3】big5=【ワъ】-->
+
+<!ENTITY M062423M062467 "<gaiji des='【SHA】' nor='【SHA】' uni='30B730e3' mojikyo='M062423M062467'/>" ><!--拼音=【SHA】內碼=【C7B3】【C7DF】big5=【Ёц】-->
+<!ENTITY M062423M062469 "<gaiji des='【SHU】' nor='【SHU】' uni='30B730e5' mojikyo='M062423M062469'/>" ><!--拼音=【SHU】內碼=【C7B3】【C7E1】big5=【Ёш】-->
+<!ENTITY M062423M062471 "<gaiji des='【SHO】' nor='【SHO】' uni='30B730e7' mojikyo='M062423M062471'/>" ><!--拼音=【SHO】內碼=【C7B3】【C7E3】big5=【Ёъ】-->
+
+<!ENTITY M062433M062467 "<gaiji des='【CHA】' nor='【CHA】' uni='30C130e3' mojikyo='M062433M062467'/>" ><!--拼音=【CHA】內碼=【C7BD】【C7DF】big5=【Хц】-->
+<!ENTITY M062433M062469 "<gaiji des='【CHU】' nor='【CHU】' uni='30C130e5' mojikyo='M062433M062469'/>" ><!--拼音=【CHU】內碼=【C7BD】【C7E1】big5=【Хш】-->
+<!ENTITY M062433M062471 "<gaiji des='【CHO】' nor='【CHO】' uni='30C130e7' mojikyo='M062433M062471'/>" ><!--拼音=【CHO】內碼=【C7BD】【C7E3】big5=【Хъ】-->
+
+<!ENTITY M062443M062467 "<gaiji des='【NYA】' nor='【NYA】' uni='30CB30e3' mojikyo='M062443M062467'/>" ><!--拼音=【NYA】內碼=【C7C7】【C7DF】big5=【Яц】-->
+<!ENTITY M062443M062469 "<gaiji des='【NYU】' nor='【NYU】' uni='30CB30e5' mojikyo='M062443M062469'/>" ><!--拼音=【NYU】內碼=【C7C7】【C7E1】big5=【Яш】-->
+<!ENTITY M062443M062471 "<gaiji des='【NYO】' nor='【NYO】' uni='30CB30e7' mojikyo='M062443M062471'/>" ><!--拼音=【NYO】內碼=【C7C7】【C7E3】big5=【Яъ】-->
+
+<!ENTITY M062450M062467 "<gaiji des='【HYA】' nor='【HYA】' uni='30D230e3' mojikyo='M062450M062467'/>" ><!--拼音=【HYA】內碼=【C7CE】【C7DF】big5=【ёц】-->
+<!ENTITY M062450M062469 "<gaiji des='【HYU】' nor='【HYU】' uni='30D230e5' mojikyo='M062450M062469'/>" ><!--拼音=【HYU】內碼=【C7CE】【C7E1】big5=【ёш】-->
+<!ENTITY M062450M062471 "<gaiji des='【HYO】' nor='【HYO】' uni='30D230e7' mojikyo='M062450M062471'/>" ><!--拼音=【HYO】內碼=【C7CE】【C7E3】big5=【ёъ】-->
+
+<!ENTITY M062463M062467 "<gaiji des='【MYA】' nor='【MYA】' uni='30DF30e3' mojikyo='M062463M062467'/>" ><!--拼音=【MYA】內碼=【C7DB】【C7DF】big5=【тц】-->
+<!ENTITY M062463M062469 "<gaiji des='【MYU】' nor='【MYU】' uni='30DF30e5' mojikyo='M062463M062469'/>" ><!--拼音=【MYU】內碼=【C7DB】【C7E1】big5=【тш】-->
+<!ENTITY M062463M062471 "<gaiji des='【MYO】' nor='【MYO】' uni='30DF30e7' mojikyo='M062463M062471'/>" ><!--拼音=【MYO】內碼=【C7DB】【C7E3】big5=【тъ】-->
+
+<!ENTITY M062474M062467 "<gaiji des='【RYA】' nor='【RYA】' uni='30EA30e3' mojikyo='M062474M062467'/>" ><!--拼音=【RYA】內碼=【C7E6】【C7DF】big5=【эц】-->
+<!ENTITY M062474M062469 "<gaiji des='【RYU】' nor='【RYU】' uni='30EA30e5' mojikyo='M062474M062469'/>" ><!--拼音=【RYU】內碼=【C7E6】【C7E1】big5=【эш】-->
+<!ENTITY M062474M062471 "<gaiji des='【RYO】' nor='【RYO】' uni='30EA30e7' mojikyo='M062474M062471'/>" ><!--拼音=【RYO】內碼=【C7E6】【C7E3】big5=【эъ】-->
+
+<!ENTITY M062414M062467 "<gaiji des='【GYA】' nor='【GYA】' uni='30AE30e3' mojikyo='M062414M062467'/>" ><!--拼音=【GYA】內碼=【C7AA】【C7DF】big5=【ヰц】-->
+<!ENTITY M062414M062469 "<gaiji des='【GYU】' nor='【GYU】' uni='30AE30e5' mojikyo='M062414M062469'/>" ><!--拼音=【GYU】內碼=【C7AA】【C7E1】big5=【ヰш】-->
+<!ENTITY M062414M062471 "<gaiji des='【GYO】' nor='【GYO】' uni='30AE30e7' mojikyo='M062414M062471'/>" ><!--拼音=【GYO】內碼=【C7AA】【C7E3】big5=【ヰъ】-->
+
+<!ENTITY M062424M062467 "<gaiji des='【ZYA】' nor='【ZYA】' uni='30B830e3' mojikyo='M062424M062467'/>" ><!--拼音=【ZYA】內碼=【C7B4】【C7DF】big5=【Жц】-->
+<!ENTITY M062424M062469 "<gaiji des='【ZYU】' nor='【ZYU】' uni='30B830e5' mojikyo='M062424M062469'/>" ><!--拼音=【ZYU】內碼=【C7B4】【C7E1】big5=【Жш】-->
+<!ENTITY M062424M062471 "<gaiji des='【ZYO】' nor='【ZYO】' uni='30B830e7' mojikyo='M062424M062471'/>" ><!--拼音=【ZYO】內碼=【C7B4】【C7E3】big5=【Жъ】-->
+
+<!ENTITY M062434M062467 "<gaiji des='【JA】' nor='【JA】' uni='30C230e3' mojikyo='M062434M062467'/>" ><!--拼音=【JA】內碼=【C7BE】【C7DF】big5=【Цц】-->
+<!ENTITY M062434M062469 "<gaiji des='【JU】' nor='【JU】' uni='30C230e5' mojikyo='M062434M062469'/>" ><!--拼音=【JU】內碼=【C7BE】【C7E1】big5=【Цш】-->
+<!ENTITY M062434M062471 "<gaiji des='【JO】' nor='【JO】' uni='30C230e7' mojikyo='M062434M062471'/>" ><!--拼音=【JO】內碼=【C7BE】【C7E3】big5=【Цъ】-->
+
+<!ENTITY M062451M062467 "<gaiji des='【BYA】' nor='【BYA】' uni='30D330e3' mojikyo='M062451M062467'/>" ><!--拼音=【BYA】內碼=【C7CF】【C7DF】big5=【жц】-->
+<!ENTITY M062451M062469 "<gaiji des='【BYU】' nor='【BYU】' uni='30D330e5' mojikyo='M062451M062469'/>" ><!--拼音=【BYU】內碼=【C7CF】【C7E1】big5=【жш】-->
+<!ENTITY M062451M062471 "<gaiji des='【BYO】' nor='【BYO】' uni='30D330e7' mojikyo='M062451M062471'/>" ><!--拼音=【BYO】內碼=【C7CF】【C7E3】big5=【жъ】-->
+
+<!ENTITY M062452M062467 "<gaiji des='【PYA】' nor='【PYA】' uni='30D430e3' mojikyo='M062452M062467'/>" ><!--拼音=【PYA】內碼=【C7D0】【C7DF】big5=【зц】-->
+<!ENTITY M062452M062469 "<gaiji des='【PYU】' nor='【PYU】' uni='30D430e5' mojikyo='M062452M062469'/>" ><!--拼音=【PYU】內碼=【C7D0】【C7E1】big5=【зш】-->
+<!ENTITY M062452M062471 "<gaiji des='【PYO】' nor='【PYO】' uni='30D430e7' mojikyo='M062452M062471'/>" ><!--拼音=【PYO】內碼=【C7D0】【C7E3】big5=【зъ】-->
+

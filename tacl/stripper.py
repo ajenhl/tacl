@@ -195,16 +195,18 @@ class Stripper (object):
         self._transform = etree.XSLT(etree.XML(STRIP_XSLT))
         self._texts = {}
 
-    def _correct_entity_file (self, filename):
+    def _correct_entity_file (self, file_path):
         """Adds an unused entity declaration to the entity file for
-        `filename`, in the hopes that this will make it not cause a
+        `file_path`, in the hopes that this will make it not cause a
         validation failure."""
-        entity_filename = '{}.ent'.format(filename.split('_')[0])
-        with open(entity_filename, 'r') as input_file:
+        path, basename = os.path.split(file_path)
+        entity_file = '{}.ent'.format(os.path.join(
+                path, basename.split('_')[0]))
+        with open(entity_file, 'rb') as input_file:
             text = input_file.read()
-        with open(entity_filename, 'w') as output_file:
+        with open(entity_file, 'wb') as output_file:
             output_file.write(text)
-            output_file.write('<!ENTITY DUMMY_ENTITY "" >')
+            output_file.write(b'<!ENTITY DUMMY_ENTITY "" >')
 
     def extract_text_name (self, filename):
         """Returns the name of the text in `filename`.
@@ -257,7 +259,7 @@ class Stripper (object):
             if tried:
                 return
             logging.warn('Retrying after modifying entity file')
-            self._correct_entity_file(filename)
+            self._correct_entity_file(file_path)
             self.strip_file(filename, True)
             return
         text_parts = self._texts.setdefault(stripped_file_path, {})

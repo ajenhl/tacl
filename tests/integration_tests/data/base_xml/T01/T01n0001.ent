@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="big5" ?>
+<!ENTITY Amacron "<gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/>" >
+<!ENTITY CB00006 "<gaiji uniflag='0' cb='CB00006' des='[(王*巨)/木]' uni='249B2' nor='璩' mojikyo='M021123' mofont='Mojikyo M104' mochar='6E82'/>" >
+<!ENTITY CB00007 "<gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/>" >
+<!ENTITY CB00008 "<gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/>" >
