@@ -13,7 +13,7 @@ documentation is available at http://tacl.readthedocs.org/en/latest/
 Installation
 ------------
 
-Using `Python 3`_\ (minimum version 3.3), run ``python setup.py
+Using `Python 3`_ (minimum version 3.3), run ``python setup.py
 install``. Requires `SQLite`_ and `lxml`_ XML library.
 
 
