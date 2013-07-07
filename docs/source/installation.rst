@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-* `Python 3`_
+* `Python 3`_ (minimum version 3.3)
 * `lxml`_
 * `SQLite3`_
 
