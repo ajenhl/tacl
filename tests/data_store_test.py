@@ -170,6 +170,8 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders = self._create_patch(
             'tacl.DataStore._get_placeholders', False)
         get_placeholders.return_value = sentinel.placeholders
+        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
+                                            False)
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
         csv.return_value = input_fh
@@ -180,6 +182,7 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.diff(catalogue, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
+        log_query_plan.assert_called_once()
         sql = tacl.constants.SELECT_DIFF_SQL.format(sentinel.placeholders,
                                                     sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
@@ -195,6 +198,8 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders = self._create_patch(
             'tacl.DataStore._get_placeholders', False)
         get_placeholders.return_value = sentinel.placeholders
+        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
+                                            False)
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
         csv.return_value = input_fh
@@ -206,6 +211,7 @@ class DataStoreTestCase (TaclTestCase):
                                           input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
+        log_query_plan.assert_called_once()
         sql = tacl.constants.SELECT_DIFF_ASYMMETRIC_SQL.format(
             sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
@@ -229,6 +235,8 @@ class DataStoreTestCase (TaclTestCase):
             'tacl.DataStore._process_supplied_results', False)
         process_supplied.return_value = [sentinel.supplied_ngrams,
                                          supplied_labels]
+        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
+                                            False)
         add_ngrams = self._create_patch('tacl.DataStore._add_temporary_ngrams')
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
@@ -240,6 +248,7 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.diff_supplied(catalogue, sentinel.supplied, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         process_supplied.assert_called_once_with(sentinel.supplied)
+        log_query_plan.assert_called_once()
         self.assertEqual(get_placeholders.mock_calls,
                          [call(trimmed_labels), call(all_labels)])
         add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
@@ -364,6 +373,8 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders = self._create_patch(
             'tacl.DataStore._get_placeholders', False)
         get_placeholders.return_value = sentinel.placeholders
+        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
+                                            False)
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
         csv.return_value = input_fh
@@ -374,6 +385,7 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.intersection(catalogue, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
+        log_query_plan.assert_called_once()
         subqueries = '{0} INTERSECT {0}'.format(
             tacl.constants.SELECT_INTERSECT_SUB_SQL)
         sql = tacl.constants.SELECT_INTERSECT_SQL.format(sentinel.placeholders,
@@ -398,6 +410,8 @@ class DataStoreTestCase (TaclTestCase):
         process_supplied.return_value = [sentinel.supplied_ngrams,
                                          supplied_labels]
         add_ngrams = self._create_patch('tacl.DataStore._add_temporary_ngrams')
+        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
+                                            False)
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
         csv.return_value = input_fh
@@ -411,6 +425,7 @@ class DataStoreTestCase (TaclTestCase):
         process_supplied.assert_called_once_with(sentinel.supplied)
         get_placeholders.assert_called_once_with(all_labels)
         add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
+        log_query_plan.assert_called_once()
         subqueries = '{0} INTERSECT {0}'.format(
             tacl.constants.SELECT_INTERSECT_SUB_SQL)
         sql = tacl.constants.SELECT_INTERSECT_SUPPLIED_SQL.format(

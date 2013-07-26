@@ -200,9 +200,11 @@ class DataStore (object):
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_SQL.format(label_placeholders,
                                                  label_placeholders)
+        parameters = labels + labels
         logging.info('Running diff query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
-        cursor = self._conn.execute(query, labels + labels)
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def diff_asymmetric (self, catalogue, prime_label, output_fh):
@@ -223,10 +225,12 @@ class DataStore (object):
         labels = self._set_labels(catalogue)
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
+        parameters = [prime_label] + labels
         logging.info('Running asymmetric diff query')
         logging.debug('Query: {}\nLabels: {}\nPrime label: {}'.format(
                 query, labels, prime_label))
-        cursor = self._conn.execute(query, [prime_label] + labels)
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def diff_supplied (self, catalogue, supplied, output_fh):
@@ -253,10 +257,12 @@ class DataStore (object):
         self._add_temporary_ngrams(supplied_ngrams)
         query = constants.SELECT_DIFF_SUPPLIED_SQL.format(
             all_label_placeholders, label_placeholders)
+        parameters = all_labels + labels
         logging.info('Running diff query with supplied results')
         logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
                 query, all_labels, labels))
-        cursor = self._conn.execute(query, all_labels + labels)
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def _drop_indices (self):
@@ -354,9 +360,11 @@ class DataStore (object):
                                         * len(labels))
         query = constants.SELECT_INTERSECT_SQL.format(label_placeholders,
                                                       subqueries)
+        parameters = labels + labels
         logging.info('Running intersection query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
-        cursor = self._conn.execute(query, labels * 2)
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def intersection_supplied (self, catalogue, supplied, output_fh):
@@ -384,11 +392,20 @@ class DataStore (object):
                                         * len(labels))
         query = constants.SELECT_INTERSECT_SUPPLIED_SQL.format(
             all_label_placeholders, subqueries)
+        parameters = all_labels + labels
         logging.info('Running intersection query with supplied results')
         logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
                 query, all_labels, labels))
-        cursor = self._conn.execute(query, all_labels + labels)
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+
+    def _log_query_plan (self, query, parameters):
+        cursor = self._conn.execute('EXPLAIN QUERY PLAN ' + query, parameters)
+        query_plan = 'Query plan:\n'
+        for row in cursor.fetchall():
+            query_plan += '|'.join([str(value) for value in row]) + '\n'
+        logging.debug(query_plan)
 
     @staticmethod
     def _process_supplied_results (input_csv):
