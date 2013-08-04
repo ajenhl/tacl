@@ -22,39 +22,44 @@ ENCODING_EPILOG = '''\
     Due to encoding issues, you may need to set the environment
     variable PYTHONIOENCODING to "utf-8".'''
 
-ASYMMETRIC_HELP = 'label of sub-corpus to restrict results to'
+ASYMMETRIC_HELP = 'Label of sub-corpus to restrict results to.'
 
-CATALOGUE_CATALOGUE_HELP = 'path to catalogue file'
+CATALOGUE_CATALOGUE_HELP = 'Path to catalogue file.'
 CATALOGUE_DESCRIPTION = 'Generate a catalogue file.'
 CATALOGUE_EPILOG = '''\
     This command is just a convenience for generating a base catalogue
     file to then be customised manually.'''
-CATALOGUE_HELP = 'generate a catalogue file'
-CATALOGUE_LABEL_HELP = 'label to use for all texts'
+CATALOGUE_HELP = 'Generate a catalogue file.'
+CATALOGUE_LABEL_HELP = 'Label to use for all texts.'
 
 COUNTS_DESCRIPTION = 'List counts of n-grams in each labelled text.'
 COUNTS_EPILOG = ENCODING_EPILOG
-COUNTS_HELP = 'list counts of n-grams in each labelled text'
+COUNTS_HELP = 'List counts of n-grams in each labelled text.'
 
-DB_CORPUS_HELP = 'path to corpus'
-DB_DATABASE_HELP = 'path to database file'
-DB_MEMORY_HELP = 'use RAM for temporary database storage'
-DB_RAM_HELP = 'number of gigabytes of RAM to use'
+DB_CORPUS_HELP = 'Path to corpus.'
+DB_DATABASE_HELP = 'Path to database file.'
+DB_MEMORY_HELP = '''\
+    Use RAM for temporary database storage.
+
+    This may cause an out of memory error, in which case run the
+    command without this switch.'''
+DB_RAM_HELP = 'Number of gigabytes of RAM to use.'
 
 DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
-DIFF_HELP = 'list n-grams unique to each sub-corpus'
+DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
-INPUT_RESULTS_HELP = 'path to results file to restrict query to'
+INPUT_RESULTS_HELP = '''\
+    Path to results file to restrict query to.'''
 
 INTERSECT_DESCRIPTION = 'List n-grams common to all sub-corpora.'
 INTERSECT_EPILOG = ENCODING_EPILOG
-INTERSECT_HELP = 'list n-grams common to all sub-corpora'
+INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
-NGRAMS_HELP = 'generate n-grams from a corpus'
-NGRAMS_MAXIMUM_HELP = 'maximum size of n-gram to generate (integer)'
-NGRAMS_MINIMUM_HELP = 'minimum size of n-gram to generate (integer)'
+NGRAMS_HELP = 'Generate n-grams from a corpus.'
+NGRAMS_MAXIMUM_HELP = 'Maximum size of n-gram to generate (integer).'
+NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
 REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
@@ -72,19 +77,19 @@ REPORT_EPILOG = '''\
         tacl report --recriprocal results.csv | tacl report --reduce -
 
     {}'''.format(ENCODING_EPILOG)
-REPORT_HELP = 'modify a query results file'
-REPORT_MINIMUM_COUNT_HELP = 'minimum total count of n-gram to include'
-REPORT_MAXIMUM_COUNT_HELP = 'maximum total count of n-gram to include'
-REPORT_MINIMUM_SIZE_HELP = 'minimum size of n-grams to include'
-REPORT_MAXIMUM_SIZE_HELP = 'maximum size of n-grams to include'
-REPORT_MINIMUM_TEXT_HELP = 'minimum count of texts containing n-gram to include'
-REPORT_MAXIMUM_TEXT_HELP = 'maximum count of texts containing n-gram to include'
+REPORT_HELP = 'Modify a query results file.'
+REPORT_MINIMUM_COUNT_HELP = 'Minimum total count of n-gram to include.'
+REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count of n-gram to include.'
+REPORT_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
+REPORT_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
+REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'
+REPORT_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
 REPORT_RECIPROCAL_HELP = '''\
-    remove n-grams that are not attested by at least one text in each
-    labelled set of texts'''
-REPORT_REDUCE_HELP = 'remove n-grams that are contained in larger n-grams'
-REPORT_REMOVE_HELP = 'remove labelled results'
-REPORT_RESULTS_HELP = 'path to CSV results; use - for stdin'
+    Remove n-grams that are not attested by at least one text in each
+    labelled set of texts.'''
+REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
+REPORT_REMOVE_HELP = 'Remove labelled results.'
+REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 
 STRIP_DESCRIPTION = '''\
     Preprocess a corpus by stripping unwanted material from each
@@ -92,9 +97,9 @@ STRIP_DESCRIPTION = '''\
 STRIP_EPILOG = '''\
     The CBETA texts are in TEI XML that needs to have the markup and
     metadata removed.'''
-STRIP_HELP = 'preprocess a corpus for use with TACL'
-STRIP_INPUT_HELP = 'directory containing files to strip'
-STRIP_OUTPUT_HELP = 'directory to output stripped files to'
+STRIP_HELP = 'Preprocess a corpus for use with TACL.'
+STRIP_INPUT_HELP = 'Directory containing files to strip.'
+STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'
 
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 
@@ -104,25 +109,25 @@ TACL_HELPER_AGAINST_DESCRIPTION = '''\
     Generate a script to compare each text of a corpus against all the
     texts in another corpus.'''
 TACL_HELPER_AGAINST_HELP = '''\
-    generate a script to compare each text of a corpus against all the
-    texts in another corpus'''
+    Generate a script to compare each text of a corpus against all the
+    texts in another corpus.'''
 TACL_HELPER_AGAINST_A_HELP = '''\
-    file containing text names to compare (one per line)'''
+    File containing text names to compare (one per line).'''
 TACL_HELPER_AGAINST_B_HELP = '''\
-    file containing corpus text names to be compared against (one per
-    line)'''
+    File containing corpus text names to be compared against (one per
+    line).'''
 TACL_HELPER_IN_DESCRIPTION = '''\
     Generate a script to compare each text of a corpus with all the
     other texts of that corpus.'''
 TACL_HELPER_IN_HELP = '''\
-    generate a script to compare each text of a corpus with all the
-    other texts of that corpus'''
+    Generate a script to compare each text of a corpus with all the
+    other texts of that corpus.'''
 TACL_HELPER_IN_TEXTS_HELP = '''\
-    file containing text names to examine (one per line)'''
-TACL_HELPER_OUTPUT = 'output directory for script and catalogue files'
+    File containing text names to examine (one per line).'''
+TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 
 VERBOSE_HELP = '''\
-    display debug information; multiple -v options increase the verbosity'''
+    Display debug information; multiple -v options increase the verbosity.'''
 
 
 # SQL statements.
@@ -200,7 +205,8 @@ SELECT_INTERSECT_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
     'FROM Text CROSS JOIN TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN ({})'
-SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
+SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
+SELECT_INTERSECT_SUB_SQL = 'SELECT DISTINCT TextNGram.ngram ' \
     'FROM Text CROSS JOIN TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
 SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \

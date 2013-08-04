@@ -142,7 +142,7 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = list(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_COUNTS_SQL.format(label_placeholders)
         logging.info('Running counts query')
@@ -196,7 +196,7 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = list(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_SQL.format(label_placeholders,
                                                  label_placeholders)
@@ -222,7 +222,7 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = list(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
         parameters = [prime_label] + labels
@@ -247,7 +247,7 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = list(self._set_labels(catalogue))
         supplied_ngrams, supplied_labels = self._process_supplied_results(
             supplied)
         labels = [label for label in labels if label not in supplied_labels]
@@ -270,6 +270,19 @@ class DataStore (object):
         logging.info('Dropping database indices')
         self._conn.execute(constants.DROP_TEXTNGRAM_INDEX_SQL)
         logging.info('Finished dropping database indices')
+
+    @staticmethod
+    def _get_intersection_subquery (labels):
+        # Create nested subselects.
+        subquery = constants.SELECT_INTERSECT_SUB_SQL
+        # The subqueries are nested in reverse order of 'size', so
+        # that the inmost select is operating on the smallest corpus,
+        # thereby minimising the result sets of outer queries the most.
+        for label in labels[1:]:
+            subquery = constants.SELECT_INTERSECT_SUB_SQL + \
+                       constants.SELECT_INTERSECT_SUB_EXTRA_SQL.format(
+                           subquery)
+        return subquery
 
     @staticmethod
     def _get_placeholders (items):
@@ -354,12 +367,11 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = self._sort_labels(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
-        subqueries = ' INTERSECT '.join([constants.SELECT_INTERSECT_SUB_SQL]
-                                        * len(labels))
+        subquery = self._get_intersection_subquery(labels)
         query = constants.SELECT_INTERSECT_SQL.format(label_placeholders,
-                                                      subqueries)
+                                                      subquery)
         parameters = labels + labels
         logging.info('Running intersection query')
         logging.debug('Query: {}\nLabels: {}'.format(query, labels))
@@ -381,17 +393,16 @@ class DataStore (object):
         :rtype: file-like object
 
         """
-        labels = self._set_labels(catalogue)
+        labels = self._sort_labels(self._set_labels(catalogue))
         supplied_ngrams, supplied_labels = self._process_supplied_results(
             supplied)
         labels = [label for label in labels if label not in supplied_labels]
         all_labels = labels + supplied_labels
         all_label_placeholders = self._get_placeholders(all_labels)
         self._add_temporary_ngrams(supplied_ngrams)
-        subqueries = ' INTERSECT '.join([constants.SELECT_INTERSECT_SUB_SQL]
-                                        * len(labels))
+        subquery = self._get_intersection_subquery(labels)
         query = constants.SELECT_INTERSECT_SUPPLIED_SQL.format(
-            all_label_placeholders, subqueries)
+            all_label_placeholders, subquery)
         parameters = all_labels + labels
         logging.info('Running intersection query with supplied results')
         logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
@@ -426,26 +437,51 @@ class DataStore (object):
         return list(ngrams), list(labels)
 
     def _set_labels (self, catalogue):
-        """Returns a list of the unique labels in `catalogue`, and
-        sets the record of each Text to the corresponding label.
+        """Returns a dictionary of the unique labels in `catalogue` and the
+        number of their associated texts, and sets the record of each
+        Text to the corresponding label.
 
         Texts that do not have a label specified are set to the empty
         string.
 
+        Text counts are included in the results to allow for
+        semi-accurate sorting based on corpora size.
+
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
-        :rtype: `list`
+        :rtype: `dict`
 
         """
         self._conn.execute(constants.UPDATE_LABELS_SQL, [''])
-        labels = set()
+        labels = {}
         for filename, label in catalogue.items():
             self._conn.execute(constants.UPDATE_LABEL_SQL, [label, filename])
-            labels.add(label)
+            labels[label] = labels.get(label, 0) + 1
         self._conn.commit()
-        return list(labels)
+        return labels
+
+    @staticmethod
+    def _sort_labels (label_data):
+        """Returns the labels in `label_data` sorted in descending order
+        according to the 'size' of their referent corpora.
+
+        There are two ways to determine the size of the labelled
+        corpora: count the number of distinct n-grams in each, and
+        count the number of texts in each. The former is more
+        accurate, the latter potentially much faster and doesn't
+        require another database query.
+
+        :param label_data: labels (with their text counts) to sort
+        :type: `dict`
+        :rtype: `list`
+
+        """
+        labels = list(label_data)
+        labels.sort(key=label_data.get, reverse=True)
+        return labels
 
     def _update_text_record (self, text, text_id):
+
         """Updates the record with `text_id` with `text`\'s checksum.
 
         :param text: text to update from
