@@ -9,6 +9,7 @@ COUNT_FIELDNAME = 'count'
 FILENAME_FIELDNAME = 'filename'
 LABEL_FIELDNAME = 'label'
 NGRAM_FIELDNAME = 'ngram'
+PERCENTAGE_FIELDNAME = 'percentage'
 SIZE_FIELDNAME = 'size'
 TOTAL_FIELDNAME = 'total'
 
@@ -16,6 +17,8 @@ QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
                     COUNT_FIELDNAME, LABEL_FIELDNAME]
 COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME, TOTAL_FIELDNAME,
                      COUNT_FIELDNAME, LABEL_FIELDNAME]
+STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_FIELDNAME,
+                         PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
 
 # Command-line documentation strings.
 ENCODING_EPILOG = '''\
@@ -63,13 +66,16 @@ NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
 REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
-    the new set of results.'''
+    the new set of results. See below for the exceptional statistics
+    output.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --reduce, --reciprocal, --min/max-texts,
-    --min/max-size, --min/max-count, --remove.
+    --min/max-size, --min/max-count, --remove. If --statistics is
+    supplied, then all other options are ignored, and a summary set of
+    statistics derived from the results and counts files are output.
 
-    Since this command always outputs a valid results file, its output
+    Since this command usually outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
@@ -90,6 +96,8 @@ REPORT_RECIPROCAL_HELP = '''\
 REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
+REPORT_STATISTICS_HELP = '''\
+    Path to CSV counts. This option overrides all other options.'''
 
 STRIP_DESCRIPTION = '''\
     Preprocess a corpus by stripping unwanted material from each

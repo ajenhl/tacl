@@ -8,10 +8,10 @@ import tacl
 
 class TaclTestCase (unittest.TestCase):
 
-    def _create_csv (self, data):
+    def _create_csv (self, data, fieldnames=tacl.constants.QUERY_FIELDNAMES):
         fh = io.StringIO(newline='')
         writer = csv.writer(fh)
-        writer.writerow(tacl.constants.QUERY_FIELDNAMES)
+        writer.writerow(fieldnames)
         for row in data:
             writer.writerow(row)
         fh.seek(0)

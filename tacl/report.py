@@ -13,19 +13,58 @@ class Report:
         self._rows = [row for row in csv.DictReader(results)]
         self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
-    def csv (self, fh):
+    def csv (self, fh, fieldnames=constants.QUERY_FIELDNAMES):
         """Writes the report data to `fh` in CSV format and returns it.
 
         :param fh: file to write data to
         :type fh: file object
+        :param fieldnames: row headings
+        :type fieldnames: `list`
         :rtype: file object
 
         """
-        writer = csv.DictWriter(fh, fieldnames=constants.QUERY_FIELDNAMES)
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
         writer.writeheader()
         for row in self._rows:
             writer.writerow(row)
         return fh
+
+    def generate_statistics (self, counts):
+        """Replaces result rows with summary statistics about the results.
+
+        These statistics give the filename, total matching tokens,
+        percentage of matching tokens and label for each filename in
+        the results.
+
+        :param counts: file of n-gram counts
+        :type counts: `file`
+
+        """
+        stats = {}
+        count_data = [row for row in csv.DictReader(counts)]
+        for row in count_data:
+            filename = row[constants.FILENAME_FIELDNAME]
+            if filename not in stats:
+                length = int(row[constants.COUNT_FIELDNAME]) + \
+                         int(row[constants.SIZE_FIELDNAME]) - 1
+                stats[filename] = {'label': row[constants.LABEL_FIELDNAME],
+                                   'length': length, 'total_count': 0}
+        self.reduce()
+        for row in self._rows:
+            filename = row[constants.FILENAME_FIELDNAME]
+            token_count = row[constants.COUNT_FIELDNAME] * \
+                          row[constants.SIZE_FIELDNAME]
+            # If the counts data does not match with the results data,
+            # the following may raise a KeyError.
+            stats[filename]['total_count'] += token_count
+        self._rows = []
+        for filename, data in stats.items():
+            percentage = data['total_count'] / data['length'] * 100
+            row = {constants.FILENAME_FIELDNAME: filename,
+                   constants.COUNT_FIELDNAME: str(data['total_count']),
+                   constants.PERCENTAGE_FIELDNAME: str(percentage),
+                   constants.LABEL_FIELDNAME: data['label']}
+            self._rows.append(row)
 
     def _generate_substrings (self, ngram, size):
         """Returns a list of all substrings of `ngram`.

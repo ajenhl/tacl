@@ -167,19 +167,24 @@ def generate_report (args):
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
     report = tacl.Report(results)
-    if args.reduce:
-        report.reduce()
-    if args.reciprocal:
-        report.reciprocal_remove()
-    if args.min_texts or args.max_texts:
-        report.prune_by_text_count(args.min_texts, args.max_texts)
-    if args.min_size or args.max_size:
-        report.prune_by_ngram_size(args.min_size, args.max_size)
-    if args.min_count or args.max_count:
-        report.prune_by_ngram_count(args.min_count, args.max_count)
-    if args.remove:
-        report.remove_label(args.remove)
-    report.csv(sys.stdout)
+    if args.statistics:
+        counts_fh = get_input_fh(args.statistics)
+        report.generate_statistics(counts_fh)
+        report.csv(sys.stdout, constants.STATISTICS_FIELDNAMES)
+    else:
+        if args.reduce:
+            report.reduce()
+        if args.reciprocal:
+            report.reciprocal_remove()
+        if args.min_texts or args.max_texts:
+            report.prune_by_text_count(args.min_texts, args.max_texts)
+        if args.min_size or args.max_size:
+            report.prune_by_ngram_size(args.min_size, args.max_size)
+        if args.min_count or args.max_count:
+            report.prune_by_ngram_count(args.min_count, args.max_count)
+        if args.remove:
+            report.remove_label(args.remove)
+        report.csv(sys.stdout)
 
 def generate_report_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to manipulate CSV
@@ -214,6 +219,8 @@ def generate_report_subparser (subparsers):
                         help=constants.REPORT_REDUCE_HELP)
     parser.add_argument('--remove', help=constants.REPORT_REMOVE_HELP,
                         metavar='LABEL', type=str)
+    parser.add_argument('--statistics', metavar='COUNTS',
+                        help=constants.REPORT_STATISTICS_HELP)
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -240,12 +247,13 @@ def get_catalogue (args):
     catalogue.load(args.catalogue)
     return catalogue
 
-def get_input_fh (args):
-    """Returns an open file of CSV results data, or None if no such
-    file is specified in `args`."""
+def get_input_fh (arg):
+    """Returns an open file of CSV data, or None if `arg` is None.
+
+    """
     input_fh = None
-    if args.input:
-        input_fh = open(args.input, 'r', newline='')
+    if arg:
+        input_fh = open(arg, 'r', newline='')
     return input_fh
 
 def get_data_store (args):
@@ -265,7 +273,7 @@ def ngram_diff (args):
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    input_fh = get_input_fh(args)
+    input_fh = get_input_fh(args.input)
     store.validate(corpus, catalogue)
     if input_fh:
         store.diff_supplied(catalogue, input_fh, sys.stdout)
@@ -279,7 +287,7 @@ def ngram_intersection (args):
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args)
-    input_fh = get_input_fh(args)
+    input_fh = get_input_fh(args.input)
     store.validate(corpus, catalogue)
     if input_fh:
         store.intersection_supplied(catalogue, input_fh, sys.stdout)
