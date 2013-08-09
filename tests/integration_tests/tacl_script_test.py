@@ -14,7 +14,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
 
     """Tests of the tacl command-line script.
 
-    These tests large duplicate much of
+    These tests duplicate much of
     integration_tests/data_store_test.py, due to not being able to
     mock out the tacl library classes in a subprocess.
 
