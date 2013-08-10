@@ -42,6 +42,7 @@ class StatisticsReport (Report):
             percentage = data['total_count'] / data['length'] * 100
             row = {constants.FILENAME_FIELDNAME: filename,
                    constants.COUNT_FIELDNAME: str(data['total_count']),
+                   constants.TOTAL_FIELDNAME: str(data['length']),
                    constants.PERCENTAGE_FIELDNAME: str(percentage),
                    constants.LABEL_FIELDNAME: data['label']}
             self._rows.append(row)

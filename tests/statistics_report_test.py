@@ -31,9 +31,9 @@ class ReportTestCase (TaclTestCase):
         report = tacl.StatisticsReport(results_fh, counts_fh)
         report.generate_statistics()
         expected_rows = [
-            ('a', '13', str(13 / 31 * 100), 'A'),
-            ('b', '6', str(6 / 201 * 100), 'B'),
-            ('c', '9', str(9 / 43 * 100), 'A')
+            ('a', '13', '31', str(13 / 31 * 100), 'A'),
+            ('b', '6', '201', str(6 / 201 * 100), 'B'),
+            ('c', '9', '43', str(9 / 43 * 100), 'A')
             ]
         actual_rows = self._get_rows_from_csv(
             report.csv(io.StringIO(newline='')))
