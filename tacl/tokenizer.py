@@ -3,7 +3,7 @@
 import re
 
 
-class Tokenizer (object):
+class Tokenizer:
 
     """A tokenizer that splits a string using a regular expression.
 

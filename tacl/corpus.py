@@ -5,7 +5,7 @@ import os
 from .text import Text
 
 
-class Corpus (object):
+class Corpus:
 
     """A Corpus represents a collection of `Text`\s.
 

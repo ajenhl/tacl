@@ -181,7 +181,7 @@ STRIP_XSLT = '''
 </xsl:stylesheet>'''
 
 
-class Stripper (object):
+class Stripper:
 
     """Class used for preprocessing a corpus of texts by stripping out
     all material that is not the textual material proper.

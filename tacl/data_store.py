@@ -8,7 +8,7 @@ import sqlite3
 from . import constants
 
 
-class DataStore (object):
+class DataStore:
 
     """Class representing the data store for text data.
 

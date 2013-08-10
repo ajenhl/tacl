@@ -7,7 +7,7 @@ from . import constants
 from .tokenizer import Tokenizer
 
 
-class Text (object):
+class Text:
 
     _tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
