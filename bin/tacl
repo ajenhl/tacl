@@ -75,6 +75,7 @@ def generate_parser ():
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_report_subparser(subparsers)
+    generate_statistics_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
 
@@ -167,24 +168,19 @@ def generate_report (args):
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
     report = tacl.Report(results)
-    if args.statistics:
-        counts_fh = get_input_fh(args.statistics)
-        report.generate_statistics(counts_fh)
-        report.csv(sys.stdout, constants.STATISTICS_FIELDNAMES)
-    else:
-        if args.reduce:
-            report.reduce()
-        if args.reciprocal:
-            report.reciprocal_remove()
-        if args.min_texts or args.max_texts:
-            report.prune_by_text_count(args.min_texts, args.max_texts)
-        if args.min_size or args.max_size:
-            report.prune_by_ngram_size(args.min_size, args.max_size)
-        if args.min_count or args.max_count:
-            report.prune_by_ngram_count(args.min_count, args.max_count)
-        if args.remove:
-            report.remove_label(args.remove)
-        report.csv(sys.stdout)
+    if args.reduce:
+        report.reduce()
+    if args.reciprocal:
+        report.reciprocal_remove()
+    if args.min_texts or args.max_texts:
+        report.prune_by_text_count(args.min_texts, args.max_texts)
+    if args.min_size or args.max_size:
+        report.prune_by_ngram_size(args.min_size, args.max_size)
+    if args.min_count or args.max_count:
+        report.prune_by_ngram_count(args.min_count, args.max_count)
+    if args.remove:
+        report.remove_label(args.remove)
+    report.csv(sys.stdout)
 
 def generate_report_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to manipulate CSV
@@ -219,10 +215,33 @@ def generate_report_subparser (subparsers):
                         help=constants.REPORT_REDUCE_HELP)
     parser.add_argument('--remove', help=constants.REPORT_REMOVE_HELP,
                         metavar='LABEL', type=str)
-    parser.add_argument('--statistics', metavar='COUNTS',
-                        help=constants.REPORT_STATISTICS_HELP)
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
+
+def generate_statistics (args):
+    results = open(args.results, 'r', encoding='utf-8', newline='')
+    counts = open(args.counts, 'r', encoding='utf-8', newline='')
+    report = tacl.StatisticsReport(results, counts)
+    if args.reduce:
+        report.reduce()
+    report.generate_statistics()
+    report.csv(sys.stdout)
+
+def generate_statistics_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to generate statistics
+    from a set of results."""
+    parser = subparsers.add_parser(
+        'stats', description=constants.STATISTICS_DESCRIPTION,
+        epilog=constants.STATISTICS_EPILOG,
+        help=constants.STATISTICS_HELP)
+    parser.set_defaults(func=generate_statistics)
+    add_common_arguments(parser)
+    parser.add_argument('--reduce', action='store_true',
+                        help=constants.REPORT_REDUCE_HELP)
+    parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
+                        metavar='RESULTS')
+    parser.add_argument('counts', help=constants.STATISTICS_COUNTS_HELP,
+                        metavar='COUNTS')
 
 def generate_strip_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to process original

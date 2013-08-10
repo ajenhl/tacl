@@ -71,16 +71,17 @@ REPORT_DESCRIPTION = '''\
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --reduce, --reciprocal, --min/max-texts,
-    --min/max-size, --min/max-count, --remove. If --statistics is
-    supplied, then all other options are ignored, and a summary set of
-    statistics derived from the results and counts files are output.
+    --min/max-size, --min/max-count, --remove.
 
-    Since this command usually outputs a valid results file, its output
+    Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
         tacl report --recriprocal results.csv | tacl report --reduce -
+
+    Note that performing "reduce" on a set of results more than once
+    will make the results inaccurate!
 
     {}'''.format(ENCODING_EPILOG)
 REPORT_HELP = 'Modify a query results file.'
@@ -96,8 +97,16 @@ REPORT_RECIPROCAL_HELP = '''\
 REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
-REPORT_STATISTICS_HELP = '''\
-    Path to CSV counts. This option overrides all other options.'''
+
+STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
+STATISTICS_DESCRIPTION = 'Generate summary statistic for a set of results.'
+STATISTICS_EPILOG = '''\
+    The output giving the percentage of each text's tokens that are in
+    the results depends on those results being reduced. If the
+    supplied results file has not been reduced, pass the --reduce
+    option.'''
+STATISTICS_HELP = 'Generate summary statistics for a set of results.'
+STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 
 STRIP_DESCRIPTION = '''\
     Preprocess a corpus by stripping unwanted material from each
