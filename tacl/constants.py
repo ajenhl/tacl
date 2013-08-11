@@ -6,19 +6,24 @@ TOKENIZER_PATTERN = r'\[[^]]*\]|\w'
 
 # CSV field names.
 COUNT_FIELDNAME = 'count'
+COUNT_TOKENS_FIELDNAME = 'matching tokens'
 FILENAME_FIELDNAME = 'filename'
 LABEL_FIELDNAME = 'label'
 NGRAM_FIELDNAME = 'ngram'
 PERCENTAGE_FIELDNAME = 'percentage'
 SIZE_FIELDNAME = 'size'
-TOTAL_FIELDNAME = 'total'
+TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
+TOTAL_TOKENS_FIELDNAME = 'total tokens'
+UNIQUE_NGRAMS_FIELDNAME = 'unique ngrams'
 
 QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
                     COUNT_FIELDNAME, LABEL_FIELDNAME]
-COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME, TOTAL_FIELDNAME,
-                     COUNT_FIELDNAME, LABEL_FIELDNAME]
-STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_FIELDNAME, TOTAL_FIELDNAME,
-                         PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
+COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME,
+                     UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
+                     LABEL_FIELDNAME]
+STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
+                         TOTAL_TOKENS_FIELDNAME, PERCENTAGE_FIELDNAME,
+                         LABEL_FIELDNAME]
 
 # Command-line documentation strings.
 ENCODING_EPILOG = '''\
@@ -172,6 +177,7 @@ CREATE_TABLE_TEXT_SQL = 'CREATE TABLE IF NOT EXISTS Text (' \
     'id INTEGER PRIMARY KEY ASC, ' \
     'filename TEXT UNIQUE NOT NULL, ' \
     'checksum TEXT NOT NULL, ' \
+    'token_count INTEGER NOT NULL, ' \
     'label TEXT NOT NULL)'
 CREATE_TABLE_TEXTNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextNGram (' \
     'text INTEGER NOT NULL REFERENCES Text (id), ' \
@@ -180,17 +186,18 @@ CREATE_TABLE_TEXTNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextNGram (' \
     'count INTEGER NOT NULL)'
 CREATE_TABLE_TEXTHASNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextHasNGram (' \
     'text INTEGER NOT NULL REFERENCES Text (id), ' \
-    'size INTEGER NOT NULL)'
+    'size INTEGER NOT NULL, ' \
+    'count INTEGER NOT NULL)'
 CREATE_TEMPORARY_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (ngram Text)'
 DELETE_TEXT_HAS_NGRAMS_SQL = 'DELETE FROM TextHasNGram WHERE text = ?'
 DELETE_TEXT_NGRAMS_SQL = 'DELETE FROM TextNGram WHERE text = ?'
 DROP_TEXTNGRAM_INDEX_SQL = 'DROP INDEX IF EXISTS TextNGramIndexTextNGram'
 INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
     'VALUES (?, ?, ?, ?)'
-INSERT_TEXT_HAS_NGRAM_SQL = 'INSERT INTO TextHasNGram (text, size) ' \
-    'VALUES (?, ?)'
-INSERT_TEXT_SQL = 'INSERT INTO Text (filename, checksum, label) ' \
+INSERT_TEXT_HAS_NGRAM_SQL = 'INSERT INTO TextHasNGram (text, size, count) ' \
     'VALUES (?, ?, ?)'
+INSERT_TEXT_SQL = 'INSERT INTO Text (filename, checksum, token_count, label) ' \
+    'VALUES (?, ?, ?, ?)'
 INSERT_TEMPORARY_NGRAM_SQL = 'INSERT INTO temp.InputNGram (ngram) VALUES (?)'
 PRAGMA_CACHE_SIZE_SQL = 'PRAGMA cache_size={}'
 PRAGMA_COUNT_CHANGES_SQL = 'PRAGMA count_changes=OFF'
@@ -198,12 +205,12 @@ PRAGMA_FOREIGN_KEYS_SQL = 'PRAGMA foreign_keys=ON'
 PRAGMA_LOCKING_MODE_SQL = 'PRAGMA locking_mode=EXCLUSIVE'
 PRAGMA_SYNCHRONOUS_SQL = 'PRAGMA synchronous=OFF'
 PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
-SELECT_COUNTS_SQL = 'SELECT Text.filename, TextNGram.size, ' \
-    'COUNT(TextNGram.ngram) as total, SUM(TextNGram.count) as count, ' \
-    'Text.label FROM Text CROSS JOIN TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
-    'GROUP BY TextNGram.text, TextNGram.size ' \
-    'ORDER BY Text.filename, TextNGram.size'
+SELECT_COUNTS_SQL = 'SELECT Text.filename, TextHasNGram.size, ' \
+    'TextHasNGram.count as "unique ngrams", ' \
+    'Text.token_count + 1 - TextHasNGram.size as "total ngrams", ' \
+    'Text.label FROM Text CROSS JOIN TextHasNGram ' \
+    'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
+    'ORDER BY Text.filename, TextHasNGram.size'
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text CROSS JOIN TextNGram ' \
@@ -228,7 +235,7 @@ SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'AND NOT EXISTS (' \
     'SELECT tn.ngram FROM Text t CROSS JOIN TextNGram tn ' \
     'WHERE t.id = tn.text AND t.label IN ({}) AND tn.ngram = TextNGram.ngram)'
-SELECT_HAS_NGRAMS_SQL = 'SELECT * FROM TextHasNGram ' \
+SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
@@ -248,7 +255,7 @@ SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE filename = ?'
 UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
-UPDATE_TEXT_SQL = 'UPDATE Text SET checksum = ? WHERE id = ?'
+UPDATE_TEXT_SQL = 'UPDATE Text SET checksum = ?, token_count = ? WHERE id = ?'
 VACUUM_SQL = 'VACUUM'
 
 HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>

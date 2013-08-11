@@ -26,7 +26,7 @@ class StatisticsReport (Report):
         for row in self._count_rows:
             filename = row[constants.FILENAME_FIELDNAME]
             if filename not in stats:
-                length = int(row[constants.COUNT_FIELDNAME]) + \
+                length = int(row[constants.TOTAL_NGRAMS_FIELDNAME]) + \
                          int(row[constants.SIZE_FIELDNAME]) - 1
                 stats[filename] = {'label': row[constants.LABEL_FIELDNAME],
                                    'length': length, 'total_count': 0}
@@ -41,8 +41,8 @@ class StatisticsReport (Report):
         for filename, data in stats.items():
             percentage = data['total_count'] / data['length'] * 100
             row = {constants.FILENAME_FIELDNAME: filename,
-                   constants.COUNT_FIELDNAME: str(data['total_count']),
-                   constants.TOTAL_FIELDNAME: str(data['length']),
+                   constants.COUNT_TOKENS_FIELDNAME: str(data['total_count']),
+                   constants.TOTAL_TOKENS_FIELDNAME: str(data['length']),
                    constants.PERCENTAGE_FIELDNAME: str(percentage),
                    constants.LABEL_FIELDNAME: data['label']}
             self._rows.append(row)

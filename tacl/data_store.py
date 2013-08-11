@@ -91,8 +91,10 @@ class DataStore:
         """
         filename = text.get_filename()
         logging.info('Adding record for text {}'.format(filename))
+        checksum = text.get_checksum()
+        token_count = len(text.get_tokens())
         cursor = self._conn.execute(constants.INSERT_TEXT_SQL,
-                                    [filename, text.get_checksum(), ''])
+                                    [filename, checksum, token_count, ''])
         self._conn.commit()
         return cursor.lastrowid
 
@@ -112,11 +114,13 @@ class DataStore:
         if self._has_ngrams(text_id, size):
             logging.info('{}-grams are already in the database'.format(size))
         else:
-            logging.info('Adding {} unique {}-grams'.format(len(ngrams), size))
+            unique_ngrams = len(ngrams)
+            logging.info('Adding {} unique {}-grams'.format(
+                unique_ngrams, size))
             parameters = [[text_id, ngram, size, count]
                           for ngram, count in ngrams.items()]
             self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
-                               [text_id, size])
+                               [text_id, size, unique_ngrams])
             self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
             self._conn.commit()
 
@@ -481,8 +485,8 @@ class DataStore:
         return labels
 
     def _update_text_record (self, text, text_id):
-
-        """Updates the record with `text_id` with `text`\'s checksum.
+        """Updates the record with `text_id` with `text`\'s checksum and
+        token count.
 
         :param text: text to update from
         :type text: `Text`
@@ -490,8 +494,10 @@ class DataStore:
         :type text_id: `int`
 
         """
+        checksum = text.get_checksum()
+        token_count = len(text.get_tokens())
         self._conn.execute(constants.UPDATE_TEXT_SQL,
-                           [text.get_checksum(), text_id])
+                           [checksum, token_count, text_id])
         self._conn.commit()
 
     def _vacuum (self):

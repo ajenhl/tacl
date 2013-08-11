@@ -74,14 +74,17 @@ class DataStoreTestCase (TaclTestCase):
         text = MagicMock(spec_set=tacl.Text)
         text.get_checksum.return_value = sentinel.checksum
         text.get_filename.return_value = sentinel.filename
+        tokens = [sentinel.token]
+        text.get_tokens.return_value = tokens
         cursor = store._conn.execute.return_value
         cursor.lastrowid = sentinel.text_id
         actual_text_id = store._add_text_record(text)
         text.get_checksum.assert_called_once_with()
         text.get_filename.assert_called_once_with()
+        text.get_tokens.assert_called_once_with()
         store._conn.execute.assert_called_once_with(
             tacl.constants.INSERT_TEXT_SQL,
-            [sentinel.filename, sentinel.checksum, ''])
+            [sentinel.filename, sentinel.checksum, len(tokens), ''])
         store._conn.commit.assert_called_once_with()
         self.assertEqual(actual_text_id, sentinel.text_id)
 
@@ -108,7 +111,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(
             store._conn.mock_calls,
             [call.execute(tacl.constants.INSERT_TEXT_HAS_NGRAM_SQL,
-                          [sentinel.text_id, size]),
+                          [sentinel.text_id, size, len(ngrams)]),
              call.executemany(tacl.constants.INSERT_NGRAM_SQL,
                               [[sentinel.text_id, 'a', size, 2],
                                [sentinel.text_id, 'b', size, 1]]),
@@ -481,11 +484,14 @@ class DataStoreTestCase (TaclTestCase):
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         text = MagicMock(spec_set=tacl.Text)
         text.get_checksum.return_value = sentinel.checksum
+        tokens = [sentinel.token]
+        text.get_tokens.return_value = tokens
         store._update_text_record(text, sentinel.text_id)
-        self.assertEqual(text.mock_calls, [call.get_checksum()])
+        self.assertEqual(text.mock_calls,
+                         [call.get_checksum(), call.get_tokens()])
         store._conn.execute.assert_called_once_with(
             tacl.constants.UPDATE_TEXT_SQL,
-            [sentinel.checksum, sentinel.text_id])
+            [sentinel.checksum, len(tokens), sentinel.text_id])
         store._conn.commit.assert_called_once_with()
 
     def test_vacuum (self):
