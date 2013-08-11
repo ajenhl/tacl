@@ -25,7 +25,7 @@ class Highlighter:
 
         """
         interchar_pattern = r'\W*'
-        pattern = interchar_pattern.join([char for char in ngram])
+        pattern = interchar_pattern.join([re.escape(char) for char in ngram])
         return r'({})'.format(pattern)
 
     @staticmethod
