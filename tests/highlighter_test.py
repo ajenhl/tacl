@@ -12,7 +12,7 @@ class HighlighterTestCase (TaclTestCase):
     def test_get_regexp_pattern (self):
         input_ngram = 'ab[cd]e'
         actual_pattern = tacl.Highlighter._get_regexp_pattern(input_ngram)
-        expected_pattern = r'(a\W*b\W*[\W*c\W*d\W*]\W*e)'
+        expected_pattern = r'(a\W*b\W*\[\W*c\W*d\W*\]\W*e)'
         self.assertEqual(actual_pattern, expected_pattern)
 
     def test_get_text_results (self):
@@ -78,6 +78,18 @@ class HighlighterTestCase (TaclTestCase):
         highlighter = tacl.Highlighter(None, [])
         actual_text = highlighter._highlight(input_text, input_results)
         expected_text = '<span class="highlight"><span class="highlight">th</span>e</span>nAw<span class="highlight">eA</span>w<span class="highlight">ent</span>'
+        self.assertEqual(actual_text, expected_text)
+
+    def test_highlight_escaping (self):
+        input_text = '火無[火*因]。是故顯物'
+        input_results = [
+            {tacl.constants.NGRAM_FIELDNAME: '無[火*因]是',
+             tacl.constants.SIZE_FIELDNAME: '3',
+             tacl.constants.FILENAME_FIELDNAME: '2.txt',
+             tacl.constants.LABEL_FIELDNAME: 'B'}]
+        highlighter = tacl.Highlighter(None, [])
+        actual_text = highlighter._highlight(input_text, input_results)
+        expected_text = '火<span class="highlight">無[火*因]。是</span>故顯物'
         self.assertEqual(actual_text, expected_text)
 
 
