@@ -52,6 +52,19 @@ DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
+HIGHLIGHT_BASE_HELP = 'Filename of text to display.'
+HIGHLIGHT_DESCRIPTION = '''\
+    Output an HTML document showing a text with its matches visually
+    highlighted.'''
+HIGHLIGHT_EPILOG = '''\
+    The scope of the supplied results may have a dramatic influence on
+    the amount of highlighting. Results containing 1-grams are very
+    likely to be almost entirely highlighted. Results may be
+    restricted by using the tacl report command.'''
+
+HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
+HIGHLIGHT_MATCH_HELP = 'Highlight only matches from this filename on the text.'
+
 INPUT_RESULTS_HELP = '''\
     Path to results file to restrict query to.'''
 
@@ -237,3 +250,20 @@ UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
 UPDATE_TEXT_SQL = 'UPDATE Text SET checksum = ? WHERE id = ?'
 VACUUM_SQL = 'VACUUM'
+
+HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
+<html>
+  <head>
+    <title>{base_filename} with matches from {results_filename} highlighted</title>
+    <style>
+      body {{ margin-left: 4em; }}
+      .highlight {{ color: green; }}
+    </style>
+  </head>
+  <body>
+    <h1>{base_filename} with matches from {results_filename} highlighted</h1>
+
+    <div>{text}</div>
+
+  </body>
+</html>'''

@@ -23,6 +23,14 @@ class Text:
         """
         return hashlib.md5(self._content.encode('utf-8')).hexdigest()
 
+    def get_content (self):
+        """Returns the content of this text.
+
+        :rtype: `str`
+
+        """
+        return self._content
+
     def get_filename (self):
         """Returns the filename of this text.
 
