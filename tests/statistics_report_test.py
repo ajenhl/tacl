@@ -39,6 +39,26 @@ class ReportTestCase (TaclTestCase):
             report.csv(io.StringIO(newline='')))
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_generate_statistics_zero_count (self):
+        # A text may have no n-grams (usually by accident, but it's
+        # not TACL's place to judge). This should lead to zeroes in
+        # the statistics entry for that text.
+        input_results = ([])
+        results_fh = self._create_csv(input_results)
+        input_counts = (
+            ['a', '2', '0', '-1', 'A'],
+            )
+        counts_fh = self._create_csv(input_counts,
+                                     tacl.constants.COUNTS_FIELDNAMES)
+        report = tacl.StatisticsReport(results_fh, counts_fh)
+        report.generate_statistics()
+        expected_rows = [
+            ('a', '0', '0', '0', 'A'),
+            ]
+        actual_rows = self._get_rows_from_csv(
+            report.csv(io.StringIO(newline='')))
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
 
 if __name__ == '__main__':
     unittest.main()

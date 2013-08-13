@@ -39,7 +39,10 @@ class StatisticsReport (Report):
             stats[filename]['total_count'] += token_count
         self._rows = []
         for filename, data in stats.items():
-            percentage = data['total_count'] / data['length'] * 100
+            if data['length'] == 0:
+                percentage = 0
+            else:
+                percentage = data['total_count'] / data['length'] * 100
             row = {constants.FILENAME_FIELDNAME: filename,
                    constants.COUNT_TOKENS_FIELDNAME: str(data['total_count']),
                    constants.TOTAL_TOKENS_FIELDNAME: str(data['length']),
