@@ -137,8 +137,11 @@ def generate_highlight_subparser (subparsers):
         epilog=constants.HIGHLIGHT_EPILOG, help=constants.HIGHLIGHT_HELP)
     parser.set_defaults(func=highlight_text)
     add_common_arguments(parser)
-    parser.add_argument('-m', '--match', help=constants.HIGHLIGHT_MATCH_HELP,
-                        metavar='MATCH_FILENAME')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-a', '--all', action='store_true',
+                       help=constants.HIGHLIGHT_ALL_HELP)
+    group.add_argument('-m', '--match', help=constants.HIGHLIGHT_MATCH_HELP,
+                       metavar='MATCH_FILENAME')
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
@@ -303,7 +306,11 @@ def highlight_text (args):
     results = open(args.results, 'r', encoding='utf-8', newline='')
     highlighter = tacl.Highlighter(corpus, results)
     match_filename = args.match or args.base
-    print(highlighter.highlight(args.base, match_filename))
+    if args.all:
+        text = highlighter.multi_highlight(args.base)
+    else:
+        text = highlighter.highlight(args.base, match_filename)
+    print(text)
 
 def ngram_counts (args):
     """Outputs the results of performing a counts query."""

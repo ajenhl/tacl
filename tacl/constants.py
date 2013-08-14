@@ -57,6 +57,10 @@ DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
+HIGHLIGHT_ALL_HELP = '''\
+    Output a "heat map" view of the base text. This allows the matches
+    from each text to be applied to the base text, with the number of
+    overlaps between texts rendered by variation in colour.'''
 HIGHLIGHT_BASE_HELP = 'Filename of text to display.'
 HIGHLIGHT_DESCRIPTION = '''\
     Output an HTML document showing a text with its matches visually
@@ -91,15 +95,18 @@ REPORT_EPILOG = '''\
     following order: --reduce, --reciprocal, --min/max-texts,
     --min/max-size, --min/max-count, --remove.
 
+    It is important to be careful with the use of --reduce. Coupled
+    with --max-size, many results may be discarded without trace
+    (since the reduce occurs first). Note too that performing "reduce"
+    on a set of results more than once will make the results
+    inaccurate!
+
     Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
         tacl report --recriprocal results.csv | tacl report --reduce -
-
-    Note that performing "reduce" on a set of results more than once
-    will make the results inaccurate!
 
     {}'''.format(ENCODING_EPILOG)
 REPORT_HELP = 'Modify a query results file.'
@@ -261,6 +268,7 @@ VACUUM_SQL = 'VACUUM'
 HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{base_filename} with matches from {results_filename} highlighted</title>
     <style>
       body {{ margin-left: 4em; }}
@@ -272,5 +280,65 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 
     <div>{text}</div>
 
+  </body>
+</html>'''
+
+HIGHLIGHT_MULTI_TEMPLATE = '''<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{base_filename} with matches from each other text highlighted</title>
+    <style>
+      body {{ margin-left: 4em; }}
+      div.text-list {{ float: right; width: 15em; margin-left: 3em; }}
+      ul {{ list-style-type: none; }}
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>{base_filename} with matches from each other text highlighted</h1>
+
+    <div class="text-list">{text_list}</div>
+
+    <div class="text">{text}</div>
+
+    <script>
+      var n = 10;
+      var xr = 0;
+      var xg = 0;
+      var xb = 0;
+      var yr = 0;
+      var yg = 128;
+      var yb = 0;
+      var max = $("input").length;
+
+      function recalculateHeat (textname, change) {{
+        $("span[data-texts~='" + textname + "']").each(function () {{
+          $(this).attr("data-count", function () {{
+            return parseInt($(this).attr("data-count")) + change;
+          }});
+          var val = parseInt($(this).attr("data-count"));
+          var pos = parseInt((Math.round((val/max)*100)).toFixed(0));
+              red = parseInt((xr + (( pos * (yr - xr)) / (n-1))).toFixed(0));
+              green = parseInt((xg + (( pos * (yg - xg)) / (n-1))).toFixed(0));
+              blue = parseInt((xb + (( pos * (yb - xb)) / (n-1))).toFixed(0));
+              clr = 'rgb('+red+','+green+','+blue+')';
+          $(this).css({{color:clr}});
+        }});
+      }}
+
+      $(document).ready(function () {{
+        $("input").on("click", function (event) {{
+          var $textname = $(this).val();
+          var $change;
+          if ($(this).prop('checked')) {{
+            $change = 1;
+          }} else {{
+            $change = -1;
+          }}
+          recalculateHeat($textname, $change);
+        }});
+      }});
+    </script>
   </body>
 </html>'''
