@@ -57,7 +57,6 @@ class DataStore:
             self._add_text_ngrams(text, minimum, maximum)
         self._add_indices()
         self._analyse()
-        self._vacuum()
 
     def _add_temporary_ngrams (self, ngrams):
         """Adds `ngrams` to a temporary table."""
@@ -499,12 +498,6 @@ class DataStore:
         self._conn.execute(constants.UPDATE_TEXT_SQL,
                            [checksum, token_count, text_id])
         self._conn.commit()
-
-    def _vacuum (self):
-        """Vacuums the database."""
-        logging.info('Vacuuming the database')
-        self._conn.execute(constants.VACUUM_SQL)
-        logging.info('Vacuuming complete')
 
     def validate (self, corpus, catalogue):
         """Returns True if all of the files labelled in `catalogue`
