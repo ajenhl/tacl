@@ -25,7 +25,6 @@ class DataStoreTestCase (TaclTestCase):
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
         initialise = self._create_patch('tacl.DataStore._initialise_database')
-        vacuum = self._create_patch('tacl.DataStore._vacuum')
         text1 = MagicMock(spec_set=tacl.Text)
         text2 = MagicMock(spec_set=tacl.Text)
         corpus = MagicMock(spec_set=tacl.Corpus)
@@ -39,7 +38,6 @@ class DataStoreTestCase (TaclTestCase):
                          [call(store, text1, 2, 3), call(store, text2, 2, 3)])
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
-        vacuum.assert_called_once_with(store)
 
     def test_add_temporary_ngrams (self):
         store = tacl.DataStore(':memory:')
@@ -493,13 +491,6 @@ class DataStoreTestCase (TaclTestCase):
             tacl.constants.UPDATE_TEXT_SQL,
             [sentinel.checksum, len(tokens), sentinel.text_id])
         store._conn.commit.assert_called_once_with()
-
-    def test_vacuum (self):
-        store = tacl.DataStore(':memory:')
-        store._conn = MagicMock(spec_set=sqlite3.Connection)
-        store._vacuum()
-        store._conn.execute.assert_called_once_with(
-            tacl.constants.VACUUM_SQL)
 
     def test_validate_true (self):
         corpus = MagicMock(spec_set=tacl.Corpus)
