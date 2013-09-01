@@ -215,47 +215,48 @@ PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
 SELECT_COUNTS_SQL = 'SELECT Text.filename, TextHasNGram.size, ' \
     'TextHasNGram.count as "unique ngrams", ' \
     'Text.token_count + 1 - TextHasNGram.size as "total ngrams", ' \
-    'Text.label FROM Text CROSS JOIN TextHasNGram ' \
+    'Text.token_count AS "total tokens", Text.label ' \
+    'FROM Text, TextHasNGram ' \
     'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
     'ORDER BY Text.filename, TextHasNGram.size'
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label IN (?) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
-    'SELECT TextNGram.ngram FROM Text CROSS JOIN TextNGram ' \
+    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
 SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'Text.filename, Text.label ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
-    'SELECT TextNGram.ngram FROM Text CROSS JOIN TextNGram ' \
+    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
 SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND NOT EXISTS (' \
-    'SELECT tn.ngram FROM Text t CROSS JOIN TextNGram tn ' \
+    'SELECT tn.ngram FROM Text t, TextNGram tn ' \
     'WHERE t.id = tn.text AND t.label IN ({}) AND tn.ngram = TextNGram.ngram)'
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
-SELECT_INTERSECT_SUB_SQL = 'SELECT DISTINCT TextNGram.ngram ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
 SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
-    'FROM Text CROSS JOIN TextNGram ' \
+    'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND TextNGram.ngram IN ({})'

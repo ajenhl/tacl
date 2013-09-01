@@ -390,7 +390,7 @@ class DataStoreTestCase (TaclTestCase):
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
         log_query_plan.assert_called_once()
-        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text CROSS JOIN TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT DISTINCT TextNGram.ngram FROM Text CROSS JOIN TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT DISTINCT TextNGram.ngram FROM Text CROSS JOIN TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, labels * 2)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
@@ -430,7 +430,7 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders.assert_called_once_with(all_labels)
         add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
         log_query_plan.assert_called_once()
-        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text CROSS JOIN TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) AND TextNGram.ngram IN (SELECT DISTINCT TextNGram.ngram FROM Text CROSS JOIN TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT DISTINCT TextNGram.ngram FROM Text CROSS JOIN TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, all_labels + trimmed_labels)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
