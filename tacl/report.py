@@ -1,16 +1,20 @@
 """Module containing the Report class."""
 
-import csv
 import logging
 
+from lxml import etree
+import pandas as pd
+
 from . import constants
+from .highlighter import Highlighter
+from .text import BaseText
 from .tokenizer import Tokenizer
 
 
 class Report:
 
-    def __init__ (self, results):
-        self._rows = [row for row in csv.DictReader(results)]
+    def __init__ (self, matches):
+        self._matches = pd.read_csv(matches)
         self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
     def csv (self, fh):
@@ -18,28 +22,71 @@ class Report:
 
         :param fh: file to write data to
         :type fh: file object
-        :param fieldnames: row headings
-        :type fieldnames: `list`
         :rtype: file object
 
         """
-        return self._csv(fh, constants.QUERY_FIELDNAMES)
-
-    def _csv (self, fh, fieldnames):
-        """Writes the report data to `fh` in CSV format and returns it.
-
-        :param fh: file to write data to
-        :type fh: file object
-        :param fieldnames: row headings
-        :type fieldnames: `list`
-        :rtype: file object
-
-        """
-        writer = csv.DictWriter(fh, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in self._rows:
-            writer.writerow(row)
+        self._matches.to_csv(fh, index=False)
         return fh
+
+    def extend (self, corpus):
+        if not self._matches:
+            return
+        # Get the XML base text for each text in the results and
+        # derive a count of all the n-grams that make it up.
+        hl = Highlighter(corpus)
+        highest_n = self._matches[constants.SIZE_FIELDNAME].max()
+        # Supply the highlighter with only matches on the largest
+        # n-grams.
+        matches = self._matches[
+            self._matches[constants.SIZE_FIELDNAME] == highest_n]
+        transform = etree.XSLT(etree.XML(EXTEND_XSLT))
+        extended_matches = pd.DataFrame()
+        cols = [constants.FILENAME_FIELDNAME, constants.LABEL_FIELDNAME]
+        for index, (filename, label) in matches[cols].drop_duplicates().iterrows():
+            base = hl.generate_base(matches, filename, False)
+            # Apply XSLT to get chained matches.
+            extended = transform(base)
+            extended_matches = extended_matches.append(
+                self._generate_extended_matches(
+                    extended, highest_n, filename, label), ignore_index=True)
+        extended_matches = extended_matches.reindex_axis(
+            constants.QUERY_FIELDNAMES, axis=1)
+        extended_matches = self._reciprocal_remove(extended_matches)
+        self._matches = self._matches.append(extended_matches)
+
+    def _generate_extended_matches (self, extended, highest_n, filename, label):
+        extended_matches = pd.DataFrame()
+        extended_ngrams = extended.xpath('//ngram')
+        # Add data for each n-gram within each extended n-gram. Since
+        # this treats each extended piece of text separately, the same
+        # n-gram may be generated more than once, so the complete set
+        # of new possible matches for this filename needs to combine
+        # the counts for such.
+        for extended_ngram in extended_ngrams:
+            content = extended_ngram.text
+            if len(content) == highest_n:
+                continue
+            text = BaseText(content)
+            for size, ngrams in text.get_ngrams(
+                    highest_n+1, len(extended_ngram.text)):
+                data = [{constants.FILENAME_FIELDNAME: filename,
+                         constants.LABEL_FIELDNAME: label,
+                         constants.SIZE_FIELDNAME: size,
+                         constants.NGRAM_FIELDNAME: ngram,
+                         constants.COUNT_FIELDNAME: count}
+                        for ngram, count in ngrams.items()]
+                extended_matches = extended_matches.append(
+                    pd.DataFrame(data), ignore_index=True)
+        # extended_matches may be an empty DataFrame, in which case
+        # manipulating it on the basis of non-existing columns is not
+        # going to go well.
+        groupby_fields = [constants.NGRAM_FIELDNAME,
+                          constants.FILENAME_FIELDNAME,
+                          constants.SIZE_FIELDNAME, constants.LABEL_FIELDNAME]
+        if constants.NGRAM_FIELDNAME in extended_matches:
+            extended_matches = extended_matches.groupby(
+                groupby_fields).sum().reset_index()
+        return extended_matches
 
     def _generate_substrings (self, ngram, size):
         """Returns a list of all substrings of `ngram`.
@@ -71,21 +118,18 @@ class Report:
 
         """
         logging.info('Pruning results by n-gram count')
-        data = {}
-        for row in self._rows:
-            ngram = row[constants.NGRAM_FIELDNAME]
-            count = data.setdefault(ngram, 0)
-            count += int(row[constants.COUNT_FIELDNAME])
-            data[ngram] = count
-        ngrams = []
-        for ngram, count in data.items():
-            if minimum and count < minimum:
-                continue
-            if maximum and count > maximum:
-                continue
-            ngrams.append(ngram)
-        self._rows = [row for row in self._rows
-                      if row[constants.NGRAM_FIELDNAME] in ngrams]
+        counts = pd.DataFrame(self._matches.groupby(constants.NGRAM_FIELDNAME)[
+            constants.COUNT_FIELDNAME].sum())
+        counts.rename(columns={constants.COUNT_FIELDNAME: 'tmp_count'},
+                      inplace=True)
+        if minimum:
+            counts = counts[counts['tmp_count'] >= minimum]
+        if maximum:
+            counts = counts[counts['tmp_count'] <= maximum]
+        self._matches = pd.merge(self._matches, counts,
+                                 left_on=constants.NGRAM_FIELDNAME,
+                                 right_index=True)
+        del self._matches['tmp_count']
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
@@ -98,15 +142,12 @@ class Report:
 
         """
         logging.info('Pruning results by n-gram size')
-        new_rows = []
-        for row in self._rows:
-            size = int(row[constants.SIZE_FIELDNAME])
-            if minimum and size < minimum:
-                continue
-            if maximum and size > maximum:
-                continue
-            new_rows.append(row)
-        self._rows = new_rows
+        if minimum:
+            self._matches = self._matches[
+                self._matches[constants.SIZE_FIELDNAME] >= minimum]
+        if maximum:
+            self._matches = self._matches[
+                self._matches[constants.SIZE_FIELDNAME] <= maximum]
 
     def prune_by_text_count (self, minimum=None, maximum=None):
         """Removes results rows for n-grams that are not attested in a
@@ -120,21 +161,16 @@ class Report:
 
         """
         logging.info('Pruning results by text count')
-        data = {}
-        for row in self._rows:
-            ngram = row[constants.NGRAM_FIELDNAME]
-            text_count = data.setdefault(ngram, 0)
-            text_count += 1
-            data[ngram] = text_count
-        ngrams = []
-        for ngram, count in data.items():
-            if minimum and count < minimum:
-                continue
-            if maximum and count > maximum:
-                continue
-            ngrams.append(ngram)
-        self._rows = [row for row in self._rows
-                      if row[constants.NGRAM_FIELDNAME] in ngrams]
+        counts = pd.DataFrame(self._matches.groupby(
+            constants.NGRAM_FIELDNAME)[constants.FILENAME_FIELDNAME].count())
+        if minimum:
+            counts = counts[counts[0] >= minimum]
+        if maximum:
+            counts = counts[counts[0] <= maximum]
+        self._matches = pd.merge(self._matches, counts,
+                                 left_on=constants.NGRAM_FIELDNAME,
+                                 right_index=True)
+        del self._matches[0]
 
     def _reduce_by_ngram (self, data, ngram):
         """Lowers the counts of all n-grams in `data` that are
@@ -163,26 +199,28 @@ class Report:
         """Removes results rows for which the n-gram is not present in
         at least one text in each labelled set of texts."""
         logging.info('Removing n-grams that are not attested in all labels')
-        labels = set()
-        data = {}
-        for row in self._rows:
-            ngram = row[constants.NGRAM_FIELDNAME]
-            label = row[constants.LABEL_FIELDNAME]
-            ngram_labels = data.setdefault(ngram, set())
-            ngram_labels.add(label)
-            data[ngram] = ngram_labels
-            labels.add(label)
-        self._rows = [row for row in self._rows
-                      if data[row[constants.NGRAM_FIELDNAME]] == labels]
+        self._matches = self._reciprocal_remove(self._matches)
+
+    def _reciprocal_remove (self, matches):
+        number_labels = matches[constants.LABEL_FIELDNAME].nunique()
+        attested = pd.DataFrame(matches.groupby(
+            constants.NGRAM_FIELDNAME)[constants.LABEL_FIELDNAME].nunique())
+        attested = attested[attested[0] == number_labels]
+        matches = pd.merge(matches, attested, left_on=constants.NGRAM_FIELDNAME,
+                           right_index=True)
+        del matches[0]
+        return matches
 
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
         n-grams."""
         logging.info('Reducing the n-grams')
+        # This does not make use of any pandas functionality; it
+        # probably could, and if so ought to.
         data = {}
         labels = {}
         # Derive a convenient data structure from the rows.
-        for row in self._rows:
+        for row_index, row in self._matches.iterrows():
             filename = row[constants.FILENAME_FIELDNAME]
             labels[filename] = row[constants.LABEL_FIELDNAME]
             text_data = data.setdefault(filename, {})
@@ -197,34 +235,62 @@ class Report:
                 if text_data[ngram]['count'] > 0:
                     self._reduce_by_ngram(text_data, ngram)
         # Recreate rows from the modified data structure.
-        self._rows = []
+        rows = []
         for filename, text_data in data.items():
             for ngram, ngram_data in text_data.items():
                 count = ngram_data['count']
                 if count > 0:
-                    self._rows.append(
+                    rows.append(
                         {constants.NGRAM_FIELDNAME: ngram,
                          constants.SIZE_FIELDNAME: ngram_data['size'],
                          constants.FILENAME_FIELDNAME: filename,
                          constants.COUNT_FIELDNAME: count,
                          constants.LABEL_FIELDNAME: labels[filename]})
+        if rows:
+            self._matches = pd.DataFrame(rows, columns=constants.QUERY_FIELDNAMES)
+        else:
+            self._matches = pd.DataFrame()
 
     def remove_label (self, label):
         logging.info('Removing label "{}"'.format(label))
-        new_rows = []
-        count = 0
-        for row in self._rows:
-            if row[constants.LABEL_FIELDNAME] == label:
-                count += 1
-            else:
-                new_rows.append(row)
+        count = self._matches[constants.LABEL_FIELDNAME].value_counts()[label]
+        self._matches = self._matches[
+            self._matches[constants.LABEL_FIELDNAME] != label]
         logging.info('Removed {} labelled results'.format(count))
-        self._rows = new_rows
 
     def sort (self):
-        self._rows.sort(key=lambda row: (
-                -int(row[constants.SIZE_FIELDNAME]),
-                 row[constants.NGRAM_FIELDNAME],
-                 -int(row[constants.COUNT_FIELDNAME]),
-                 row[constants.LABEL_FIELDNAME],
-                 row[constants.FILENAME_FIELDNAME]))
+        self._matches.sort_index(
+            by=[constants.SIZE_FIELDNAME, constants.NGRAM_FIELDNAME,
+                constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
+                constants.FILENAME_FIELDNAME],
+            ascending=[False, True, False, True, True], inplace=True)
+
+
+EXTEND_XSLT = '''<xsl:stylesheet version="2.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:template match="div">
+    <xsl:copy>
+      <xsl:apply-templates />
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="span[@data-base-match]">
+    <xsl:if test="not(preceding-sibling::*[1][@data-base-match])">
+      <ngram>
+        <xsl:apply-templates mode="ngram" select="." />
+      </ngram>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="span" />
+
+  <xsl:template match="span" mode="ngram">
+    <xsl:value-of select="." />
+    <xsl:if test="following-sibling::*[1][@data-base-match]">
+      <xsl:apply-templates mode="ngram"
+                           select="following-sibling::*[1]" />
+    </xsl:if>
+  </xsl:template>
+
+</xsl:stylesheet>'''

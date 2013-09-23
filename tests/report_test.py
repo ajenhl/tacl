@@ -121,7 +121,7 @@ class ReportTestCase (TaclTestCase):
             ('ABCDEF', '6', 'b', '3', 'B'), ('GHIJ', '4', 'b', '2', 'B')]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
-        self.assertEqual(actual_rows, expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
         # More than two labels, and more than one text per label.
         input_data = (
             ['AB', '2', 'a', '5', 'A'], ['ABCDEF', '6', 'a', '7', 'A'],
@@ -139,7 +139,7 @@ class ReportTestCase (TaclTestCase):
             ('GHIJ', '4', 'f', '11', 'C'), ('ABCDEF', '6', 'g', '8', 'C')]
         actual_rows = self._get_rows_from_csv(report.csv(
                 io.StringIO(newline='')))
-        self.assertEqual(actual_rows, expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reduce (self):
         input_data = (

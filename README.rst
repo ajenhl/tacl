@@ -14,7 +14,8 @@ Installation
 ------------
 
 Using `Python 3`_ (minimum version 3.3), run ``python setup.py
-install``. Requires `SQLite`_ and `lxml`_ XML library.
+install``. Requires `SQLite`_, the `lxml`_ XML library and the
+`pandas`_ data analysis library.
 
 
 Usage
@@ -28,3 +29,4 @@ Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 .. _Python 3: http://www.python.org/
 .. _SQLite: http://www.sqlite.org/
 .. _lxml: http://lxml.de/
+.. _pandas: http://pandas.pydata.org/

@@ -11,7 +11,7 @@ setup(name='tacl',
       url='https://github.com/ajenhl/tacl',
       packages=['tacl'],
       scripts=['bin/tacl', 'bin/tacl-helper'],
-      requires=['lxml'],
+      requires=['lxml', 'pandas'],
       classifiers=[
         'Environment :: Console',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

@@ -1,146 +1,129 @@
 """Module containing the Highlighter class."""
 
-import csv
 import re
 
 from lxml import etree
+import pandas as pd
 
 from . import constants
+from .tokenizer import Tokenizer
 
 
 class Highlighter:
 
-    def __init__ (self, corpus, results):
+    def __init__ (self, corpus):
         self._corpus = corpus
-        self._results = [row for row in csv.DictReader(results)]
+        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
+
+    def _annotate_tokens (self, match_obj):
+        match = match_obj.group(0)
+        root = etree.fromstring('<div>{}</div>'.format(match))
+        for span in root.xpath('//span'):
+            # The resuls are not guaranteed to have non-base matches
+            # in it, so do not rely on being able to derive base
+            # matches from them.
+            if self._match_source == self._base_filename:
+                if span.get('data-base-match') is None:
+                    span.set('data-base-match', '')
+            else:
+                texts = span.get('data-texts')
+                if ' {} '.format(self._match_source) not in texts:
+                    new_value = '{}{} '.format(texts, self._match_source)
+                    span.set('data-texts', new_value)
+        return etree.tostring(root, encoding='utf-8').decode('utf-8')[5:-6]
+
+    def generate_base (self, matches, filename, all=True):
+        """Returns an XML document containing the text of `filename`
+        marked up with its n-grams in `matches`.
+
+        If `all` is True, generate results for all matches, not just
+        those on `filename`.
+
+        :param matches: matches data
+        :type matches: `pandas.DataFrame`
+        :param filename: filename of text to generate an XML document from
+        :type filename: `str`
+        :rtype: `lxml.etree._Element`
+
+        """
+        # This method creates the base XML highlight document for
+        # `matches`.
+        self._base_filename = filename
+        text = self._corpus.get_text(filename).get_content().strip()
+        text = self._prepare_text(text)
+        if not all:
+            matches = matches[matches[constants.FILENAME_FIELDNAME] == filename]
+        text = self._highlight(text, matches)
+        root = etree.fromstring('<div>{}</div>'.format(text))
+        return root
+
+    def _generate_html (self, matches, base_filename, text):
+        text_list = self._generate_text_list(matches, base_filename)
+        text_list_html = self._generate_text_list_html(text_list)
+        text_data = {'base_filename': base_filename, 'text': text,
+                     'text_list': text_list_html}
+        return constants.HIGHLIGHT_TEMPLATE.format(**text_data)
 
     @staticmethod
-    def _generate_text_list (results, base_filename):
-        text_list = set()
-        for row in results:
-            text_list.add(row[constants.FILENAME_FIELDNAME])
-        text_list.discard(base_filename)
-        text_list = list(text_list)
+    def _generate_text_list (matches, base_filename):
+        text_list = list(matches[constants.FILENAME_FIELDNAME].unique())
+        text_list.remove(base_filename)
         text_list.sort()
         return text_list
 
     @staticmethod
-    def _generate_text_list_html (text_list):
+    def _generate_text_list_html (texts):
         widgets = []
-        for text in text_list:
+        for text in texts:
             widgets.append('<li><input type="checkbox" name="text" value="{0}"> {0}'.format(text))
-        html = '<form><ul>{}</ul></form>'.format(''.join(widgets))
-        return html
+        text_list = '<form><ul>{}</ul></form>'.format(''.join(widgets))
+        return text_list
 
-    @staticmethod
-    def _get_multi_regexp_pattern (ngram):
-        interchar_pattern = r'</span>\W*<span[^>]*>'
-        pattern = interchar_pattern.join([re.escape(char) for char in ngram])
+    def _get_regexp_pattern (self, ngram):
+        inter_token_pattern = r'</span>\W*<span[^>]*>'
+        pattern = inter_token_pattern.join(
+            [re.escape(token) for token in self._tokenizer.tokenize(ngram)])
         return r'(<span[^>]*>{}</span>)'.format(pattern)
 
-    @staticmethod
-    def _get_regexp_pattern (ngram):
-        """Returns a regular expression pattern for matching on `ngram`.
+    def highlight (self, matches_filename, text_filename):
+        """Returns the text of `filename` as an HTML document with its matches
+        in `matches` highlighted.
 
-        The individual tokens in `ngram` may, in the text the pattern
-        is to match on, be mixed in with any number of non-tokens.
-
-        :param ngram: n-gram to create a pattern for
-        :type ngram: `str`
-        :rtype: `str`
-
-        """
-        interchar_pattern = r'\W*'
-        pattern = interchar_pattern.join([re.escape(char) for char in ngram])
-        return r'({})'.format(pattern)
-
-    @staticmethod
-    def _get_text_results (results, filename):
-        """Returns members of `results` associated with `filename`,
-        sorted in descending order of size.
-
-        :param results: rows of results
-        :type results: `list`
-        :param filename: filename to restrict results to
+        :param results: file containing matches to highlight
+        :type results: `TextIOWrapper`
+        :param corpus: corpus of documents containing `text_filename`
+        :type corpus: `tacl.Corpus`
+        :param filename: filename of text to highlight
         :type filename: `str`
-        :rtype: `list`
 
         """
-        results = [row for row in results \
-                   if row[constants.FILENAME_FIELDNAME] == filename]
-        results.sort(key=lambda row: row[constants.SIZE_FIELDNAME],
-                     reverse=True)
-        return results
+        matches = pd.read_csv(matches_filename)
+        base = self.generate_base(matches, text_filename, all=True)
+        text = etree.tostring(base, encoding='unicode', xml_declaration=False)
+        return self._generate_html(matches, text_filename, text)
 
-    def highlight (self, base_filename, results_filename):
-        """Returns the text of `base_filename` with the results tokens
-        for `results_filename` highlighted.
-
-        :param base_filename: filename of text to highlight
-        :type base_filename: `str`
-        :param results_filename: filename of text whose tokens are highlighted
-        :type: results_filename: `str`
-        :rtype: `str`
-
-        """
-        text = self._corpus.get_text(base_filename).get_content().strip()
-        results = self._get_text_results(self._results, results_filename)
-        text = self._highlight(text, results)
-        text = re.sub(r'\n', r'<br>\n', text)
-        text_data = {'base_filename': base_filename,
-                     'results_filename': results_filename,
-                     'text': text}
-        return constants.HIGHLIGHT_TEMPLATE.format(**text_data)
-
-    def _highlight (self, text, results):
-        """Returns `text` with all n-grams in `results` highlighted.
-
-        :param text: text to highlight
-        :type text: `str`
-        :param results: results to be highlighted
-        :type results: `list`
-        :rtype: `str`
-
-        """
-        for result in results:
-            ngram = result[constants.NGRAM_FIELDNAME]
+    def _highlight (self, text, matches):
+        for row_index, row in matches.iterrows():
+            ngram = row[constants.NGRAM_FIELDNAME]
+            self._match_source = row[constants.FILENAME_FIELDNAME]
             pattern = self._get_regexp_pattern(ngram)
-            text = re.sub(pattern, r'<span class="highlight">\1</span>', text)
-        return text
-
-    def multi_highlight (self, base_filename):
-        text = self._corpus.get_text(base_filename).get_content().strip()
-        text = self._prepare_multi_text(text)
-        text = self._multi_highlight(text, self._results)
-        text = re.sub(r'\n', r'<br>\n', text)
-        text = re.sub(r'<span data-texts=" ">([^<]*)</span>', r'\1', text)
-        text_list = self._generate_text_list(self._results, base_filename)
-        text_list_html = self._generate_text_list_html(text_list)
-        text_data = {'base_filename': base_filename, 'text': text,
-                     'text_list': text_list_html}
-        return constants.HIGHLIGHT_MULTI_TEMPLATE.format(**text_data)
-
-    def _multi_highlight (self, text, results):
-        for result in results:
-            ngram = result[constants.NGRAM_FIELDNAME]
-            self._match_source = result[constants.FILENAME_FIELDNAME]
-            pattern = self._get_multi_regexp_pattern(ngram)
-            text = re.sub(pattern, self._sub_multi, text)
+            text = re.sub(pattern, self._annotate_tokens, text)
         return text
 
     @staticmethod
-    def _prepare_multi_text (text):
-        return re.sub(r'(\w)', r'<span data-count="0" data-texts=" ">\1</span>',
-                      text)
+    def _prepare_text (text):
+        """Returns `text` with each consituent token wrapped in HTML markup
+        for later match annotation.
 
-    def _sub_multi (self, match_obj):
-        match = match_obj.group(0)
-        # Add the filename associated with this match to the
-        # data-texts attribute.
-        root = etree.fromstring('<div>{}</div>'.format(match))
-        for span in root.xpath('//span'):
-            texts = span.get('data-texts')
-            if ' {} '.format(self._match_source) not in texts:
-                new_value = '{}{} '.format(texts, self._match_source)
-                span.set('data-texts', new_value)
-        return etree.tostring(root, encoding='utf-8').decode('utf-8')[5:-6]
+        :param text: text to be marked up
+        :type text: `str`
+        :rtype: `str`
+
+        """
+        # Remove characters that should be escaped for XML input (but
+        # which cause problems when escaped, since they become
+        # tokens).
+        text = re.sub(r'[<>&]', '', text)
+        pattern = r'({})'.format(constants.TOKENIZER_PATTERN)
+        replacement = r'<span data-count="0" data-texts=" ">\1</span>'
+        return re.sub(pattern, replacement, text)

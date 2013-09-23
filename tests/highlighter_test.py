@@ -3,6 +3,8 @@
 import csv
 import unittest
 
+import pandas as pd
+
 import tacl
 from .tacl_test_case import TaclTestCase
 
@@ -11,85 +13,32 @@ class HighlighterTestCase (TaclTestCase):
 
     def test_get_regexp_pattern (self):
         input_ngram = 'ab[cd]e'
-        actual_pattern = tacl.Highlighter._get_regexp_pattern(input_ngram)
-        expected_pattern = r'(a\W*b\W*\[\W*c\W*d\W*\]\W*e)'
+        hl = tacl.Highlighter(None)
+        actual_pattern = hl._get_regexp_pattern(input_ngram)
+        expected_pattern = r'(<span[^>]*>a</span>\W*<span[^>]*>b</span>\W*<span[^>]*>\[cd\]</span>\W*<span[^>]*>e</span>)'
         self.assertEqual(actual_pattern, expected_pattern)
 
-    def test_get_text_results (self):
-        input_results = (
-            ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],
-            ['ABD', '3', 'a', '1', 'A'], ['ABCD', '4', 'a', '2', 'A'],
-            ['AB', '2', 'b', '2', 'B'], ['ABC', '3', 'c', '2', 'A'])
-        input_rows = [row for row in csv.DictReader(
-            self._create_csv(input_results))]
-        actual_rows = tacl.Highlighter._get_text_results(input_rows, 'a')
-        expected_rows = [
-            {tacl.constants.NGRAM_FIELDNAME: 'ABCD',
-             tacl.constants.SIZE_FIELDNAME: '4',
-             tacl.constants.FILENAME_FIELDNAME: 'a',
-             tacl.constants.COUNT_FIELDNAME: '2',
-             tacl.constants.LABEL_FIELDNAME: 'A'},
-            {tacl.constants.NGRAM_FIELDNAME: 'ABC',
-             tacl.constants.SIZE_FIELDNAME: '3',
-             tacl.constants.FILENAME_FIELDNAME: 'a',
-             tacl.constants.COUNT_FIELDNAME: '2',
-             tacl.constants.LABEL_FIELDNAME: 'A'},
-            {tacl.constants.NGRAM_FIELDNAME: 'ABD',
-             tacl.constants.SIZE_FIELDNAME: '3',
-             tacl.constants.FILENAME_FIELDNAME: 'a',
-             tacl.constants.COUNT_FIELDNAME: '1',
-             tacl.constants.LABEL_FIELDNAME: 'A'},
-            {tacl.constants.NGRAM_FIELDNAME: 'AB',
-             tacl.constants.SIZE_FIELDNAME: '2',
-             tacl.constants.FILENAME_FIELDNAME: 'a',
-             tacl.constants.COUNT_FIELDNAME: '4',
-             tacl.constants.LABEL_FIELDNAME: 'A'},
-        ]
-        self.assertEqual(actual_rows, expected_rows)
-
     def test_highlight (self):
-        input_text = 'thenAweAwent'
-        input_results = [
-            {tacl.constants.NGRAM_FIELDNAME: 'the',
-             tacl.constants.SIZE_FIELDNAME: '3',
-             tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.COUNT_FIELDNAME: '1',
-             tacl.constants.LABEL_FIELDNAME: 'B'},
-            {tacl.constants.NGRAM_FIELDNAME: 'ent',
-             tacl.constants.SIZE_FIELDNAME: '3',
-             tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.COUNT_FIELDNAME: '1',
-             tacl.constants.LABEL_FIELDNAME: 'B'},
-            {tacl.constants.NGRAM_FIELDNAME: 'th',
-             tacl.constants.SIZE_FIELDNAME: '2',
-             tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.COUNT_FIELDNAME: '1',
-             tacl.constants.LABEL_FIELDNAME: 'B'},
-            {tacl.constants.NGRAM_FIELDNAME: 'he',
-             tacl.constants.SIZE_FIELDNAME: '2',
-             tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.COUNT_FIELDNAME: '2',
-             tacl.constants.LABEL_FIELDNAME: 'B'},
-            {tacl.constants.NGRAM_FIELDNAME: 'eA',
-             tacl.constants.SIZE_FIELDNAME: '2',
-             tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.COUNT_FIELDNAME: '2',
-             tacl.constants.LABEL_FIELDNAME: 'B'}]
-        highlighter = tacl.Highlighter(None, [])
-        actual_text = highlighter._highlight(input_text, input_results)
-        expected_text = '<span class="highlight"><span class="highlight">th</span>e</span>nAw<span class="highlight">eA</span>w<span class="highlight">ent</span>'
-        self.assertEqual(actual_text, expected_text)
-
-    def test_highlight_escaping (self):
-        input_text = '火無[火*因]。是故顯物'
-        input_results = [
+        input_text = '<span data-count="0" data-texts=" ">火</span><span data-count="0" data-texts=" ">無</span><span data-count="0" data-texts=" ">[火*因]</span>。<span data-count="0" data-texts=" ">是</span><span data-count="0" data-texts=" ">故</span><span data-count="0" data-texts=" ">顯</span><span data-count="0" data-texts=" ">物</span>'
+        input_results = pd.DataFrame([
             {tacl.constants.NGRAM_FIELDNAME: '無[火*因]是',
              tacl.constants.SIZE_FIELDNAME: '3',
              tacl.constants.FILENAME_FIELDNAME: '2.txt',
-             tacl.constants.LABEL_FIELDNAME: 'B'}]
-        highlighter = tacl.Highlighter(None, [])
+             tacl.constants.LABEL_FIELDNAME: 'B'}])
+        highlighter = tacl.Highlighter(None)
+        highlighter._base_filename = '2.txt'
         actual_text = highlighter._highlight(input_text, input_results)
-        expected_text = '火<span class="highlight">無[火*因]。是</span>故顯物'
+        expected_text = '<span data-count="0" data-texts=" ">火</span><span data-count="0" data-texts=" " data-base-match="">無</span><span data-count="0" data-texts=" " data-base-match="">[火*因]</span>。<span data-count="0" data-texts=" " data-base-match="">是</span><span data-count="0" data-texts=" ">故</span><span data-count="0" data-texts=" ">顯</span><span data-count="0" data-texts=" ">物</span>'
+        self.assertEqual(actual_text, expected_text)
+        highlighter._base_filename = '1.txt'
+        actual_text = highlighter._highlight(input_text, input_results)
+        expected_text = '<span data-count="0" data-texts=" ">火</span><span data-count="0" data-texts=" 2.txt ">無</span><span data-count="0" data-texts=" 2.txt ">[火*因]</span>。<span data-count="0" data-texts=" 2.txt ">是</span><span data-count="0" data-texts=" ">故</span><span data-count="0" data-texts=" ">顯</span><span data-count="0" data-texts=" ">物</span>'
+        self.assertEqual(actual_text, expected_text)
+
+    def test_prepare_text (self):
+        input_text = '無[火*因]是<物即同如'
+        expected_text = '<span data-count="0" data-texts=" ">無</span><span data-count="0" data-texts=" ">[火*因]</span><span data-count="0" data-texts=" ">是</span><span data-count="0" data-texts=" ">物</span><span data-count="0" data-texts=" ">即</span><span data-count="0" data-texts=" ">同</span><span data-count="0" data-texts=" ">如</span>'
+        actual_text = tacl.Highlighter._prepare_text(input_text)
         self.assertEqual(actual_text, expected_text)
 
 

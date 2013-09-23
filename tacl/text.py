@@ -7,21 +7,12 @@ from . import constants
 from .tokenizer import Tokenizer
 
 
-class Text:
+class BaseText:
 
     _tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
-    def __init__ (self, filename, content):
-        self._filename = filename
+    def __init__ (self, content):
         self._content = content
-
-    def get_checksum (self):
-        """Returns the checksum for the content of this text.
-
-        :rtype: `str`
-
-        """
-        return hashlib.md5(self._content.encode('utf-8')).hexdigest()
 
     def get_content (self):
         """Returns the content of this text.
@@ -30,14 +21,6 @@ class Text:
 
         """
         return self._content
-
-    def get_filename (self):
-        """Returns the filename of this text.
-
-        :rtype: `str`
-
-        """
-        return self._filename
 
     def get_ngrams (self, minimum, maximum):
         """Returns a generator supplying the n-grams (`minimum` <= n
@@ -83,3 +66,26 @@ class Text:
         count = max(0, len(sequence) - degree + 1)
         return [''.join(''.join(sequence[i:i+degree]).split())
                 for i in range(count)]
+
+
+class Text (BaseText):
+
+    def __init__ (self, filename, content):
+        super().__init__(content)
+        self._filename = filename
+
+    def get_checksum (self):
+        """Returns the checksum for the content of this text.
+
+        :rtype: `str`
+
+        """
+        return hashlib.md5(self._content.encode('utf-8')).hexdigest()
+
+    def get_filename (self):
+        """Returns the filename of this text.
+
+        :rtype: `str`
+
+        """
+        return self._filename

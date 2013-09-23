@@ -20,7 +20,7 @@ QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
                     COUNT_FIELDNAME, LABEL_FIELDNAME]
 COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
-                     LABEL_FIELDNAME]
+                     TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
 STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
                          TOTAL_TOKENS_FIELDNAME, PERCENTAGE_FIELDNAME,
                          LABEL_FIELDNAME]
@@ -57,10 +57,6 @@ DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
-HIGHLIGHT_ALL_HELP = '''\
-    Output a "heat map" view of the base text. This allows the matches
-    from each text to be applied to the base text, with the number of
-    overlaps between texts rendered by variation in colour.'''
 HIGHLIGHT_BASE_HELP = 'Filename of text to display.'
 HIGHLIGHT_DESCRIPTION = '''\
     Output an HTML document showing a text with its matches visually
@@ -70,9 +66,7 @@ HIGHLIGHT_EPILOG = '''\
     the amount of highlighting. Results containing 1-grams are very
     likely to be almost entirely highlighted. Results may be
     restricted by using the tacl report command.'''
-
 HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
-HIGHLIGHT_MATCH_HELP = 'Highlight only matches from this filename on the text.'
 
 INPUT_RESULTS_HELP = '''\
     Path to results file to restrict query to.'''
@@ -122,6 +116,7 @@ REPORT_RECIPROCAL_HELP = '''\
 REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
+REPORT_SORT_HELP = 'Sort the results.'
 
 STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
 STATISTICS_DESCRIPTION = 'Generate summary statistic for a set of results.'
@@ -270,24 +265,6 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>{base_filename} with matches from {results_filename} highlighted</title>
-    <style>
-      body {{ margin-left: 4em; }}
-      .highlight {{ color: green; }}
-    </style>
-  </head>
-  <body>
-    <h1>{base_filename} with matches from {results_filename} highlighted</h1>
-
-    <div>{text}</div>
-
-  </body>
-</html>'''
-
-HIGHLIGHT_MULTI_TEMPLATE = '''<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{base_filename} with matches from each other text highlighted</title>
     <style>
       body {{ margin-left: 4em; }}
@@ -319,7 +296,7 @@ HIGHLIGHT_MULTI_TEMPLATE = '''<!DOCTYPE html>
             return parseInt($(this).attr("data-count")) + change;
           }});
           var val = parseInt($(this).attr("data-count"));
-          var pos = parseInt((Math.round((val/max)*100)).toFixed(0));
+          var pos = parseInt((Math.round((val/max)*n)).toFixed(0));
               red = parseInt((xr + (( pos * (yr - xr)) / (n-1))).toFixed(0));
               green = parseInt((xg + (( pos * (yg - xg)) / (n-1))).toFixed(0));
               blue = parseInt((xb + (( pos * (yb - xb)) / (n-1))).toFixed(0));
