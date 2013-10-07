@@ -284,9 +284,9 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
       var n = 10;
       var xr = 0;
       var xg = 0;
-      var xb = 0;
-      var yr = 0;
-      var yg = 128;
+      var xb = 255;
+      var yr = 255;
+      var yg = 0;
       var yb = 0;
       var max = $("input").length;
 
