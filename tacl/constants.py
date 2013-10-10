@@ -267,7 +267,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{base_filename} with matches from each other text highlighted</title>
     <style>
-      body {{ margin-left: 4em; }}
+      body {{ margin-left: 4em; color: black; background-color: white; }}
       div.text-list {{ float: right; width: 15em; margin-left: 3em; }}
       ul {{ list-style-type: none; }}
     </style>
@@ -295,12 +295,16 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
           $(this).attr("data-count", function () {{
             return parseInt($(this).attr("data-count")) + change;
           }});
-          var val = parseInt($(this).attr("data-count"));
-          var pos = parseInt((Math.round((val/max)*n)).toFixed(0));
+          val = parseInt($(this).attr("data-count"));
+          if (val == 0) {{
+              clr = 'rgb(0,0,0)';
+          }} else {{
+              pos = parseInt((Math.round((val/max)*n)).toFixed(0));
               red = parseInt((xr + (( pos * (yr - xr)) / (n-1))).toFixed(0));
               green = parseInt((xg + (( pos * (yg - xg)) / (n-1))).toFixed(0));
               blue = parseInt((xb + (( pos * (yb - xb)) / (n-1))).toFixed(0));
               clr = 'rgb('+red+','+green+','+blue+')';
+          }}
           $(this).css({{color:clr}});
         }});
       }}
