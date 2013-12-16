@@ -13,6 +13,12 @@
 
 import sys, os
 
+import unittest.mock
+
+MOCK_MODULES = ['lxml']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = unittest.mock.Mock()
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -41,8 +47,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'TACL'
-copyright = u'2012, Jamie Norrish'
+project = 'TACL'
+copyright = '2012, Jamie Norrish'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -184,8 +190,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'TACL.tex', u'TACL Documentation',
-   u'Jamie Norrish', 'manual'),
+  ('index', 'TACL.tex', 'TACL Documentation',
+   'Jamie Norrish', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -214,8 +220,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tacl', u'TACL Documentation',
-     [u'Jamie Norrish'], 1)
+    ('index', 'tacl', 'TACL Documentation',
+     ['Jamie Norrish'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -228,8 +234,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'TACL', u'TACL Documentation',
-   u'Jamie Norrish', 'TACL', 'One line description of project.',
+  ('index', 'TACL', 'TACL Documentation',
+   'Jamie Norrish', 'TACL', 'One line description of project.',
    'Miscellaneous'),
 ]
 
