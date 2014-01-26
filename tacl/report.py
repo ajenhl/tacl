@@ -14,7 +14,11 @@ from .tokenizer import Tokenizer
 class Report:
 
     def __init__ (self, matches):
-        self._matches = pd.read_csv(matches)
+        self._matches = pd.read_csv(matches, encoding='utf-8')
+        # Work around a problem with CSV files produced on Windows
+        # being read by pandas and creating an empty row for each
+        # actual row.
+        self._matches = self._matches.dropna(how='all')
         self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
 
     def csv (self, fh):
@@ -25,11 +29,11 @@ class Report:
         :rtype: file object
 
         """
-        self._matches.to_csv(fh, index=False)
+        self._matches.to_csv(fh, encoding='utf-8', index=False)
         return fh
 
     def extend (self, corpus):
-        if not self._matches:
+        if self._matches.empty:
             return
         # Get the XML base text for each text in the results and
         # derive a count of all the n-grams that make it up.
@@ -203,13 +207,8 @@ class Report:
 
     def _reciprocal_remove (self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
-        attested = pd.DataFrame(matches.groupby(
-            constants.NGRAM_FIELDNAME)[constants.LABEL_FIELDNAME].nunique())
-        attested = attested[attested[0] == number_labels]
-        matches = pd.merge(matches, attested, left_on=constants.NGRAM_FIELDNAME,
-                           right_index=True)
-        del matches[0]
-        return matches
+        grouped = matches.groupby(constants.NGRAM_FIELDNAME)
+        return grouped.filter(lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
