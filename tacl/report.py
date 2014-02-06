@@ -29,7 +29,8 @@ class Report:
         :rtype: file object
 
         """
-        self._matches.to_csv(fh, encoding='utf-8', index=False)
+        self._matches.to_csv(fh, encoding='utf-8', float_format='%d',
+                             index=False)
         return fh
 
     def extend (self, corpus):
