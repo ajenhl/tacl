@@ -18,13 +18,13 @@ def main ():
     parser = generate_parser()
     args = parser.parse_args()
     configure_logging(args.verbose)
-    # This error handling is pretty poor!
-    #try:
-    #    args.func(args)
-    #except Exception as err:
-    #    print('Error: {0}'.format(err))
-    #    sys.exit(1)
-    args.func(args)
+    try:
+        args.func(args)
+    except Exception as err:
+        if args.verbose and args.verbose > 1:
+            sys.excepthook(*sys.exc_info())
+        print('Error: {0}'.format(err))
+        sys.exit(1)
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
