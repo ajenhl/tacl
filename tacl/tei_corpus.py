@@ -1,0 +1,272 @@
+"""Module containing the TEICorpus class."""
+
+from copy import deepcopy
+import logging
+import os
+import re
+
+from lxml import etree
+
+
+text_name_pattern = re.compile(
+    r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<text>[^_\.]+)_(?P<part>\d+)$')
+
+# XSLT to transform a P4 TEI document with a DTD, external entity
+# references, and insanely complex gaiji elements into a P4 TEI
+# document with no DTD or external references and all gaiji elements
+# replaced with the best representation available, encoded in UTF-8.
+SIMPLIFY_XSLT = '''
+<xsl:stylesheet extension-element-prefixes="fn my str"
+                version="1.0"
+                xmlns:fn="http://exslt.org/functions"
+                xmlns:my="urn:foo"
+                xmlns:str="http://exslt.org/strings"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:output encoding="UTF-8" method="xml" />
+
+  <xsl:strip-space elements="*" />
+
+  <xsl:template match="gaiji">
+    <xsl:choose>
+      <xsl:when test="@des">
+        <xsl:value-of select="@des" />
+      </xsl:when>
+      <xsl:when test="@uni">
+        <xsl:value-of select="my:decode-codepoint(@uni)" />
+      </xsl:when>
+      <xsl:when test="@udia">
+        <xsl:value-of select="@udia" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>GAIJI WITHOUT REPRESENTATION</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+
+  <!-- The following functions are by Aristotle Pagaltzis, from
+       http://plasmasturm.org/log/386/ -->
+  <fn:function name="my:hex2num">
+    <xsl:param name="hexstr" />
+    <xsl:variable name="head"
+                  select="substring( $hexstr, 1, string-length( $hexstr ) - 1 )"
+    />
+    <xsl:variable name="nybble"
+                  select="substring( $hexstr, string-length( $hexstr ) )" />
+    <xsl:choose>
+      <xsl:when test="string-length( $hexstr ) = 0">
+        <fn:result select="0" />
+      </xsl:when>
+      <xsl:when test="string( number( $nybble ) ) = 'NaN'">
+        <fn:result select="
+          my:hex2num( $head ) * 16
+          + number( concat( 1, translate( $nybble, 'ABCDEF', '012345' ) ) )
+        "/>
+      </xsl:when>
+      <xsl:otherwise>
+        <fn:result select="my:hex2num( $head ) * 16 + number( $nybble )" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </fn:function>
+  <fn:function name="my:num2hex">
+    <xsl:param name="num" />
+    <xsl:variable name="nybble" select="$num mod 16" />
+    <xsl:variable name="head" select="floor( $num div 16 )" />
+    <xsl:variable name="rest">
+      <xsl:if test="not( $head = 0 )">
+        <xsl:value-of select="my:num2hex( $head )"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$nybble > 9">
+        <fn:result select="concat(
+          $rest,
+          translate( substring( $nybble, 2 ), '012345', 'ABCDEF' )
+        )"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <fn:result select="concat( $rest, $nybble )" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </fn:function>
+  <fn:function name="my:char-to-utf8bytes">
+    <xsl:param name="codepoint" />
+    <xsl:choose>
+      <xsl:when test="$codepoint > 65536">
+        <fn:result select="
+            ( ( floor( $codepoint div 262144 ) mod  8 + 240 ) * 16777216 )
+          + ( ( floor( $codepoint div   4096 ) mod 64 + 128 ) *    65536 )
+          + ( ( floor( $codepoint div     64 ) mod 64 + 128 ) *      256 )
+          + ( ( floor( $codepoint div      1 ) mod 64 + 128 ) *        1 )
+        " />
+      </xsl:when>
+      <xsl:when test="$codepoint > 2048">
+        <fn:result select="
+            ( ( floor( $codepoint div   4096 ) mod 16 + 224 ) *    65536 )
+          + ( ( floor( $codepoint div     64 ) mod 64 + 128 ) *      256 )
+          + ( ( floor( $codepoint div      1 ) mod 64 + 128 ) *        1 )
+        " />
+      </xsl:when>
+      <xsl:when test="$codepoint > 128">
+        <fn:result select="
+            ( ( floor( $codepoint div     64 ) mod 32 + 192 ) *      256 )
+          + ( ( floor( $codepoint div      1 ) mod 64 + 128 ) *        1 )
+        " />
+      </xsl:when>
+      <xsl:otherwise>
+        <fn:result select="$codepoint" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </fn:function>
+  <fn:function name="my:percentify">
+    <xsl:param name="str" />
+    <xsl:choose>
+      <xsl:when test="string-length( $str ) > 2">
+        <fn:result select="concat(
+          '%',
+          substring( $str, 1, 2 ),
+          my:percentify( substring( $str, 3 ) )
+        )" />
+      </xsl:when>
+      <xsl:otherwise>
+        <fn:result select="concat( '%', $str )" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </fn:function>
+  <fn:function name="my:decode-codepoint">
+    <xsl:param name="codepoint" />
+    <fn:result
+      select="str:decode-uri( my:percentify(
+        my:num2hex( my:char-to-utf8bytes(
+          my:hex2num( $codepoint )
+        ) )
+      ) )"
+    />
+  </fn:function>
+
+</xsl:stylesheet>
+'''
+
+TEI_CORPUS_XML = '''<teiCorpus.2></teiCorpus.2>'''
+
+
+class TEICorpus:
+
+    """A TEICorpus represents a collection of TEI XML documents.
+
+    The CBETA texts are TEI XML that have certain quirks that make
+    them difficult to use directly in TACL's stripping process. This
+    class provides a tidy method to deal with these quirks; in
+    particular it consolidates multiple XML files for a single text
+    into one XML file. This is most useful for variant handling, which
+    requires that all of the variants used in a given text be known
+    before processing the file(s) associated with that text.
+
+    """
+
+    def __init__ (self, input_dir, output_dir):
+        self._input_dir = os.path.abspath(input_dir)
+        self._output_dir = os.path.abspath(output_dir)
+        self._transform = etree.XSLT(etree.XML(SIMPLIFY_XSLT))
+        self._texts = {}
+
+    def _correct_entity_file (self, file_path):
+        """Adds an unused entity declaration to the entity file for
+        `file_path`, in the hopes that this will make it not cause a
+        validation failure."""
+        path, basename = os.path.split(file_path)
+        entity_file = '{}.ent'.format(os.path.join(
+                path, basename.split('_')[0]))
+        with open(entity_file, 'rb') as input_file:
+            text = input_file.read()
+        with open(entity_file, 'wb') as output_file:
+            output_file.write(text)
+            output_file.write(b'<!ENTITY DUMMY_ENTITY "" >')
+
+    def extract_text_name (self, filename):
+        """Returns the name of the text in `filename`.
+
+        Many texts are divided into multiple parts that need to be
+        joined together.
+
+        """
+        basename = os.path.splitext(os.path.basename(filename))[0]
+        match = text_name_pattern.search(basename)
+        if match is None:
+            logging.warn('Found an anomalous filename "{}"'.format(filename))
+            return None, None
+        text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
+        return text_name, int(match.group('part'))
+
+    def tidy (self):
+        if not os.path.exists(self._output_dir):
+            try:
+                os.makedirs(self._output_dir)
+            except OSError as err:
+                logging.error('Could not create output directory: {}'.format(
+                    err))
+                raise
+        # This approach ends up with all of the texts in memory. This
+        # shouldn't be an issue.
+        for dirpath, dirnames, filenames in os.walk(self._input_dir):
+            for filename in filenames:
+                if os.path.splitext(filename)[1] == '.xml':
+                    self._tidy(os.path.relpath(dirpath, self._input_dir),
+                               filename)
+        for dirpath, text_name in self._texts.keys():
+            text_dir = os.path.join(self._output_dir, dirpath)
+            try:
+                os.makedirs(text_dir)
+            except OSError as err:
+                logging.error('Could not create output directory: {}'.format(
+                    err))
+                raise
+            parts = list(self._texts[(dirpath, text_name)])
+            parts.sort()
+            # Add each part in turn to the skeleton TEICorpus document.
+            corpus_root = etree.XML(TEI_CORPUS_XML)
+            for part in parts:
+                part_root = self._texts[(dirpath, text_name)][part]
+                # Add the teiHeader for the first part as the
+                # teiHeader of the teiCorpus.
+                if part == 1:
+                    corpus_root.append(deepcopy(part_root[0]))
+                corpus_root.append(part_root)
+            tree = etree.ElementTree(corpus_root)
+            output_filename = os.path.join(text_dir, text_name)
+            tree.write(output_filename, encoding='utf-8', pretty_print=True)
+
+    def _tidy (self, dirpath, filename, tried=False):
+        """Transforms the file `filename` at `dirpath` into simpler XML.
+
+        Stores the resulting XML document in self._texts."""
+        input_file_path = os.path.join(self._input_dir, dirpath, filename)
+        text_name, part_number = self.extract_text_name(filename)
+        if text_name is None:
+            logging.warn('Skipping file "{}"'.format(filename))
+            return
+        text_name = '{}.xml'.format(text_name)
+        output_file = os.path.join(self._output_dir, dirpath, text_name)
+        logging.info('Tidying file {} into {}'.format(
+            input_file_path, output_file))
+        try:
+            tei_doc = etree.parse(input_file_path)
+        except etree.XMLSyntaxError as err:
+            logging.warn('XML file "{}" is invalid'.format(filename))
+            if tried:
+                logging.error(
+                    'XML file "{}" is irretrievably invalid: {}'.format(
+                        filename, err))
+                raise
+            logging.warn('Retrying after modifying entity file')
+            self._correct_entity_file(input_file_path)
+            self._tidy(dirpath, filename, True)
+            return
+        text_parts = self._texts.setdefault((dirpath, text_name), {})
+        text_parts[part_number] = self._transform(tei_doc).getroot()

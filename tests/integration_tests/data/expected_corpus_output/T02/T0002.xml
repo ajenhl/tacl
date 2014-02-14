@@ -1,0 +1,142 @@
+<teiCorpus.2>
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taisho Tripitaka, Electronic version, No. 0099 雜阿含經</title>
+        <author>劉宋 求那跋陀羅譯</author>
+        <respStmt>
+          <resp>Electronic Version by</resp>
+          <name>CBETA</name>
+        </respStmt>
+      </titleStmt>
+      <editionStmt>
+        <edition>$Revision: 1.75 $ (Big5)<date>$Date: 2009/03/20 05:56:27 $</date>新式標點版</edition>
+      </editionStmt>
+      <extent>50卷</extent>
+      <publicationStmt>
+        <distributor>
+          <name>中華電子佛典協會 （CBETA）</name>
+          <address>
+            <addrLine>service@cbeta.org</addrLine>
+          </address>
+        </distributor>
+        <availability>
+          <p>Available for non-commercial use when distributed with this header intact.</p>
+        </availability>
+        <date>$Date: 2009/03/20 05:56:27 $</date>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>Taisho Tripitaka Vol. 2, No. 099 </bibl>
+      </sourceDesc>
+    </fileDesc>
+    <encodingDesc>
+      <projectDesc>
+        <p lang="eng" type="ly">Text as provided by Mr. Hsiao Chen-Kuo / proofread twice by Mr. Chang Wen-Ming, Text as provided by The Canon Series / proofread by Miao-Yuan Aranya, Text as provided by Anonymous, USA, Punctuated text as provided by Dhammavassarama / Revised by National Taiwan University Lion Buddhism BBS (http://cbs.ntu.edu.tw)</p>
+        <p lang="chi" type="ly">蕭鎮國大德提供／張文明大德二校，佛教經典系列提供／妙雲蘭若校對，北美某大德提供，法雨道場提供新式標點／台大獅子吼佛學專站校讀</p>
+      </projectDesc>
+    </encodingDesc>
+    <profileDesc>
+      <langUsage>
+        <language id="san">Sanskrit</language>
+        <language id="pli">Pali</language>
+        <language id="eng">English</language>
+        <language id="chi">Chinese</language>
+        <language id="unknown"/>
+      </langUsage>
+    </profileDesc>
+    <revisionDesc>
+      <change>
+        <date>19990810/22:37:09</date>
+        <respStmt>
+          <name>CW</name>
+          <resp>ed.</resp>
+        </respStmt>
+        <item>Created initial TEI XML version with BASICX.BAT （99/8/10）</item>
+      </change>
+    </revisionDesc>
+  </teiHeader>
+  <TEI.2>
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Taisho Tripitaka, Electronic version, No. 0099 雜阿含經</title>
+          <author>劉宋 求那跋陀羅譯</author>
+          <respStmt>
+            <resp>Electronic Version by</resp>
+            <name>CBETA</name>
+          </respStmt>
+        </titleStmt>
+        <editionStmt>
+          <edition>$Revision: 1.75 $ (Big5)<date>$Date: 2009/03/20 05:56:27 $</date>新式標點版</edition>
+        </editionStmt>
+        <extent>50卷</extent>
+        <publicationStmt>
+          <distributor>
+            <name>中華電子佛典協會 （CBETA）</name>
+            <address>
+              <addrLine>service@cbeta.org</addrLine>
+            </address>
+          </distributor>
+          <availability>
+            <p>Available for non-commercial use when distributed with this header intact.</p>
+          </availability>
+          <date>$Date: 2009/03/20 05:56:27 $</date>
+        </publicationStmt>
+        <sourceDesc>
+          <bibl>Taisho Tripitaka Vol. 2, No. 099 </bibl>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <projectDesc>
+          <p lang="eng" type="ly">Text as provided by Mr. Hsiao Chen-Kuo / proofread twice by Mr. Chang Wen-Ming, Text as provided by The Canon Series / proofread by Miao-Yuan Aranya, Text as provided by Anonymous, USA, Punctuated text as provided by Dhammavassarama / Revised by National Taiwan University Lion Buddhism BBS (http://cbs.ntu.edu.tw)</p>
+          <p lang="chi" type="ly">蕭鎮國大德提供／張文明大德二校，佛教經典系列提供／妙雲蘭若校對，北美某大德提供，法雨道場提供新式標點／台大獅子吼佛學專站校讀</p>
+        </projectDesc>
+      </encodingDesc>
+      <profileDesc>
+        <langUsage>
+          <language id="san">Sanskrit</language>
+          <language id="pli">Pali</language>
+          <language id="eng">English</language>
+          <language id="chi">Chinese</language>
+          <language id="unknown"/>
+        </langUsage>
+      </profileDesc>
+      <revisionDesc>
+        <change>
+          <date>19990810/22:37:09</date>
+          <respStmt>
+            <name>CW</name>
+            <resp>ed.</resp>
+          </respStmt>
+          <item>Created initial TEI XML version with BASICX.BAT （99/8/10）</item>
+        </change>
+      </revisionDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <pb n="0001a" id="T02.0099.0001a" ed="T"/>
+        <lb n="0001a01" ed="T"/>
+        <milestone unit="juan" n="1"/>
+        <lb n="0001a06" ed="T"/>
+        <div1 type="other">
+          <mulu level="1" label="一" type="其他"/>
+          <div2 type="jing">
+            <mulu level="2" n="1" label="1" type="經"/>
+            <head><note n="0001001" resp="Taisho" place="foot text" type="orig">S. 22. 12-14. Anicca, etc.</note><note n="0001001" type="equivalent" place="foot">S. 22. 12-14. Anicca, etc.</note>（一）</head>
+            <p id="pT02p0001a0602" place="inline">如是我聞：</p>
+            <p id="pT02p0001a0606" place="inline">一時，佛住舍衛國祇樹給孤
+      <lb n="0001a07" ed="T"/>獨園。</p>
+          </div2>
+          <lb n="0001a16" ed="T"/>
+          <div2 type="jing">
+            <mulu level="2" n="2" label="2" type="經"/>
+            <head><note n="0001002" resp="Taisho" place="foot text" type="orig">S. 22. 15-17. Yad aniccam, etc.</note><note n="0001002" type="equivalent" place="foot">S. 22. 15-17. Yad aniccam, etc.</note>（二）</head>
+            <p id="pT02p0001a1602" place="inline">如是我聞：</p>
+            <p id="pT02p0001a1606" place="inline">一時，佛住舍衛國祇樹給孤</p>
+          </div2>
+        </div1>
+        <lb/>
+      </body>
+    </text>
+  </TEI.2>
+</teiCorpus.2>

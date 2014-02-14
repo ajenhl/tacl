@@ -6,5 +6,6 @@ from .highlighter import Highlighter
 from .report import Report
 from .statistics_report import StatisticsReport
 from .stripper import Stripper
+from .tei_corpus import TEICorpus
 from .text import BaseText, Text
 from .tokenizer import Tokenizer
