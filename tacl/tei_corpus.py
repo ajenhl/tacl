@@ -222,7 +222,7 @@ class TEICorpus:
         for dirpath, text_name in self._texts.keys():
             text_dir = os.path.join(self._output_dir, dirpath)
             try:
-                os.makedirs(text_dir)
+                os.makedirs(text_dir, exist_ok=True)
             except OSError as err:
                 logging.error('Could not create output directory: {}'.format(
                     err))

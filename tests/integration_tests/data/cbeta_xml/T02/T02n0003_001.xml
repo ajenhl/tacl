@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="big5" ?><!-- -*- coding: big5-dos -*- -->
+<?xml-stylesheet type="text/xsl" href="../dtd/cbeta.xsl" ?>
+<!DOCTYPE TEI.2 SYSTEM "../dtd/cbetaxml.dtd"
+[<!ENTITY % ENTY SYSTEM "T02n0003.ent">
+<!ENTITY % CBENT SYSTEM "../dtd/cbeta.ent">
+%ENTY;
+%CBENT;
+]>
+<TEI.2>
+<teiHeader>
+	<fileDesc>
+		<titleStmt>
+			<title>Taisho Tripitaka, Electronic version, No. 0107 佛說不自守意經</title>
+			<author>吳 支謙譯</author>
+			<respStmt>
+				<resp>Electronic Version by</resp>
+				<name>CBETA</name>
+			</respStmt>
+		</titleStmt>
+	<editionStmt>
+		<edition>$Revision: 1.6 $ (Big5)<date>$Date: 2006/04/12 21:54:10 $</date></edition>
+	</editionStmt>
+	<extent>1卷</extent>
+	<publicationStmt>
+		<distributor>
+			<name>中華電子佛典協會 (CBETA)</name>
+			<address>
+				<addrLine>service@cbeta.org</addrLine>
+			</address>
+		</distributor>
+		<availability>
+			<p>Available for non-commercial use when distributed with this header intact.</p>
+		</availability>
+		<date>$Date: 2006/04/12 21:54:10 $</date>
+	</publicationStmt>
+	<sourceDesc>
+		<bibl>Taisho Tripitaka Vol. 2, No. 107 &desc;</bibl>
+	</sourceDesc>
+</fileDesc>
+<encodingDesc>
+	<projectDesc>
+		<p lang="eng" type="ly">Text as provided by Mr. Hsiao Chen-Kuo / proofread twice by Mr. Chang Wen-Ming, Tripitaka Koreana as provided by Mr. Christian Wittern, Text as provided by Anonymous, USA</p>
+		<p lang="chi" type="ly">蕭鎮國大德提供／張文明大德二校，維習安大德提供之高麗藏 CD 經文，北美某大德提供</p>
+	</projectDesc>
+</encodingDesc>
+<profileDesc>
+		<langUsage>
+			<language id="eng">English</language>
+			<language id="chi">Chinese</language>
+		</langUsage>
+	</profileDesc>
+	<revisionDesc>
+	<change>
+		<date>19990810/22:37:49</date>
+		<respStmt><name>CW</name><resp>ed.</resp></respStmt>
+		<item>Created initial TEI XML version with BASICX.BAT (99/8/10)</item>
+	</change>
+<!--
+$Log: T02n0107.xml,v $
+Revision 1.6  2006/04/12 21:54:10  saywhat
+lem 加 wit 屬性，p, lg, item 第二次加 id 屬性
+
+Revision 1.4  2004/10/08 09:57:51  saywhat
+段落加入圈點
+
+Revision 1.3  2004/04/20 08:36:52  maha
+「版本日期」標記修訂
+
+Revision 1.2  2003/05/07 09:15:41  moved
+movestar
+
+Revision 1.13  2002/11/27 11:15:06  saywhat
+校勘插入處理
+
+Revision 1.12  2002/11/04 10:31:26  ray
+tei.2 => TEI.2
+
+Revision 1.11  2002/07/29 09:43:25  vinking
+modified lang
+
+Revision 1.10  2002/04/03 05:43:43  ray
+xml:stylesheet => xml-stylesheet
+
+Revision 1.9  2001/07/27 07:07:45  ray
+去除多餘的 <author>
+
+Revision 1.8  2001/07/24 06:47:25  ray
+add 作者、譯者 <author> 卷數 <extent>
+
+Revision 1.7  2001/05/25 08:41:44  ray
+經號統一為四碼
+
+Revision 1.6  2001/03/25 07:56:52  ray
+add milestone
+
+Revision 1.5  2001/02/07 06:40:07  chris
+Fixed problem with comment in the previous checkin
+
+Revision 1.4  2001/02/03 07:28:50  chris
+Added keywords $Revision: 1.6 $, $Date: 2006/04/12 21:54:10 $ and $Log.
+Added comment  for Emacs
+
+-->
+ </revisionDesc>
+</teiHeader>
+<text><body>
+<lb n="0502b07" ed="T"/>
+<milestone unit="juan" n="1"/>
+<lb n="0502b08" ed="T"/>
+<lb n="0502b09" ed="T"/><head type="no">No. 107 [No. 99(277)]</head><div1 type="jing">
+<lb n="0502b10" ed="T"/><juan n="001" fun="open"><mulu n="001" type="卷"/><jhead><title>佛說不自守意經</title></jhead></juan>
+<lb n="0502b11" ed="T"/>
+<lb n="0502b12" ed="T"/><byline type="Translator">吳月支優婆塞支謙譯</byline>
+<lb n="0502b13" ed="T"/><p id="pT02p0502b1301">聞如是。一時佛在舍衛國祇樹給孤獨園。佛
+<lb n="0502b14" ed="T"/>告諸比丘。比丘。應唯然。佛言。聽說自守亦
+<lb n="0502b15" ed="T"/>不自守。比丘便叉手從佛聽。佛告比丘。幾
+<lb n="0502b16" ed="T"/>因緣不自守。若眼根不閉守。若眼<note n="0502001" resp="Taisho" place="foot text" type="orig">墮色識＝識墮色【三】</note><note n="0502001" resp="CBETA" type="mod">墮色識＝識墮色【宋】【元】【明】</note><app n="0502001"><lem wit="【大】">墮色識</lem><rdg resp="Taisho" wit="【宋】【元】【明】">識墮色</rdg></app>意
+<lb n="0502b17" ed="T"/>便泆。已意泆便更苦。已更苦便不得定意。已
+<lb n="0502b18" ed="T"/>不得定意便不知至誠。如有已不知便不見
+<lb n="0502b19" ed="T"/>如有。已不知已不見如有。便不捨結亦不度
+<lb n="0502b20" ed="T"/>疑。已不捨結不度疑。便屬他因緣。異知已異
+<lb n="0502b21" ed="T"/>知。便苦不安隱。如是說。耳亦爾鼻亦爾口亦
+<lb n="0502b22" ed="T"/>爾身亦爾意亦爾。如是行名為不自守。</p>
+<lb n="0502b23" ed="T"/><p id="pT02p0502b2301">佛復告比丘。幾因緣自守。若眼根自守。止眼
+<lb n="0502b24" ed="T"/>識不墮色意便不泆。已意不泆便更樂。已更
+<lb n="0502b25" ed="T"/>樂便得定意。已得定意便諦如有知諦如有
+<lb n="0502b26" ed="T"/>見。已諦如知諦如見。便捨結亦度疑。便不
+<lb n="0502b27" ed="T"/>信不至誠。便慧智。便意樂安隱。六根亦如
+<lb n="0502b28" ed="T"/>是說。如是名為自守。所說自守不自守如是。
+<lb n="0502b29" ed="T"/>佛說如是。皆歡喜受。</p>
+<pb n="0502c" id="T02.0107.0502c" ed="T"/>
+<lb n="0502c01" ed="T"/><juan n="001" fun="close"><jhead><note n="0502002" resp="Taisho" place="foot text" type="orig">〔佛說〕－【宋】【元】</note><app n="0502002"><lem wit="【大】">佛說</lem><rdg resp="Taisho" wit="【宋】【元】">&lac;</rdg></app>不自守意經</jhead></juan></div1>
+</body></text></TEI.2>

@@ -35,7 +35,7 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
     def test_tidy (self):
         corpus = tacl.TEICorpus(self._xml_dir, self._actual_output_dir)
         corpus.tidy()
-        expected_files = ['T01/T0001.xml', 'T02/T0002.xml']
+        expected_files = ['T01/T0001.xml', 'T02/T0002.xml', 'T02/T0003.xml']
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             self.assertTrue(os.path.exists(actual_path),
