@@ -204,6 +204,31 @@ class TEICorpus:
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
         return text_name, int(match.group('part'))
 
+    def _output_text (self, dirpath, text_name):
+        """Saves a TEI XML document `text_name` that consists of all of the
+        indidivual TEI XML source documents joined."""
+        text_dir = os.path.join(self._output_dir, dirpath)
+        try:
+            os.makedirs(text_dir, exist_ok=True)
+        except OSError as err:
+            logging.error('Could not create output directory: {}'.format(
+                err))
+            raise
+        parts = list(self._texts[(dirpath, text_name)])
+        parts.sort()
+        # Add each part in turn to the skeleton TEICorpus document.
+        corpus_root = etree.XML(TEI_CORPUS_XML)
+        for part in parts:
+            part_root = self._texts[(dirpath, text_name)][part]
+            # Add the teiHeader for the first part as the
+            # teiHeader of the teiCorpus.
+            if part == 1:
+                corpus_root.append(deepcopy(part_root[0]))
+            corpus_root.append(part_root)
+        tree = etree.ElementTree(corpus_root)
+        output_filename = os.path.join(text_dir, text_name)
+        tree.write(output_filename, encoding='utf-8', pretty_print=True)
+
     def tidy (self):
         if not os.path.exists(self._output_dir):
             try:
@@ -215,32 +240,13 @@ class TEICorpus:
         # This approach ends up with all of the texts in memory. This
         # shouldn't be an issue.
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
+            self._texts = {}
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
                     self._tidy(os.path.relpath(dirpath, self._input_dir),
                                filename)
-        for dirpath, text_name in self._texts.keys():
-            text_dir = os.path.join(self._output_dir, dirpath)
-            try:
-                os.makedirs(text_dir, exist_ok=True)
-            except OSError as err:
-                logging.error('Could not create output directory: {}'.format(
-                    err))
-                raise
-            parts = list(self._texts[(dirpath, text_name)])
-            parts.sort()
-            # Add each part in turn to the skeleton TEICorpus document.
-            corpus_root = etree.XML(TEI_CORPUS_XML)
-            for part in parts:
-                part_root = self._texts[(dirpath, text_name)][part]
-                # Add the teiHeader for the first part as the
-                # teiHeader of the teiCorpus.
-                if part == 1:
-                    corpus_root.append(deepcopy(part_root[0]))
-                corpus_root.append(part_root)
-            tree = etree.ElementTree(corpus_root)
-            output_filename = os.path.join(text_dir, text_name)
-            tree.write(output_filename, encoding='utf-8', pretty_print=True)
+            for dirpath, text_name in self._texts.keys():
+                self._output_text(dirpath, text_name)
 
     def _tidy (self, dirpath, filename, tried=False):
         """Transforms the file `filename` at `dirpath` into simpler XML.
