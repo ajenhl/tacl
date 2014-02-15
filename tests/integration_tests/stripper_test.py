@@ -29,20 +29,22 @@ class StripperIntegrationTestCase (unittest.TestCase):
         stripper = tacl.Stripper(self._xml_dir, self._actual_output_dir)
         stripper.strip_files()
         expected_files = ['T0001/base.txt', 'T0001/大.txt', 'T0001/宋.txt',
-                          'T0002/base.txt']
+                          'T0002/base.txt', 'T0003/base.txt', 'T0003/元.txt',
+                          'T0003/明.txt', 'T0003/宋.txt']
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
+            expected_path = os.path.join(self._expected_output_dir, filename)
             self.assertTrue(os.path.exists(actual_path),
                             'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
                 actual_content = fh.read()
-            with open(os.path.join(self._expected_output_dir, filename)) as fh:
+            with open(expected_path) as fh:
                 expected_content = fh.read()
-            self.assertEqual(actual_content, expected_content)
+            self.assertEqual(actual_content, expected_content, 'Expected contents of {} to match {}'.format(actual_path, expected_path))
         # Check that no extra files are created.
         files = set()
-        for directory in ['T0001', 'T0002']:
+        for directory in ['T0001', 'T0002', 'T0003']:
             output_dir = os.path.join(self._actual_output_dir, directory)
             for filename in os.listdir(output_dir):
                 files.add(os.path.join(directory, filename))
