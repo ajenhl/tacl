@@ -8,12 +8,12 @@ from . import constants
 class StatisticsReport:
 
     def __init__ (self, matches, counts):
-        self._matches = pd.read_csv(matches)
-        self._counts = pd.read_csv(counts)
+        self._matches = pd.read_csv(matches, encoding='utf-8')
+        self._counts = pd.read_csv(counts, encoding='utf-8')
 
     def csv (self, fh):
         self._stats.to_csv(fh, cols=constants.STATISTICS_FIELDNAMES,
-                           index=False)
+                           encoding='utf-8', index=False)
         return fh
 
     def generate_statistics (self):
