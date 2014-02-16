@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="big5" ?><!-- -*- coding: big5-dos -*- -->
+<?xml-stylesheet type="text/xsl" href="../dtd/cbeta.xsl" ?>
+<!DOCTYPE TEI.2 SYSTEM "../dtd/cbetaxml.dtd"
+[<!ENTITY % ENTY SYSTEM "T01n0003.ent">
+<!ENTITY % CBENT SYSTEM "../dtd/cbeta.ent">
+%ENTY;
+%CBENT;
+]>
+<TEI.2>
+<teiHeader>
+	<fileDesc>
+		<titleStmt>
+			<title>Taisho Tripitaka, Electronic version, No. 0072 三歸五戒慈心厭離功德經</title>
+			<author>失譯</author>
+			<respStmt>
+				<resp>Electronic Version by</resp>
+				<name>CBETA</name>
+			</respStmt>
+		</titleStmt>
+	<editionStmt>
+		<edition>$Revision: 1.5 $ (Big5)<date>$Date: 2006/04/12 15:27:12 $</date></edition>
+	</editionStmt>
+	<extent>1卷</extent>
+	<publicationStmt>
+		<distributor>
+			<name>中華電子佛典協會 (CBETA)</name>
+			<address>
+				<addrLine>service@cbeta.org</addrLine>
+			</address>
+		</distributor>
+		<availability>
+			<p>Available for non-commercial use when distributed with this header intact.</p>
+		</availability>
+		<date>$Date: 2006/04/12 15:27:12 $</date>
+	</publicationStmt>
+	<sourceDesc>
+		<bibl>Taisho Tripitaka Vol. 1, No. 072 &desc;</bibl>
+	</sourceDesc>
+</fileDesc>
+<encodingDesc>
+	<projectDesc>
+		<p lang="eng" type="ly">Text as provided by Mr. Hsiao Chen-Kuo, Text as provided by Mr. Chang Wen-Ming, Text as provided by Anonymous, USA</p>
+		<p lang="chi" type="ly">蕭鎮國大德提供，張文明大德提供，北美某大德提供</p>
+	</projectDesc>
+</encodingDesc>
+<profileDesc>
+		<langUsage>
+			<language id="eng">English</language>
+			<language id="chi">Chinese</language>
+		</langUsage>
+	</profileDesc>
+	<revisionDesc>
+	<change>
+		<date>19990810/22:32:30</date>
+		<respStmt><name>CW</name><resp>ed.</resp></respStmt>
+		<item>Created initial TEI XML version with BASICX.BAT (99/8/10)</item>
+	</change>
+<!--
+$Log: T01n0072.xml,v $
+Revision 1.5  2006/04/12 15:27:12  saywhat
+lem 加 wit 屬性，p, lg, item 第二次加 id 屬性
+
+Revision 1.3  2004/10/07 04:49:35  saywhat
+執行圈點程式
+
+Revision 1.2  2004/04/20 08:36:48  maha
+「版本日期」標記修訂
+
+Revision 1.1.1.1  2003/05/05 04:08:20  ray
+recover cvs
+
+Revision 1.15  2002/11/27 11:14:01  saywhat
+校勘插入處理
+
+Revision 1.14  2002/11/04 10:30:57  ray
+tei.2 => TEI.2
+
+Revision 1.13  2002/07/29 09:43:01  vinking
+modified lang
+
+Revision 1.12  2002/04/03 03:37:27  ray
+xml:stylesheet => xml-stylesheet
+
+Revision 1.11  2001/07/24 06:47:14  ray
+add 作者、譯者 <author> 卷數 <extent>
+
+Revision 1.10  2001/05/25 08:41:17  ray
+經號統一為四碼
+
+Revision 1.9  2001/04/01 05:53:52  ray
+heaven 重新加入 <milestone>
+
+Revision 1.8  2001/03/30 00:35:24  ray
+缺字CB碼由四碼增長為五碼
+
+Revision 1.7  2001/02/07 06:39:35  chris
+Fixed problem with comment in the previous checkin
+
+Revision 1.6  2001/02/03 07:28:19  chris
+Added keywords $Revision: 1.5 $, $Date: 2006/04/12 15:27:12 $ and $Log.
+Added comment  for Emacs
+
+-->
+ </revisionDesc>
+</teiHeader>
+<text><body>
+<pb n="0878c" id="T01.0072.0878c" ed="T"/>
+<lb n="0878c01" ed="T"/>
+<milestone unit="juan" n="1"/>
+<lb n="0878c02" ed="T"/>
+<lb n="0878c03" ed="T"/>
+<lb n="0878c04" ed="T"/>
+<lb n="0878c05" ed="T"/><head type="no">No. 72 [No. 26(155), Nos. 73, 74, No. 125
+<lb n="0878c06" ed="T"/>(27.3)]</head><div1 type="jing">
+<lb n="0878c07" ed="T"/><juan n="001" fun="open"><mulu n="001" type="卷"/><jhead><note n="0878008" resp="Taisho" place="foot text" type="orig">〔佛說〕－【三】</note><note n="0878008" resp="CBETA" type="mod">〔佛說〕－【宋】【元】【明】</note><app n="0878008"><lem wit="【大】">佛說</lem><rdg resp="Taisho" wit="【宋】【元】【明】">&lac;</rdg></app>三歸五戒慈心厭離功德經</jhead></juan>
+<lb n="0878c08" ed="T"/>
+<lb n="0878c09" ed="T"/><byline type="Translator">失譯<note n="0878009" resp="Taisho" place="foot text" type="orig">〔人名〕－【宋】【元】</note><app n="0878009"><lem wit="【大】">人名</lem><rdg resp="Taisho" wit="【宋】【元】">&lac;</rdg></app>今附東晉錄</byline>
+<lb n="0878c10" ed="T"/><p id="pT01p0878c1001">聞如是。一時佛在舍衛國祇樹給孤獨園。佛
+<lb n="0878c11" ed="T"/>為阿那邠邸長者說過去久遠有梵志名毗羅
+<lb n="0878c12" ed="T"/>摩。饒財多寶若布施時。用八萬四千金&CB00425;盛
+<lb n="0878c13" ed="T"/>滿碎銀。八萬四千銀&CB00425;盛滿碎金。復以八萬
+<lb n="0878c14" ed="T"/>四千金銀澡<note n="0878010" resp="Taisho" place="foot text" type="orig">罐＝灌【宋】【元】</note><app n="0878010"><lem wit="【大】">罐</lem><rdg resp="Taisho" wit="【宋】【元】">灌</rdg></app>。復以八萬四千牛。皆以金銀
+<lb n="0878c15" ed="T"/>覆角。復以八萬四千玉女莊嚴具足。復以八
+<lb n="0878c16" ed="T"/>萬四千臥具眾綵自覆。復以八萬四千衣裳。
+<lb n="0878c17" ed="T"/>復以八萬四千象馬。皆以金銀鞍勒。復以八
+<lb n="0878c18" ed="T"/>萬四千房舍布施。復於四城門中布施。隨其
+<lb n="0878c19" ed="T"/>所欲皆悉與之。復以一房舍施招提僧。如上
+<lb n="0878c20" ed="T"/>施福不如受三自歸。所以然者。受三歸者。施
+<lb n="0878c21" ed="T"/>一切眾生無畏。是故歸佛法僧。其福不可計
+<lb n="0878c22" ed="T"/>量也。如上布施及受三歸福復不如受五戒
+<lb n="0878c23" ed="T"/>福。受五戒者。功德滿具其福勝也。如上布施
+<lb n="0878c24" ed="T"/>及受三歸五戒福。復不如彈指頃慈念眾生
+<lb n="0878c25" ed="T"/>福也。如上布施及受三歸五戒慈念眾生福。
+<lb n="0878c26" ed="T"/>復不如起一切世間不可樂想福。所以然者。
+<lb n="0878c27" ed="T"/>起一切世間不可樂想福。能令行者滅生死
+<lb n="0878c28" ed="T"/>苦。終成佛道故其福最勝也。爾時長者聞佛
+<pb n="0879a" id="T01.0072.0879a" ed="T"/>
+<lb n="0879a01" ed="T"/>所說。歡喜奉行。</p>
+<lb n="0879a02" ed="T"/><juan n="001" fun="close"><jhead><note n="0879001" resp="Taisho" place="foot text" type="orig">〔佛說〕－【三】</note><note n="0879001" resp="CBETA" type="mod">〔佛說〕－【宋】【元】【明】</note><app n="0879001"><lem wit="【大】">佛說</lem><rdg resp="Taisho" wit="【宋】【元】【明】">&lac;</rdg></app>三歸五戒慈心厭離功德經</jhead></juan>
+</div1></body></text></TEI.2>

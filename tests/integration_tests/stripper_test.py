@@ -38,9 +38,10 @@ class StripperIntegrationTestCase (unittest.TestCase):
                             'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
-                actual_content = fh.read()
+                actual_content = fh.readlines()
             with open(expected_path) as fh:
-                expected_content = fh.read()
+                expected_content = fh.readlines()
+            self.maxDiff = None
             self.assertEqual(actual_content, expected_content, 'Expected contents of {} to match {}'.format(actual_path, expected_path))
         # Check that no extra files are created.
         files = set()

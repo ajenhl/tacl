@@ -204,29 +204,19 @@ class TEICorpus:
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
         return text_name, int(match.group('part'))
 
-    def _output_text (self, dirpath, text_name):
+    def _output_text (self, text_name, parts):
         """Saves a TEI XML document `text_name` that consists of all of the
         indidivual TEI XML source documents joined."""
-        text_dir = os.path.join(self._output_dir, dirpath)
-        try:
-            os.makedirs(text_dir, exist_ok=True)
-        except OSError as err:
-            logging.error('Could not create output directory: {}'.format(
-                err))
-            raise
-        parts = list(self._texts[(dirpath, text_name)])
-        parts.sort()
         # Add each part in turn to the skeleton TEICorpus document.
         corpus_root = etree.XML(TEI_CORPUS_XML)
-        for part in parts:
-            part_root = self._texts[(dirpath, text_name)][part]
+        for index, part in enumerate(parts):
             # Add the teiHeader for the first part as the
             # teiHeader of the teiCorpus.
-            if part == 1:
-                corpus_root.append(deepcopy(part_root[0]))
-            corpus_root.append(part_root)
+            if index == 0:
+                corpus_root.append(deepcopy(part[0]))
+            corpus_root.append(part)
         tree = etree.ElementTree(corpus_root)
-        output_filename = os.path.join(text_dir, text_name)
+        output_filename = os.path.join(self._output_dir, text_name)
         tree.write(output_filename, encoding='utf-8', pretty_print=True)
 
     def tidy (self):
@@ -237,42 +227,49 @@ class TEICorpus:
                 logging.error('Could not create output directory: {}'.format(
                     err))
                 raise
-        # This approach ends up with all of the texts in memory. This
-        # shouldn't be an issue.
+        # The CBETA texts are organised into directories, and each
+        # text may be in multiple numbered parts. Crucially, these
+        # parts may be split over multiple directories. Since it is
+        # too memory intensive to store all of the lxml
+        # representations of the XML files at once, before joining the
+        # parts together, assemble the filenames into groups and then
+        # process them one by one.
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
-            self._texts = {}
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
-                    self._tidy(os.path.relpath(dirpath, self._input_dir),
-                               filename)
-            for dirpath, text_name in self._texts.keys():
-                self._output_text(dirpath, text_name)
+                    text_name, part_number = self.extract_text_name(filename)
+                    if text_name is None:
+                        logging.warn('Skipping file "{}"'.format(filename))
+                    else:
+                        text_name = '{}.xml'.format(text_name)
+                        text_parts = self._texts.setdefault(text_name, {})
+                        text_parts[part_number] = os.path.join(
+                            dirpath, filename)
+        for text_name, paths in self._texts.items():
+            parts = list(paths.keys())
+            parts.sort()
+            xml_parts = []
+            for part in parts:
+                xml_parts.append(self._tidy(text_name, paths[part]))
+            self._output_text(text_name, xml_parts)
 
-    def _tidy (self, dirpath, filename, tried=False):
-        """Transforms the file `filename` at `dirpath` into simpler XML.
-
-        Stores the resulting XML document in self._texts."""
-        input_file_path = os.path.join(self._input_dir, dirpath, filename)
-        text_name, part_number = self.extract_text_name(filename)
-        if text_name is None:
-            logging.warn('Skipping file "{}"'.format(filename))
-            return
-        text_name = '{}.xml'.format(text_name)
-        output_file = os.path.join(self._output_dir, dirpath, text_name)
-        logging.info('Tidying file {} into {}'.format(
-            input_file_path, output_file))
+    def _tidy (self, text_name, file_path, tried=False):
+        """Transforms the file at `file_path` into simpler XML and returns
+        it."""
+        output_file = os.path.join(self._output_dir, text_name)
+        logging.info('Tidying file {} into {}'.format(file_path, output_file))
         try:
-            tei_doc = etree.parse(input_file_path)
+            tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError as err:
-            logging.warn('XML file "{}" is invalid'.format(filename))
+            logging.warn('XML file "{}" is invalid'.format(file_path))
             if tried:
                 logging.error(
                     'XML file "{}" is irretrievably invalid: {}'.format(
-                        filename, err))
+                        file_path, err))
                 raise
             logging.warn('Retrying after modifying entity file')
-            self._correct_entity_file(input_file_path)
-            self._tidy(dirpath, filename, True)
-            return
-        text_parts = self._texts.setdefault((dirpath, text_name), {})
-        text_parts[part_number] = self._transform(tei_doc).getroot()
+            self._correct_entity_file(file_path)
+            xml = self._tidy(text_name, file_path, True)
+        else:
+            xml = self._transform(tei_doc).getroot()
+        return xml

@@ -35,7 +35,7 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
     def test_tidy (self):
         corpus = tacl.TEICorpus(self._xml_dir, self._actual_output_dir)
         corpus.tidy()
-        expected_files = ['T01/T0001.xml', 'T02/T0002.xml', 'T02/T0003.xml']
+        expected_files = ['T0001.xml', 'T0002.xml', 'T0003.xml']
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             self.assertTrue(os.path.exists(actual_path),
@@ -47,9 +47,5 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
                 expected_content = fh.readlines()
             self.assertEqual(actual_content, expected_content)
         # Check that no extra files are created.
-        files = set()
-        for directory in ['T01', 'T02']:
-            output_dir = os.path.join(self._actual_output_dir, directory)
-            for filename in os.listdir(output_dir):
-                files.add(os.path.join(directory, filename))
-        self.assertEqual(files, set(expected_files))
+        self.assertEqual(set(os.listdir(self._actual_output_dir)),
+                         set(expected_files))

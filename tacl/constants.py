@@ -133,8 +133,9 @@ STRIP_DESCRIPTION = '''\
     text.'''
 STRIP_EPILOG = '''\
     The CBETA texts are in TEI XML that needs to have the markup and
-    metadata removed.'''
-STRIP_HELP = 'Preprocess a corpus for use with TACL.'
+    metadata removed. If the TEI specifies textual variants, plain
+    text versions based on these are also created.'''
+STRIP_HELP = 'Generate texts for use with TACL from a corpus of TEI XML.'
 STRIP_INPUT_HELP = 'Directory containing files to strip.'
 STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'
 

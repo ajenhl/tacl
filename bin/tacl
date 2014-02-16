@@ -6,6 +6,7 @@ texts."""
 import argparse
 import io
 import logging
+import os
 import re
 import sys
 import textwrap
@@ -348,7 +349,11 @@ def ngram_intersection (args):
 
 def strip_texts (args):
     """Processes texts for use with the tacl ngrams command."""
-    stripper = tacl.Stripper(args.input, args.output)
+    xml_output_dir = os.path.join(args.output, 'xml')
+    stripped_output_dir = os.path.join(args.output, 'text')
+    corpus = tacl.TEICorpus(args.input, xml_output_dir)
+    corpus.tidy()
+    stripper = tacl.Stripper(xml_output_dir, stripped_output_dir)
     stripper.strip_files()
 
 

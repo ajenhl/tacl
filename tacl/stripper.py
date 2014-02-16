@@ -109,6 +109,20 @@ class Stripper:
                     witnesses.add(witness)
         return witnesses
 
+    def _output_file (self, text_name, witnesses):
+        text_dir = os.path.join(self._output_dir, text_name)
+        try:
+            os.makedirs(text_dir)
+        except OSError as err:
+            logging.error('Could not create output directory: {}'.format(
+                err))
+            raise
+        for witness in witnesses.keys():
+            witness_file_path = os.path.join(
+                text_dir, '{}.txt'.format(witness))
+            with open(witness_file_path, 'wb') as output_file:
+                output_file.write(witnesses[witness].encode('utf-8'))
+
     def strip_files (self):
         if not os.path.exists(self._output_dir):
             try:
@@ -120,20 +134,9 @@ class Stripper:
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
-                    self.strip_file(os.path.join(dirpath, filename))
-        for text_name, witnesses in self._texts.items():
-            text_dir = os.path.join(self._output_dir, text_name)
-            try:
-                os.makedirs(text_dir)
-            except OSError as err:
-                logging.error('Could not create output directory: {}'.format(
-                    err))
-                raise
-            for witness in witnesses.keys():
-                witness_file_path = os.path.join(
-                    text_dir, '{}.txt'.format(witness))
-                with open(witness_file_path, 'wb') as output_file:
-                    output_file.write(witnesses[witness].encode('utf-8'))
+                    text_name, witnesses = self.strip_file(
+                        os.path.join(dirpath, filename))
+                    self._output_file(text_name, witnesses)
 
     def strip_file (self, filename):
         file_path = os.path.join(self._input_dir, filename)
@@ -151,3 +154,4 @@ class Stripper:
             witness_param = "'{}'".format(witness)
             text = str(self._transform(tei_doc, witness=witness_param))
             text_witnesses[witness] = text
+        return text_name, text_witnesses
