@@ -25,6 +25,8 @@ STRIP_XSLT = '''
     <xsl:apply-templates select="node()" />
   </xsl:template>
 
+  <xsl:template match="foreign[@place='foot']" />
+
   <xsl:template match="gaiji">
     <xsl:choose>
       <xsl:when test="@des">
