@@ -39,7 +39,7 @@ STRIP_XSLT = '''
         <xsl:value-of select="@udia" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>GAIJI WITHOUT REPRESENTATION</xsl:text>
+        <xsl:text>[GAIJI WITHOUT REPRESENTATION]</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
