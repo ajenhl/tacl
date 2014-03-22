@@ -192,6 +192,7 @@ class Stripper:
     to the original as possible, including whitespace."""
 
     def __init__ (self, input_dir, output_dir):
+        self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
         self._transform = etree.XSLT(etree.XML(STRIP_XSLT))
@@ -220,7 +221,8 @@ class Stripper:
         basename = os.path.splitext(os.path.basename(filename))[0]
         match = text_name_pattern.search(basename)
         if match is None:
-            logging.warn('Found an anomalous filename "{}"'.format(filename))
+            self._logger.warn('Found an anomalous filename "{}"'.format(
+                filename))
             return None, None
         text_name = '{}{}.txt'.format(match.group('prefix'),
                                       match.group('text'))
@@ -231,8 +233,8 @@ class Stripper:
             try:
                 os.makedirs(self._output_dir)
             except OSError as err:
-                logging.error('Could not create output directory: {}'.format(
-                        err))
+                self._logger.error(
+                    'Could not create output directory: {}'.format(err))
                 raise
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
@@ -249,18 +251,18 @@ class Stripper:
         file_path = os.path.join(self._input_dir, filename)
         text_name, part_number = self.extract_text_name(filename)
         if text_name is None:
-            logging.warn('Skipping file "{}"'.format(filename))
+            self._logger.warn('Skipping file "{}"'.format(filename))
             return
         stripped_file_path = os.path.join(self._output_dir, text_name)
-        logging.info('Stripping file {} into {}'.format(
+        self._logger.info('Stripping file {} into {}'.format(
                 file_path, stripped_file_path))
         try:
             text = str(self._transform(etree.parse(file_path)))
         except etree.XMLSyntaxError:
-            logging.warn('XML file "{}" is invalid'.format(filename))
+            self._logger.warn('XML file "{}" is invalid'.format(filename))
             if tried:
                 return
-            logging.warn('Retrying after modifying entity file')
+            self._logger.warn('Retrying after modifying entity file')
             self._correct_entity_file(file_path)
             self.strip_file(filename, True)
             return

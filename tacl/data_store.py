@@ -18,6 +18,7 @@ class DataStore:
     """
 
     def __init__ (self, db_name, use_memory=True, ram=0):
+        self._logger = logging.getLogger(__name__)
         if db_name == ':memory:':
             self._db_name = db_name
         else:
@@ -37,9 +38,9 @@ class DataStore:
 
     def _add_indices (self):
         """Adds the database indices relating to n-grams."""
-        logging.info('Adding database indices')
+        self._logger.info('Adding database indices')
         self._conn.execute(constants.CREATE_INDEX_TEXTNGRAM_SQL)
-        logging.info('Indices added')
+        self._logger.info('Indices added')
 
     def add_ngrams (self, corpus, minimum, maximum):
         """Adds n-gram data from `corpus` to the data store.
@@ -76,8 +77,8 @@ class DataStore:
 
         """
         text_id = self._get_text_id(text)
-        logging.info('Adding n-grams ({} <= n <= {}) for {}'.format(
-                minimum, maximum, text.get_filename()))
+        self._logger.info('Adding n-grams ({} <= n <= {}) for {}'.format(
+            minimum, maximum, text.get_filename()))
         for size, ngrams in text.get_ngrams(minimum, maximum):
             self._add_text_size_ngrams(text_id, size, ngrams)
 
@@ -89,7 +90,7 @@ class DataStore:
 
         """
         filename = text.get_filename()
-        logging.info('Adding record for text {}'.format(filename))
+        self._logger.info('Adding record for text {}'.format(filename))
         checksum = text.get_checksum()
         token_count = len(text.get_tokens())
         cursor = self._conn.execute(constants.INSERT_TEXT_SQL,
@@ -111,10 +112,11 @@ class DataStore:
 
         """
         if self._has_ngrams(text_id, size):
-            logging.info('{}-grams are already in the database'.format(size))
+            self._logger.info('{}-grams are already in the database'.format(
+                size))
         else:
             unique_ngrams = len(ngrams)
-            logging.info('Adding {} unique {}-grams'.format(
+            self._logger.info('Adding {} unique {}-grams'.format(
                 unique_ngrams, size))
             parameters = [[text_id, ngram, size, count]
                           for ngram, count in ngrams.items()]
@@ -130,9 +132,9 @@ class DataStore:
         :type table: `str`
 
         """
-        logging.info('Starting analysis of database')
+        self._logger.info('Starting analysis of database')
         self._conn.execute(constants.ANALYSE_SQL.format(table))
-        logging.info('Analysis of database complete')
+        self._logger.info('Analysis of database complete')
 
     def counts (self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving
@@ -148,13 +150,12 @@ class DataStore:
         labels = list(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_COUNTS_SQL.format(label_placeholders)
-        logging.info('Running counts query')
-        logging.debug('Query: {}\nLabels: {}'.format(query, labels))
+        self._logger.info('Running counts query')
+        self._logger.debug('Query: {}\nLabels: {}'.format(query, labels))
         cursor = self._conn.execute(query, labels)
         return self._csv(cursor, constants.COUNTS_FIELDNAMES, output_fh)
 
-    @staticmethod
-    def _csv (cursor, fieldnames, output_fh):
+    def _csv (self, cursor, fieldnames, output_fh):
         """Writes the rows of `cursor` in CSV format to `output_fh`
         and returns it.
 
@@ -167,12 +168,12 @@ class DataStore:
         :rtype: file object
 
         """
-        logging.info('Finished query; outputting results in CSV format')
+        self._logger.info('Finished query; outputting results in CSV format')
         writer = csv.writer(output_fh)
         writer.writerow(fieldnames)
         for row in cursor:
             writer.writerow([row[fieldname] for fieldname in fieldnames])
-        logging.info('Finished outputting results')
+        self._logger.info('Finished outputting results')
         return output_fh
 
     def _delete_text_ngrams (self, text_id):
@@ -204,8 +205,8 @@ class DataStore:
         query = constants.SELECT_DIFF_SQL.format(label_placeholders,
                                                  label_placeholders)
         parameters = labels + labels
-        logging.info('Running diff query')
-        logging.debug('Query: {}\nLabels: {}'.format(query, labels))
+        self._logger.info('Running diff query')
+        self._logger.debug('Query: {}\nLabels: {}'.format(query, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
@@ -230,9 +231,9 @@ class DataStore:
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
         parameters = [prime_label, prime_label] + labels
-        logging.info('Running asymmetric diff query')
-        logging.debug('Query: {}\nLabels: {}\nPrime label: {}'.format(
-                query, labels, prime_label))
+        self._logger.info('Running asymmetric diff query')
+        self._logger.debug('Query: {}\nLabels: {}\nPrime label: {}'.format(
+            query, labels, prime_label))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
@@ -262,18 +263,18 @@ class DataStore:
         query = constants.SELECT_DIFF_SUPPLIED_SQL.format(
             all_label_placeholders, label_placeholders)
         parameters = all_labels + labels
-        logging.info('Running diff query with supplied results')
-        logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
-                query, all_labels, labels))
+        self._logger.info('Running diff query with supplied results')
+        self._logger.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
+            query, all_labels, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def _drop_indices (self):
         """Drops the database indices relating to n-grams."""
-        logging.info('Dropping database indices')
+        self._logger.info('Dropping database indices')
         self._conn.execute(constants.DROP_TEXTNGRAM_INDEX_SQL)
-        logging.info('Finished dropping database indices')
+        self._logger.info('Finished dropping database indices')
 
     @staticmethod
     def _get_intersection_subquery (labels):
@@ -322,10 +323,10 @@ class DataStore:
         else:
             text_id = text_record['id']
             if text_record['checksum'] != text.get_checksum():
-                logging.info('Text {} has changed since it was added to the '
-                             'database'.format(filename))
+                self._logger.info('Text {} has changed since it was added to '
+                                  'the database'.format(filename))
                 self._update_text_record(text, text_id)
-                logging.info('Deleting potentially out-of-date n-grams')
+                self._logger.info('Deleting potentially out-of-date n-grams')
                 self._delete_text_ngrams(text_id)
         return text_id
 
@@ -352,7 +353,7 @@ class DataStore:
         is safe to be called on an existing database.
 
         """
-        logging.info('Creating database schema, if necessary')
+        self._logger.info('Creating database schema, if necessary')
         self._conn.execute(constants.CREATE_TABLE_TEXT_SQL)
         self._conn.execute(constants.CREATE_TABLE_TEXTNGRAM_SQL)
         self._conn.execute(constants.CREATE_TABLE_TEXTHASNGRAM_SQL)
@@ -377,8 +378,8 @@ class DataStore:
         query = constants.SELECT_INTERSECT_SQL.format(label_placeholders,
                                                       subquery)
         parameters = labels + labels
-        logging.info('Running intersection query')
-        logging.debug('Query: {}\nLabels: {}'.format(query, labels))
+        self._logger.info('Running intersection query')
+        self._logger.debug('Query: {}\nLabels: {}'.format(query, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
@@ -408,9 +409,9 @@ class DataStore:
         query = constants.SELECT_INTERSECT_SUPPLIED_SQL.format(
             all_label_placeholders, subquery)
         parameters = all_labels + labels
-        logging.info('Running intersection query with supplied results')
-        logging.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
-                query, all_labels, labels))
+        self._logger.info('Running intersection query with supplied results')
+        self._logger.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
+            query, all_labels, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
@@ -420,10 +421,9 @@ class DataStore:
         query_plan = 'Query plan:\n'
         for row in cursor.fetchall():
             query_plan += '|'.join([str(value) for value in row]) + '\n'
-        logging.debug(query_plan)
+        self._logger.debug(query_plan)
 
-    @staticmethod
-    def _process_supplied_results (input_csv):
+    def _process_supplied_results (self, input_csv):
         """Returns the unique n-grams and labels used in `input_csv`.
 
         :param input_csv: query results in CSV format
@@ -431,7 +431,7 @@ class DataStore:
         :rtype: `tuple` of `list` of `str`
 
         """
-        logging.info('Processing supplied results')
+        self._logger.info('Processing supplied results')
         reader = csv.DictReader(input_csv)
         ngrams = set()
         labels = set()
@@ -516,17 +516,17 @@ class DataStore:
             try:
                 checksum = corpus.get_text(filename).get_checksum()
             except FileNotFoundError:
-                logging.error('Catalogue references {} that does not exist in '
-                              'the corpus'.format(filename))
+                self._logger.error('Catalogue references {} that does not '
+                                   'exist in the corpus'.format(filename))
                 raise
             row = self._conn.execute(constants.SELECT_TEXT_SQL,
                                      [filename]).fetchone()
             if row is None:
                 is_valid = False
-                logging.warning('No record (or n-grams) exists for {} in the '
-                                'database'.format(filename))
+                self._logger.warning('No record (or n-grams) exists for {} in '
+                                     'the database'.format(filename))
             elif row['checksum'] != checksum:
                 is_valid = False
-                logging.warning('{} has changed since its n-grams were added '
-                                'to the database'.format(filename))
+                self._logger.warning('{} has changed since its n-grams were '
+                                     'added to the database'.format(filename))
         return is_valid

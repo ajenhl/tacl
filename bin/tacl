@@ -14,17 +14,18 @@ import tacl
 from tacl import constants
 
 
+logger = logging.getLogger('tacl')
+
+
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
-    configure_logging(args.verbose)
-    # This error handling is pretty poor!
-    #try:
-    #    args.func(args)
-    #except Exception as err:
-    #    print('Error: {0}'.format(err))
-    #    sys.exit(1)
-    args.func(args)
+    if hasattr(args, 'verbose'):
+        configure_logging(args.verbose)
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        parser.print_help()
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
@@ -62,8 +63,13 @@ def configure_logging (verbose):
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        level=log_level)
+    logger.setLevel(log_level)
+    ch = logging.StreamHandler()
+    ch.setLevel(log_level)
+    formatter = logging.Formatter(
+        '%(asctime)s %(name)s %(levelname)s: %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 def generate_parser ():
     """Returns a parser configured with sub-commands and arguments."""

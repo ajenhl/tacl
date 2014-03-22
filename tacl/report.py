@@ -14,6 +14,7 @@ from .tokenizer import Tokenizer
 class Report:
 
     def __init__ (self, matches):
+        self._logger = logging.getLogger(__name__)
         self._matches = pd.read_csv(matches, encoding='utf-8')
         # Work around a problem with CSV files produced on Windows
         # being read by pandas and creating an empty row for each
@@ -122,7 +123,7 @@ class Report:
         :type maximum: `int`
 
         """
-        logging.info('Pruning results by n-gram count')
+        self._logger.info('Pruning results by n-gram count')
         counts = pd.DataFrame(self._matches.groupby(constants.NGRAM_FIELDNAME)[
             constants.COUNT_FIELDNAME].sum())
         counts.rename(columns={constants.COUNT_FIELDNAME: 'tmp_count'},
@@ -146,7 +147,7 @@ class Report:
         :type maximum: `int`
 
         """
-        logging.info('Pruning results by n-gram size')
+        self._logger.info('Pruning results by n-gram size')
         if minimum:
             self._matches = self._matches[
                 self._matches[constants.SIZE_FIELDNAME] >= minimum]
@@ -165,7 +166,7 @@ class Report:
         :type maximum: `int`
 
         """
-        logging.info('Pruning results by text count')
+        self._logger.info('Pruning results by text count')
         counts = pd.DataFrame(self._matches.groupby(
             constants.NGRAM_FIELDNAME)[constants.FILENAME_FIELDNAME].count())
         if minimum:
@@ -203,7 +204,8 @@ class Report:
     def reciprocal_remove (self):
         """Removes results rows for which the n-gram is not present in
         at least one text in each labelled set of texts."""
-        logging.info('Removing n-grams that are not attested in all labels')
+        self._logger.info(
+            'Removing n-grams that are not attested in all labels')
         self._matches = self._reciprocal_remove(self._matches)
 
     def _reciprocal_remove (self, matches):
@@ -214,7 +216,7 @@ class Report:
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
         n-grams."""
-        logging.info('Reducing the n-grams')
+        self._logger.info('Reducing the n-grams')
         # This does not make use of any pandas functionality; it
         # probably could, and if so ought to.
         data = {}
@@ -252,11 +254,11 @@ class Report:
             self._matches = pd.DataFrame()
 
     def remove_label (self, label):
-        logging.info('Removing label "{}"'.format(label))
+        self._logger.info('Removing label "{}"'.format(label))
         count = self._matches[constants.LABEL_FIELDNAME].value_counts()[label]
         self._matches = self._matches[
             self._matches[constants.LABEL_FIELDNAME] != label]
-        logging.info('Removed {} labelled results'.format(count))
+        self._logger.info('Removed {} labelled results'.format(count))
 
     def sort (self):
         self._matches.sort_index(
