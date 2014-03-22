@@ -194,7 +194,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric (self):
-        labels = {sentinel.label: 1}
+        labels = {sentinel.label: 1, sentinel.prime_label: 1}
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
         get_placeholders = self._create_patch(
@@ -212,12 +212,13 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.diff_asymmetric(catalogue, sentinel.prime_label,
                                           input_fh)
         set_labels.assert_called_once_with(store, catalogue)
-        get_placeholders.assert_called_once_with(list(labels))
+        get_placeholders.assert_called_once_with([sentinel.label])
         log_query_plan.assert_called_once()
         sql = tacl.constants.SELECT_DIFF_ASYMMETRIC_SQL.format(
             sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, [sentinel.prime_label,
+                                             sentinel.prime_label,
                                              sentinel.label])])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)

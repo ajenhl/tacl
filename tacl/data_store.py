@@ -226,9 +226,10 @@ class DataStore:
 
         """
         labels = list(self._set_labels(catalogue))
+        labels.remove(prime_label)
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
-        parameters = [prime_label] + labels
+        parameters = [prime_label, prime_label] + labels
         logging.info('Running asymmetric diff query')
         logging.debug('Query: {}\nLabels: {}\nPrime label: {}'.format(
                 query, labels, prime_label))

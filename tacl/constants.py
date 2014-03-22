@@ -217,11 +217,13 @@ SELECT_COUNTS_SQL = 'SELECT Text.filename, TextHasNGram.size, ' \
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
-    'WHERE Text.label IN (?) AND Text.id = TextNGram.text ' \
+    'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
-    'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
+    'WHERE Text.id = TextNGram.text AND Text.label = ? ' \
+    'EXCEPT ' \
+    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
+    'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
 SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
