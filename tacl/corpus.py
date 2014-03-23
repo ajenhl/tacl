@@ -27,7 +27,7 @@ class Corpus:
         :rtype: `Text`
 
         """
-        logging.debug('Creating Text object from {}'.format(filename))
+        self._logger.debug('Creating Text object from {}'.format(filename))
         with open(os.path.join(self._path, filename), encoding='utf-8') as text:
             content = text.read()
         return Text(filename, content)
