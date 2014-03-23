@@ -1,5 +1,6 @@
 """Module containing the Corpus class."""
 
+import logging
 import os
 
 from .text import Text
@@ -15,6 +16,7 @@ class Corpus:
     """
 
     def __init__ (self, path):
+        self._logger = logging.getLogger(__name__)
         self._path = os.path.abspath(path)
 
     def get_text (self, filename):
@@ -25,6 +27,7 @@ class Corpus:
         :rtype: `Text`
 
         """
+        logging.debug('Creating Text object from {}'.format(filename))
         with open(os.path.join(self._path, filename), encoding='utf-8') as text:
             content = text.read()
         return Text(filename, content)
