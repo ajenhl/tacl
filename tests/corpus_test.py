@@ -26,6 +26,9 @@ class CorpusTestCase (TaclTestCase):
     def test_get_texts (self):
         listdir = self._create_patch('os.listdir')
         listdir.return_value = [sentinel.filename1, sentinel.filename2]
+        isfile = self._create_patch('os.path.isfile')
+        isfile.return_value = True
+        join = self._create_patch('os.path.join')
         get_text = self._create_patch('tacl.Corpus.get_text')
         get_text.return_value = MagicMock(spec_set=tacl.Text)
         path = '/'

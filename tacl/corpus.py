@@ -1,7 +1,7 @@
 """Module containing the Corpus class."""
 
 import logging
-import os
+import os.path
 
 from .text import Text
 
@@ -40,4 +40,5 @@ class Corpus:
 
         """
         for filename in os.listdir(self._path):
-            yield self.get_text(filename)
+            if os.path.isfile(os.path.join(self._path, filename)):
+                yield self.get_text(filename)
