@@ -64,6 +64,15 @@ analysis of the corpus, as listed with example commands:
 
        tacl catalogue -l "base" path/stripped/dir path/catalogue/file
 
+   An example catalogue: ::
+
+       T0237.txt Vaj
+       T0097.txt AV
+       T0667.txt P-ref
+       T1461.txt P-ref
+       T1559.txt
+       T2137.txt
+
 4. Analyse the n-grams to find either the difference between
    (:doc:`tacl diff <scripts/tacl-diff>`) or intersection of
    (:doc:`tacl intersect </scripts/tacl-intersect>`) the groups of
