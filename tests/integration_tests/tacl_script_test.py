@@ -25,6 +25,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         self._corpus_dir = os.path.join(self._data_dir, 'stripped')
         self._db_path = os.path.join(self._data_dir, 'test.db')
         self._catalogue_path = os.path.join(self._data_dir, 'catalogue.txt')
+        self._ngrams_path = os.path.join(self._data_dir, 'search_ngrams.txt')
         # Since ngrams need to be added to a database for many of
         # these tests, define the command here.
         minimum = 1
@@ -238,6 +239,31 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('nt', '2', '2.txt', '1', 'B'), ('the', '3', '1.txt', '1', 'A'),
             ('the', '3', '2.txt', '1', 'B'), ('ent', '3', '1.txt', '1', 'A'),
             ('ent', '3', '2.txt', '1', 'B')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_search (self):
+        subprocess.call(self._ngrams_command_args)
+        search_command = 'tacl search {} {} {}'.format(
+            self._db_path, self._corpus_dir, self._ngrams_path)
+        data = subprocess.check_output(shlex.split(search_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        expected_rows = [
+            ('1.txt', '1', ''),
+            ('2.txt', '2', ''),
+            ('4.txt', '1', '')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_search_with_catalogue (self):
+        subprocess.call(self._ngrams_command_args)
+        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
+        search_command = 'tacl search -c {} {} {} {}'.format(
+            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
+        data = subprocess.check_output(shlex.split(search_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        expected_rows = [
+            ('1.txt', '1', 'A'),
+            ('2.txt', '2', ''),
+            ('4.txt', '1', 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 

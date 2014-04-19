@@ -440,6 +440,17 @@ class DataStore:
             labels.add(row[constants.LABEL_FIELDNAME])
         return list(ngrams), list(labels)
 
+    def search (self, catalogue, ngrams, output_fh):
+        self._set_labels(catalogue)
+        self._add_temporary_ngrams(ngrams)
+        query = constants.SELECT_SEARCH_SQL
+        self._logger.info('Running search query')
+        self._logger.debug('Query: {}\nN-grams: {}'.format(
+            query, ', '.join(ngrams)))
+        self._log_query_plan(query, [])
+        cursor = self._conn.execute(query)
+        return self._csv(cursor, constants.SEARCH_FIELDNAMES, output_fh)
+
     def _set_labels (self, catalogue):
         """Returns a dictionary of the unique labels in `catalogue` and the
         number of their associated texts, and sets the record of each

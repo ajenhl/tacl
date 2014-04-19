@@ -21,6 +21,7 @@ QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
 COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
+SEARCH_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME]
 STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
                          TOTAL_TOKENS_FIELDNAME, PERCENTAGE_FIELDNAME,
                          LABEL_FIELDNAME]
@@ -117,6 +118,15 @@ REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 REPORT_SORT_HELP = 'Sort the results.'
+
+SEARCH_DESCRIPTION = '''\
+    List texts containing at least one of the supplied n-grams, along
+    with a count of how many of the n-grams are present in each
+    text.'''
+SEARCH_HELP = 'List texts containing at least one of the supplied n-grams.'
+SEARCH_NGRAMS_HELP = '''\
+    Path to file containing list of n-grams to search for, with one
+    n-gram per line.'''
 
 STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
 STATISTICS_DESCRIPTION = 'Generate summary statistic for a set of results.'
@@ -242,7 +252,7 @@ SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'WHERE t.id = tn.text AND t.label IN ({}) AND tn.ngram = TextNGram.ngram)'
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
-SELECT_INTERSECT_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
+SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
@@ -251,12 +261,18 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
+SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND TextNGram.ngram IN ({})'
+SELECT_SEARCH_SQL = 'SELECT Text.filename, COUNT(TextNGram.ngram) AS count, ' \
+    'Text.label ' \
+    'FROM Text, TextNGram ' \
+    'WHERE Text.id = TextNGram.text ' \
+    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
+    'GROUP BY TextNGram.text'
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE filename = ?'
 UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
