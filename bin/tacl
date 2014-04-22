@@ -221,7 +221,8 @@ def generate_report_subparser (subparsers):
         help=constants.REPORT_HELP)
     add_common_arguments(parser)
     parser.set_defaults(func=generate_report)
-    parser.add_argument('-e', '--extend', dest='extend', metavar='CORPUS')
+    parser.add_argument('-e', '--extend', dest='extend',
+                        help=constants.REPORT_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--min-count', dest='min_count',
                         help=constants.REPORT_MINIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)

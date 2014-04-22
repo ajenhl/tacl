@@ -85,9 +85,13 @@ REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
     the new set of results. See below for the exceptional statistics
     output.'''
+REPORT_EXTEND_HELP = '''\
+    Extend the results to list the highest size grams that also count
+    as matches, going beyond the maximum size recorded in the
+    database.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --reduce, --reciprocal, --min/max-texts,
+    following order: --extend, --reduce, --reciprocal, --min/max-texts,
     --min/max-size, --min/max-count, --remove.
 
     It is important to be careful with the use of --reduce. Coupled
