@@ -39,6 +39,9 @@ def add_db_arguments (parser):
                         help=constants.DB_MEMORY_HELP)
     parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
                         type=int)
+    parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
+                        default=constants.TOKENIZER_CHOICE_CBETA,
+                        help=constants.DB_TOKENIZER_HELP)
     parser.add_argument('db', help=constants.DB_DATABASE_HELP,
                         metavar='DATABASE')
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
@@ -192,9 +195,10 @@ def generate_report (args):
                                    newline='')
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
-    report = tacl.Report(results)
+    tokenizer = tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])
+    report = tacl.Report(results, tokenizer)
     if args.extend:
-        corpus = tacl.Corpus(args.extend)
+        corpus = tacl.Corpus(args.extend, tokenizer)
         report.extend(corpus)
     if args.reduce:
         report.reduce()
@@ -249,6 +253,9 @@ def generate_report_subparser (subparsers):
                         metavar='LABEL', type=str)
     parser.add_argument('--sort', action='store_true',
                         help=constants.REPORT_SORT_HELP)
+    parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
+                        default=constants.TOKENIZER_CHOICE_CBETA,
+                        help=constants.DB_TOKENIZER_HELP)
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -306,7 +313,8 @@ def generate_strip_subparser (subparsers):
 
 def get_corpus (args):
     """Returns a `tacl.Corpus`."""
-    return tacl.Corpus(args.corpus)
+    tokenizer = tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])
+    return tacl.Corpus(args.corpus, tokenizer)
 
 def get_catalogue (args):
     """Returns a `tacl.Catalogue`."""

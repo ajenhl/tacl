@@ -6,6 +6,8 @@ import shlex
 import subprocess
 import unittest
 
+
+import tacl
 from ..tacl_test_case import TaclTestCase
 
 
@@ -18,7 +20,8 @@ class ReportIntegrationTestCase (TaclTestCase):
 
     def test_extend (self):
         results = os.path.join(self._data_dir, 'non-extend-results.csv')
-        command = 'tacl report -e {} {}'.format(self._stripped_dir, results)
+        command = 'tacl report -e {} -t {} {}'.format(
+            self._stripped_dir, tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir, 'extend-results.csv')

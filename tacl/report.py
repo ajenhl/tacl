@@ -13,14 +13,14 @@ from .tokenizer import Tokenizer
 
 class Report:
 
-    def __init__ (self, matches):
+    def __init__ (self, matches, tokenizer):
         self._logger = logging.getLogger(__name__)
         self._matches = pd.read_csv(matches, encoding='utf-8')
         # Work around a problem with CSV files produced on Windows
         # being read by pandas and creating an empty row for each
         # actual row.
         self._matches = self._matches.dropna(how='all')
-        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
+        self._tokenizer = tokenizer
 
     def csv (self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
@@ -72,7 +72,7 @@ class Report:
             content = extended_ngram.text
             if len(content) == highest_n:
                 continue
-            text = BaseText(content)
+            text = BaseText(content, self._tokenizer)
             for size, ngrams in text.get_ngrams(
                     highest_n+1, len(extended_ngram.text)):
                 data = [{constants.FILENAME_FIELDNAME: filename,

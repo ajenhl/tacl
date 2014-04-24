@@ -13,7 +13,8 @@ class Highlighter:
 
     def __init__ (self, corpus):
         self._corpus = corpus
-        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
+        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN_CBETA,
+                                    constants.TOKENIZER_JOINER_CBETA)
 
     def _annotate_tokens (self, match_obj):
         match = match_obj.group(0)
@@ -124,6 +125,6 @@ class Highlighter:
         # which cause problems when escaped, since they become
         # tokens).
         text = re.sub(r'[<>&]', '', text)
-        pattern = r'({})'.format(constants.TOKENIZER_PATTERN)
+        pattern = r'({})'.format(constants.TOKENIZER_PATTERN_CBETA)
         replacement = r'<span data-count="0" data-texts=" ">\1</span>'
         return re.sub(pattern, replacement, text)

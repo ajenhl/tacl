@@ -3,16 +3,12 @@
 import collections
 import hashlib
 
-from . import constants
-from .tokenizer import Tokenizer
-
 
 class BaseText:
 
-    _tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
-
-    def __init__ (self, content):
+    def __init__ (self, content, tokenizer):
         self._content = content
+        self._tokenizer = tokenizer
 
     def get_content (self):
         """Returns the content of this text.
@@ -39,15 +35,14 @@ class BaseText:
         """
         tokens = self.get_tokens()
         for size in range(minimum, maximum + 1):
-            ngrams = collections.Counter(self.ngrams(tokens, size))
+            ngrams = collections.Counter(self._ngrams(tokens, size))
             yield (size, ngrams)
 
     def get_tokens (self):
         """Returns a list of tokens in this text."""
         return self._tokenizer.tokenize(self._content)
 
-    @staticmethod
-    def ngrams (sequence, degree):
+    def _ngrams (self, sequence, degree):
         """Returns the n-grams generated from `sequence`.
 
         Based on the ngrams function from the Natural Language
@@ -64,14 +59,15 @@ class BaseText:
 
         """
         count = max(0, len(sequence) - degree + 1)
-        return [''.join(''.join(sequence[i:i+degree]).split())
-                for i in range(count)]
+        #return [''.join(''.join(sequence[i:i+degree]).split())
+        #        for i in range(count)]
+        return [self._tokenizer.joiner.join(self._tokenizer.joiner.join(sequence[i:i+degree]).split()) for i in range(count)]
 
 
 class Text (BaseText):
 
-    def __init__ (self, filename, content):
-        super().__init__(content)
+    def __init__ (self, filename, content, tokenizer):
+        super().__init__(content, tokenizer)
         self._filename = filename
 
     def get_checksum (self):

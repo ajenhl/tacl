@@ -11,12 +11,18 @@ class Tokenizer:
 
     """
 
-    def __init__ (self, pattern, flags=re.UNICODE | re.MULTILINE | re.DOTALL):
+    def __init__ (self, pattern, joiner, flags=re.UNICODE | re.MULTILINE |
+                  re.DOTALL):
         try:
             self._regexp = re.compile(pattern, flags)
         except re.error as err:
             raise ValueError('Error in regular expression %r: %s' %
                              (pattern, err))
+        self._joiner = joiner
+
+    @property
+    def joiner (self):
+        return self._joiner
 
     def tokenize (self, text):
         return self._regexp.findall(text)

@@ -1,8 +1,23 @@
 """Module containing constants."""
 
-# A token is either a workaround (anything in square brackets, as
-# a whole), or a single word character.
-TOKENIZER_PATTERN = r'\[[^]]*\]|\w'
+TOKENIZER_CHOICE_CBETA = 'cbeta'
+TOKENIZER_CHOICE_PAGEL = 'pagel'
+TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
+# For the CBETA (Chinese) tokenizer, a token is either a workaround
+# (anything in square brackets, as a whole), or a single word
+# character. Tokens are grouped together (when constituted into
+# n-grams) by an empty string.
+TOKENIZER_PATTERN_CBETA = r'\[[^]]*\]|\w'
+TOKENIZER_JOINER_CBETA = ''
+# For the Pagel (Tibetan) tokenizer, a token is a continuous set of
+# word (plus apostrophe) characters. Tokens are grouped together (when
+# constituted into n-grams) by a space.
+TOKENIZER_PATTERN_PAGEL = r"[\w']+"
+TOKENIZER_JOINER_PAGEL = ' '
+TOKENIZERS = {
+    TOKENIZER_CHOICE_CBETA: [TOKENIZER_PATTERN_CBETA, TOKENIZER_JOINER_CBETA],
+    TOKENIZER_CHOICE_PAGEL: [TOKENIZER_PATTERN_PAGEL, TOKENIZER_JOINER_PAGEL],
+}
 
 # CSV field names.
 COUNT_FIELDNAME = 'count'
@@ -53,6 +68,12 @@ DB_MEMORY_HELP = '''\
     This may cause an out of memory error, in which case run the
     command without this switch.'''
 DB_RAM_HELP = 'Number of gigabytes of RAM to use.'
+DB_TOKENIZER_HELP = '''\
+    Type of tokenizer to use. The "cbeta" tokenizer is suitable for
+    the Chinese CBETA texts (tokens are single characters or
+    workaround clusters within square brackets). The "pagel" tokenizer
+    is for use with the transliterated Tibetan corpus (tokens are sets
+    of word characters plus apostrophes).'''
 
 DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
