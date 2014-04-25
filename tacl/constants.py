@@ -298,6 +298,8 @@ SELECT_SEARCH_SQL = 'SELECT Text.filename, COUNT(TextNGram.ngram) AS count, ' \
     'WHERE Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'GROUP BY TextNGram.text'
+SELECT_TEXT_TOKEN_COUNT_SQL = 'SELECT Text.token_count ' \
+    'FROM Text WHERE Text.filename = ?'
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE filename = ?'
 UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'

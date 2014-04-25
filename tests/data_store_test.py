@@ -456,18 +456,28 @@ class DataStoreTestCase (TaclTestCase):
              (sentinel.text3, sentinel.label1)])
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
+        cursor = store._conn.execute.return_value
+        store._conn.execute.return_value = cursor
+        cursor.fetchone.return_value = {'token_count': 10}
         actual_labels = store._set_labels(catalogue)
-        expected_labels = {sentinel.label1: 2, sentinel.label2: 1}
+        expected_labels = {sentinel.label1: 20, sentinel.label2: 10}
         connection_calls = [
             call.execute(tacl.constants.UPDATE_LABELS_SQL, ['']),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label1, sentinel.text1]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text1]),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label2, sentinel.text2]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text2]),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label1, sentinel.text3]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text3]),
             call.commit()]
-        self.assertEqual(store._conn.mock_calls, connection_calls)
+        for connection_call in connection_calls:
+            self.assertIn(connection_call, store._conn.mock_calls)
         self.assertEqual(actual_labels, expected_labels)
 
     def test_sort_labels (self):

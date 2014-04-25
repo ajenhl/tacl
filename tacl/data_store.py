@@ -459,7 +459,7 @@ class DataStore:
         Texts that do not have a label specified are set to the empty
         string.
 
-        Text counts are included in the results to allow for
+        Token counts are included in the results to allow for
         semi-accurate sorting based on corpora size.
 
         :param catalogue: catalogue matching filenames to labels
@@ -471,22 +471,20 @@ class DataStore:
         labels = {}
         for filename, label in catalogue.items():
             self._conn.execute(constants.UPDATE_LABEL_SQL, [label, filename])
-            labels[label] = labels.get(label, 0) + 1
+            cursor = self._conn.execute(constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                                        [filename])
+            token_count = cursor.fetchone()['token_count']
+            labels[label] = labels.get(label, 0) + token_count
         self._conn.commit()
         return labels
 
     @staticmethod
     def _sort_labels (label_data):
         """Returns the labels in `label_data` sorted in descending order
-        according to the 'size' of their referent corpora.
+        according to the 'size' (total token count) of their referent
+        corpora.
 
-        There are two ways to determine the size of the labelled
-        corpora: count the number of distinct n-grams in each, and
-        count the number of texts in each. The former is more
-        accurate, the latter potentially much faster and doesn't
-        require another database query.
-
-        :param label_data: labels (with their text counts) to sort
+        :param label_data: labels (with their token counts) to sort
         :type: `dict`
         :rtype: `list`
 
