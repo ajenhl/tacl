@@ -109,7 +109,7 @@ REPORT_DESCRIPTION = '''\
 REPORT_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
-    database.'''
+    database. This has no effect on the results of a diff query.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --min/max-texts,
