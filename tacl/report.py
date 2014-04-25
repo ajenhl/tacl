@@ -8,7 +8,6 @@ import pandas as pd
 from . import constants
 from .highlighter import Highlighter
 from .text import BaseText
-from .tokenizer import Tokenizer
 
 
 class Report:
@@ -39,7 +38,7 @@ class Report:
             return
         # Get the XML base text for each text in the results and
         # derive a count of all the n-grams that make it up.
-        hl = Highlighter(corpus)
+        hl = Highlighter(corpus, self._tokenizer)
         highest_n = self._matches[constants.SIZE_FIELDNAME].max()
         # Supply the highlighter with only matches on the largest
         # n-grams.
@@ -48,7 +47,8 @@ class Report:
         transform = etree.XSLT(etree.XML(EXTEND_XSLT))
         extended_matches = pd.DataFrame()
         cols = [constants.FILENAME_FIELDNAME, constants.LABEL_FIELDNAME]
-        for index, (filename, label) in matches[cols].drop_duplicates().iterrows():
+        for index, (filename, label) in \
+            matches[cols].drop_duplicates().iterrows():
             base = hl.generate_base(matches, filename, False)
             # Apply XSLT to get chained matches.
             extended = transform(base)
@@ -108,7 +108,7 @@ class Report:
         tokens = self._tokenizer.tokenize(ngram)
         for n in range(1, size):
             count = max(0, len(tokens) - n + 1)
-            ngrams = [''.join(tokens[i:i+n]) for i in range(count)]
+            ngrams = [self._tokenizer.joiner.join(tokens[i:i+n]) for i in range(count)]
             substrings.extend(ngrams)
         return substrings
 
@@ -178,29 +178,6 @@ class Report:
                                  right_index=True)
         del self._matches[0]
 
-    def _reduce_by_ngram (self, data, ngram):
-        """Lowers the counts of all n-grams in `data` that are
-        substrings of `ngram` by `ngram`\'s count.
-
-        Modifies `data` in place.
-
-        :param data: row data dictionary for the current text
-        :type data: `dict`
-        :param ngram: n-gram being reduced
-        :type ngram: `str`
-
-        """
-        # Find all substrings of `ngram` and reduce their count by the
-        # count of `ngram`. Substrings may not exist in `data`.
-        count = data[ngram]['count']
-        for substring in self._generate_substrings(ngram, data[ngram]['size']):
-            try:
-                substring_data = data[substring]
-            except KeyError:
-                continue
-            else:
-                substring_data['count'] -= count
-
     def reciprocal_remove (self):
         """Removes results rows for which the n-gram is not present in
         at least one text in each labelled set of texts."""
@@ -211,7 +188,8 @@ class Report:
     def _reciprocal_remove (self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
         grouped = matches.groupby(constants.NGRAM_FIELDNAME)
-        return grouped.filter(lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
+        return grouped.filter(
+            lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 
     def reduce (self):
         """Removes results rows whose n-grams are contained in larger
@@ -252,6 +230,29 @@ class Report:
             self._matches = pd.DataFrame(rows, columns=constants.QUERY_FIELDNAMES)
         else:
             self._matches = pd.DataFrame()
+
+    def _reduce_by_ngram (self, data, ngram):
+        """Lowers the counts of all n-grams in `data` that are
+        substrings of `ngram` by `ngram`\'s count.
+
+        Modifies `data` in place.
+
+        :param data: row data dictionary for the current text
+        :type data: `dict`
+        :param ngram: n-gram being reduced
+        :type ngram: `str`
+
+        """
+        # Find all substrings of `ngram` and reduce their count by the
+        # count of `ngram`. Substrings may not exist in `data`.
+        count = data[ngram]['count']
+        for substring in self._generate_substrings(ngram, data[ngram]['size']):
+            try:
+                substring_data = data[substring]
+            except KeyError:
+                continue
+            else:
+                substring_data['count'] -= count
 
     def remove_label (self, label):
         self._logger.info('Removing label "{}"'.format(label))

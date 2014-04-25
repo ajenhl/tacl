@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>1.txt with matches from each other text highlighted</title>
+    <style>
+      body { margin-left: 4em; color: black; background-color: white; }
+      div.text-list { float: right; width: 15em; margin-left: 3em; }
+      ul { list-style-type: none; }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>1.txt with matches from each other text highlighted</h1>
+
+    <div class="text-list"><form><ul><li><input type="checkbox" name="text" value="2.txt"> 2.txt<li><input type="checkbox" name="text" value="3.txt"> 3.txt</ul></form></div>
+
+    <div class="text"><div>|| <span data-count="0" data-texts=" ">rgya</span> <span data-count="0" data-texts=" ">gar</span> <span data-count="0" data-texts=" ">skad</span> <span data-count="0" data-texts=" ">du</span> | <span data-count="0" data-texts=" ">'tshal</span> <span data-count="0" data-texts=" ">lo</span> || <span data-count="0" data-texts=" ">'di</span> <span data-count="0" data-texts=" ">skad</span> <span data-count="0" data-texts=" ">bdag</span> <span data-count="0" data-texts=" ">gis</span> <span data-count="0" data-texts=" 2.txt " data-base-match="">thos</span> <span data-count="0" data-texts=" 2.txt " data-base-match="">pa</span> <span data-count="0" data-texts=" 2.txt " data-base-match="">dus</span> <span data-count="0" data-texts=" 2.txt " data-base-match="">gcig</span> <span data-count="0" data-texts=" 2.txt " data-base-match="">na</span> | <span data-count="0" data-texts=" ">bcom</span>
+<span data-count="0" data-texts=" ">ldan</span> <span data-count="0" data-texts=" ">'das</span> <span data-count="0" data-texts=" 3.txt " data-base-match="">rgyal</span> <span data-count="0" data-texts=" 3.txt " data-base-match="">po'i</span> <span data-count="0" data-texts=" 3.txt " data-base-match="">khab</span> <span data-count="0" data-texts=" ">na</span> <span data-count="0" data-texts=" ">bya</span> <span data-count="0" data-texts=" ">rgod</span> <span data-count="0" data-texts=" 3.txt " data-base-match="">phung</span> <span data-count="0" data-texts=" 3.txt " data-base-match="">po'i</span> <span data-count="0" data-texts=" ">ril</span> <span data-count="0" data-texts=" ">dge</span> <span data-count="0" data-texts=" ">slong</span> <span data-count="0" data-texts=" ">lnga</span> <span data-count="0" data-texts=" ">stong</span> <span data-count="0" data-texts=" ">gi</span>
+<span data-count="0" data-texts=" ">dge</span> <span data-count="0" data-texts=" ">slong</span></div></div>
+
+    <script>
+      var n = 10;
+      var xr = 0;
+      var xg = 0;
+      var xb = 255;
+      var yr = 255;
+      var yg = 0;
+      var yb = 0;
+      var max = $("input").length;
+
+      function recalculateHeat (textname, change) {
+        $("span[data-texts~='" + textname + "']").each(function () {
+          $(this).attr("data-count", function () {
+            return parseInt($(this).attr("data-count")) + change;
+          });
+          val = parseInt($(this).attr("data-count"));
+          if (val == 0) {
+              clr = 'rgb(0,0,0)';
+          } else {
+              pos = parseInt((Math.round((val/max)*n)).toFixed(0));
+              red = parseInt((xr + (( pos * (yr - xr)) / (n-1))).toFixed(0));
+              green = parseInt((xg + (( pos * (yg - xg)) / (n-1))).toFixed(0));
+              blue = parseInt((xb + (( pos * (yb - xb)) / (n-1))).toFixed(0));
+              clr = 'rgb('+red+','+green+','+blue+')';
+          }
+          $(this).css({color:clr});
+        });
+      }
+
+      $(document).ready(function () {
+        $("input").on("click", function (event) {
+          var $textname = $(this).val();
+          var $change;
+          if ($(this).prop('checked')) {
+            $change = 1;
+          } else {
+            $change = -1;
+          }
+          recalculateHeat($textname, $change);
+        });
+      });
+    </script>
+  </body>
+</html>

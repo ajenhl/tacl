@@ -145,7 +145,8 @@ class ReportTestCase (TaclTestCase):
                 io.StringIO(newline='')))
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_reduce (self):
+    def test_reduce_cbeta (self):
+        tokenizer = self._tokenizer
         input_data = (
             ['AB', '2', 'a', '4', 'A'], ['ABC', '3', 'a', '2', 'A'],
             ['ABD', '3', 'a', '1', 'A'], ['ABCD', '4', 'a', '2', 'A'],
@@ -153,7 +154,7 @@ class ReportTestCase (TaclTestCase):
         expected_rows = set(
             (('AB', '2', 'a', '1', 'A'), ('ABD', '3', 'a', '1', 'A'),
              ('ABCD', '4', 'a', '2', 'A'), ('ABC', '3', 'b', '2', 'A')))
-        actual_rows = self._perform_reduce(input_data)
+        actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
         # Overlapping n-grams are trickier. Take the intersection of
         # two texts:
@@ -174,7 +175,7 @@ class ReportTestCase (TaclTestCase):
             (('ABABAB', '6', 'text1', '1', 'C1'),
              ('AB', '2', 'text1', '1', 'C1'),
              ('A', '1', 'text1', '1', 'C1')))
-        actual_rows = self._perform_reduce(input_data)
+        actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
         # An n-gram that consists of a single repeated token is a form
         # of overlapping. Take the intersection of two texts:
@@ -201,7 +202,7 @@ class ReportTestCase (TaclTestCase):
              ('AAA', '3', 'text2', '1', 'C2'),
              ('AA', '2', 'text2', '1', 'C2'),
              ('A', '1', 'text2', '1', 'C2')))
-        actual_rows = self._perform_reduce(input_data)
+        actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
         # If the token is more than a single character, the case is
         # even more pathological. [...] is a single token.
@@ -214,12 +215,26 @@ class ReportTestCase (TaclTestCase):
             (('[A][A][A]', '3', 'text1', '1', 'C1'),
              ('[A][A]', '2', 'text1', '1', 'C1'),
              ('[A]', '1', 'text1', '1', 'C1')))
-        actual_rows = self._perform_reduce(input_data)
+        actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
 
-    def _perform_reduce (self, input_data):
+    def test_reduce_pagel (self):
+        tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
+                                   tacl.constants.TOKENIZER_JOINER_PAGEL)
+        input_data = (
+            ['pa dus', '2', '2.txt', '1', 'B'],
+            ['pa dus gcig', '3', '2.txt', '1', 'B'],
+            ['pa dus gcig na', '4', '2.txt', '1', 'B'],
+        )
+        expected_rows = (
+            ('pa dus gcig na', '4', '2.txt', '1', 'B'),
+        )
+        actual_rows = self._perform_reduce(input_data, tokenizer)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def _perform_reduce (self, input_data, tokenizer):
         fh = self._create_csv(input_data)
-        report = tacl.Report(fh, self._tokenizer)
+        report = tacl.Report(fh, tokenizer)
         report.reduce()
         return self._get_rows_from_csv(report.csv(io.StringIO(newline='')))
 

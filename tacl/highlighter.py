@@ -6,15 +6,13 @@ from lxml import etree
 import pandas as pd
 
 from . import constants
-from .tokenizer import Tokenizer
 
 
 class Highlighter:
 
-    def __init__ (self, corpus):
+    def __init__ (self, corpus, tokenizer):
         self._corpus = corpus
-        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN_CBETA,
-                                    constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tokenizer
 
     def _annotate_tokens (self, match_obj):
         match = match_obj.group(0)
@@ -111,8 +109,7 @@ class Highlighter:
             text = re.sub(pattern, self._annotate_tokens, text)
         return text
 
-    @staticmethod
-    def _prepare_text (text):
+    def _prepare_text (self, text):
         """Returns `text` with each consituent token wrapped in HTML markup
         for later match annotation.
 
@@ -125,6 +122,6 @@ class Highlighter:
         # which cause problems when escaped, since they become
         # tokens).
         text = re.sub(r'[<>&]', '', text)
-        pattern = r'({})'.format(constants.TOKENIZER_PATTERN_CBETA)
+        pattern = r'({})'.format(self._tokenizer.pattern)
         replacement = r'<span data-count="0" data-texts=" ">\1</span>'
         return re.sub(pattern, replacement, text)
