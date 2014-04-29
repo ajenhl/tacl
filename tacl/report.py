@@ -34,6 +34,7 @@ class Report:
         return fh
 
     def extend (self, corpus):
+        self._logger.info('Extending results')
         if self._matches.empty:
             return
         # Get the XML base text for each text in the results and
@@ -51,7 +52,8 @@ class Report:
             matches[cols].drop_duplicates().iterrows():
             base = hl.generate_base(matches, filename, False)
             # Apply XSLT to get chained matches.
-            extended = transform(base)
+            extended = transform(base, joiner="'{}'".format(
+                self._tokenizer.joiner))
             extended_matches = extended_matches.append(
                 self._generate_extended_matches(
                     extended, highest_n, filename, label), ignore_index=True)
@@ -272,6 +274,8 @@ class Report:
 EXTEND_XSLT = '''<xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:param name="joiner" />
+
   <xsl:template match="div">
     <xsl:copy>
       <xsl:apply-templates />
@@ -289,6 +293,7 @@ EXTEND_XSLT = '''<xsl:stylesheet version="2.0"
   <xsl:template match="span" />
 
   <xsl:template match="span" mode="ngram">
+    <xsl:value-of select="$joiner" />
     <xsl:value-of select="." />
     <xsl:if test="following-sibling::*[1][@data-base-match]">
       <xsl:apply-templates mode="ngram"

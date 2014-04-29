@@ -1,0 +1,13 @@
+ngram,size,filename,count,label
+pa,1,t1.txt,1,A
+dang,1,t1.txt,1,A
+drang,1,t1.txt,1,A
+ba'i,1,t1.txt,1,A
+tshul,1,t1.txt,1,A
+pa,1,t2.txt,1,B
+dang,1,t2.txt,1,B
+drang,1,t2.txt,1,B
+ba'i,1,t2.txt,1,B
+tshul,1,t2.txt,1,B
+pa dang,2,t1.txt,1,A
+pa dang,2,t2.txt,1,B
