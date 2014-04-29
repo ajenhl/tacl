@@ -44,6 +44,9 @@ class TokenizerTestCase (unittest.TestCase):
             ("bcom ldan 'das", ["bcom", "ldan", "'das"]),
             ("so || lha'i", ["so", "lha'i"]),
             ("ba\tdang | zhe\r\nsdang", ["ba", "dang", "zhe", "sdang"]),
+            ("pr-its+tshA", ["pr-its+tshA"]),
+            ("rgya?sa", ["rgya?sa"]),
+            ("hU~M", ["hU~M"]),
         )
         for input_text, expected_tokens in data:
             actual_tokens = tokenizer.tokenize(input_text)

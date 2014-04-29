@@ -12,7 +12,7 @@ TOKENIZER_JOINER_CBETA = ''
 # For the Pagel (Tibetan) tokenizer, a token is a continuous set of
 # word (plus apostrophe) characters. Tokens are grouped together (when
 # constituted into n-grams) by a space.
-TOKENIZER_PATTERN_PAGEL = r"[\w']+"
+TOKENIZER_PATTERN_PAGEL = r"[\w'\-+?~]+"
 TOKENIZER_JOINER_PAGEL = ' '
 TOKENIZERS = {
     TOKENIZER_CHOICE_CBETA: [TOKENIZER_PATTERN_CBETA, TOKENIZER_JOINER_CBETA],
