@@ -1,5 +1,6 @@
 """Module containing the Highlighter class."""
 
+import logging
 import re
 
 from lxml import etree
@@ -11,6 +12,7 @@ from . import constants
 class Highlighter:
 
     def __init__ (self, corpus, tokenizer):
+        self._logger = logging.getLogger(__name__)
         self._corpus = corpus
         self._tokenizer = tokenizer
 
@@ -29,7 +31,7 @@ class Highlighter:
                 if ' {} '.format(self._match_source) not in texts:
                     new_value = '{}{} '.format(texts, self._match_source)
                     span.set('data-texts', new_value)
-        return etree.tostring(root, encoding='utf-8').decode('utf-8')[5:-6]
+        return etree.tostring(root, encoding='unicode')[5:-6]
 
     def generate_base (self, matches, filename, all=True):
         """Returns an XML document containing the text of `filename`
@@ -45,8 +47,8 @@ class Highlighter:
         :rtype: `lxml.etree._Element`
 
         """
-        # This method creates the base XML highlight document for
-        # `matches`.
+        self._logger.debug('Generating the base XML file for {}'.format(
+            filename))
         self._base_filename = filename
         text = self._corpus.get_text(filename).get_content().strip()
         text = self._prepare_text(text)
