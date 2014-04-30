@@ -59,8 +59,6 @@ class BaseText:
 
         """
         count = max(0, len(sequence) - degree + 1)
-        #return [''.join(''.join(sequence[i:i+degree]).split())
-        #        for i in range(count)]
         return [self._tokenizer.joiner.join(self._tokenizer.joiner.join(sequence[i:i+degree]).split()) for i in range(count)]
 
 
