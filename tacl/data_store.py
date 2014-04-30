@@ -532,10 +532,10 @@ class DataStore:
                                      [filename]).fetchone()
             if row is None:
                 is_valid = False
-                self._logger.warning('No record (or n-grams) exists for {} in '
+                self._logger.warn('No record (or n-grams) exists for {} in '
                                      'the database'.format(filename))
             elif row['checksum'] != checksum:
                 is_valid = False
-                self._logger.warning('{} has changed since its n-grams were '
+                self._logger.warn('{} has changed since its n-grams were '
                                      'added to the database'.format(filename))
         return is_valid
