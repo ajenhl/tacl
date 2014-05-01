@@ -1,12 +1,11 @@
 """Module containing the Report class."""
 
 import logging
+import re
 
-from lxml import etree
 import pandas as pd
 
 from . import constants
-from .highlighter import Highlighter
 from .text import BaseText
 
 
@@ -37,54 +36,53 @@ class Report:
         self._logger.info('Extending results')
         if self._matches.empty:
             return
-        # Get the XML base text for each text in the results and
-        # derive a count of all the n-grams that make it up.
-        hl = Highlighter(corpus, self._tokenizer)
         highest_n = self._matches[constants.SIZE_FIELDNAME].max()
+        if highest_n == 1:
+            self._logger.warn('Extending results that contain only 1-grams is '
+                              'unsupported; the original results will be used')
+            return
         # Supply the highlighter with only matches on the largest
         # n-grams.
         matches = self._matches[
             self._matches[constants.SIZE_FIELDNAME] == highest_n]
-        transform = etree.XSLT(etree.XML(EXTEND_XSLT))
         extended_matches = pd.DataFrame()
         cols = [constants.FILENAME_FIELDNAME, constants.LABEL_FIELDNAME]
         for index, (filename, label) in \
             matches[cols].drop_duplicates().iterrows():
-            base = hl.generate_base(matches, filename, False)
-            # Apply XSLT to get chained matches.
-            extended = transform(base, joiner="'{}'".format(
-                self._tokenizer.joiner))
-            extended_matches = extended_matches.append(
-                self._generate_extended_matches(
-                    extended, highest_n, filename, label), ignore_index=True)
+            extended_ngrams = self._generate_extended_ngrams(
+                matches, filename, corpus, highest_n)
+            extended_matches = pd.concat(
+                [extended_matches, self._generate_extended_matches(
+                    extended_ngrams, highest_n, filename, label)])
+            extended_ngrams = None
         extended_matches = extended_matches.reindex_axis(
             constants.QUERY_FIELDNAMES, axis=1)
         extended_matches = self._reciprocal_remove(extended_matches)
         self._matches = self._matches.append(extended_matches)
 
-    def _generate_extended_matches (self, extended, highest_n, filename, label):
-        extended_matches = pd.DataFrame()
-        extended_ngrams = extended.xpath('//ngram')
+    def _generate_extended_matches (self, extended_ngrams, highest_n, filename,
+                                    label):
         # Add data for each n-gram within each extended n-gram. Since
         # this treats each extended piece of text separately, the same
         # n-gram may be generated more than once, so the complete set
         # of new possible matches for this filename needs to combine
         # the counts for such.
+        rows_list = []
         for extended_ngram in extended_ngrams:
-            content = extended_ngram.text
-            if len(content) == highest_n:
-                continue
-            text = BaseText(content, self._tokenizer)
-            for size, ngrams in text.get_ngrams(
-                    highest_n+1, len(extended_ngram.text)):
+            text = BaseText(extended_ngram, self._tokenizer)
+            for size, ngrams in text.get_ngrams(highest_n+1,
+                                                len(text.get_tokens())):
                 data = [{constants.FILENAME_FIELDNAME: filename,
                          constants.LABEL_FIELDNAME: label,
                          constants.SIZE_FIELDNAME: size,
                          constants.NGRAM_FIELDNAME: ngram,
                          constants.COUNT_FIELDNAME: count}
                         for ngram, count in ngrams.items()]
-                extended_matches = extended_matches.append(
-                    pd.DataFrame(data), ignore_index=True)
+                rows_list.extend(data)
+        self._logger.debug('Number of extended results: {}'.format(len(rows_list)))
+        extended_matches = pd.DataFrame(rows_list)
+        rows_list = None
+        self._logger.debug('Finished generating intermediate extended matches')
         # extended_matches may be an empty DataFrame, in which case
         # manipulating it on the basis of non-existing columns is not
         # going to go well.
@@ -95,6 +93,94 @@ class Report:
             extended_matches = extended_matches.groupby(
                 groupby_fields).sum().reset_index()
         return extended_matches
+
+    def _generate_extended_ngrams (self, matches, filename, corpus, highest_n):
+        """Returns the n-grams of the largest size that exist in `filename`\'s
+        text, generated from adding together overlapping n-grams in
+        `matches`.
+
+        :param matches: n-gram matches
+        :type matches: `pandas.DataFrame`
+        :param filename: filename of text whose results are being processed
+        :type filename: `str`
+        :param corpus: corpus to which `filename` belongs
+        :type corpus: `Corpus`
+        :param highest_n: highest degree of n-gram in `matches`
+        :type highest_n: `int`
+        :rtype: `list` of `str`
+
+        """
+        # For large result sets, this method may involve a lot of
+        # processing within the for loop, so optimise even small
+        # things, such as aliasing dotted calls here and below.
+        t_join = self._tokenizer.joiner.join
+        file_matches = matches[matches[constants.FILENAME_FIELDNAME]
+                               == filename]
+        text = t_join(corpus.get_text(filename).get_tokens())
+        ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
+                  list(file_matches[constants.NGRAM_FIELDNAME])]
+        # Go through the list of n-grams, and create a list of
+        # extended n-grams by joining two n-grams together that
+        # overlap (a[-overlap:] == b[:-1]) and checking that the result
+        # occurs in text.
+        working_ngrams = ngrams[:]
+        extended_ngrams = set(ngrams)
+        new_working_ngrams = []
+        overlap = highest_n - 1
+        # Create an index of n-grams by their overlapping portion,
+        # pointing to the non-overlapping token.
+        ngram_index = {}
+        for ngram in ngrams:
+            values = ngram_index.setdefault(ngram[:-1], [])
+            values.append(ngram[-1:])
+        extended_add = extended_ngrams.add
+        new_working_append = new_working_ngrams.append
+        ngram_size = highest_n
+        while working_ngrams:
+            removals = set()
+            ngram_size += 1
+            self._logger.debug('Iterating over {} n-grams to produce '
+                               '{}-grams'.format(len(working_ngrams),
+                                                 ngram_size))
+            for base in working_ngrams:
+                remove_base = False
+                base_overlap = base[-overlap:]
+                for next_token in ngram_index.get(base_overlap, []):
+                    extension = base + next_token
+                    if t_join(extension) in text:
+                        extended_add(extension)
+                        new_working_append(extension)
+                        remove_base = True
+                if remove_base:
+                    # Remove base from extended_ngrams, because it is
+                    # now encompassed by extension.
+                    removals.add(base)
+            extended_ngrams -= removals
+            working_ngrams = new_working_ngrams[:]
+            new_working_ngrams = []
+            new_working_append = new_working_ngrams.append
+        extended_ngrams = sorted(extended_ngrams, key=len, reverse=True)
+        extended_ngrams = [t_join(ngram) for ngram in extended_ngrams]
+        self._logger.debug('Generated {} extended n-grams'.format(
+            len(extended_ngrams)))
+        self._logger.debug('Longest generated n-gram: {}'.format(
+            extended_ngrams[0]))
+        # In order to get the counts correct in the next step of the
+        # process, these n-grams must be overlaid over the text and
+        # repeated as many times as there are matches. N-grams that do
+        # not match (and they may not match on previously matched
+        # parts of the text) are discarded.
+        ngrams = []
+        for ngram in extended_ngrams:
+            # Remove from the text those parts that match. Replace
+            # them with a double space, which should prevent any
+            # incorrect match on the text from each side of the match
+            # that is now contiguous.
+            text, count = re.subn(re.escape(ngram), '  ', text)
+            ngrams.extend([ngram]*count)
+        self._logger.debug('Aligned extended n-grams with the text; '
+                           '{} distinct n-grams exist'.format(len(ngrams)))
+        return ngrams
 
     def _generate_substrings (self, ngram, size):
         """Returns a list of all substrings of `ngram`.
@@ -110,7 +196,8 @@ class Report:
         tokens = self._tokenizer.tokenize(ngram)
         for n in range(1, size):
             count = max(0, len(tokens) - n + 1)
-            ngrams = [self._tokenizer.joiner.join(tokens[i:i+n]) for i in range(count)]
+            ngrams = [self._tokenizer.joiner.join(tokens[i:i+n])
+                      for i in range(count)]
             substrings.extend(ngrams)
         return substrings
 
@@ -229,7 +316,8 @@ class Report:
                          constants.COUNT_FIELDNAME: count,
                          constants.LABEL_FIELDNAME: labels[filename]})
         if rows:
-            self._matches = pd.DataFrame(rows, columns=constants.QUERY_FIELDNAMES)
+            self._matches = pd.DataFrame(
+                rows, columns=constants.QUERY_FIELDNAMES)
         else:
             self._matches = pd.DataFrame()
 
@@ -269,36 +357,3 @@ class Report:
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
                 constants.FILENAME_FIELDNAME],
             ascending=[False, True, False, True, True], inplace=True)
-
-
-EXTEND_XSLT = '''<xsl:stylesheet version="2.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-  <xsl:param name="joiner" />
-
-  <xsl:template match="div">
-    <xsl:copy>
-      <xsl:apply-templates />
-    </xsl:copy>
-  </xsl:template>
-
-  <xsl:template match="span[@data-base-match]">
-    <xsl:if test="not(preceding-sibling::*[1][@data-base-match])">
-      <ngram>
-        <xsl:apply-templates mode="ngram" select="." />
-      </ngram>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="span" />
-
-  <xsl:template match="span" mode="ngram">
-    <xsl:value-of select="$joiner" />
-    <xsl:value-of select="." />
-    <xsl:if test="following-sibling::*[1][@data-base-match]">
-      <xsl:apply-templates mode="ngram"
-                           select="following-sibling::*[1]" />
-    </xsl:if>
-  </xsl:template>
-
-</xsl:stylesheet>'''
