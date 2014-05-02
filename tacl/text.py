@@ -59,7 +59,11 @@ class BaseText:
 
         """
         count = max(0, len(sequence) - degree + 1)
-        return [self._tokenizer.joiner.join(self._tokenizer.joiner.join(sequence[i:i+degree]).split()) for i in range(count)]
+        # The extra split and join are due to having to handle
+        # whitespace within a CBETA token (eg, [(禾*尤)\n/上/日]).
+        return [self._tokenizer.joiner.join(
+            self._tokenizer.joiner.join(sequence[i:i+degree]).split())
+                for i in range(count)]
 
 
 class Text (BaseText):
