@@ -177,7 +177,7 @@ class Report:
             # incorrect match on the text from each side of the match
             # that is now contiguous.
             text, count = re.subn(re.escape(ngram), '  ', text)
-            ngrams.extend([ngram]*count)
+            ngrams.extend([ngram] * count)
         self._logger.debug('Aligned extended n-grams with the text; '
                            '{} distinct n-grams exist'.format(len(ngrams)))
         return ngrams
@@ -192,13 +192,11 @@ class Report:
         :rtype: `list`
 
         """
+        text = BaseText(ngram, self._tokenizer)
         substrings = []
-        tokens = self._tokenizer.tokenize(ngram)
-        for n in range(1, size):
-            count = max(0, len(tokens) - n + 1)
-            ngrams = [self._tokenizer.joiner.join(tokens[i:i+n])
-                      for i in range(count)]
-            substrings.extend(ngrams)
+        for sub_size, ngrams in text.get_ngrams(1, size-1):
+            for sub_ngram, count in ngrams.items():
+                substrings.extend([sub_ngram] * count)
         return substrings
 
     def prune_by_ngram_count (self, minimum=None, maximum=None):
