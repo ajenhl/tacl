@@ -10,8 +10,8 @@ TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
 TOKENIZER_PATTERN_CBETA = r'\[[^]]*\]|\w'
 TOKENIZER_JOINER_CBETA = ''
 # For the Pagel (Tibetan) tokenizer, a token is a continuous set of
-# word (plus apostrophe) characters. Tokens are grouped together (when
-# constituted into n-grams) by a space.
+# word (plus some punctuation) characters. Tokens are grouped together
+# (when constituted into n-grams) by a space.
 TOKENIZER_PATTERN_PAGEL = r"[\w'\-+?~]+"
 TOKENIZER_JOINER_PAGEL = ' '
 TOKENIZERS = {
@@ -73,7 +73,8 @@ DB_TOKENIZER_HELP = '''\
     the Chinese CBETA texts (tokens are single characters or
     workaround clusters within square brackets). The "pagel" tokenizer
     is for use with the transliterated Tibetan corpus (tokens are sets
-    of word characters plus apostrophes).'''
+    of word characters plus some punctuation used to transliterate
+    characters).'''
 
 DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
