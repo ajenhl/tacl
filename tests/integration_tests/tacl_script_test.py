@@ -280,10 +280,14 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, self._corpus_dir, self._ngrams_path)
         data = subprocess.check_output(shlex.split(search_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        # The SQLite3 documentation says that the order of
+        # concatenated tokens (as seen in the fourth element in each
+        # row) is arbitrary, which means this test may sometimes fail
+        # in its current form.
         expected_rows = [
-            ('1.txt', '1', ''),
-            ('2.txt', '2', ''),
-            ('4.txt', '1', '')]
+            ('1.txt', '1', '', 'he'),
+            ('2.txt', '2', '', 'ese, he'),
+            ('4.txt', '1', '', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_search_with_catalogue (self):
@@ -293,10 +297,14 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
         data = subprocess.check_output(shlex.split(search_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        # The SQLite3 documentation says that the order of
+        # concatenated tokens (as seen in the fourth element in each
+        # row) is arbitrary, which means this test may sometimes fail
+        # in its current form.
         expected_rows = [
-            ('1.txt', '1', 'A'),
-            ('2.txt', '2', ''),
-            ('4.txt', '1', 'B')]
+            ('1.txt', '1', 'A', 'he'),
+            ('2.txt', '2', '', 'ese, he'),
+            ('4.txt', '1', 'B', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 
