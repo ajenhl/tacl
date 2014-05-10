@@ -7,7 +7,10 @@ available from the `Chinese Buddhist Electronic Text Association`_
 modifications on other corpora.
 
 The code is developed at https://github.com/ajenhl/tacl/ and the
-documentation is available at http://tacl.readthedocs.org/en/latest/
+documentation is available at http://tacl.readthedocs.org/en/latest/ -
+Read the Docs unfortunately does not display the script usage
+documentation, but running the commands under `Usage` below gives the
+same information.
 
 
 Installation
