@@ -3,9 +3,13 @@
 from distutils.core import setup
 
 
+with open('README.rst') as fh:
+    long_description = fh.read()
+
 setup(name='tacl',
       version='1.0',
       description='Text analyser for corpus linguistics',
+      long_description=long_description,
       author='Jamie Norrish',
       author_email='jamie@artefact.org.nz',
       url='https://github.com/ajenhl/tacl',
