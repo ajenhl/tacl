@@ -7,7 +7,7 @@ with open('README.rst') as fh:
     long_description = fh.read()
 
 setup(name='tacl',
-      version='1.0.1',
+      version='1.0.2',
       description='Text analyser for corpus linguistics',
       long_description=long_description,
       author='Jamie Norrish',
@@ -16,6 +16,7 @@ setup(name='tacl',
       packages=['tacl'],
       scripts=['bin/tacl', 'bin/tacl-helper'],
       requires=['lxml', 'pandas'],
+      install_requires=['lxml', 'pandas'],
       classifiers=[
         'Environment :: Console',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
