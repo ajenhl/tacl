@@ -22,7 +22,12 @@ install``, or install . Requires `SQLite`_, the `biopython`_ suite of
 tools, the `lxml`_ XML library, and the `pandas`_ data analysis
 library. Python on Windows comes with the SQLite DLL, and on all
 platforms the other dependencies are installed automatically when tacl
-is installed with ``pip``).
+is installed with ``pip``.
+
+Note however that on Windows (and perhaps Mac OS X) it is very likely
+that the dependencies that have non-Python components will not build
+due to a missing compiler. In such a case, follow the instructions at
+https://github.com/ajenhl/tacl/wiki/Installation
 
 
 Usage

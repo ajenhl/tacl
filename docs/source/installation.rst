@@ -2,7 +2,9 @@ Installation
 ============
 
 tacl is available on `PyPI`_ and so can be installed (along with its
-Python dependencies) using `pip`_.
+Python dependencies) using `pip`_. If problems occur, see
+https://github.com/ajenhl/tacl/wiki/Installation for alternative
+instructions.
 
 Requirements
 ------------
