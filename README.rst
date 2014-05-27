@@ -16,9 +16,13 @@ same information.
 Installation
 ------------
 
-Using `Python 3`_ (minimum version 3.3), run ``python setup.py
-install``. Requires `SQLite`_, the `lxml`_ XML library and the
-`pandas`_ data analysis library.
+Using `Python 3`_ (minimum version 3.3), either run ``pip install
+tacl`` or download the code manually and run ``python setup.py
+install``, or install . Requires `SQLite`_, the `biopython`_ suite of
+tools, the `lxml`_ XML library, and the `pandas`_ data analysis
+library. Python on Windows comes with the SQLite DLL, and on all
+platforms the other dependencies are installed automatically when tacl
+is installed with ``pip``).
 
 
 Usage
@@ -31,5 +35,6 @@ Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/
 .. _Python 3: http://www.python.org/
 .. _SQLite: http://www.sqlite.org/
+.. _biopython: http://biopython.org/
 .. _lxml: http://lxml.de/
 .. _pandas: http://pandas.pydata.org/

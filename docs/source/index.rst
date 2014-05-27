@@ -88,6 +88,12 @@ analysis of the corpus, as listed with example commands:
 
        tacl report --reduce --min-count 5 diff-results.csv > reduced-diff-results.csv
 
+6. Display a side by side comparison of matching parts of pairs of
+   texts in a set of intersection query results (:doc:`tacl align
+   </scripts/tacl-align>`). ::
+
+       tacl align path/stripped/dir path/output/dir intersect-results.csv
+
 Another script, :doc:`tacl-helper </scripts/tacl-helper>`, can be used
 to create sets of catalogue files and prepare batches of commands for
 particular sets of queries.

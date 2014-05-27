@@ -19,6 +19,16 @@ TOKENIZERS = {
     TOKENIZER_CHOICE_PAGEL: [TOKENIZER_PATTERN_PAGEL, TOKENIZER_JOINER_PAGEL],
 }
 
+# Sequencer scoring values.
+IDENTICAL_CHARACTER_SCORE = 1
+DIFFERENT_CHARACTER_SCORE = -1
+OPEN_GAP_PENALTY = -0.5
+EXTEND_GAP_PENALTY = -0.1
+# The threshold is the ratio between the alignment score and the
+# length of the text being aligned below which the alignment is used
+# as is, rather than further expanded.
+SCORE_THRESHOLD = 0.75
+
 # CSV field names.
 COUNT_FIELDNAME = 'count'
 COUNT_TOKENS_FIELDNAME = 'matching tokens'
@@ -46,6 +56,19 @@ STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
 ENCODING_EPILOG = '''\
     Due to encoding issues, you may need to set the environment
     variable PYTHONIOENCODING to "utf-8".'''
+
+ALIGN_DESCRIPTION = '''\
+    Generates an HTML report giving tables showing aligned sequences
+    of text between each text within each label and all of the texts
+    in the other labels, within a set of results. This functionality
+    is only appropriate for intersect results.'''
+ALIGN_EPILOG = ENCODING_EPILOG + '''\
+    \n\nThis function requires the Biopython suite of software to be
+    installed. It is extremely slow and resource hungry when the
+    overlap between two texts is very great.'''
+ALIGN_HELP = 'Show aligned sets of matches between two texts side by side.'
+ALIGN_MINIMUM_SIZE_HELP = 'Minimum size of n-gram to base sequences around.'
+ALIGN_OUTPUT_HELP = 'Directory to output alignment files to.'
 
 ASYMMETRIC_HELP = 'Label of sub-corpus to restrict results to.'
 
@@ -372,3 +395,38 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
     </script>
   </body>
 </html>'''
+
+FILE_SEQUENCES_HTML = '''<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title lang="en">Alignment between {f1} and {f2}</title>
+    <style>
+      :lang(en) {{ overflow-wrap: normal; word-break: normal; }}
+      :lang(zh) {{ overflow-wrap: break-word; word-break: break-all; }}
+      table {{ border-style: dotted; border-width: 1px; margin-bottom: 3em; }}
+      td {{ border-style: dotted; border-width: 1px; line-height: 1.5;
+            padding: 0.5em; vertical-align: top; }}
+      .match {{ font-weight: bold; }}
+    </style>
+  </head>
+  <body>
+    <h1 lang="en">Alignment between {f1} and {f2}</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>{f1}</th>
+          <th>{f2}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sequences}
+      </tbody>
+    </table>
+  </body>
+</html>'''
+
+SEQUENCE_HTML = '''<tr>
+  <td>{}</td>
+  <td>{}</td>
+</tr>'''

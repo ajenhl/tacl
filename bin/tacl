@@ -61,6 +61,17 @@ def add_tokenizer_argument (parser):
                         default=constants.TOKENIZER_CHOICE_CBETA,
                         help=constants.DB_TOKENIZER_HELP)
 
+def align_results (args):
+    if args.results == '-':
+        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
+                                   newline='')
+    else:
+        results = open(args.results, 'r', encoding='utf-8', newline='')
+    tokenizer = get_tokenizer(args)
+    corpus = tacl.Corpus(args.corpus, tokenizer)
+    s = tacl.Sequencer(corpus, tokenizer, results, args.output)
+    s.generate_sequences(args.minimum)
+
 def configure_logging (verbose):
     """Configures the logging used."""
     if not verbose:
@@ -83,6 +94,7 @@ def generate_parser ():
         description=constants.TACL_DESCRIPTION,
         formatter_class=ParagraphFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
+    generate_align_subparser(subparsers)
     generate_catalogue_subparser(subparsers)
     generate_counts_subparser(subparsers)
     generate_diff_subparser(subparsers)
@@ -94,6 +106,25 @@ def generate_parser ():
     generate_statistics_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
+
+def generate_align_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to generate aligned
+    sequences from a set of results."""
+    parser = subparsers.add_parser(
+        'align', description=constants.ALIGN_DESCRIPTION,
+        epilog=constants.ALIGN_EPILOG,
+        formatter_class=ParagraphFormatter, help=constants.ALIGN_HELP)
+    parser.set_defaults(func=align_results)
+    add_common_arguments(parser)
+    parser.add_argument('-m', '--minimum', default=20,
+                        help=constants.ALIGN_MINIMUM_SIZE_HELP, type=int)
+    add_tokenizer_argument(parser)
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
+    parser.add_argument('output', help=constants.ALIGN_OUTPUT_HELP,
+                        metavar='OUTPUT')
+    parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
+                        metavar='RESULTS')
 
 def generate_catalogue (args):
     """Generates and saves a catalogue file."""
