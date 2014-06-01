@@ -45,6 +45,11 @@ analysis of the corpus, as listed with example commands:
 
        tacl strip path/XML/dir path/stripped/dir
 
+   Note that the output format is simply plain text. If you already
+   have plain text files, then this step is not necessary. The
+   processing is also specific to the style of TEI XML used by the
+   CBETA corpus as per the 2011 CD release.
+
 2. Generate the n-grams that will be used in the analysis (:doc:`tacl
    ngrams </scripts/tacl-ngrams>`). This is typically the slowest part
    of the entire process. ::
