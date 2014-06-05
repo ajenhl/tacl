@@ -61,6 +61,7 @@ class DataStore:
 
     def _add_temporary_ngrams (self, ngrams):
         """Adds `ngrams` to a temporary table."""
+        self._conn.execute(constants.DROP_TEMPORARY_TABLE_SQL)
         self._conn.execute(constants.CREATE_TEMPORARY_TABLE_SQL)
         self._conn.executemany(constants.INSERT_TEMPORARY_NGRAM_SQL,
                                [(ngram,) for ngram in ngrams])

@@ -45,9 +45,26 @@ class DataStoreTestCase (TaclTestCase):
         store._add_temporary_ngrams([sentinel.ngram1, sentinel.ngram2])
         self.assertEqual(
             store._conn.mock_calls,
-            [call.execute(tacl.constants.CREATE_TEMPORARY_TABLE_SQL),
+            [call.execute(tacl.constants.DROP_TEMPORARY_TABLE_SQL),
+             call.execute(tacl.constants.CREATE_TEMPORARY_TABLE_SQL),
              call.executemany(tacl.constants.INSERT_TEMPORARY_NGRAM_SQL,
                               [(sentinel.ngram1,), (sentinel.ngram2,)])])
+
+    def test_add_temporary_ngrams_twice (self):
+        # Test that multiple calls to the method succeed.
+        store = tacl.DataStore(':memory:')
+        input_ngrams = ['禁律', '律藏也']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = set(input_ngrams)
+        actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
+        input_ngrams = ['每', '以示']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = set(input_ngrams)
+        actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
 
     def test_add_text_ngrams (self):
         get_text_id = self._create_patch('tacl.DataStore._get_text_id')
