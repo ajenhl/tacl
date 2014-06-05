@@ -286,7 +286,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # in its current form.
         expected_rows = [
             ('1.txt', '1', '', 'he'),
-            ('2.txt', '2', '', 'ese, he'),
+            ('2.txt', '4', '', 'ese, he'),
             ('4.txt', '1', '', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
@@ -303,7 +303,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # in its current form.
         expected_rows = [
             ('1.txt', '1', 'A', 'he'),
-            ('2.txt', '2', '', 'ese, he'),
+            ('2.txt', '4', '', 'ese, he'),
             ('4.txt', '1', 'B', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 

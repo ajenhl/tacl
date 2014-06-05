@@ -319,7 +319,7 @@ SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND TextNGram.ngram IN ({})'
-SELECT_SEARCH_SQL = 'SELECT Text.filename, COUNT(TextNGram.ngram) AS count, ' \
+SELECT_SEARCH_SQL = 'SELECT Text.filename, SUM(TextNGram.count) AS count, ' \
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \
     'FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text ' \
