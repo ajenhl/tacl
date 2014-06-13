@@ -18,7 +18,7 @@ Installation
 
 Using `Python 3`_ (minimum version 3.3), either run ``pip install
 tacl`` or download the code manually and run ``python setup.py
-install``, or install . Requires `SQLite`_, the `biopython`_ suite of
+install``. Requires `SQLite`_, the `biopython`_ suite of
 tools, the `lxml`_ XML library, and the `pandas`_ data analysis
 library. Python on Windows comes with the SQLite DLL, and on all
 platforms the other dependencies are installed automatically when tacl
