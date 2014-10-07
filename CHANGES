@@ -1,0 +1,24 @@
+1.1.0  2014-05-27  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added a tacl align command, to output aligned sequences of
+    intersections between all pairs of differently labelled texts in a
+    set of results.
+
+  * Added LICENCE and CHANGES to MANIFEST.in.
+
+
+1.0.2  2014-05-20  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added install_requires to setup.py, so that installation via pip
+    installs the dependences.
+
+
+1.0.1  2014-05-20  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added a MANIFEST.in to explicitly include README.rst in the
+    distribution.
+
+
+1.0.0  2014-05-20  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Initial publicised release.

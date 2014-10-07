@@ -29,6 +29,8 @@ STRIP_XSLT = '''
     <xsl:apply-templates select="node()" />
   </xsl:template>
 
+  <xsl:template match="foreign[@place='foot']" />
+
   <xsl:template match="head[@type='no']" />
 
   <xsl:template match="item">
@@ -87,6 +89,7 @@ class Stripper:
     to the original as possible, including whitespace."""
 
     def __init__ (self, input_dir, output_dir):
+        self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
         self._transform = etree.XSLT(etree.XML(STRIP_XSLT))
@@ -128,8 +131,8 @@ class Stripper:
             try:
                 os.makedirs(self._output_dir)
             except OSError as err:
-                logging.error('Could not create output directory: {}'.format(
-                        err))
+                self._logger.error(
+                    'Could not create output directory: {}'.format(err))
                 raise
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
@@ -142,7 +145,7 @@ class Stripper:
         file_path = os.path.join(self._input_dir, filename)
         text_name = os.path.splitext(os.path.basename(filename))[0]
         stripped_file_path = os.path.join(self._output_dir, text_name)
-        logging.info('Stripping file {} into {}'.format(
+        self._logger.info('Stripping file {} into {}'.format(
                 file_path, stripped_file_path))
         try:
             tei_doc = etree.parse(file_path)

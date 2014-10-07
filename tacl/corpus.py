@@ -1,6 +1,7 @@
 """Module containing the Corpus class."""
 
-import os
+import logging
+import os.path
 
 from .text import Text
 
@@ -14,8 +15,10 @@ class Corpus:
 
     """
 
-    def __init__ (self, path):
+    def __init__ (self, path, tokenizer):
+        self._logger = logging.getLogger(__name__)
         self._path = os.path.abspath(path)
+        self._tokenizer = tokenizer
 
     def get_text (self, filename):
         """Returns a `Text` representing the file at `filename`.
@@ -25,9 +28,10 @@ class Corpus:
         :rtype: `Text`
 
         """
+        self._logger.debug('Creating Text object from {}'.format(filename))
         with open(os.path.join(self._path, filename), encoding='utf-8') as text:
             content = text.read()
-        return Text(filename, content)
+        return Text(filename, content, self._tokenizer)
 
     def get_texts (self):
         """Returns a generator supplying `Text` objects for each file
@@ -37,4 +41,5 @@ class Corpus:
 
         """
         for filename in os.listdir(self._path):
-            yield self.get_text(filename)
+            if os.path.isfile(os.path.join(self._path, filename)):
+                yield self.get_text(filename)

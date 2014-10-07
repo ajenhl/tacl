@@ -8,8 +8,11 @@ from ..tacl_test_case import TaclTestCase
 class DataStoreIntegrationTestCase (TaclTestCase):
 
     def setUp (self):
+        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
+                                         tacl.constants.TOKENIZER_JOINER_CBETA)
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data')
-        self._corpus = tacl.Corpus(os.path.join(self._data_dir, 'stripped'))
+        self._corpus = tacl.Corpus(os.path.join(self._data_dir, 'stripped'),
+                                   self._tokenizer)
         self._catalogue = tacl.Catalogue()
         self._catalogue.load(os.path.join(self._data_dir, 'catalogue.txt'))
         self._store = tacl.DataStore(':memory:')

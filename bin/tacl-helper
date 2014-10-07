@@ -31,15 +31,21 @@ def add_db_arguments (parser):
                         metavar='CORPUS')
 
 def configure_logging (verbose):
-    logger = logging.getLogger('tacl-helper')
+    logger = logging.getLogger('tacl')
     if not verbose:
         log_level = logging.WARNING
     elif verbose == 1:
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        level=log_level)
+    logger.setLevel(log_level)
+    ch = logging.StreamHandler()
+    ch.setLevel(log_level)
+    formatter = logging.Formatter(
+        '%(asctime)s %(name)s %(levelname)s: %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
 
 def _copy_options (args):
     """Returns a string form of the options in `args`."""

@@ -45,6 +45,11 @@ analysis of the corpus, as listed with example commands:
 
        tacl strip path/XML/dir path/stripped/dir
 
+   Note that the output format is simply plain text. If you already
+   have plain text files, then this step is not necessary. The
+   processing is also specific to the style of TEI XML used by the
+   CBETA corpus as per the 2011 CD release.
+
 2. Generate the n-grams that will be used in the analysis (:doc:`tacl
    ngrams </scripts/tacl-ngrams>`). This is typically the slowest part
    of the entire process. ::
@@ -64,6 +69,15 @@ analysis of the corpus, as listed with example commands:
 
        tacl catalogue -l "base" path/stripped/dir path/catalogue/file
 
+   An example catalogue: ::
+
+       T0237.txt Vaj
+       T0097.txt AV
+       T0667.txt P-ref
+       T1461.txt P-ref
+       T1559.txt
+       T2137.txt
+
 4. Analyse the n-grams to find either the difference between
    (:doc:`tacl diff <scripts/tacl-diff>`) or intersection of
    (:doc:`tacl intersect </scripts/tacl-intersect>`) the groups of
@@ -78,6 +92,12 @@ analysis of the corpus, as listed with example commands:
    report </scripts/tacl-report>`). ::
 
        tacl report --reduce --min-count 5 diff-results.csv > reduced-diff-results.csv
+
+6. Display a side by side comparison of matching parts of pairs of
+   texts in a set of intersection query results (:doc:`tacl align
+   </scripts/tacl-align>`). ::
+
+       tacl align path/stripped/dir path/output/dir intersect-results.csv
 
 Another script, :doc:`tacl-helper </scripts/tacl-helper>`, can be used
 to create sets of catalogue files and prepare batches of commands for

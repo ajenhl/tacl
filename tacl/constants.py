@@ -1,8 +1,33 @@
 """Module containing constants."""
 
-# A token is either a workaround (anything in square brackets, as
-# a whole), or a single word character.
-TOKENIZER_PATTERN = r'\[[^]]*\]|\w'
+TOKENIZER_CHOICE_CBETA = 'cbeta'
+TOKENIZER_CHOICE_PAGEL = 'pagel'
+TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
+# For the CBETA (Chinese) tokenizer, a token is either a workaround
+# (anything in square brackets, as a whole), or a single word
+# character. Tokens are grouped together (when constituted into
+# n-grams) by an empty string.
+TOKENIZER_PATTERN_CBETA = r'\[[^]]*\]|\w'
+TOKENIZER_JOINER_CBETA = ''
+# For the Pagel (Tibetan) tokenizer, a token is a continuous set of
+# word (plus some punctuation) characters. Tokens are grouped together
+# (when constituted into n-grams) by a space.
+TOKENIZER_PATTERN_PAGEL = r"[\w'\-+?~]+"
+TOKENIZER_JOINER_PAGEL = ' '
+TOKENIZERS = {
+    TOKENIZER_CHOICE_CBETA: [TOKENIZER_PATTERN_CBETA, TOKENIZER_JOINER_CBETA],
+    TOKENIZER_CHOICE_PAGEL: [TOKENIZER_PATTERN_PAGEL, TOKENIZER_JOINER_PAGEL],
+}
+
+# Sequencer scoring values.
+IDENTICAL_CHARACTER_SCORE = 1
+DIFFERENT_CHARACTER_SCORE = -1
+OPEN_GAP_PENALTY = -0.5
+EXTEND_GAP_PENALTY = -0.1
+# The threshold is the ratio between the alignment score and the
+# length of the text being aligned below which the alignment is used
+# as is, rather than further expanded.
+SCORE_THRESHOLD = 0.75
 
 # CSV field names.
 COUNT_FIELDNAME = 'count'
@@ -10,6 +35,7 @@ COUNT_TOKENS_FIELDNAME = 'matching tokens'
 FILENAME_FIELDNAME = 'filename'
 LABEL_FIELDNAME = 'label'
 NGRAM_FIELDNAME = 'ngram'
+NGRAMS_FIELDNAME = 'ngrams'
 PERCENTAGE_FIELDNAME = 'percentage'
 SIZE_FIELDNAME = 'size'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
@@ -21,6 +47,7 @@ QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
 COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
+SEARCH_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME, NGRAMS_FIELDNAME]
 STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
                          TOTAL_TOKENS_FIELDNAME, PERCENTAGE_FIELDNAME,
                          LABEL_FIELDNAME]
@@ -29,6 +56,19 @@ STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
 ENCODING_EPILOG = '''\
     Due to encoding issues, you may need to set the environment
     variable PYTHONIOENCODING to "utf-8".'''
+
+ALIGN_DESCRIPTION = '''\
+    Generates an HTML report giving tables showing aligned sequences
+    of text between each text within each label and all of the texts
+    in the other labels, within a set of results. This functionality
+    is only appropriate for intersect results.'''
+ALIGN_EPILOG = ENCODING_EPILOG + '''\
+    \n\nThis function requires the Biopython suite of software to be
+    installed. It is extremely slow and resource hungry when the
+    overlap between two texts is very great.'''
+ALIGN_HELP = 'Show aligned sets of matches between two texts side by side.'
+ALIGN_MINIMUM_SIZE_HELP = 'Minimum size of n-gram to base sequences around.'
+ALIGN_OUTPUT_HELP = 'Directory to output alignment files to.'
 
 ASYMMETRIC_HELP = 'Label of sub-corpus to restrict results to.'
 
@@ -52,6 +92,13 @@ DB_MEMORY_HELP = '''\
     This may cause an out of memory error, in which case run the
     command without this switch.'''
 DB_RAM_HELP = 'Number of gigabytes of RAM to use.'
+DB_TOKENIZER_HELP = '''\
+    Type of tokenizer to use. The "cbeta" tokenizer is suitable for
+    the Chinese CBETA texts (tokens are single characters or
+    workaround clusters within square brackets). The "pagel" tokenizer
+    is for use with the transliterated Tibetan corpus (tokens are sets
+    of word characters plus some punctuation used to transliterate
+    characters).'''
 
 DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
@@ -84,9 +131,14 @@ REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
     the new set of results. See below for the exceptional statistics
     output.'''
+REPORT_EXTEND_HELP = '''\
+    Extend the results to list the highest size grams that also count
+    as matches, going beyond the maximum size recorded in the
+    database. This has no effect on the results of a diff query, or if
+    the results contain only 1-grams.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --reduce, --reciprocal, --min/max-texts,
+    following order: --extend, --reduce, --reciprocal, --min/max-texts,
     --min/max-size, --min/max-count, --remove.
 
     It is important to be careful with the use of --reduce. Coupled
@@ -117,6 +169,15 @@ REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 REPORT_SORT_HELP = 'Sort the results.'
+
+SEARCH_DESCRIPTION = '''\
+    List texts containing at least one of the supplied n-grams, along
+    with a count of how many of the n-grams are present in each
+    text.'''
+SEARCH_HELP = 'List texts containing at least one of the supplied n-grams.'
+SEARCH_NGRAMS_HELP = '''\
+    Path to file containing list of n-grams to search for, with one
+    n-gram per line.'''
 
 STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
 STATISTICS_DESCRIPTION = 'Generate summary statistic for a set of results.'
@@ -194,6 +255,7 @@ CREATE_TABLE_TEXTHASNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextHasNGram (' \
 CREATE_TEMPORARY_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (ngram Text)'
 DELETE_TEXT_HAS_NGRAMS_SQL = 'DELETE FROM TextHasNGram WHERE text = ?'
 DELETE_TEXT_NGRAMS_SQL = 'DELETE FROM TextNGram WHERE text = ?'
+DROP_TEMPORARY_TABLE_SQL = 'DROP TABLE IF EXISTS InputNGram'
 DROP_TEXTNGRAM_INDEX_SQL = 'DROP INDEX IF EXISTS TextNGramIndexTextNGram'
 INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
     'VALUES (?, ?, ?, ?)'
@@ -218,11 +280,13 @@ SELECT_COUNTS_SQL = 'SELECT Text.filename, TextHasNGram.size, ' \
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
-    'WHERE Text.label IN (?) AND Text.id = TextNGram.text ' \
+    'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
-    'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
+    'WHERE Text.id = TextNGram.text AND Text.label = ? ' \
+    'EXCEPT ' \
+    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
+    'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
 SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
@@ -241,7 +305,7 @@ SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'WHERE t.id = tn.text AND t.label IN ({}) AND tn.ngram = TextNGram.ngram)'
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
-SELECT_INTERSECT_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
+SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
@@ -250,12 +314,20 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNgram.ngram, TextNGram.size, ' \
+SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'TextNGram.count, Text.filename, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND TextNGram.ngram IN ({})'
+SELECT_SEARCH_SQL = 'SELECT Text.filename, SUM(TextNGram.count) AS count, ' \
+    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \
+    'FROM Text, TextNGram ' \
+    'WHERE Text.id = TextNGram.text ' \
+    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
+    'GROUP BY TextNGram.text'
+SELECT_TEXT_TOKEN_COUNT_SQL = 'SELECT Text.token_count ' \
+    'FROM Text WHERE Text.filename = ?'
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE filename = ?'
 UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
@@ -325,3 +397,38 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
     </script>
   </body>
 </html>'''
+
+FILE_SEQUENCES_HTML = '''<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title lang="en">Alignment between {f1} and {f2}</title>
+    <style>
+      :lang(en) {{ overflow-wrap: normal; word-break: normal; }}
+      :lang(zh) {{ overflow-wrap: break-word; word-break: break-all; }}
+      table {{ border-style: dotted; border-width: 1px; margin-bottom: 3em; }}
+      td {{ border-style: dotted; border-width: 1px; line-height: 1.5;
+            padding: 0.5em; vertical-align: top; }}
+      .match {{ font-weight: bold; }}
+    </style>
+  </head>
+  <body>
+    <h1 lang="en">Alignment between {f1} and {f2}</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>{f1}</th>
+          <th>{f2}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sequences}
+      </tbody>
+    </table>
+  </body>
+</html>'''
+
+SEQUENCE_HTML = '''<tr>
+  <td>{}</td>
+  <td>{}</td>
+</tr>'''

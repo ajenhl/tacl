@@ -120,6 +120,7 @@
         <div1 type="xu">
           <mulu level="1" label="序" type="序"/>
           <note n="0001001" resp="Taisho" place="foot text" type="orig">此序依宋元明三本【NI】依【TE】載【SU】</note>
+          <foreign n="0001009" resp="Taisho" lang="san" place="foot">1. Nid[amacron]na.</foreign>
           <head><title>長阿含經</title>序</head>
           <lb n="0001a03" ed="T"/>
           <lb n="0001a04" ed="T"/>

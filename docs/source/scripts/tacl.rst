@@ -6,6 +6,7 @@ Subcommands:
 .. toctree::
    :maxdepth: 1
 
+   tacl-align
    tacl-catalogue
    tacl-diff
    tacl-highlight

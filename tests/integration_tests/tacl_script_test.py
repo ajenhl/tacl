@@ -9,6 +9,8 @@ import unittest
 
 from ..tacl_test_case import TaclTestCase
 
+from tacl import constants
+
 
 class TaclScriptIntegrationTestCase (TaclTestCase):
 
@@ -25,6 +27,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         self._corpus_dir = os.path.join(self._data_dir, 'stripped')
         self._db_path = os.path.join(self._data_dir, 'test.db')
         self._catalogue_path = os.path.join(self._data_dir, 'catalogue.txt')
+        self._ngrams_path = os.path.join(self._data_dir, 'search_ngrams.txt')
         # Since ngrams need to be added to a database for many of
         # these tests, define the command here.
         minimum = 1
@@ -40,7 +43,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         if os.path.exists(self._db_path):
             os.remove(self._db_path)
 
-    def test_add_ngrams (self):
+    def test_add_ngrams_cbeta (self):
         subprocess.call(self._ngrams_command_args)
         conn = sqlite3.connect(self._db_path)
         actual_rows = conn.execute(
@@ -125,6 +128,37 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('4.txt', 1), ('4.txt', 2), ('4.txt', 3),
             ('5.txt', 1), ('5.txt', 2), ('5.txt', 3),
             ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_add_ngrams_pagel (self):
+        ngrams_command = 'tacl ngrams -t {} {} {} {} {}'.format(
+            constants.TOKENIZER_CHOICE_PAGEL, self._db_path,
+            self._corpus_dir, 1, 3)
+        subprocess.call(shlex.split(ngrams_command))
+        conn = sqlite3.connect(self._db_path)
+        actual_rows = conn.execute(
+            'SELECT Text.filename, Text.checksum, Text.label, '
+            'TextNGram.ngram, TextNGram.size, TextNGram.count '
+            'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
+        expected_rows = [
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'then', 1, 1),
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'we', 1, 1),
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'went', 1, 1),
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'then we', 2, 1),
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'we went', 2, 1),
+            ('1.txt', '705c89d665a5300516fe7314f84ebce0', '', 'then we went',
+             3, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'these', 1, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'he', 1, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'sent', 1, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'these he', 2, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'he sent', 2, 1),
+            ('2.txt', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'these he sent',
+             3, 1),
+            ('3.txt', 'bb34469a937a77ae77c2aeb67248c43c', '', 'that', 1, 1),
+            ('4.txt', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'hense', 1, 1),
+            ('5.txt', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'well', 1, 1),
+        ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_counts (self):
@@ -238,6 +272,39 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('nt', '2', '2.txt', '1', 'B'), ('the', '3', '1.txt', '1', 'A'),
             ('the', '3', '2.txt', '1', 'B'), ('ent', '3', '1.txt', '1', 'A'),
             ('ent', '3', '2.txt', '1', 'B')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_search (self):
+        subprocess.call(self._ngrams_command_args)
+        search_command = 'tacl search {} {} {}'.format(
+            self._db_path, self._corpus_dir, self._ngrams_path)
+        data = subprocess.check_output(shlex.split(search_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        # The SQLite3 documentation says that the order of
+        # concatenated tokens (as seen in the fourth element in each
+        # row) is arbitrary, which means this test may sometimes fail
+        # in its current form.
+        expected_rows = [
+            ('1.txt', '1', '', 'he'),
+            ('2.txt', '4', '', 'ese, he'),
+            ('4.txt', '1', '', 'he')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_search_with_catalogue (self):
+        subprocess.call(self._ngrams_command_args)
+        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
+        search_command = 'tacl search -c {} {} {} {}'.format(
+            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
+        data = subprocess.check_output(shlex.split(search_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        # The SQLite3 documentation says that the order of
+        # concatenated tokens (as seen in the fourth element in each
+        # row) is arbitrary, which means this test may sometimes fail
+        # in its current form.
+        expected_rows = [
+            ('1.txt', '1', 'A', 'he'),
+            ('2.txt', '4', '', 'ese, he'),
+            ('4.txt', '1', 'B', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 

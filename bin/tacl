@@ -15,17 +15,18 @@ import tacl
 from tacl import constants
 
 
+logger = logging.getLogger('tacl')
+
+
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
-    configure_logging(args.verbose)
-    try:
+    if hasattr(args, 'verbose'):
+        configure_logging(args.verbose)
+    if hasattr(args, 'func'):
         args.func(args)
-    except Exception as err:
-        if args.verbose and args.verbose > 1:
-            sys.excepthook(*sys.exc_info())
-        print('Error: {0}'.format(err))
-        sys.exit(1)
+    else:
+        parser.print_help()
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
@@ -39,6 +40,7 @@ def add_db_arguments (parser):
                         help=constants.DB_MEMORY_HELP)
     parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
                         type=int)
+    add_tokenizer_argument(parser)
     parser.add_argument('db', help=constants.DB_DATABASE_HELP,
                         metavar='DATABASE')
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
@@ -55,6 +57,22 @@ def add_query_arguments (parser):
     parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
                         metavar='CATALOGUE')
 
+def add_tokenizer_argument (parser):
+    parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
+                        default=constants.TOKENIZER_CHOICE_CBETA,
+                        help=constants.DB_TOKENIZER_HELP)
+
+def align_results (args):
+    if args.results == '-':
+        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
+                                   newline='')
+    else:
+        results = open(args.results, 'r', encoding='utf-8', newline='')
+    tokenizer = get_tokenizer(args)
+    corpus = tacl.Corpus(args.corpus, tokenizer)
+    s = tacl.Sequencer(corpus, tokenizer, results, args.output)
+    s.generate_sequences(args.minimum)
+
 def configure_logging (verbose):
     """Configures the logging used."""
     if not verbose:
@@ -63,8 +81,13 @@ def configure_logging (verbose):
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        level=log_level)
+    logger.setLevel(log_level)
+    ch = logging.StreamHandler()
+    ch.setLevel(log_level)
+    formatter = logging.Formatter(
+        '%(asctime)s %(name)s %(levelname)s: %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 def generate_parser ():
     """Returns a parser configured with sub-commands and arguments."""
@@ -72,6 +95,7 @@ def generate_parser ():
         description=constants.TACL_DESCRIPTION,
         formatter_class=ParagraphFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
+    generate_align_subparser(subparsers)
     generate_catalogue_subparser(subparsers)
     generate_counts_subparser(subparsers)
     generate_diff_subparser(subparsers)
@@ -79,9 +103,29 @@ def generate_parser ():
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_report_subparser(subparsers)
+    generate_search_subparser(subparsers)
     generate_statistics_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
+
+def generate_align_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to generate aligned
+    sequences from a set of results."""
+    parser = subparsers.add_parser(
+        'align', description=constants.ALIGN_DESCRIPTION,
+        epilog=constants.ALIGN_EPILOG,
+        formatter_class=ParagraphFormatter, help=constants.ALIGN_HELP)
+    parser.set_defaults(func=align_results)
+    add_common_arguments(parser)
+    parser.add_argument('-m', '--minimum', default=20,
+                        help=constants.ALIGN_MINIMUM_SIZE_HELP, type=int)
+    add_tokenizer_argument(parser)
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
+    parser.add_argument('output', help=constants.ALIGN_OUTPUT_HELP,
+                        metavar='OUTPUT')
+    parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
+                        metavar='RESULTS')
 
 def generate_catalogue (args):
     """Generates and saves a catalogue file."""
@@ -140,6 +184,7 @@ def generate_highlight_subparser (subparsers):
         epilog=constants.HIGHLIGHT_EPILOG, help=constants.HIGHLIGHT_HELP)
     parser.set_defaults(func=highlight_text)
     add_common_arguments(parser)
+    add_tokenizer_argument(parser)
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
@@ -186,9 +231,10 @@ def generate_report (args):
                                    newline='')
     else:
         results = open(args.results, 'r', encoding='utf-8', newline='')
-    report = tacl.Report(results)
+    tokenizer = get_tokenizer(args)
+    report = tacl.Report(results, tokenizer)
     if args.extend:
-        corpus = tacl.Corpus(args.extend)
+        corpus = tacl.Corpus(args.extend, tokenizer)
         report.extend(corpus)
     if args.reduce:
         report.reduce()
@@ -215,7 +261,8 @@ def generate_report_subparser (subparsers):
         help=constants.REPORT_HELP)
     add_common_arguments(parser)
     parser.set_defaults(func=generate_report)
-    parser.add_argument('-e', '--extend', dest='extend', metavar='CORPUS')
+    parser.add_argument('-e', '--extend', dest='extend',
+                        help=constants.REPORT_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--min-count', dest='min_count',
                         help=constants.REPORT_MINIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
@@ -242,8 +289,23 @@ def generate_report_subparser (subparsers):
                         metavar='LABEL', type=str)
     parser.add_argument('--sort', action='store_true',
                         help=constants.REPORT_SORT_HELP)
+    add_tokenizer_argument(parser)
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
+
+def generate_search_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to generate search
+    results for a set of n-grams."""
+    parser = subparsers.add_parser(
+        'search', description=constants.SEARCH_DESCRIPTION,
+        help=constants.SEARCH_HELP)
+    parser.set_defaults(func=search_texts)
+    add_common_arguments(parser)
+    add_db_arguments(parser)
+    parser.add_argument('-c', '--catalogue', metavar='CATALOGUE',
+                        help=constants.CATALOGUE_CATALOGUE_HELP)
+    parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
+                        metavar='NGRAMS')
 
 def generate_statistics (args):
     results = open(args.results, 'r', encoding='utf-8', newline='')
@@ -285,7 +347,8 @@ def generate_strip_subparser (subparsers):
 
 def get_corpus (args):
     """Returns a `tacl.Corpus`."""
-    return tacl.Corpus(args.corpus)
+    tokenizer = get_tokenizer(args)
+    return tacl.Corpus(args.corpus, tokenizer)
 
 def get_catalogue (args):
     """Returns a `tacl.Catalogue`."""
@@ -306,10 +369,14 @@ def get_data_store (args):
     """Returns a `tacl.DataStore`."""
     return tacl.DataStore(args.db, args.memory, args.ram)
 
+def get_tokenizer (args):
+    return tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])
+
 def highlight_text (args):
     """Outputs the result of highlighting a text."""
+    tokenizer = get_tokenizer(args)
     corpus = get_corpus(args)
-    highlighter = tacl.Highlighter(corpus)
+    highlighter = tacl.Highlighter(corpus, tokenizer)
     text = highlighter.highlight(args.results, args.base)
     print(text)
 
@@ -346,6 +413,18 @@ def ngram_intersection (args):
         store.intersection_supplied(catalogue, input_fh, sys.stdout)
     else:
         store.intersection(catalogue, sys.stdout)
+
+def search_texts (args):
+    """Searches texts for presence of n-grams."""
+    store = get_data_store(args)
+    corpus = get_corpus(args)
+    catalogue = tacl.Catalogue()
+    if args.catalogue:
+        catalogue.load(args.catalogue)
+    store.validate(corpus, catalogue)
+    with open(args.ngrams, 'r', encoding='utf-8') as fh:
+        ngrams = [ngram.strip() for ngram in fh.readlines()]
+    store.search(catalogue, ngrams, sys.stdout)
 
 def strip_texts (args):
     """Processes texts for use with the tacl ngrams command."""

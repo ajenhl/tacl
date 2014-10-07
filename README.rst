@@ -7,15 +7,23 @@ available from the `Chinese Buddhist Electronic Text Association`_
 modifications on other corpora.
 
 The code is developed at https://github.com/ajenhl/tacl/ and the
-documentation is available at http://tacl.readthedocs.org/en/latest/
+documentation is available at http://pythonhosted.org/tacl/.
 
 
 Installation
 ------------
 
-Using `Python 3`_ (minimum version 3.3), run ``python setup.py
-install``. Requires `SQLite`_, the `lxml`_ XML library and the
-`pandas`_ data analysis library.
+Using `Python 3`_ (minimum version 3.3), either run ``pip install
+tacl`` or download the code manually and run ``python setup.py
+install``. Requires `SQLite`_, the `biopython`_ suite of tools, the
+`lxml`_ XML library, and the `pandas`_ data analysis library. On all
+platforms the dependencies are installed automatically when tacl is
+installed with ``pip``.
+
+Note however that on Windows (and perhaps Mac OS X) it is very likely
+that the dependencies that have non-Python components will not build
+due to a missing compiler. In such a case, follow the instructions at
+https://github.com/ajenhl/tacl/wiki/Installation
 
 
 Usage
@@ -28,5 +36,6 @@ Run ``tacl -h`` for a listing of available subcommands, and ``tacl
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/
 .. _Python 3: http://www.python.org/
 .. _SQLite: http://www.sqlite.org/
+.. _biopython: http://biopython.org/
 .. _lxml: http://lxml.de/
 .. _pandas: http://pandas.pydata.org/

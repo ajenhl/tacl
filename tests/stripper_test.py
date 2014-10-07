@@ -31,6 +31,18 @@ class StripTestCase (unittest.TestCase):
         actual_witnesses = stripper.get_witnesses(etree.XML(input_xml))
         self.assertEqual(expected_witnesses, actual_witnesses)
 
+    def test_foreign (self):
+        """Tests that foreign elements with @place="foot" are stripped."""
+        foreign_data = (
+            ('<foreign n="0018011" resp="Taisho" lang="san">Saalva</foreign>',
+             'Saalva'),
+            ('<foreign n="0018011" resp="Taisho" lang="san" place="foot">Saalva</foreign>',
+             ''),
+            )
+        for input_xml, expected_output in foreign_data:
+            actual_output = str(self.transform(etree.XML(input_xml)))
+            self.assertEqual(expected_output, actual_output)
+
     def test_no_header (self):
         """Tests that the TEI header is stripped."""
         input_xml = '''

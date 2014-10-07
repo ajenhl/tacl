@@ -45,9 +45,26 @@ class DataStoreTestCase (TaclTestCase):
         store._add_temporary_ngrams([sentinel.ngram1, sentinel.ngram2])
         self.assertEqual(
             store._conn.mock_calls,
-            [call.execute(tacl.constants.CREATE_TEMPORARY_TABLE_SQL),
+            [call.execute(tacl.constants.DROP_TEMPORARY_TABLE_SQL),
+             call.execute(tacl.constants.CREATE_TEMPORARY_TABLE_SQL),
              call.executemany(tacl.constants.INSERT_TEMPORARY_NGRAM_SQL,
                               [(sentinel.ngram1,), (sentinel.ngram2,)])])
+
+    def test_add_temporary_ngrams_twice (self):
+        # Test that multiple calls to the method succeed.
+        store = tacl.DataStore(':memory:')
+        input_ngrams = ['禁律', '律藏也']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = set(input_ngrams)
+        actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
+        input_ngrams = ['每', '以示']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = set(input_ngrams)
+        actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
 
     def test_add_text_ngrams (self):
         get_text_id = self._create_patch('tacl.DataStore._get_text_id')
@@ -194,7 +211,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric (self):
-        labels = {sentinel.label: 1}
+        labels = {sentinel.label: 1, sentinel.prime_label: 1}
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
         get_placeholders = self._create_patch(
@@ -212,12 +229,13 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.diff_asymmetric(catalogue, sentinel.prime_label,
                                           input_fh)
         set_labels.assert_called_once_with(store, catalogue)
-        get_placeholders.assert_called_once_with(list(labels))
+        get_placeholders.assert_called_once_with([sentinel.label])
         log_query_plan.assert_called_once()
         sql = tacl.constants.SELECT_DIFF_ASYMMETRIC_SQL.format(
             sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, [sentinel.prime_label,
+                                             sentinel.prime_label,
                                              sentinel.label])])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)
@@ -390,7 +408,7 @@ class DataStoreTestCase (TaclTestCase):
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
         log_query_plan.assert_called_once()
-        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, labels * 2)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
@@ -430,7 +448,7 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders.assert_called_once_with(all_labels)
         add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
         log_query_plan.assert_called_once()
-        sql = 'SELECT TextNgram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, Text.filename, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, all_labels + trimmed_labels)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
@@ -455,18 +473,28 @@ class DataStoreTestCase (TaclTestCase):
              (sentinel.text3, sentinel.label1)])
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
+        cursor = store._conn.execute.return_value
+        store._conn.execute.return_value = cursor
+        cursor.fetchone.return_value = {'token_count': 10}
         actual_labels = store._set_labels(catalogue)
-        expected_labels = {sentinel.label1: 2, sentinel.label2: 1}
+        expected_labels = {sentinel.label1: 20, sentinel.label2: 10}
         connection_calls = [
             call.execute(tacl.constants.UPDATE_LABELS_SQL, ['']),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label1, sentinel.text1]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text1]),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label2, sentinel.text2]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text2]),
             call.execute(tacl.constants.UPDATE_LABEL_SQL,
                          [sentinel.label1, sentinel.text3]),
+            call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
+                         [sentinel.text3]),
             call.commit()]
-        self.assertEqual(store._conn.mock_calls, connection_calls)
+        for connection_call in connection_calls:
+            self.assertIn(connection_call, store._conn.mock_calls)
         self.assertEqual(actual_labels, expected_labels)
 
     def test_sort_labels (self):

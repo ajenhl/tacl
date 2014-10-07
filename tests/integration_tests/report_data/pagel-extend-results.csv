@@ -1,0 +1,33 @@
+ngram,size,filename,count,label
+pa,1,t1.txt,1,A
+dang,1,t1.txt,1,A
+drang,1,t1.txt,1,A
+ba'i,1,t1.txt,1,A
+tshul,1,t1.txt,1,A
+sems,1,t1.txt,1,A
+khong,1,t1.txt,1,A
+pa dang,2,t1.txt,1,A
+dang drang,2,t1.txt,1,A
+drang ba'i,2,t1.txt,1,A
+ba'i tshul,2,t1.txt,1,A
+tshul sems,2,t1.txt,1,A
+pa dang drang,3,t1.txt,1,A
+drang ba'i tshul,3,t1.txt,1,A
+ba'i tshul sems,3,t1.txt,1,A
+drang ba'i tshul sems,4,t1.txt,1,A
+pa,1,t2.txt,1,B
+dang,1,t2.txt,1,B
+drang,1,t2.txt,2,B
+ba'i,1,t2.txt,1,B
+tshul,1,t2.txt,1,B
+sems,1,t2.txt,1,B
+khong,1,t2.txt,1,B
+pa dang,2,t2.txt,1,B
+dang drang,2,t2.txt,1,B
+drang ba'i,2,t2.txt,1,B
+ba'i tshul,2,t2.txt,1,B
+tshul sems,2,t2.txt,1,B
+pa dang drang,3,t2.txt,1,B
+drang ba'i tshul,3,t2.txt,1,B
+ba'i tshul sems,3,t2.txt,1,B
+drang ba'i tshul sems,4,t2.txt,1,B

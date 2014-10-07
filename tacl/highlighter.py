@@ -1,19 +1,20 @@
 """Module containing the Highlighter class."""
 
+import logging
 import re
 
 from lxml import etree
 import pandas as pd
 
 from . import constants
-from .tokenizer import Tokenizer
 
 
 class Highlighter:
 
-    def __init__ (self, corpus):
+    def __init__ (self, corpus, tokenizer):
+        self._logger = logging.getLogger(__name__)
         self._corpus = corpus
-        self._tokenizer = Tokenizer(constants.TOKENIZER_PATTERN)
+        self._tokenizer = tokenizer
 
     def _annotate_tokens (self, match_obj):
         match = match_obj.group(0)
@@ -30,7 +31,7 @@ class Highlighter:
                 if ' {} '.format(self._match_source) not in texts:
                     new_value = '{}{} '.format(texts, self._match_source)
                     span.set('data-texts', new_value)
-        return etree.tostring(root, encoding='utf-8').decode('utf-8')[5:-6]
+        return etree.tostring(root, encoding='unicode')[5:-6]
 
     def generate_base (self, matches, filename, all=True):
         """Returns an XML document containing the text of `filename`
@@ -46,8 +47,8 @@ class Highlighter:
         :rtype: `lxml.etree._Element`
 
         """
-        # This method creates the base XML highlight document for
-        # `matches`.
+        self._logger.debug('Generating the base XML file for {}'.format(
+            filename))
         self._base_filename = filename
         text = self._corpus.get_text(filename).get_content().strip()
         text = self._prepare_text(text)
@@ -110,8 +111,7 @@ class Highlighter:
             text = re.sub(pattern, self._annotate_tokens, text)
         return text
 
-    @staticmethod
-    def _prepare_text (text):
+    def _prepare_text (self, text):
         """Returns `text` with each consituent token wrapped in HTML markup
         for later match annotation.
 
@@ -124,6 +124,6 @@ class Highlighter:
         # which cause problems when escaped, since they become
         # tokens).
         text = re.sub(r'[<>&]', '', text)
-        pattern = r'({})'.format(constants.TOKENIZER_PATTERN)
+        pattern = r'({})'.format(self._tokenizer.pattern)
         replacement = r'<span data-count="0" data-texts=" ">\1</span>'
         return re.sub(pattern, replacement, text)
