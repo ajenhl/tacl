@@ -32,25 +32,27 @@ SCORE_THRESHOLD = 0.75
 # CSV field names.
 COUNT_FIELDNAME = 'count'
 COUNT_TOKENS_FIELDNAME = 'matching tokens'
-FILENAME_FIELDNAME = 'filename'
 LABEL_FIELDNAME = 'label'
+NAME_FIELDNAME = 'text name'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
 PERCENTAGE_FIELDNAME = 'percentage'
+SIGLUM_FIELDNAME = 'siglum'
 SIZE_FIELDNAME = 'size'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
 TOTAL_TOKENS_FIELDNAME = 'total tokens'
 UNIQUE_NGRAMS_FIELDNAME = 'unique ngrams'
 
-QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, FILENAME_FIELDNAME,
-                    COUNT_FIELDNAME, LABEL_FIELDNAME]
-COUNTS_FIELDNAMES = [FILENAME_FIELDNAME, SIZE_FIELDNAME,
+QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, NAME_FIELDNAME,
+                    SIGLUM_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME]
+COUNTS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
-SEARCH_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME, NGRAMS_FIELDNAME]
-STATISTICS_FIELDNAMES = [FILENAME_FIELDNAME, COUNT_TOKENS_FIELDNAME,
-                         TOTAL_TOKENS_FIELDNAME, PERCENTAGE_FIELDNAME,
-                         LABEL_FIELDNAME]
+SEARCH_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
+                     LABEL_FIELDNAME, NGRAMS_FIELDNAME]
+STATISTICS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME,
+                         COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
+                         PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
 
 # Command-line documentation strings.
 ENCODING_EPILOG = '''\
@@ -104,7 +106,8 @@ DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
-HIGHLIGHT_BASE_HELP = 'Filename of text to display.'
+HIGHLIGHT_BASE_NAME_HELP = 'Name of text to display.'
+HIGHLIGHT_BASE_SIGLUM_HELP = 'Siglum of text to display.'
 HIGHLIGHT_DESCRIPTION = '''\
     Output an HTML document showing a text with its matches visually
     highlighted.'''
@@ -239,10 +242,12 @@ CREATE_INDEX_TEXTNGRAM_SQL = 'CREATE INDEX IF NOT EXISTS ' \
     'TextNGramIndexTextNGram ON TextNGram (text, ngram)'
 CREATE_TABLE_TEXT_SQL = 'CREATE TABLE IF NOT EXISTS Text (' \
     'id INTEGER PRIMARY KEY ASC, ' \
-    'filename TEXT UNIQUE NOT NULL, ' \
+    'name TEXT NOT NULL, ' \
+    'siglum TEXT NOT NULL, ' \
     'checksum TEXT NOT NULL, ' \
     'token_count INTEGER NOT NULL, ' \
-    'label TEXT NOT NULL)'
+    'label TEXT NOT NULL, ' \
+    'UNIQUE (name, siglum))'
 CREATE_TABLE_TEXTNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextNGram (' \
     'text INTEGER NOT NULL REFERENCES Text (id), ' \
     'ngram TEXT NOT NULL, ' \
@@ -261,8 +266,9 @@ INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
     'VALUES (?, ?, ?, ?)'
 INSERT_TEXT_HAS_NGRAM_SQL = 'INSERT INTO TextHasNGram (text, size, count) ' \
     'VALUES (?, ?, ?)'
-INSERT_TEXT_SQL = 'INSERT INTO Text (filename, checksum, token_count, label) ' \
-    'VALUES (?, ?, ?, ?)'
+INSERT_TEXT_SQL = 'INSERT INTO Text ' \
+    '(name, siglum, checksum, token_count, label) ' \
+    'VALUES (?, ?, ?, ?, ?)'
 INSERT_TEMPORARY_NGRAM_SQL = 'INSERT INTO temp.InputNGram (ngram) VALUES (?)'
 PRAGMA_CACHE_SIZE_SQL = 'PRAGMA cache_size={}'
 PRAGMA_COUNT_CHANGES_SQL = 'PRAGMA count_changes=OFF'
@@ -270,15 +276,15 @@ PRAGMA_FOREIGN_KEYS_SQL = 'PRAGMA foreign_keys=ON'
 PRAGMA_LOCKING_MODE_SQL = 'PRAGMA locking_mode=EXCLUSIVE'
 PRAGMA_SYNCHRONOUS_SQL = 'PRAGMA synchronous=OFF'
 PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
-SELECT_COUNTS_SQL = 'SELECT Text.filename, TextHasNGram.size, ' \
-    'TextHasNGram.count as "unique ngrams", ' \
-    'Text.token_count + 1 - TextHasNGram.size as "total ngrams", ' \
+SELECT_COUNTS_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
+    'TextHasNGram.size, TextHasNGram.count AS "unique ngrams", ' \
+    'Text.token_count + 1 - TextHasNGram.size AS "total ngrams", ' \
     'Text.token_count AS "total tokens", Text.label ' \
     'FROM Text, TextHasNGram ' \
     'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
-    'ORDER BY Text.filename, TextHasNGram.size'
+    'ORDER BY Text.name, TextHasNGram.size'
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.filename, Text.label ' \
+    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
@@ -288,7 +294,7 @@ SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
 SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
-    'Text.filename, Text.label ' \
+    'Text.name AS "text name", Text.siglum, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
@@ -296,7 +302,7 @@ SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
 SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.filename, Text.label ' \
+    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
@@ -306,7 +312,7 @@ SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.filename, Text.label ' \
+    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN ({})'
@@ -315,21 +321,22 @@ SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
 SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.filename, Text.label ' \
+    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'AND TextNGram.ngram IN ({})'
-SELECT_SEARCH_SQL = 'SELECT Text.filename, SUM(TextNGram.count) AS count, ' \
+SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
+    'SUM(TextNGram.count) AS count, ' \
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \
     'FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'GROUP BY TextNGram.text'
 SELECT_TEXT_TOKEN_COUNT_SQL = 'SELECT Text.token_count ' \
-    'FROM Text WHERE Text.filename = ?'
-SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE filename = ?'
-UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE filename = ?'
+    'FROM Text WHERE Text.name = ?'
+SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE name = ? AND siglum = ?'
+UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE name = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
 UPDATE_TEXT_SQL = 'UPDATE Text SET checksum = ?, token_count = ? WHERE id = ?'
 VACUUM_SQL = 'VACUUM'
@@ -338,7 +345,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>{base_filename} with matches from each other text highlighted</title>
+    <title>{base_name} {base_siglum} with matches from each other text highlighted</title>
     <style>
       body {{ margin-left: 4em; color: black; background-color: white; }}
       div.text-list {{ float: right; width: 15em; margin-left: 3em; }}
@@ -347,7 +354,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   </head>
   <body>
-    <h1>{base_filename} with matches from each other text highlighted</h1>
+    <h1>{base_name} {base_siglum} with matches from each other text highlighted</h1>
 
     <div class="text-list">{text_list}</div>
 

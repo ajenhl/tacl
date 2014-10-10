@@ -1,2 +1,2 @@
-1.txt A
-4.txt B
+T1 A
+T4 B

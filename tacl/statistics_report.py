@@ -24,7 +24,7 @@ class StatisticsReport:
         the results.
 
         """
-        counts = self._counts.drop_duplicates(cols=constants.FILENAME_FIELDNAME)
+        counts = self._counts.drop_duplicates(cols=constants.NAME_FIELDNAME)
         del counts[constants.SIZE_FIELDNAME]
         del counts[constants.UNIQUE_NGRAMS_FIELDNAME]
         del counts[constants.TOTAL_NGRAMS_FIELDNAME]
@@ -32,10 +32,10 @@ class StatisticsReport:
             self._matches[constants.COUNT_FIELDNAME] * \
             self._matches[constants.SIZE_FIELDNAME]
         matching_tokens = pd.DataFrame(self._matches.groupby(
-            constants.FILENAME_FIELDNAME)[
+            constants.NAME_FIELDNAME)[
                 constants.COUNT_TOKENS_FIELDNAME].sum())
         self._stats = pd.merge(counts, matching_tokens, how='outer',
-                               left_on=constants.FILENAME_FIELDNAME,
+                               left_on=constants.NAME_FIELDNAME,
                                right_index=True)
         self._stats = self._stats.fillna(0)
         self._stats[constants.PERCENTAGE_FIELDNAME] = \

@@ -91,11 +91,12 @@ class DataStore:
 
         """
         filename = text.get_filename()
+        name, siglum = text.get_names()
         self._logger.info('Adding record for text {}'.format(filename))
         checksum = text.get_checksum()
         token_count = len(text.get_tokens())
         cursor = self._conn.execute(constants.INSERT_TEXT_SQL,
-                                    [filename, checksum, token_count, ''])
+                                    [name, siglum, checksum, token_count, ''])
         self._conn.commit()
         return cursor.lastrowid
 
@@ -316,14 +317,15 @@ class DataStore:
         :rtype: `int`
 
         """
-        filename = text.get_filename()
+        name, siglum = text.get_names()
         text_record = self._conn.execute(constants.SELECT_TEXT_SQL,
-                                         [filename]).fetchone()
+                                         [name, siglum]).fetchone()
         if text_record is None:
             text_id = self._add_text_record(text)
         else:
             text_id = text_record['id']
             if text_record['checksum'] != text.get_checksum():
+                filename = text.get_filename()
                 self._logger.info('Text {} has changed since it was added to '
                                   'the database'.format(filename))
                 self._update_text_record(text, text_id)
@@ -470,10 +472,10 @@ class DataStore:
         """
         self._conn.execute(constants.UPDATE_LABELS_SQL, [''])
         labels = {}
-        for filename, label in catalogue.items():
-            self._conn.execute(constants.UPDATE_LABEL_SQL, [label, filename])
+        for name, label in catalogue.items():
+            self._conn.execute(constants.UPDATE_LABEL_SQL, [label, name])
             cursor = self._conn.execute(constants.SELECT_TEXT_TOKEN_COUNT_SQL,
-                                        [filename])
+                                        [name])
             token_count = cursor.fetchone()['token_count']
             labels[label] = labels.get(label, 0) + token_count
         self._conn.commit()
@@ -522,21 +524,25 @@ class DataStore:
 
         """
         is_valid = True
-        for filename in catalogue:
-            try:
-                checksum = corpus.get_text(filename).get_checksum()
-            except FileNotFoundError:
-                self._logger.error('Catalogue references {} that does not '
-                                   'exist in the corpus'.format(filename))
-                raise
-            row = self._conn.execute(constants.SELECT_TEXT_SQL,
-                                     [filename]).fetchone()
-            if row is None:
-                is_valid = False
-                self._logger.warn('No record (or n-grams) exists for {} in '
-                                     'the database'.format(filename))
-            elif row['checksum'] != checksum:
-                is_valid = False
-                self._logger.warn('{} has changed since its n-grams were '
-                                     'added to the database'.format(filename))
+        for name in catalogue:
+            count = 0
+            for text in corpus.get_texts(name):
+                count += 1
+                name, siglum = text.get_names()
+                filename = text.get_filename()
+                #except FileNotFoundError:
+                row = self._conn.execute(constants.SELECT_TEXT_SQL,
+                                         [name, siglum]).fetchone()
+                if row is None:
+                    is_valid = False
+                    self._logger.warn('No record (or n-grams) exists for {} in '
+                                      'the database'.format(filename))
+                elif row['checksum'] != text.get_checksum():
+                    is_valid = False
+                    self._logger.warn('{} has changed since its n-grams were '
+                                      'added to the database'.format(filename))
+            if count == 0:
+                self._logger.error('Catalogue references text {} that does not '
+                                   'exist in the corpus'.format(name))
+                raise FileNotFoundError
         return is_valid

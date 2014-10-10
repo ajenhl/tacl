@@ -1,7 +1,7 @@
-ngram,size,filename,count,label
-thos pa dus gcig na,5,2.txt,1,B
-phung po'i,2,1.txt,1,A
-rgyal po'i khab,3,1.txt,1,A
-thos pa dus gcig na,5,1.txt,1,A
-rgyal po'i khab,3,3.txt,1,B
-phung po'i,2,3.txt,1,B
+ngram,size,text name,siglum,count,label
+thos pa dus gcig na,5,t2,base,1,B
+phung po'i,2,t1,base,1,A
+rgyal po'i khab,3,t1,base,1,A
+thos pa dus gcig na,5,t1,base,1,A
+rgyal po'i khab,3,t3,base,1,B
+phung po'i,2,t3,base,1,B

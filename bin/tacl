@@ -189,8 +189,10 @@ def generate_highlight_subparser (subparsers):
                         metavar='CORPUS')
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
                         metavar='RESULTS')
-    parser.add_argument('base', help=constants.HIGHLIGHT_BASE_HELP,
-                        metavar='BASE_FILENAME')
+    parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
+                        metavar='BASE_NAME')
+    parser.add_argument('base_siglum', metavar='BASE_SIGLUM',
+                        help=constants.HIGHLIGHT_BASE_SIGLUM_HELP)
 
 def generate_intersect_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to make an
@@ -377,7 +379,7 @@ def highlight_text (args):
     tokenizer = get_tokenizer(args)
     corpus = get_corpus(args)
     highlighter = tacl.Highlighter(corpus, tokenizer)
-    text = highlighter.highlight(args.results, args.base)
+    text = highlighter.highlight(args.results, args.base_name, args.base_siglum)
     print(text)
 
 def ngram_counts (args):

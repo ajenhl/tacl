@@ -14,19 +14,29 @@ class TextTestCase (TaclTestCase):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_assemble_filename (self):
+        actual_filename = tacl.Text.assemble_filename('T1', 'base')
+        expected_filename = 'T1/base.txt'
+        self.assertEqual(actual_filename, expected_filename)
+
     def test_get_checksum (self):
         content = '阿闍世[(禾*尤)/上/日]首佛足。敬\n強耶。又'
-        text = tacl.Text('test.txt', content, self._tokenizer)
+        text = tacl.Text('test', 'base', content, self._tokenizer)
         actual_checksum = text.get_checksum()
         expected_checksum = 'a94e3a20bc95a93710487611e65484d1'
         self.assertEqual(actual_checksum, expected_checksum)
 
     def test_get_filename (self):
-        filename = 'test.txt'
-        text = tacl.Text(filename, 'test content', self._tokenizer)
+        text = tacl.Text('test', 'base', 'test content', self._tokenizer)
         actual_filename = text.get_filename()
-        expected_filename = filename
+        expected_filename = 'test/base.txt'
         self.assertEqual(actual_filename, expected_filename)
+
+    def test_get_names (self):
+        text = tacl.Text('T1', 'base', 'test content', self._tokenizer)
+        actual_names = text.get_names()
+        expected_names = ('T1', 'base')
+        self.assertEqual(actual_names, expected_names)
 
     def test_get_ngrams (self):
         # Being a static method, a mock of tacl.Text.ngrams using
@@ -37,7 +47,7 @@ class TextTestCase (TaclTestCase):
         get_tokens = self._create_patch('tacl.Text.get_tokens')
         get_tokens.return_value = sentinel.tokens
         collection = collections.Counter(sample_ngrams)
-        text = tacl.Text('test.txt', 'test content', self._tokenizer)
+        text = tacl.Text('test', 'base', 'test content', self._tokenizer)
         actual_ngrams = list(text.get_ngrams(2, 3))
         expected_ngrams = [(2, collection), (3, collection)]
         get_tokens.assert_called_once_with(text)
@@ -48,14 +58,14 @@ class TextTestCase (TaclTestCase):
     def test_get_tokens (self):
         content = '阿闍世[(禾*尤)/上/日]首佛足。敬\n強耶。又'
         self._tokenizer.tokenize = MagicMock(return_value=sentinel.tokens)
-        text = tacl.Text('test.txt', content, self._tokenizer)
+        text = tacl.Text('test', 'base', content, self._tokenizer)
         actual_tokens = text.get_tokens()
         self._tokenizer.tokenize.assert_called_once_with(content)
         self.assertEqual(actual_tokens, sentinel.tokens)
 
     def test_ngrams_cbeta (self):
         content = ''
-        text = tacl.Text('test.txt', content, self._tokenizer)
+        text = tacl.Text('test', 'base', content, self._tokenizer)
         tokens = ['阿', '闍', '世', '[(禾*尤)\n/上/日]', '首', '佛', '足',
                   '敬', '強', '耶', '又']
         expected_ngrams = [
@@ -70,7 +80,7 @@ class TextTestCase (TaclTestCase):
         content = ''
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)
-        text = tacl.Text('test.txt', content, tokenizer)
+        text = tacl.Text('test', 'base', content, tokenizer)
         tokens = ["dpa'", "sems", "dpa'", "chen", "po", "rnam", "par", "mi"]
         expected_ngrams = [
             "dpa' sems dpa'", "sems dpa' chen", "dpa' chen po", "chen po rnam",

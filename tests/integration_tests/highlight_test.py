@@ -20,8 +20,9 @@ class HighlightIntegrationTestCase (TaclTestCase):
     def test_highlight (self):
         corpus = os.path.join(self._data_dir, 'stripped')
         results = os.path.join(self._data_dir, 'results.csv')
-        command = 'tacl highlight -t {} {} {} {}'.format(
-            tacl.constants.TOKENIZER_CHOICE_PAGEL, corpus, results, '1.txt')
+        command = 'tacl highlight -t {} {} {} {} {}'.format(
+            tacl.constants.TOKENIZER_CHOICE_PAGEL, corpus, results, 't1',
+            'base')
         actual_output = subprocess.check_output(shlex.split(command))
         expected_output = open(os.path.join(self._data_dir, 'highlight.html'),
                                'r').read()
