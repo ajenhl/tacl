@@ -111,11 +111,24 @@ class StripTestCase (unittest.TestCase):
             self.transform(etree.XML(input_xml),
                            witness="'{}'".format(tacl.stripper.BASE_WITNESS)))
         self.assertEqual(expected_output, actual_output)
-        # With a witness name provided.
+        # With a witness name provided that occurs in a rdg.
         expected_output = '''
 在直樹林故名釋懿'''
         actual_output = str(self.transform(etree.XML(input_xml),
                                            witness="'明'"))
+        self.assertEqual(expected_output, actual_output)
+        # With a witness name provided that occurs in the lem.
+        expected_output = '''
+釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
+        actual_output = str(self.transform(etree.XML(input_xml),
+                                           witness="'大'"))
+        self.assertEqual(expected_output, actual_output)
+        # A particular witness may not be listed either in the lem or
+        # a rdg, in which case the lem must be used.
+        expected_output = '''
+釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
+        actual_output = str(self.transform(etree.XML(input_xml),
+                                           witness="'元'"))
         self.assertEqual(expected_output, actual_output)
 
 

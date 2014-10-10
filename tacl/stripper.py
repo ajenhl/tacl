@@ -48,7 +48,8 @@ STRIP_XSLT = '''
   </xsl:template>
 
   <xsl:template match="lem">
-    <xsl:if test="$witness = '{base}' or contains(@wit, $full_witness)">
+    <xsl:if test="$witness = '{base}' or contains(@wit, $full_witness) or
+                  not(../rdg[contains(@wit, $full_witness)])">
       <xsl:apply-templates />
     </xsl:if>
   </xsl:template>
