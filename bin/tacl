@@ -438,7 +438,7 @@ def strip_texts (args):
     stripper.strip_files()
 
 
-class ParagraphFormatter (argparse.HelpFormatter):
+class ParagraphFormatter (argparse.ArgumentDefaultsHelpFormatter):
 
     """argparse formatter to maintain paragraph breaks in text, while
     wrapping those blocks.

@@ -60,7 +60,8 @@ def _copy_options (args):
 
 def generate_parser ():
     parser = argparse.ArgumentParser(
-        description=constants.TACL_HELPER_DESCRIPTION)
+        description=constants.TACL_HELPER_DESCRIPTION,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
     generate_text_against_corpus_subparser(subparsers)
     generate_text_in_corpus_subparser(subparsers)
@@ -70,7 +71,8 @@ def generate_text_against_corpus_subparser (subparsers):
     parser = subparsers.add_parser(
         'text-against-corpus',
         description=constants.TACL_HELPER_AGAINST_DESCRIPTION,
-        help=constants.TACL_HELPER_AGAINST_HELP)
+        help=constants.TACL_HELPER_AGAINST_HELP,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.set_defaults(func=text_against_corpus)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -85,7 +87,8 @@ def generate_text_against_corpus_subparser (subparsers):
 def generate_text_in_corpus_subparser (subparsers):
     parser = subparsers.add_parser(
         'text-in-corpus', description=constants.TACL_HELPER_IN_DESCRIPTION,
-        help=constants.TACL_HELPER_IN_HELP)
+        help=constants.TACL_HELPER_IN_HELP,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.set_defaults(func=text_in_corpus)
     add_common_arguments(parser)
     add_db_arguments(parser)
