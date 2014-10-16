@@ -24,13 +24,14 @@ class CorpusIntegrationTestCase (unittest.TestCase):
 
     def test_get_texts (self):
         corpus = tacl.Corpus(self._data_dir, self._tokenizer)
-        expected_texts = [tacl.Text('T1', 'base', 'then we went\n',
-                                    self._tokenizer),
-                          tacl.Text('T2', 'base', 'these he sent\n',
-                                    self._tokenizer),
-                          tacl.Text('T3', 'base', 'that\n', self._tokenizer),
-                          tacl.Text('T4', 'base', 'hense\n', self._tokenizer),
-                          tacl.Text('T5', 'base', 'well\n', self._tokenizer)]
+        expected_texts = [
+            tacl.Text('T1', 'a', 'the we went\n', self._tokenizer),
+            tacl.Text('T1', 'base', 'then we went\n', self._tokenizer),
+            tacl.Text('T2', 'a', 'thews he sent\n', self._tokenizer),
+            tacl.Text('T2', 'base', 'these he sent\n', self._tokenizer),
+            tacl.Text('T3', 'base', 'that\n', self._tokenizer),
+            tacl.Text('T4', 'base', 'hense\n', self._tokenizer),
+            tacl.Text('T5', 'base', 'well\n', self._tokenizer)]
         actual_texts = list(corpus.get_texts())
         actual_texts.sort(key=lambda x: x.get_filename())
         for actual_text, expected_text in zip(actual_texts, expected_texts):

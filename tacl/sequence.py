@@ -79,16 +79,19 @@ class Sequencer:
     def _generate_sequences(self, primary_label, secondary_label, ngrams):
         self._substitutes = {}
         self._char_code = 61440
-        primary_filenames = self._matches[self._matches[constants.LABEL_FIELDNAME] == primary_label][constants.FILENAME_FIELDNAME].unique()
-        secondary_filenames = self._matches[self._matches[constants.LABEL_FIELDNAME] == secondary_label][constants.FILENAME_FIELDNAME].unique()
-        for filename1 in primary_filenames:
-            text1 = self._get_text(filename1)
-            for filename2 in secondary_filenames:
-                text2 = self._get_text(filename2)
-                self._generate_sequences_for_texts(filename1, text1, filename2,
-                                                   text2, ngrams)
+        cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME]
+        primary_texts = self._matches[self._matches[constants.LABEL_FIELDNAME] == primary_label][cols].drop_duplicates()
+        secondary_texts = self._matches[self._matches[constants.LABEL_FIELDNAME] == secondary_label][cols].drop_duplicates()
+        for index, (name1, siglum1) in primary_texts.iterrows():
+            text1 = self._get_text(name1, siglum1)
+            label1 = '{}_{}'.format(name1, siglum1)
+            for index, (name2, siglum2) in secondary_texts.iterrows():
+                text2 = self._get_text(name2, siglum2)
+                label2 = '{}_{}'.format(name2, siglum2)
+                self._generate_sequences_for_texts(label1, text1, label2, text2,
+                                                   ngrams)
 
-    def _generate_sequences_for_texts(self, f1, t1, f2, t2, ngrams):
+    def _generate_sequences_for_texts(self, l1, t1, l2, t2, ngrams):
         self._r_substitutes = dict((v, k) for k, v in self._substitutes.items())
         sequences = []
         covered_spans = [[], []]
@@ -97,17 +100,16 @@ class Sequencer:
             # covered by a sequence, to ensure that they aren't
             # reported more than once.
             sequences.extend(self._generate_sequences_for_ngram(
-                f1, t1, f2, t2, ngram, covered_spans))
+                t1, t2, ngram, covered_spans))
         if sequences:
             html = constants.FILE_SEQUENCES_HTML.format(
-                f1=f1, f2=f2, sequences='\n'.join(sequences))
+                l1=l1, l2=l2, sequences='\n'.join(sequences))
             output_name = os.path.join(self._output_dir,
-                                       '{}-{}.html'.format(f1, f2))
+                                       '{}-{}.html'.format(l1, l2))
             with open(output_name, 'w', encoding='utf-8') as fh:
                 fh.write(html)
 
-    def _generate_sequences_for_ngram (self, f1, t1, f2, t2, ngram,
-                                       covered_spans):
+    def _generate_sequences_for_ngram (self, t1, t2, ngram, covered_spans):
         self._logger.debug('Generating sequences for n-gram "{}"'.format(ngram))
         pattern = re.compile(re.escape(ngram))
         context_length = len(ngram)
@@ -125,11 +127,13 @@ class Sequencer:
                     sequences.append(sequence.render())
         return sequences
 
-    def _get_text (self, filename):
-        """Returns the text of `filename`, with all [] tokens replaced with a
-        single character. Substitutions are recorded in
-        self._substitutes."""
-        tokens = self._corpus.get_text(filename).get_tokens()
+    def _get_text (self, name, siglum):
+        """Returns the text identified by `name` and `siglum`, with all []
+        tokens replaced with a single character. Substitutions are
+        recorded in self._substitutes.
+
+        """
+        tokens = self._corpus.get_text(name, siglum).get_tokens()
         for i, token in enumerate(tokens):
             if len(token) > 1:
                 char = chr(self._char_code)

@@ -240,38 +240,6 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def diff_supplied (self, catalogue, supplied, output_fh):
-        """Returns `output_fh` populated with CSV results giving the
-        difference in n-grams between the labelled sets of texts in
-        `catalogue`, limited to those results present in `supplied`.
-
-        :param catalogue: catalogue matching filenames to labels
-        :type catalogue: `Catalogue`
-        :param supplied: CSV results used to limit query
-        :type supplied: file-like object
-        :param output_fh: object to output results to
-        :type output_fh: file-like object
-        :rtype: file-like object
-
-        """
-        labels = list(self._set_labels(catalogue))
-        supplied_ngrams, supplied_labels = self._process_supplied_results(
-            supplied)
-        labels = [label for label in labels if label not in supplied_labels]
-        label_placeholders = self._get_placeholders(labels)
-        all_labels = labels + supplied_labels
-        all_label_placeholders = self._get_placeholders(all_labels)
-        self._add_temporary_ngrams(supplied_ngrams)
-        query = constants.SELECT_DIFF_SUPPLIED_SQL.format(
-            all_label_placeholders, label_placeholders)
-        parameters = all_labels + labels
-        self._logger.info('Running diff query with supplied results')
-        self._logger.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
-            query, all_labels, labels))
-        self._log_query_plan(query, parameters)
-        cursor = self._conn.execute(query, parameters)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
-
     def _drop_indices (self):
         """Drops the database indices relating to n-grams."""
         self._logger.info('Dropping database indices')
@@ -387,61 +355,12 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def intersection_supplied (self, catalogue, supplied, output_fh):
-        """Returns `output_fh` populated with CSV results giving the
-        intersection in n-grams between the labelled sets of texts in
-        `catalogue`, limited to those results present in `supplied`.
-
-        :param catalogue: catalogue matching filenames to labels
-        :type catalogue: `Catalogue`
-        :param supplied: CSV results used to limit query
-        :type supplied: file-like object
-        :param output_fh: object to output results to
-        :type output_fh: file-like object
-        :rtype: file-like object
-
-        """
-        labels = self._sort_labels(self._set_labels(catalogue))
-        supplied_ngrams, supplied_labels = self._process_supplied_results(
-            supplied)
-        labels = [label for label in labels if label not in supplied_labels]
-        all_labels = labels + supplied_labels
-        all_label_placeholders = self._get_placeholders(all_labels)
-        self._add_temporary_ngrams(supplied_ngrams)
-        subquery = self._get_intersection_subquery(labels)
-        query = constants.SELECT_INTERSECT_SUPPLIED_SQL.format(
-            all_label_placeholders, subquery)
-        parameters = all_labels + labels
-        self._logger.info('Running intersection query with supplied results')
-        self._logger.debug('Query: {}\nLabels: {}\nSub-labels: {}'.format(
-            query, all_labels, labels))
-        self._log_query_plan(query, parameters)
-        cursor = self._conn.execute(query, parameters)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
-
     def _log_query_plan (self, query, parameters):
         cursor = self._conn.execute('EXPLAIN QUERY PLAN ' + query, parameters)
         query_plan = 'Query plan:\n'
         for row in cursor.fetchall():
             query_plan += '|'.join([str(value) for value in row]) + '\n'
         self._logger.debug(query_plan)
-
-    def _process_supplied_results (self, input_csv):
-        """Returns the unique n-grams and labels used in `input_csv`.
-
-        :param input_csv: query results in CSV format
-        :type input_csv: file-like object
-        :rtype: `tuple` of `list` of `str`
-
-        """
-        self._logger.info('Processing supplied results')
-        reader = csv.DictReader(input_csv)
-        ngrams = set()
-        labels = set()
-        for row in reader:
-            ngrams.add(row[constants.NGRAM_FIELDNAME])
-            labels.add(row[constants.LABEL_FIELDNAME])
-        return list(ngrams), list(labels)
 
     def search (self, catalogue, ngrams, output_fh):
         self._set_labels(catalogue)
@@ -526,6 +445,8 @@ class DataStore:
         is_valid = True
         for name in catalogue:
             count = 0
+            # It is unfortunate that this creates Text objects for
+            # each text, since that involves reading the file.
             for text in corpus.get_texts(name):
                 count += 1
                 name, siglum = text.get_names()

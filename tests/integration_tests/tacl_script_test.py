@@ -71,6 +71,23 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'ewe', 3, 1),
             ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'wen', 3, 1),
             ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'ent', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 't', 1, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'h', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'e', 1, 3),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'w', 1, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'n', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'th', 2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'he', 2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'ew', 2, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'we', 2, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'en', 2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'nt', 2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'the', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'hew', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'ewe', 3, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'wew', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'wen', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'ent', 3, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 't', 1, 2),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'h', 1, 2),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'e', 1, 4),
@@ -90,6 +107,30 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'ehe', 3, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'sen', 3, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'ent', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 't', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'h', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'e', 1, 3),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'w', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 's', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'n', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'th', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'he', 2, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ew', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ws', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'sh', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'es', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'se', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'en', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'nt', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'the', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'hew', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ews', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'wsh', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'she', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'hes', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ese', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'sen', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ent', 3, 1),
             ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 't', 1, 2),
             ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'h', 1, 1),
             ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'a', 1, 1),
@@ -124,7 +165,9 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             'WHERE Text.id = TextHasNGram.text').fetchall()
         expected_rows = [
             ('T1', 'base', 1), ('T1', 'base', 2), ('T1', 'base', 3),
+            ('T1', 'a', 1), ('T1', 'a', 2), ('T1', 'a', 3),
             ('T2', 'base', 1), ('T2', 'base', 2), ('T2', 'base', 3),
+            ('T2', 'a', 1), ('T2', 'a', 2), ('T2', 'a', 3),
             ('T3', 'base', 1), ('T3', 'base', 2), ('T3', 'base', 3),
             ('T4', 'base', 1), ('T4', 'base', 2), ('T4', 'base', 3),
             ('T5', 'base', 1), ('T5', 'base', 2), ('T5', 'base', 3),
@@ -154,6 +197,14 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
              'we went', 2, 1),
             ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '',
              'then we went', 3, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'the', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'we', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'went', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'the we', 2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'we went',
+             2, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'the we went',
+             3, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '',
              'these', 1, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '',
@@ -166,6 +217,15 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
              'he sent', 2, 1),
             ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '',
              'these he sent', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'thews', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'he', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'sent', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'thews he',
+             2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'he sent',
+             2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'thews he sent',
+             3, 1),
             ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '',
              'that', 1, 1),
             ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '',
@@ -185,9 +245,15 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T1', 'base', '1', '5', '10', '10', 'A'),
             ('T1', 'base', '2', '7', '9', '10', 'A'),
             ('T1', 'base', '3', '8', '8', '10', 'A'),
+            ('T1', 'a', '1', '5', '9', '9', 'A'),
+            ('T1', 'a', '2', '6', '8', '9', 'A'),
+            ('T1', 'a', '3', '6', '7', '9', 'A'),
             ('T2', 'base', '1', '5', '11', '11', 'B'),
             ('T2', 'base', '2', '7', '10', '11', 'B'),
             ('T2', 'base', '3', '7', '9', '11', 'B'),
+            ('T2', 'a', '1', '6', '11', '11', 'B'),
+            ('T2', 'a', '2', '9', '10', '11', 'B'),
+            ('T2', 'a', '3', '9', '9', '11', 'B'),
             ('T3', 'base', '1', '3', '4', '4', 'C'),
             ('T3', 'base', '2', '3', '3', '4', 'C'),
             ('T3', 'base', '3', '2', '2', '4', 'C'),
@@ -203,17 +269,20 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         data = subprocess.check_output(shlex.split(diff_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_rows = [
-            ('w', '1', 'T1', 'base', '2', 'A'),
-            ('w', '1', 'T5', 'base', '1', 'A'),
             ('s', '1', 'T2', 'base', '2', 'B'),
+            ('s', '1', 'T2', 'a', '2', 'B'),
             ('a', '1', 'T3', 'base', '1', 'C'),
             ('l', '1', 'T5', 'base', '2', 'A'),
             ('nw', '2', 'T1', 'base', '1', 'A'),
             ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
             ('we', '2', 'T5', 'base', '1', 'A'),
-            ('ew', '2', 'T1', 'base', '1', 'A'),
             ('es', '2', 'T2', 'base', '2', 'B'),
+            ('es', '2', 'T2', 'a', '1', 'B'),
             ('se', '2', 'T2', 'base', '2', 'B'),
+            ('se', '2', 'T2', 'a', '1', 'B'),
+            ('ws', '2', 'T2', 'a', '1', 'B'),
+            ('sh', '2', 'T2', 'a', '1', 'B'),
             ('eh', '2', 'T2', 'base', '1', 'B'),
             ('ha', '2', 'T3', 'base', '1', 'C'),
             ('at', '2', 'T3', 'base', '1', 'C'),
@@ -223,13 +292,22 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('enw', '3', 'T1', 'base', '1', 'A'),
             ('nwe', '3', 'T1', 'base', '1', 'A'),
             ('wew', '3', 'T1', 'base', '1', 'A'),
+            ('wew', '3', 'T1', 'a', '1', 'A'),
             ('ewe', '3', 'T1', 'base', '1', 'A'),
+            ('ewe', '3', 'T1', 'a', '2', 'A'),
             ('wen', '3', 'T1', 'base', '1', 'A'),
+            ('wen', '3', 'T1', 'a', '1', 'A'),
             ('hes', '3', 'T2', 'base', '2', 'B'),
+            ('hes', '3', 'T2', 'a', '1', 'B'),
             ('ese', '3', 'T2', 'base', '2', 'B'),
+            ('ese', '3', 'T2', 'a', '1', 'B'),
+            ('ews', '3', 'T2', 'a', '1', 'B'),
             ('seh', '3', 'T2', 'base', '1', 'B'),
+            ('wsh', '3', 'T2', 'a', '1', 'B'),
             ('ehe', '3', 'T2', 'base', '1', 'B'),
+            ('she', '3', 'T2', 'a', '1', 'B'),
             ('sen', '3', 'T2', 'base', '1', 'B'),
+            ('sen', '3', 'T2', 'a', '1', 'B'),
             ('tha', '3', 'T3', 'base', '1', 'C'),
             ('hat', '3', 'T3', 'base', '1', 'C'),
             ('wel', '3', 'T5', 'base', '1', 'A'),
@@ -243,46 +321,24 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         data = subprocess.check_output(shlex.split(diff_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_rows = [
-            ('w', '1', 'T1', 'base', '2', 'A'),
-            ('w', '1', 'T5', 'base', '1', 'A'),
             ('l', '1', 'T5', 'base', '2', 'A'),
             ('nw', '2', 'T1', 'base', '1', 'A'),
             ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
             ('we', '2', 'T5', 'base', '1', 'A'),
-            ('ew', '2', 'T1', 'base', '1', 'A'),
             ('el', '2', 'T5', 'base', '1', 'A'),
             ('ll', '2', 'T5', 'base', '1', 'A'),
             ('hen', '3', 'T1', 'base', '1', 'A'),
             ('enw', '3', 'T1', 'base', '1', 'A'),
             ('nwe', '3', 'T1', 'base', '1', 'A'),
             ('wew', '3', 'T1', 'base', '1', 'A'),
+            ('wew', '3', 'T1', 'a', '1', 'A'),
             ('ewe', '3', 'T1', 'base', '1', 'A'),
+            ('ewe', '3', 'T1', 'a', '2', 'A'),
             ('wen', '3', 'T1', 'base', '1', 'A'),
+            ('wen', '3', 'T1', 'a', '1', 'A'),
             ('wel', '3', 'T5', 'base', '1', 'A'),
             ('ell', '3', 'T5', 'base', '1', 'A')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_diff_supplied (self):
-        subprocess.call(self._ngrams_command_args)
-        input_path = os.path.join(self._data_dir, 'diff_supplied.csv')
-        diff_command = 'tacl diff -i {} {} {} {}'.format(
-            input_path, self._db_path, self._corpus_dir, self._catalogue_path)
-        data = subprocess.check_output(shlex.split(diff_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
-        expected_rows = [
-            ('e', '1', 'T1', 'base', '3', 'A'),
-            ('e', '1', 'T2', 'base', '4', 'B'),
-            ('e', '1', 'T5', 'base', '1', 'A'),
-            ('n', '1', 'T1', 'base', '2', 'A'),
-            ('n', '1', 'T2', 'base', '1', 'B'),
-            ('he', '2', 'T1', 'base', '1', 'A'),
-            ('he', '2', 'T2', 'base', '2', 'B'),
-            ('en', '2', 'T1', 'base', '2', 'A'),
-            ('en', '2', 'T2', 'base', '1', 'B'),
-            ('the', '3', 'T1', 'base', '1', 'A'),
-            ('the', '3', 'T2', 'base', '1', 'B'),
-            ('ent', '3', 'T1', 'base', '1', 'A'),
-            ('ent', '3', 'T2', 'base', '1', 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_intersection (self):
@@ -293,39 +349,20 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('t', '1', 'T1', 'base', '2', 'A'),
+            ('t', '1', 'T1', 'a', '2', 'A'),
             ('t', '1', 'T2', 'base', '2', 'B'),
+            ('t', '1', 'T2', 'a', '2', 'B'),
             ('t', '1', 'T3', 'base', '2', 'C'),
             ('h', '1', 'T1', 'base', '1', 'A'),
+            ('h', '1', 'T1', 'a', '1', 'A'),
             ('h', '1', 'T2', 'base', '2', 'B'),
+            ('h', '1', 'T2', 'a', '2', 'B'),
             ('h', '1', 'T3', 'base', '1', 'C'),
             ('th', '2', 'T1', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'a', '1', 'A'),
             ('th', '2', 'T2', 'base', '1', 'B'),
+            ('th', '2', 'T2', 'a', '1', 'B'),
             ('th', '2', 'T3', 'base', '1', 'C')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_intersection_supplied (self):
-        subprocess.call(self._ngrams_command_args)
-        input_path = os.path.join(self._data_dir, 'intersection_supplied.csv')
-        intersect_command = 'tacl intersect -i {} {} {} {}'.format(
-            input_path, self._db_path, self._corpus_dir, self._catalogue_path)
-        data = subprocess.check_output(shlex.split(intersect_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
-        expected_rows = [
-            ('e', '1', 'T1', 'base', '3', 'A'),
-            ('e', '1', 'T2', 'base', '4', 'B'),
-            ('e', '1', 'T5', 'base', '1', 'A'),
-            ('n', '1', 'T1', 'base', '2', 'A'),
-            ('n', '1', 'T2', 'base', '1', 'B'),
-            ('he', '2', 'T1', 'base', '1', 'A'),
-            ('he', '2', 'T2', 'base', '2', 'B'),
-            ('en', '2', 'T1', 'base', '2', 'A'),
-            ('en', '2', 'T2', 'base', '1', 'B'),
-            ('nt', '2', 'T1', 'base', '1', 'A'),
-            ('nt', '2', 'T2', 'base', '1', 'B'),
-            ('the', '3', 'T1', 'base', '1', 'A'),
-            ('the', '3', 'T2', 'base', '1', 'B'),
-            ('ent', '3', 'T1', 'base', '1', 'A'),
-            ('ent', '3', 'T2', 'base', '1', 'B')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_search (self):
@@ -340,7 +377,9 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # in its current form.
         expected_rows = [
             ('T1', 'base', '1', '', 'he'),
+            ('T1', 'a', '1', '', 'he'),
             ('T2', 'base', '4', '', 'ese, he'),
+            ('T2', 'a', '3', '', 'ese, he'),
             ('T4', 'base', '1', '', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
@@ -357,7 +396,9 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # in its current form.
         expected_rows = [
             ('T1', 'base', '1', 'A', 'he'),
+            ('T1', 'a', '1', 'A', 'he'),
             ('T2', 'base', '4', '', 'ese, he'),
+            ('T2', 'a', '3', '', 'ese, he'),
             ('T4', 'base', '1', 'B', 'he')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 

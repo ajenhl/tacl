@@ -242,45 +242,6 @@ class DataStoreTestCase (TaclTestCase):
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
 
-    def test_diff_supplied (self):
-        labels = {sentinel.label1: 1, sentinel.label2: 2}
-        supplied_labels = [sentinel.label2]
-        trimmed_labels = [sentinel.label1]
-        all_labels = trimmed_labels + supplied_labels
-        set_labels = self._create_patch('tacl.DataStore._set_labels')
-        set_labels.return_value = labels
-        get_placeholders = self._create_patch(
-            'tacl.DataStore._get_placeholders', False)
-        get_placeholders.return_value = sentinel.placeholders
-        process_supplied = self._create_patch(
-            'tacl.DataStore._process_supplied_results', False)
-        process_supplied.return_value = [sentinel.supplied_ngrams,
-                                         supplied_labels]
-        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
-                                            False)
-        add_ngrams = self._create_patch('tacl.DataStore._add_temporary_ngrams')
-        input_fh = MagicMock(name='fh')
-        csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = input_fh
-        catalogue = MagicMock(name='catalogue')
-        store = tacl.DataStore(':memory:')
-        store._conn = MagicMock(spec_set=sqlite3.Connection)
-        cursor = store._conn.execute.return_value
-        output_fh = store.diff_supplied(catalogue, sentinel.supplied, input_fh)
-        set_labels.assert_called_once_with(store, catalogue)
-        process_supplied.assert_called_once_with(sentinel.supplied)
-        log_query_plan.assert_called_once()
-        self.assertEqual(get_placeholders.mock_calls,
-                         [call(trimmed_labels), call(all_labels)])
-        add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
-        sql = tacl.constants.SELECT_DIFF_SUPPLIED_SQL.format(
-            sentinel.placeholders, sentinel.placeholders)
-        self.assertEqual(store._conn.mock_calls,
-                         [call.execute(sql, all_labels + trimmed_labels)])
-        csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
-                                    input_fh)
-        self.assertEqual(input_fh, output_fh)
-
     def test_drop_indices (self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
@@ -417,59 +378,6 @@ class DataStoreTestCase (TaclTestCase):
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
-
-    def test_intersection_supplied (self):
-        labels = [sentinel.label1, sentinel.label2, sentinel.label3]
-        supplied_labels = [sentinel.label2]
-        trimmed_labels = [sentinel.label1, sentinel.label3]
-        all_labels = trimmed_labels + supplied_labels
-        set_labels = self._create_patch('tacl.DataStore._set_labels')
-        set_labels.return_value = {}
-        sort_labels = self._create_patch('tacl.DataStore._sort_labels', False)
-        sort_labels.return_value = labels
-        get_placeholders = self._create_patch(
-            'tacl.DataStore._get_placeholders', False)
-        get_placeholders.return_value = sentinel.placeholders
-        process_supplied = self._create_patch(
-            'tacl.DataStore._process_supplied_results', False)
-        process_supplied.return_value = [sentinel.supplied_ngrams,
-                                         supplied_labels]
-        add_ngrams = self._create_patch('tacl.DataStore._add_temporary_ngrams')
-        log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
-                                            False)
-        input_fh = MagicMock(name='fh')
-        csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = input_fh
-        catalogue = MagicMock(name='catalogue')
-        store = tacl.DataStore(':memory:')
-        store._conn = MagicMock(spec_set=sqlite3.Connection)
-        cursor = store._conn.execute.return_value
-        output_fh = store.intersection_supplied(catalogue, sentinel.supplied,
-                                                input_fh)
-        set_labels.assert_called_once_with(store, catalogue)
-        process_supplied.assert_called_once_with(sentinel.supplied)
-        get_placeholders.assert_called_once_with(all_labels)
-        add_ngrams.assert_called_once_with(store, sentinel.supplied_ngrams)
-        log_query_plan.assert_called_once()
-        sql = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, Text.name AS "text name", Text.siglum, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
-        self.assertEqual(store._conn.mock_calls,
-                         [call.execute(sql, all_labels + trimmed_labels)])
-        csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
-                                    input_fh)
-        self.assertEqual(input_fh, output_fh)
-
-    def test_process_supplied_results (self):
-        input_data = [('th', 2, 'text1', 'base', 1, 'A'),
-                      ('th', 2, 'text2', 'base', 1, 'B'),
-                      ('th', 2, 'text3', 'base', 1, 'C'),
-                      ('he', 2, 'text1', 'base', 1, 'A'),
-                      ('he', 2, 'text2', 'base', 2, 'B')]
-        input_csv = self._create_csv(input_data)
-        expected_output = (set(['th', 'he']), set(['A', 'B', 'C']))
-        store = tacl.DataStore(':memory:')
-        actual_output = store._process_supplied_results(input_csv)
-        self.assertEqual((set(actual_output[0]), set(actual_output[1])),
-                          expected_output)
 
     def test_set_labels (self):
         catalogue = collections.OrderedDict(

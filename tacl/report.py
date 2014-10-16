@@ -267,6 +267,10 @@ class Report:
         number of texts in the range specified by `minimum` and
         `maximum`.
 
+        Text here encompasses all witnesses, so that the same n-gram
+        appearing in multiple witnesses of the same text are counted
+        as a single text.
+
         :param minimum: minimum number of texts
         :type minimum: `int`
         :param maximum: maximum number of texts
@@ -276,7 +280,7 @@ class Report:
         self._logger.info('Pruning results by text count')
         count_fieldname = 'tmp_count'
         counts = pd.DataFrame(self._matches.groupby(
-            constants.NGRAM_FIELDNAME)[constants.NAME_FIELDNAME].count())
+            constants.NGRAM_FIELDNAME)[constants.NAME_FIELDNAME].nunique())
         counts.rename(columns={constants.NAME_FIELDNAME: count_fieldname},
                       inplace=True)
         if minimum:
@@ -378,5 +382,5 @@ class Report:
         self._matches.sort_index(
             by=[constants.SIZE_FIELDNAME, constants.NGRAM_FIELDNAME,
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
-                constants.NAME_FIELDNAME],
-            ascending=[False, True, False, True, True], inplace=True)
+                constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME],
+            ascending=[False, True, False, True, True, True], inplace=True)

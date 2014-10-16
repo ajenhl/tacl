@@ -102,7 +102,9 @@ DB_TOKENIZER_HELP = '''\
     of word characters plus some punctuation used to transliterate
     characters).'''
 
-DIFF_DESCRIPTION = 'List n-grams unique to each sub-corpus.'
+DIFF_DESCRIPTION = '''\
+    List n-grams unique to each sub-corpus (as defined by the labels
+    in the specified catalogue file).'''
 DIFF_EPILOG = ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
@@ -118,10 +120,9 @@ HIGHLIGHT_EPILOG = '''\
     restricted by using the tacl report command.'''
 HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
 
-INPUT_RESULTS_HELP = '''\
-    Path to results file to restrict query to.'''
-
-INTERSECT_DESCRIPTION = 'List n-grams common to all sub-corpora.'
+INTERSECT_DESCRIPTION = '''\
+    List n-grams common to all sub-corpora (as defined by the labels
+    in the specified catalogue file).'''
 INTERSECT_EPILOG = ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
@@ -155,9 +156,8 @@ REPORT_EPILOG = '''\
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
-        tacl report --recriprocal results.csv | tacl report --reduce -
-
-    {}'''.format(ENCODING_EPILOG)
+        tacl report --recriprocal results.csv | tacl report --reduce -\n\n''' \
+            + ENCODING_EPILOG
 REPORT_HELP = 'Modify a query results file.'
 REPORT_MINIMUM_COUNT_HELP = 'Minimum total count of n-gram to include.'
 REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count of n-gram to include.'
@@ -301,14 +301,6 @@ SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
-SELECT_DIFF_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
-    'AND NOT EXISTS (' \
-    'SELECT tn.ngram FROM Text t, TextNGram tn ' \
-    'WHERE t.id = tn.text AND t.label IN ({}) AND tn.ngram = TextNGram.ngram)'
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
@@ -320,12 +312,6 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
-    'AND TextNGram.ngram IN ({})'
 SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
     'SUM(TextNGram.count) AS count, ' \
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \
