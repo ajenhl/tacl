@@ -31,3 +31,19 @@ pa dang drang,3,t2,base,1,B
 drang ba'i tshul,3,t2,base,1,B
 ba'i tshul sems,3,t2,base,1,B
 drang ba'i tshul sems,4,t2,base,1,B
+pa,1,t2,a,1,B
+dang,1,t2,a,1,B
+drang,1,t2,a,2,B
+ba'i,1,t2,a,2,B
+tshul,1,t2,a,2,B
+sems,1,t2,a,2,B
+khong,1,t2,a,1,B
+pa dang,2,t2,a,1,B
+dang drang,2,t2,a,1,B
+drang ba'i,2,t2,a,1,B
+ba'i tshul,2,t2,a,2,B
+tshul sems,2,t2,a,2,B
+pa dang drang,3,t2,a,1,B
+drang ba'i tshul,3,t2,a,1,B
+ba'i tshul sems,3,t2,a,2,B
+drang ba'i tshul sems,4,t2,a,1,B

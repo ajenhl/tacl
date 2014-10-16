@@ -51,7 +51,7 @@ class Report:
         for index, (text_name, siglum, label) in \
             matches[cols].drop_duplicates().iterrows():
             extended_ngrams = self._generate_extended_ngrams(
-                matches, text_name, corpus, highest_n)
+                matches, text_name, siglum, corpus, highest_n)
             extended_matches = pd.concat(
                 [extended_matches, self._generate_extended_matches(
                     extended_ngrams, highest_n, text_name, siglum, label)])
@@ -115,15 +115,18 @@ class Report:
                 groupby_fields).sum().reset_index()
         return extended_matches
 
-    def _generate_extended_ngrams (self, matches, filename, corpus, highest_n):
+    def _generate_extended_ngrams (self, matches, name, siglum, corpus,
+                                   highest_n):
         """Returns the n-grams of the largest size that exist in `filename`\'s
         text, generated from adding together overlapping n-grams in
         `matches`.
 
         :param matches: n-gram matches
         :type matches: `pandas.DataFrame`
-        :param filename: filename of text whose results are being processed
-        :type filename: `str`
+        :param name: name of text whose results are being processed
+        :type name: `str`
+        :param siglum: siglum of text whose results are being processed
+        :type siglum: `str`
         :param corpus: corpus to which `filename` belongs
         :type corpus: `Corpus`
         :param highest_n: highest degree of n-gram in `matches`
@@ -135,8 +138,8 @@ class Report:
         # processing within the for loop, so optimise even small
         # things, such as aliasing dotted calls here and below.
         t_join = self._tokenizer.joiner.join
-        file_matches = matches[matches[constants.NAME_FIELDNAME] == filename]
-        text = t_join(corpus.get_text(filename, 'base').get_tokens())
+        file_matches = matches[matches[constants.NAME_FIELDNAME] == name]
+        text = t_join(corpus.get_text(name, siglum).get_tokens())
         ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
                   list(file_matches[constants.NGRAM_FIELDNAME])]
         # Go through the list of n-grams, and create a list of
