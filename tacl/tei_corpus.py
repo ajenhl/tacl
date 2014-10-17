@@ -171,6 +171,7 @@ class TEICorpus:
     """
 
     def __init__ (self, input_dir, output_dir):
+        self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
         self._transform = etree.XSLT(etree.XML(SIMPLIFY_XSLT))
@@ -199,7 +200,8 @@ class TEICorpus:
         basename = os.path.splitext(os.path.basename(filename))[0]
         match = text_name_pattern.search(basename)
         if match is None:
-            logging.warn('Found an anomalous filename "{}"'.format(filename))
+            self._logger.warn('Found an anomalous filename "{}"'.format(
+                filename))
             return None, None
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
         return text_name, int(match.group('part'))
@@ -224,8 +226,8 @@ class TEICorpus:
             try:
                 os.makedirs(self._output_dir)
             except OSError as err:
-                logging.error('Could not create output directory: {}'.format(
-                    err))
+                self._logger.error(
+                    'Could not create output directory: {}'.format(err))
                 raise
         # The CBETA texts are organised into directories, and each
         # text may be in multiple numbered parts. Crucially, these
@@ -239,7 +241,7 @@ class TEICorpus:
                 if os.path.splitext(filename)[1] == '.xml':
                     text_name, part_number = self.extract_text_name(filename)
                     if text_name is None:
-                        logging.warn('Skipping file "{}"'.format(filename))
+                        self._logger.warn('Skipping file "{}"'.format(filename))
                     else:
                         text_name = '{}.xml'.format(text_name)
                         text_parts = self._texts.setdefault(text_name, {})
@@ -257,17 +259,18 @@ class TEICorpus:
         """Transforms the file at `file_path` into simpler XML and returns
         it."""
         output_file = os.path.join(self._output_dir, text_name)
-        logging.info('Tidying file {} into {}'.format(file_path, output_file))
+        self._logger.info('Tidying file {} into {}'.format(
+            file_path, output_file))
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError as err:
-            logging.warn('XML file "{}" is invalid'.format(file_path))
+            self._logger.warn('XML file "{}" is invalid'.format(file_path))
             if tried:
-                logging.error(
+                self._logger.error(
                     'XML file "{}" is irretrievably invalid: {}'.format(
                         file_path, err))
                 raise
-            logging.warn('Retrying after modifying entity file')
+            self._logger.warn('Retrying after modifying entity file')
             self._correct_entity_file(file_path)
             xml = self._tidy(text_name, file_path, True)
         else:
