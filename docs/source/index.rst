@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 1
 
    installation
+   guide
    scripts/tacl
    scripts/tacl-helper
 
@@ -71,12 +72,12 @@ analysis of the corpus, as listed with example commands:
 
    An example catalogue: ::
 
-       T0237.txt Vaj
-       T0097.txt AV
-       T0667.txt P-ref
-       T1461.txt P-ref
-       T1559.txt
-       T2137.txt
+       T0237 Vaj
+       T0097 AV
+       T0667 P-ref
+       T1461 P-ref
+       T1559
+       T2137
 
 4. Analyse the n-grams to find either the difference between
    (:doc:`tacl diff <scripts/tacl-diff>`) or intersection of
@@ -98,6 +99,12 @@ analysis of the corpus, as listed with example commands:
    </scripts/tacl-align>`). ::
 
        tacl align path/stripped/dir path/output/dir intersect-results.csv
+
+7. Display one text with the option to highlight matches from other
+   texts in a set of intersection query results, producing a heatmap
+   visualisation (:doc:`tacl highlight </scripts/tacl-highlight>`). ::
+
+       tacl highlight path/stripped/dir intersect-results.csv text-name witness-siglum
 
 Another script, :doc:`tacl-helper </scripts/tacl-helper>`, can be used
 to create sets of catalogue files and prepare batches of commands for
