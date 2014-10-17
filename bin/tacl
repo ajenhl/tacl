@@ -8,6 +8,7 @@ import io
 import logging
 import os
 import re
+import shutil
 import sys
 import textwrap
 
@@ -415,12 +416,13 @@ def search_texts (args):
 
 def strip_texts (args):
     """Processes texts for use with the tacl ngrams command."""
-    xml_output_dir = os.path.join(args.output, 'xml')
-    stripped_output_dir = os.path.join(args.output, 'text')
+    xml_output_dir = os.path.join(args.output, 'tacl_xml')
+    stripped_output_dir = args.output
     corpus = tacl.TEICorpus(args.input, xml_output_dir)
     corpus.tidy()
     stripper = tacl.Stripper(xml_output_dir, stripped_output_dir)
     stripper.strip_files()
+    shutil.rmtree(xml_output_dir)
 
 
 class ParagraphFormatter (argparse.ArgumentDefaultsHelpFormatter):
