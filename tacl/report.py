@@ -138,10 +138,11 @@ class Report:
         # processing within the for loop, so optimise even small
         # things, such as aliasing dotted calls here and below.
         t_join = self._tokenizer.joiner.join
-        file_matches = matches[matches[constants.NAME_FIELDNAME] == name]
+        witness_matches = matches[(matches[constants.NAME_FIELDNAME] == name) &
+                                  (matches[constants.SIGLUM_FIELDNAME] == siglum)]
         text = t_join(corpus.get_text(name, siglum).get_tokens())
         ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
-                  list(file_matches[constants.NGRAM_FIELDNAME])]
+                  list(witness_matches[constants.NGRAM_FIELDNAME])]
         # Go through the list of n-grams, and create a list of
         # extended n-grams by joining two n-grams together that
         # overlap (a[-overlap:] == b[:-1]) and checking that the result
