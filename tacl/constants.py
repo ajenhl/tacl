@@ -394,7 +394,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 FILE_SEQUENCES_HTML = '''<html lang="zh">
   <head>
     <meta charset="UTF-8">
-    <title lang="en">Alignment between {f1} and {f2}</title>
+    <title lang="en">Alignment between {l1} and {l2}</title>
     <style>
       :lang(en) {{ overflow-wrap: normal; word-break: normal; }}
       :lang(zh) {{ overflow-wrap: break-word; word-break: break-all; }}
@@ -405,13 +405,13 @@ FILE_SEQUENCES_HTML = '''<html lang="zh">
     </style>
   </head>
   <body>
-    <h1 lang="en">Alignment between {f1} and {f2}</h1>
+    <h1 lang="en">Alignment between {l1} and {l2}</h1>
 
     <table>
       <thead>
         <tr>
-          <th>{f1}</th>
-          <th>{f2}</th>
+          <th>{l1}</th>
+          <th>{l2}</th>
         </tr>
       </thead>
       <tbody>

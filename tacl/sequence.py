@@ -1,7 +1,7 @@
 """Module containing the Sequence and Sequencer classes."""
 
 import logging
-import os.path
+import os
 import re
 
 from Bio import pairwise2
@@ -70,7 +70,7 @@ class Sequencer:
     def generate_sequences (self, minimum_size):
         # Get a list of the files in the matches, grouped by label
         # (ordered by number of texts).
-        labels = list(self._matches.groupby(['label'])['filename'].nunique().index)
+        labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[constants.NAME_FIELDNAME].nunique().index)
         ngrams = self._matches[self._matches[constants.SIZE_FIELDNAME] >= minimum_size].sort(constants.SIZE_FIELDNAME, ascending=False)[constants.NGRAM_FIELDNAME].unique()
         for index, primary_label in enumerate(labels):
             for secondary_label in labels[index+1:]:
@@ -104,6 +104,7 @@ class Sequencer:
         if sequences:
             html = constants.FILE_SEQUENCES_HTML.format(
                 l1=l1, l2=l2, sequences='\n'.join(sequences))
+            os.makedirs(self._output_dir, exist_ok=True)
             output_name = os.path.join(self._output_dir,
                                        '{}-{}.html'.format(l1, l2))
             with open(output_name, 'w', encoding='utf-8') as fh:
