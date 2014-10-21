@@ -39,7 +39,7 @@ class Sequencer:
         self._logger = logging.getLogger(__name__)
         self._corpus = corpus
         self._tokenizer = tokenizer
-        self._matches = pd.read_csv(results, encoding='utf-8')
+        self._matches = pd.read_csv(results, encoding='utf-8', na_filter=False)
         self._output_dir = output_dir
 
     def _generate_sequence (self, t1, t1_span, t2, t2_span, context_length,

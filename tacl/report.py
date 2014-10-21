@@ -13,7 +13,7 @@ class Report:
 
     def __init__ (self, matches, tokenizer):
         self._logger = logging.getLogger(__name__)
-        self._matches = pd.read_csv(matches, encoding='utf-8')
+        self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
         # Work around a problem with CSV files produced on Windows
         # being read by pandas and creating an empty row for each
         # actual row.

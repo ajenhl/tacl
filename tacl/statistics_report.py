@@ -8,7 +8,7 @@ from . import constants
 class StatisticsReport:
 
     def __init__ (self, matches, counts):
-        self._matches = pd.read_csv(matches, encoding='utf-8')
+        self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
         self._counts = pd.read_csv(counts, encoding='utf-8')
 
     def csv (self, fh):
