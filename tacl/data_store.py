@@ -80,7 +80,13 @@ class DataStore:
         text_id = self._get_text_id(text)
         self._logger.info('Adding n-grams ({} <= n <= {}) for {}'.format(
             minimum, maximum, text.get_filename()))
-        for size, ngrams in text.get_ngrams(minimum, maximum):
+        skip_sizes = []
+        for size in range(minimum, maximum + 1):
+            if self._has_ngrams(text_id, size):
+                self._logger.info('{}-grams are already in the database'.format(
+                    size))
+                skip_sizes.append(size)
+        for size, ngrams in text.get_ngrams(minimum, maximum, skip_sizes):
             self._add_text_size_ngrams(text_id, size, ngrams)
 
     def _add_text_record (self, text):
@@ -113,19 +119,15 @@ class DataStore:
         :type ngrams: `collections.Counter`
 
         """
-        if self._has_ngrams(text_id, size):
-            self._logger.info('{}-grams are already in the database'.format(
-                size))
-        else:
-            unique_ngrams = len(ngrams)
-            self._logger.info('Adding {} unique {}-grams'.format(
-                unique_ngrams, size))
-            parameters = [[text_id, ngram, size, count]
-                          for ngram, count in ngrams.items()]
-            self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
-                               [text_id, size, unique_ngrams])
-            self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
-            self._conn.commit()
+        unique_ngrams = len(ngrams)
+        self._logger.info('Adding {} unique {}-grams'.format(
+            unique_ngrams, size))
+        parameters = [[text_id, ngram, size, count]
+                      for ngram, count in ngrams.items()]
+        self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
+                           [text_id, size, unique_ngrams])
+        self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
+        self._conn.commit()
 
     def _analyse (self, table=''):
         """Analyses the database, or `table` if it is supplied.

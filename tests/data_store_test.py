@@ -66,9 +66,11 @@ class DataStoreTestCase (TaclTestCase):
         actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
         self.assertEqual(actual_ngrams, expected_ngrams)
 
-    def test_add_text_ngrams (self):
+    def test_add_text_ngrams_existing (self):
         get_text_id = self._create_patch('tacl.DataStore._get_text_id')
         get_text_id.return_value = sentinel.text_id
+        has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
+        has_ngrams.return_value = True
         add_text_size_ngrams = self._create_patch(
             'tacl.DataStore._add_text_size_ngrams')
         text = MagicMock(spec_set=tacl.Text)
@@ -77,11 +79,32 @@ class DataStoreTestCase (TaclTestCase):
         store = tacl.DataStore(':memory:')
         store._add_text_ngrams(text, 2, 3)
         get_text_id.assert_called_once_with(store, text)
-        text.get_ngrams.assert_called_once_with(2, 3)
-        expected_calls = [
+        has_ngrams.assert_has_calls([
+            call(store, sentinel.text_id, 2),
+            call(store, sentinel.text_id, 3)])
+        text.get_ngrams.assert_called_once_with(2, 3, [2, 3])
+        add_text_size_ngrams.assert_has_calls([])
+
+    def test_add_text_ngrams_not_existing (self):
+        get_text_id = self._create_patch('tacl.DataStore._get_text_id')
+        get_text_id.return_value = sentinel.text_id
+        has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
+        has_ngrams.return_value = False
+        add_text_size_ngrams = self._create_patch(
+            'tacl.DataStore._add_text_size_ngrams')
+        text = MagicMock(spec_set=tacl.Text)
+        text.get_ngrams.return_value = [(2, sentinel.two_grams),
+                                        (3, sentinel.three_grams)]
+        store = tacl.DataStore(':memory:')
+        store._add_text_ngrams(text, 2, 3)
+        get_text_id.assert_called_once_with(store, text)
+        has_ngrams.assert_has_calls([
+            call(store, sentinel.text_id, 2),
+            call(store, sentinel.text_id, 3)])
+        text.get_ngrams.assert_called_once_with(2, 3, [])
+        add_text_size_ngrams.assert_has_calls([
             call(store, sentinel.text_id, 2, sentinel.two_grams),
-            call(store, sentinel.text_id, 3, sentinel.three_grams)]
-        self.assertEqual(add_text_size_ngrams.call_args_list, expected_calls)
+            call(store, sentinel.text_id, 3, sentinel.three_grams)])
 
     def test_add_text_record (self):
         store = tacl.DataStore(':memory:')
@@ -104,26 +127,12 @@ class DataStoreTestCase (TaclTestCase):
         store._conn.commit.assert_called_once_with()
         self.assertEqual(actual_text_id, sentinel.text_id)
 
-    def test_add_text_size_ngrams_existing (self):
-        has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
-        has_ngrams.return_value = True
+    def test_add_text_size_ngrams (self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         size = 1
         ngrams = collections.OrderedDict([('a', 2), ('b', 1)])
         store._add_text_size_ngrams(sentinel.text_id, size, ngrams)
-        has_ngrams.assert_called_once_with(store, sentinel.text_id, size)
-        self.assertEqual(store._conn.mock_calls, [])
-
-    def test_add_text_size_ngrams_not_existing (self):
-        has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
-        has_ngrams.return_value = False
-        store = tacl.DataStore(':memory:')
-        store._conn = MagicMock(spec_set=sqlite3.Connection)
-        size = 1
-        ngrams = collections.OrderedDict([('a', 2), ('b', 1)])
-        store._add_text_size_ngrams(sentinel.text_id, size, ngrams)
-        has_ngrams.assert_called_once_with(store, sentinel.text_id, size)
         self.assertEqual(
             store._conn.mock_calls,
             [call.execute(tacl.constants.INSERT_TEXT_HAS_NGRAM_SQL,

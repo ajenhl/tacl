@@ -19,7 +19,7 @@ class BaseText:
         """
         return self._content
 
-    def get_ngrams (self, minimum, maximum):
+    def get_ngrams (self, minimum, maximum, skip_sizes=None):
         """Returns a generator supplying the n-grams (`minimum` <= n
         <= `maximum`) for this text.
 
@@ -34,10 +34,12 @@ class BaseText:
         :rtype: `generator`
 
         """
+        skip_sizes = skip_sizes or []
         tokens = self.get_tokens()
         for size in range(minimum, maximum + 1):
-            ngrams = collections.Counter(self._ngrams(tokens, size))
-            yield (size, ngrams)
+            if size not in skip_sizes:
+                ngrams = collections.Counter(self._ngrams(tokens, size))
+                yield (size, ngrams)
 
     def get_tokens (self):
         """Returns a list of tokens in this text."""
