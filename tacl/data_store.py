@@ -4,6 +4,7 @@ import csv
 import logging
 import os.path
 import sqlite3
+import sys
 
 from . import constants
 
@@ -173,7 +174,13 @@ class DataStore:
 
         """
         self._logger.info('Finished query; outputting results in CSV format')
-        writer = csv.writer(output_fh)
+        # Specify a lineterminator to avoid an extra \r being added on
+        # Windows; see
+        # https://stackoverflow.com/questions/3191528/csv-in-python-adding-extra-carriage-return
+        if sys.platform in ('win32', 'cygwin') and output_fh is sys.stdout:
+            writer = csv.writer(output_fh, lineterminator='\n')
+        else:
+            writer = csv.writer(output_fh)
         writer.writerow(fieldnames)
         for row in cursor:
             writer.writerow([row[fieldname] for fieldname in fieldnames])
