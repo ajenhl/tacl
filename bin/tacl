@@ -34,6 +34,14 @@ def add_common_arguments (parser):
     parser.add_argument('-v', '--verbose', action='count',
                         help=constants.VERBOSE_HELP)
 
+def add_corpus_arguments (parser):
+    """Adds common arguments for commands making use of a corpus to
+    `parser`."""
+    add_tokenizer_argument(parser)
+    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
+                        metavar='CORPUS')
+
+
 def add_db_arguments (parser):
     """Adds common arguments for the database sub-commands to
     `parser`."""
@@ -41,16 +49,21 @@ def add_db_arguments (parser):
                         help=constants.DB_MEMORY_HELP)
     parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
                         type=int)
-    add_tokenizer_argument(parser)
     parser.add_argument('db', help=constants.DB_DATABASE_HELP,
                         metavar='DATABASE')
-    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
-                        metavar='CORPUS')
 
 def add_query_arguments (parser):
     """Adds common arguments for query sub-commonads to `parser`."""
     parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
                         metavar='CATALOGUE')
+
+def add_supplied_query_arguments (parser):
+    """Adds common arguments for supplied query sub-commands to
+    `parser`."""
+    parser.add_argument('-l', '--labels', help=constants.SUPPLIED_LABELS_HELP,
+                        nargs='*', required=True)
+    parser.add_argument('-s', '--supplied', help=constants.SUPPLIED_RESULTS_HELP,
+                        metavar='RESULTS', nargs='*', required=True)
 
 def add_tokenizer_argument (parser):
     parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
@@ -98,7 +111,9 @@ def generate_parser ():
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_report_subparser(subparsers)
+    generate_supplied_diff_subparser(subparsers)
     generate_search_subparser(subparsers)
+    generate_supplied_intersect_subparser(subparsers)
     generate_statistics_subparser(subparsers)
     generate_strip_subparser(subparsers)
     return parser
@@ -114,9 +129,7 @@ def generate_align_subparser (subparsers):
     add_common_arguments(parser)
     parser.add_argument('-m', '--minimum', default=20,
                         help=constants.ALIGN_MINIMUM_SIZE_HELP, type=int)
-    add_tokenizer_argument(parser)
-    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
-                        metavar='CORPUS')
+    add_corpus_arguments(parser)
     parser.add_argument('output', help=constants.ALIGN_OUTPUT_HELP,
                         metavar='OUTPUT')
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
@@ -153,6 +166,7 @@ def generate_counts_subparser (subparsers):
     parser.set_defaults(func=ngram_counts)
     add_common_arguments(parser)
     add_db_arguments(parser)
+    add_corpus_arguments(parser)
     add_query_arguments(parser)
 
 def generate_diff_subparser (subparsers):
@@ -168,6 +182,7 @@ def generate_diff_subparser (subparsers):
                        metavar='LABEL')
     add_common_arguments(parser)
     add_db_arguments(parser)
+    add_corpus_arguments(parser)
     add_query_arguments(parser)
 
 def generate_highlight_subparser (subparsers):
@@ -178,9 +193,7 @@ def generate_highlight_subparser (subparsers):
         epilog=constants.HIGHLIGHT_EPILOG, help=constants.HIGHLIGHT_HELP)
     parser.set_defaults(func=highlight_text)
     add_common_arguments(parser)
-    add_tokenizer_argument(parser)
-    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
-                        metavar='CORPUS')
+    add_corpus_arguments(parser)
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
                         metavar='RESULTS')
     parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
@@ -198,6 +211,7 @@ def generate_intersect_subparser (subparsers):
     parser.set_defaults(func=ngram_intersection)
     add_common_arguments(parser)
     add_db_arguments(parser)
+    add_corpus_arguments(parser)
     add_query_arguments(parser)
 
 def generate_ngrams (args):
@@ -215,6 +229,7 @@ def generate_ngrams_subparser (subparsers):
     parser.set_defaults(func=generate_ngrams)
     add_common_arguments(parser)
     add_db_arguments(parser)
+    add_corpus_arguments(parser)
     parser.add_argument('min_size', help=constants.NGRAMS_MINIMUM_HELP,
                         metavar='MINIMUM', type=int)
     parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
@@ -297,6 +312,7 @@ def generate_search_subparser (subparsers):
     parser.set_defaults(func=search_texts)
     add_common_arguments(parser)
     add_db_arguments(parser)
+    add_corpus_arguments(parser)
     parser.add_argument('-c', '--catalogue', metavar='CATALOGUE',
                         help=constants.CATALOGUE_CATALOGUE_HELP)
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
@@ -340,6 +356,31 @@ def generate_strip_subparser (subparsers):
     parser.add_argument('output', help=constants.STRIP_OUTPUT_HELP,
                         metavar='OUTPUT')
 
+def generate_supplied_diff_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to run a diff query using
+    the supplied results sets."""
+    parser = subparsers.add_parser(
+        'sdiff', description=constants.SUPPLIED_DIFF_DESCRIPTION,
+        epilog=constants.SUPPLIED_DIFF_EPILOG,
+        formatter_class=ParagraphFormatter, help=constants.SUPPLIED_DIFF_HELP)
+    parser.set_defaults(func=supplied_diff)
+    add_common_arguments(parser)
+    add_db_arguments(parser)
+    add_supplied_query_arguments(parser)
+
+def generate_supplied_intersect_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to run an intersect query
+    using the supplied results sets."""
+    parser = subparsers.add_parser(
+        'sintersect', description=constants.SUPPLIED_INTERSECT_DESCRIPTION,
+        epilog=constants.SUPPLIED_INTERSECT_EPILOG,
+        formatter_class=ParagraphFormatter,
+        help=constants.SUPPLIED_INTERSECT_HELP)
+    parser.set_defaults(func=supplied_intersect)
+    add_common_arguments(parser)
+    add_db_arguments(parser)
+    add_supplied_query_arguments(parser)
+
 def get_corpus (args):
     """Returns a `tacl.Corpus`."""
     tokenizer = get_tokenizer(args)
@@ -351,6 +392,10 @@ def get_catalogue (args):
     catalogue.load(args.catalogue)
     return catalogue
 
+def get_data_store (args):
+    """Returns a `tacl.DataStore`."""
+    return tacl.DataStore(args.db, args.memory, args.ram)
+
 def get_input_fh (arg):
     """Returns an open file of CSV data, or None if `arg` is None.
 
@@ -359,10 +404,6 @@ def get_input_fh (arg):
     if arg:
         input_fh = open(arg, 'r', encoding='utf-8', newline='')
     return input_fh
-
-def get_data_store (args):
-    """Returns a `tacl.DataStore`."""
-    return tacl.DataStore(args.db, args.memory, args.ram)
 
 def get_tokenizer (args):
     return tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])
@@ -423,6 +464,18 @@ def strip_texts (args):
     stripper = tacl.Stripper(xml_output_dir, stripped_output_dir)
     stripper.strip_files()
     shutil.rmtree(xml_output_dir)
+
+def supplied_diff (args):
+    labels = args.labels
+    results = args.supplied
+    store = get_data_store(args)
+    store.diff_supplied(results, labels, sys.stdout)
+
+def supplied_intersect (args):
+    labels = args.labels
+    results = args.supplied
+    store = get_data_store(args)
+    store.intersection_supplied(results, labels, sys.stdout)
 
 
 class ParagraphFormatter (argparse.ArgumentDefaultsHelpFormatter):

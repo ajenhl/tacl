@@ -245,6 +245,40 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('ell', '3', 'T5', 'base', '1', 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_diff_supplied (self):
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results = [os.path.join(supplied_dir, 'diff_input_1.csv'),
+                   os.path.join(supplied_dir, 'diff_input_2.csv'),
+                   os.path.join(supplied_dir, 'diff_input_3.csv')]
+        labels = ('A', 'B', 'C')
+        actual_rows = self._get_rows_from_csv(
+            self._store.diff_supplied(results, labels, io.StringIO(newline='')))
+        expected_rows = [
+            ('過失', '2', 'T0005', 'base', '5', 'A'),
+            ('過失', '2', 'T0003', '大', '2', 'A'),
+            ('皆不', '2', 'T0004', 'base', '1', 'A'),
+            ('皆不', '2', 'T0002', '大', '1', 'A'),
+            ('皆不', '2', 'T0003', '大', '1', 'A'),
+            ('棄捨', '2', 'T0004', '元', '4', 'A'),
+            ('棄捨', '2', 'T0003', 'base', '2', 'A'),
+            ('七佛', '2', 'T0006', 'base', '3', 'B'),
+            ('七佛', '2', 'T0004', '元', '3', 'B'),
+            ('七佛', '2', 'T0002', '大', '2', 'B'),
+            ('人子', '2', 'T0004', '元', '1', 'C'),
+            ('人子', '2', 'T0007', 'base', '1', 'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_diff_supplied_argument_mismatch (self):
+        # Supplying a list of labels that differs in length from the
+        # list of results should raise an exception.
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results = [os.path.join(supplied_dir, 'diff_input_1.csv'),
+                   os.path.join(supplied_dir, 'diff_input_2.csv'),
+                   os.path.join(supplied_dir, 'diff_input_3.csv')]
+        labels = ('A', 'B')
+        self.assertRaises(IndexError, self._store.diff_supplied, results,
+                          labels, io.StringIO(newline=''))
+
     def test_intersection (self):
         actual_rows = self._get_rows_from_csv(self._store.intersection(
                 self._catalogue, io.StringIO(newline='')))
@@ -265,6 +299,38 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('th', '2', 'T2', 'a', '1', 'B'),
             ('th', '2', 'T3', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_intersection_supplied (self):
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results = [os.path.join(supplied_dir, 'intersect_input_1.csv'),
+                   os.path.join(supplied_dir, 'intersect_input_2.csv'),
+                   os.path.join(supplied_dir, 'intersect_input_3.csv')]
+        labels = ('A', 'B', 'C')
+        actual_rows = self._get_rows_from_csv(
+            self._store.intersection_supplied(results, labels,
+                                              io.StringIO(newline='')))
+        expected_rows = [
+            ('龍皆起前', '4', 'T0033', '元', '1', 'A'),
+            ('龍皆起前', '4', 'T0034', '明', '2', 'A'),
+            ('龍皆起前', '4', 'T0002', 'base', '3', 'B'),
+            ('龍皆起前', '4', 'T0052', 'base', '2', 'C'),
+            ('[月*劦]生', '2', 'T0002', '明', '10', 'A'),
+            ('[月*劦]生', '2', 'T0002', 'base', '10', 'A'),
+            ('[月*劦]生', '2', 'T0023', '大', '2', 'B'),
+            ('[月*劦]生', '2', 'T0053', '大', '2', 'C'),
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_intersection_supplied_argument_mismatch (self):
+        # Supplying a list of labels that differs in length from the
+        # list of results should raise an exception.
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results = [os.path.join(supplied_dir, 'intersect_input_1.csv'),
+                   os.path.join(supplied_dir, 'intersect_input_2.csv'),
+                   os.path.join(supplied_dir, 'intersect_input_3.csv')]
+        labels = ('A', 'B')
+        self.assertRaises(IndexError, self._store.intersection_supplied,
+                          results, labels, io.StringIO(newline=''))
 
     def test_validate_missing_text (self):
         self._catalogue['missing'] = 'A'

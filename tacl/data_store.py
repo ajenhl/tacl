@@ -62,10 +62,40 @@ class DataStore:
 
     def _add_temporary_ngrams (self, ngrams):
         """Adds `ngrams` to a temporary table."""
-        self._conn.execute(constants.DROP_TEMPORARY_TABLE_SQL)
-        self._conn.execute(constants.CREATE_TEMPORARY_TABLE_SQL)
+        self._conn.execute(constants.DROP_TEMPORARY_NGRAMS_TABLE_SQL)
+        self._conn.execute(constants.CREATE_TEMPORARY_NGRAMS_TABLE_SQL)
         self._conn.executemany(constants.INSERT_TEMPORARY_NGRAM_SQL,
                                [(ngram,) for ngram in ngrams])
+
+    def _add_temporary_results_sets (self, results_filenames, labels):
+        if len(results_filenames) != len(labels):
+            raise IndexError(constants.SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR)
+        self._create_temporary_results_table()
+        for results_filename, label in zip(results_filenames, labels):
+            with open(results_filename, encoding='utf-8', newline='') as fh:
+                self._add_temporary_results(fh, label)
+        self._add_temporary_results_index()
+        self._analyse('temp.InputResults')
+
+    def _add_temporary_results (self, results, label):
+        """Adds `results` to a temporary table with `label`.
+
+        :param results: results file
+        :type results: `File`
+        :param label: label to be associated with results
+        :type label: `str`
+
+        """
+        NGRAM, SIZE, NAME, SIGLUM, COUNT, LABEL = constants.QUERY_FIELDNAMES
+        reader = csv.DictReader(results)
+        data = [(row[NGRAM], row[SIZE], row[NAME], row[SIGLUM], row[COUNT],
+                 label) for row in reader]
+        self._conn.executemany(constants.INSERT_TEMPORARY_RESULTS_SQL, data)
+
+    def _add_temporary_results_index (self):
+        self._logger.info('Adding index to temporary results table')
+        self._conn.execute(constants.CREATE_INDEX_INPUT_RESULTS_SQL)
+        self._logger.info('Index added')
 
     def _add_text_ngrams (self, text, minimum, maximum):
         """Adds n-gram data from `text` to the data store.
@@ -160,6 +190,10 @@ class DataStore:
         cursor = self._conn.execute(query, labels)
         return self._csv(cursor, constants.COUNTS_FIELDNAMES, output_fh)
 
+    def _create_temporary_results_table (self):
+        self._conn.execute(constants.DROP_TEMPORARY_RESULTS_TABLE_SQL)
+        self._conn.execute(constants.CREATE_TEMPORARY_RESULTS_TABLE_SQL)
+
     def _csv (self, cursor, fieldnames, output_fh):
         """Writes the rows of `cursor` in CSV format to `output_fh`
         and returns it.
@@ -200,9 +234,12 @@ class DataStore:
         self._conn.commit()
 
     def diff (self, catalogue, output_fh):
-        """Returns `output_fh` populated with CSV results giving the
-        symmetric difference in n-grams between the labelled sets of
-        texts in `catalogue`.
+        """Returns `output_fh` populated with CSV results giving the n-grams
+        that are unique to each labelled set of texts in `catalogue`.
+
+        Note that this is not the same as the symmetric difference of
+        these sets, except in the case where there are only two
+        labels.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
@@ -247,6 +284,32 @@ class DataStore:
             query, labels, prime_label))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+
+    def diff_supplied (self, results_filenames, labels, output_fh):
+        """Returns `output_fh` populated with CSV results giving the n-grams
+        that are unique to each set of texts in `results_sets`, using
+        the labels in `labels`.
+
+        Note that this is not the same as the symmetric difference of
+        these sets, except in the case where there are only two
+        labels.
+
+        :param results_filenames: list of results filenames to be diffed
+        :type results_filenames: `list` of `str`
+        :param labels: labels to be applied to the results_sets
+        :type labels: `list`
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
+        self._add_temporary_results_sets(results_filenames, labels)
+        query = constants.SELECT_DIFF_SUPPLIED_SQL
+        self._logger.info('Running supplied diff query')
+        self._logger.debug('Query: {}'.format(query))
+        self._log_query_plan(query, [])
+        cursor = self._conn.execute(query)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def _drop_indices (self):
@@ -364,6 +427,30 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
+    def intersection_supplied (self, results_filenames, labels, output_fh):
+        """Returns `output_fh` populated with CSV results giving the n-grams
+        that are common to every set of texts in `results_sets`, using
+        the labels in `labels`.
+
+        :param results_filenames: list of results to be diffed
+        :type results_filenames: `list` of `str`
+        :param labels: labels to be applied to the results_sets
+        :type labels: `list`
+        :param output_fh: object to output results to
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
+        self._add_temporary_results_sets(results_filenames, labels)
+        query = constants.SELECT_INTERSECT_SUPPLIED_SQL
+        parameters = [len(labels)]
+        self._logger.info('Running supplied intersect query')
+        self._logger.debug('Query: {}\nNumber of labels: {}'.format(
+            query, parameters[0]))
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+
     def _log_query_plan (self, query, parameters):
         cursor = self._conn.execute('EXPLAIN QUERY PLAN ' + query, parameters)
         query_plan = 'Query plan:\n'
@@ -460,7 +547,6 @@ class DataStore:
                 count += 1
                 name, siglum = text.get_names()
                 filename = text.get_filename()
-                #except FileNotFoundError:
                 row = self._conn.execute(constants.SELECT_TEXT_SQL,
                                          [name, siglum]).fetchone()
                 if row is None:

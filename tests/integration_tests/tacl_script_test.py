@@ -28,6 +28,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         self._db_path = os.path.join(self._data_dir, 'test.db')
         self._catalogue_path = os.path.join(self._data_dir, 'catalogue.txt')
         self._ngrams_path = os.path.join(self._data_dir, 'search_ngrams.txt')
+        self._supplied_path = os.path.join(self._data_dir, 'supplied_input')
         # Since ngrams need to be added to a database for many of
         # these tests, define the command here.
         minimum = 1
@@ -341,6 +342,30 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('ell', '3', 'T5', 'base', '1', 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_diff_supplied (self):
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results1 = os.path.join(supplied_dir, 'diff_input_1.csv')
+        results2 = os.path.join(supplied_dir, 'diff_input_2.csv')
+        results3 = os.path.join(supplied_dir, 'diff_input_3.csv')
+        diff_command = 'tacl sdiff {} -l A B C -s {} {} {}'.format(
+            self._db_path, results1, results2, results3)
+        data = subprocess.check_output(shlex.split(diff_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        expected_rows = [
+            ('過失', '2', 'T0005', 'base', '5', 'A'),
+            ('過失', '2', 'T0003', '大', '2', 'A'),
+            ('皆不', '2', 'T0004', 'base', '1', 'A'),
+            ('皆不', '2', 'T0002', '大', '1', 'A'),
+            ('皆不', '2', 'T0003', '大', '1', 'A'),
+            ('棄捨', '2', 'T0004', '元', '4', 'A'),
+            ('棄捨', '2', 'T0003', 'base', '2', 'A'),
+            ('七佛', '2', 'T0006', 'base', '3', 'B'),
+            ('七佛', '2', 'T0004', '元', '3', 'B'),
+            ('七佛', '2', 'T0002', '大', '2', 'B'),
+            ('人子', '2', 'T0004', '元', '1', 'C'),
+            ('人子', '2', 'T0007', 'base', '1', 'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_intersection (self):
         subprocess.call(self._ngrams_command_args)
         intersect_command = 'tacl intersect {} {} {}'.format(
@@ -363,6 +388,26 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('th', '2', 'T2', 'base', '1', 'B'),
             ('th', '2', 'T2', 'a', '1', 'B'),
             ('th', '2', 'T3', 'base', '1', 'C')]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_intersection_supplied (self):
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results1 = os.path.join(supplied_dir, 'intersect_input_1.csv')
+        results2 = os.path.join(supplied_dir, 'intersect_input_2.csv')
+        results3 = os.path.join(supplied_dir, 'intersect_input_3.csv')
+        intersect_command = 'tacl sintersect {} -l A B C -s {} {} {}'.format(
+            self._db_path, results1, results2, results3)
+        data = subprocess.check_output(shlex.split(intersect_command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        expected_rows = [
+            ('龍皆起前', '4', 'T0033', '元', '1', 'A'),
+            ('龍皆起前', '4', 'T0034', '明', '2', 'A'),
+            ('龍皆起前', '4', 'T0002', 'base', '3', 'B'),
+            ('龍皆起前', '4', 'T0052', 'base', '2', 'C'),
+            ('[月*劦]生', '2', 'T0002', '明', '10', 'A'),
+            ('[月*劦]生', '2', 'T0002', 'base', '10', 'A'),
+            ('[月*劦]生', '2', 'T0023', '大', '2', 'B'),
+            ('[月*劦]生', '2', 'T0053', '大', '2', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_search (self):

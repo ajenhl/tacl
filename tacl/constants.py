@@ -167,7 +167,8 @@ REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.
 REPORT_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
 REPORT_RECIPROCAL_HELP = '''\
     Remove n-grams that are not attested by at least one text in each
-    labelled set of texts.'''
+    labelled set of texts. This can be useful after reducing a set of
+    intersection results.'''
 REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
@@ -203,6 +204,32 @@ STRIP_HELP = 'Generate texts for use with TACL from a corpus of TEI XML.'
 STRIP_INPUT_HELP = 'Directory containing files to strip.'
 STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'
 
+SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
+SUPPLIED_DIFF_DESCRIPTION = '''\
+    List n-grams unique to each set of results (as defined by the
+    specified results files).'''
+SUPPLIED_DIFF_HELP = 'List n-grams unqiue to each results file.'
+SUPPLIED_EPILOG = '''\
+    The number of labels supplied must match the number of results
+    files. The first label is assigned to all results in the first
+    results file, the second label to all results in the second
+    results file, etc. The labels specified in the results files are
+    replaced with the supplied labels in the output.
+
+    Due to the variable number of labels and results files that can be
+    specified, the database argument must preceed both the -l and -s
+    options. Eg:
+
+        tacl {} cbeta.sqlite3 -l A B -s results1.csv results2.csv'''
+SUPPLIED_DIFF_EPILOG = SUPPLIED_EPILOG.format('sdiff')
+SUPPLIED_INTERSECT_EPILOG = SUPPLIED_EPILOG.format('sintersect')
+SUPPLIED_INTERSECT_DESCRIPTION = '''\
+    List n-grams common to all sets of results (as defined by the
+    specified results files).'''
+SUPPLIED_INTERSECT_HELP = 'List n-grams common to all results files.'
+SUPPLIED_LABELS_HELP = 'Labels to be assigned in order to the supplied results.'
+SUPPLIED_RESULTS_HELP = 'Paths to results files to be used in the query.'
+
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 
 TACL_HELPER_DESCRIPTION = '''\
@@ -234,6 +261,8 @@ VERBOSE_HELP = '''\
 
 # SQL statements.
 ANALYSE_SQL = 'ANALYZE {}'
+CREATE_INDEX_INPUT_RESULTS_SQL = 'CREATE INDEX IF NOT EXISTS ' \
+        'temp.InputResultsLabel ON InputResults (ngram)'
 CREATE_INDEX_TEXT_SQL = 'CREATE INDEX IF NOT EXISTS TextIndexLabel ' \
     'ON Text (label)'
 CREATE_INDEX_TEXTHASNGRAM_SQL = 'CREATE UNIQUE INDEX IF NOT EXISTS ' \
@@ -257,10 +286,19 @@ CREATE_TABLE_TEXTHASNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextHasNGram (' \
     'text INTEGER NOT NULL REFERENCES Text (id), ' \
     'size INTEGER NOT NULL, ' \
     'count INTEGER NOT NULL)'
-CREATE_TEMPORARY_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (ngram Text)'
+CREATE_TEMPORARY_NGRAMS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (' \
+    'ngram TEXT)'
+CREATE_TEMPORARY_RESULTS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputResults (' \
+    'ngram TEXT NOT NULL, ' \
+    'size INTEGER NOT NULL, ' \
+    'name TEXT NOT NULL, ' \
+    'siglum TEXT NOT NULL, ' \
+    'count INTEGER NOT NULL, ' \
+    'label TEXT NOT NULL)'
 DELETE_TEXT_HAS_NGRAMS_SQL = 'DELETE FROM TextHasNGram WHERE text = ?'
 DELETE_TEXT_NGRAMS_SQL = 'DELETE FROM TextNGram WHERE text = ?'
-DROP_TEMPORARY_TABLE_SQL = 'DROP TABLE IF EXISTS InputNGram'
+DROP_TEMPORARY_NGRAMS_TABLE_SQL = 'DROP TABLE IF EXISTS InputNGram'
+DROP_TEMPORARY_RESULTS_TABLE_SQL = 'DROP TABLE IF EXISTS InputResults'
 DROP_TEXTNGRAM_INDEX_SQL = 'DROP INDEX IF EXISTS TextNGramIndexTextNGram'
 INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
     'VALUES (?, ?, ?, ?)'
@@ -270,6 +308,9 @@ INSERT_TEXT_SQL = 'INSERT INTO Text ' \
     '(name, siglum, checksum, token_count, label) ' \
     'VALUES (?, ?, ?, ?, ?)'
 INSERT_TEMPORARY_NGRAM_SQL = 'INSERT INTO temp.InputNGram (ngram) VALUES (?)'
+INSERT_TEMPORARY_RESULTS_SQL = 'INSERT INTO temp.InputResults ' \
+    '(ngram, size, name, siglum, count, label) ' \
+    'VALUES (?, ?, ?, ?, ?, ?)'
 PRAGMA_CACHE_SIZE_SQL = 'PRAGMA cache_size={}'
 PRAGMA_COUNT_CHANGES_SQL = 'PRAGMA count_changes=OFF'
 PRAGMA_FOREIGN_KEYS_SQL = 'PRAGMA foreign_keys=ON'
@@ -301,6 +342,12 @@ SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
+SELECT_DIFF_SUPPLIED_SQL = '''SELECT ngram, size, count, name AS "text name",
+siglum, label
+FROM temp.InputResults
+WHERE ngram IN (
+SELECT ngram FROM temp.InputResults
+GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)'''
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
@@ -312,6 +359,12 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
+SELECT_INTERSECT_SUPPLIED_SQL = '''SELECT ngram, size, count,
+name AS "text name", siglum, label
+FROM temp.InputResults
+WHERE ngram IN (
+SELECT ngram FROM temp.InputResults
+GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)'''
 SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
     'SUM(TextNGram.count) AS count, ' \
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \

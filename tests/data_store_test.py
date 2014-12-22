@@ -45,8 +45,8 @@ class DataStoreTestCase (TaclTestCase):
         store._add_temporary_ngrams([sentinel.ngram1, sentinel.ngram2])
         self.assertEqual(
             store._conn.mock_calls,
-            [call.execute(tacl.constants.DROP_TEMPORARY_TABLE_SQL),
-             call.execute(tacl.constants.CREATE_TEMPORARY_TABLE_SQL),
+            [call.execute(tacl.constants.DROP_TEMPORARY_NGRAMS_TABLE_SQL),
+             call.execute(tacl.constants.CREATE_TEMPORARY_NGRAMS_TABLE_SQL),
              call.executemany(tacl.constants.INSERT_TEMPORARY_NGRAM_SQL,
                               [(sentinel.ngram1,), (sentinel.ngram2,)])])
 

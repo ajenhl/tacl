@@ -1,0 +1,8 @@
+ngram,size,text name,siglum,count,label
+一佛,2,T0004,元,3,A
+一佛,2,T0006,base,1,B
+須臾,2,T0005,base,1,B
+須臾,2,T0003,明,4,A
+七佛,2,T0006,base,3,B
+七佛,2,T0004,元,3,B
+七佛,2,T0002,大,2,A
