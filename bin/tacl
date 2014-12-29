@@ -322,8 +322,6 @@ def generate_statistics (args):
     results = open(args.results, 'r', encoding='utf-8', newline='')
     counts = open(args.counts, 'r', encoding='utf-8', newline='')
     report = tacl.StatisticsReport(results, counts)
-    if args.reduce:
-        report.reduce()
     report.generate_statistics()
     report.csv(sys.stdout)
 
@@ -336,8 +334,6 @@ def generate_statistics_subparser (subparsers):
         help=constants.STATISTICS_HELP)
     parser.set_defaults(func=generate_statistics)
     add_common_arguments(parser)
-    parser.add_argument('--reduce', action='store_true',
-                        help=constants.REPORT_REDUCE_HELP)
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
                         metavar='RESULTS')
     parser.add_argument('counts', help=constants.STATISTICS_COUNTS_HELP,

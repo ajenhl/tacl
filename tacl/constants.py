@@ -184,12 +184,16 @@ SEARCH_NGRAMS_HELP = '''\
     n-gram per line.'''
 
 STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
-STATISTICS_DESCRIPTION = 'Generate summary statistic for a set of results.'
+STATISTICS_DESCRIPTION = 'Generate summary statistics for a set of results.'
 STATISTICS_EPILOG = '''\
+
     The output giving the percentage of each text's tokens that are in
-    the results depends on those results being reduced. If the
-    supplied results file has not been reduced, pass the --reduce
-    option.'''
+    the results depends on those results being reduced (via the tacl
+    report command). If the results have not been reduced, the
+    statistics produced by this command will not be in any way
+    accurate. (The only circumstance in which case unreduced results
+    will produce accurate statistics is when the results contain
+    n-grams of only a single size.)'''
 STATISTICS_HELP = 'Generate summary statistics for a set of results.'
 STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 
