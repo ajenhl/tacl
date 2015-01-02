@@ -133,8 +133,7 @@ NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
 REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
-    the new set of results. See below for the exceptional statistics
-    output.'''
+    the new set of results.'''
 REPORT_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
@@ -183,17 +182,10 @@ SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''
 
-STATISTICS_COUNTS_HELP = 'Path to CSV counts (from tacl counts).'
-STATISTICS_DESCRIPTION = 'Generate summary statistics for a set of results.'
-STATISTICS_EPILOG = '''\
-
-    The output giving the percentage of each text's tokens that are in
-    the results depends on those results being reduced (via the tacl
-    report command). If the results have not been reduced, the
-    statistics produced by this command will not be in any way
-    accurate. (The only circumstance in which case unreduced results
-    will produce accurate statistics is when the results contain
-    n-grams of only a single size.)'''
+STATISTICS_DESCRIPTION = '''
+    Generate summary statistics for a set of results. This gives the
+    counts of all tokens and matching tokens in each witness and the
+    percentage of the witness that is encompassed by the matches.'''
 STATISTICS_HELP = 'Generate summary statistics for a set of results.'
 STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 

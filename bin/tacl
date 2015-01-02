@@ -319,9 +319,9 @@ def generate_search_subparser (subparsers):
                         metavar='NGRAMS')
 
 def generate_statistics (args):
-    results = open(args.results, 'r', encoding='utf-8', newline='')
-    counts = open(args.counts, 'r', encoding='utf-8', newline='')
-    report = tacl.StatisticsReport(results, counts)
+    corpus = get_corpus(args)
+    tokenizer = get_tokenizer(args)
+    report = tacl.StatisticsReport(corpus, tokenizer, args.results)
     report.generate_statistics()
     report.csv(sys.stdout)
 
@@ -330,14 +330,12 @@ def generate_statistics_subparser (subparsers):
     from a set of results."""
     parser = subparsers.add_parser(
         'stats', description=constants.STATISTICS_DESCRIPTION,
-        epilog=constants.STATISTICS_EPILOG,
-        help=constants.STATISTICS_HELP)
+        formatter_class=ParagraphFormatter, help=constants.STATISTICS_HELP)
     parser.set_defaults(func=generate_statistics)
     add_common_arguments(parser)
+    add_corpus_arguments(parser)
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
                         metavar='RESULTS')
-    parser.add_argument('counts', help=constants.STATISTICS_COUNTS_HELP,
-                        metavar='COUNTS')
 
 def generate_strip_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to process original
