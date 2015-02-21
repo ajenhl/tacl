@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import logging
 import os
@@ -11,8 +9,12 @@ from tacl import constants
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
-    configure_logging(args.verbose)
-    args.func(args)
+    if hasattr(args, 'verbose'):
+        configure_logging(args.verbose)
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        parser.print_help()
 
 def add_common_arguments (parser):
     """Adds common arguments for all parsers."""
@@ -153,8 +155,3 @@ def text_in_corpus (args):
     commands_path = os.path.join(output_dir, 'commands')
     with open(commands_path, 'w') as fh:
         fh.writelines(commands)
-
-
-
-if __name__ == '__main__':
-    main()

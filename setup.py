@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 
 with open('README.rst') as fh:
@@ -13,8 +13,13 @@ setup(name='tacl',
       author='Jamie Norrish',
       author_email='jamie@artefact.org.nz',
       url='https://github.com/ajenhl/tacl',
-      packages=['tacl'],
-      scripts=['bin/tacl', 'bin/tacl-helper'],
+      packages=['tacl', 'tacl.command'],
+      entry_points = {
+          'console_scripts': [
+              'tacl=tacl.command.tacl_script:main',
+              'tacl-helper=tacl.command.tacl_helper_script:main',
+          ],
+      },
       requires=['biopython', 'lxml', 'pandas'],
       install_requires=['biopython', 'lxml', 'pandas'],
       classifiers=[
@@ -23,5 +28,5 @@ setup(name='tacl',
           'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
           'Programming Language :: Python :: 3',
           'Topic :: Text Processing :: Linguistic',
-        ]
-      )
+      ],
+)
