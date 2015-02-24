@@ -20,7 +20,6 @@ setup(name='tacl',
               'tacl-helper=tacl.command.tacl_helper_script:main',
           ],
       },
-      requires=['biopython', 'lxml', 'pandas'],
       install_requires=['biopython', 'lxml', 'pandas'],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
@@ -29,4 +28,5 @@ setup(name='tacl',
           'Programming Language :: Python :: 3',
           'Topic :: Text Processing :: Linguistic',
       ],
+      test_suite = 'tests',
 )
