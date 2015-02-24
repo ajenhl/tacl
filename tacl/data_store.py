@@ -551,12 +551,14 @@ class DataStore:
                                          [name, siglum]).fetchone()
                 if row is None:
                     is_valid = False
-                    self._logger.warn('No record (or n-grams) exists for {} in '
-                                      'the database'.format(filename))
+                    self._logger.warning(
+                        'No record (or n-grams) exists for {} in '
+                        'the database'.format(filename))
                 elif row['checksum'] != text.get_checksum():
                     is_valid = False
-                    self._logger.warn('{} has changed since its n-grams were '
-                                      'added to the database'.format(filename))
+                    self._logger.warning(
+                        '{} has changed since its n-grams were '
+                        'added to the database'.format(filename))
             if count == 0:
                 self._logger.error('Catalogue references text {} that does not '
                                    'exist in the corpus'.format(name))

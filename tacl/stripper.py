@@ -151,7 +151,7 @@ class Stripper:
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError:
-            logging.warn('XML file "{}" is invalid'.format(filename))
+            logging.warning('XML file "{}" is invalid'.format(filename))
             return
         text_witnesses = self._texts.setdefault(stripped_file_path, {})
         for witness in self.get_witnesses(tei_doc):

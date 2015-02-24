@@ -200,7 +200,7 @@ class TEICorpus:
         basename = os.path.splitext(os.path.basename(filename))[0]
         match = text_name_pattern.search(basename)
         if match is None:
-            self._logger.warn('Found an anomalous filename "{}"'.format(
+            self._logger.warning('Found an anomalous filename "{}"'.format(
                 filename))
             return None, None
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
@@ -241,7 +241,8 @@ class TEICorpus:
                 if os.path.splitext(filename)[1] == '.xml':
                     text_name, part_number = self.extract_text_name(filename)
                     if text_name is None:
-                        self._logger.warn('Skipping file "{}"'.format(filename))
+                        self._logger.warning('Skipping file "{}"'.format(
+                            filename))
                     else:
                         text_name = '{}.xml'.format(text_name)
                         text_parts = self._texts.setdefault(text_name, {})
@@ -264,13 +265,13 @@ class TEICorpus:
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError as err:
-            self._logger.warn('XML file "{}" is invalid'.format(file_path))
+            self._logger.warning('XML file "{}" is invalid'.format(file_path))
             if tried:
                 self._logger.error(
                     'XML file "{}" is irretrievably invalid: {}'.format(
                         file_path, err))
                 raise
-            self._logger.warn('Retrying after modifying entity file')
+            self._logger.warning('Retrying after modifying entity file')
             self._correct_entity_file(file_path)
             xml = self._tidy(text_name, file_path, True)
         else:

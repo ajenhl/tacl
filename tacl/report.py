@@ -38,8 +38,9 @@ class Report:
             return
         highest_n = self._matches[constants.SIZE_FIELDNAME].max()
         if highest_n == 1:
-            self._logger.warn('Extending results that contain only 1-grams is '
-                              'unsupported; the original results will be used')
+            self._logger.warning(
+                'Extending results that contain only 1-grams is unsupported; '
+                'the original results will be used')
             return
         # Supply the extender with only matches on the largest
         # n-grams.
