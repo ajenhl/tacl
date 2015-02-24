@@ -24,11 +24,11 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        reader = csv.reader(open(path, 'r', encoding='utf-8', newline=''),
-                            delimiter=' ', skipinitialspace=True)
-        for row in reader:
-            if len(row) > 1 and row[1]:
-                self[row[0]] = row[1]
+        with open(path, 'r', encoding='utf-8', newline='') as fh:
+            reader = csv.reader(fh, delimiter=' ', skipinitialspace=True)
+            for row in reader:
+                if len(row) > 1 and row[1]:
+                    self[row[0]] = row[1]
 
     def save (self, path):
         """Saves this catalogue's data to `path`.

@@ -27,8 +27,8 @@ class ReportIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'cbeta-extend-results.csv')
-        expected_rows = self._get_rows_from_csv(open(expected_results,
-                                                     newline=''))
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_extend_pagel (self):
@@ -40,8 +40,8 @@ class ReportIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'pagel-extend-results.csv')
-        expected_rows = self._get_rows_from_csv(open(expected_results,
-                                                     newline=''))
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 
