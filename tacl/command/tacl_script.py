@@ -38,7 +38,6 @@ def add_corpus_arguments (parser):
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
 
-
 def add_db_arguments (parser):
     """Adds common arguments for the database sub-commands to
     `parser`."""
@@ -107,6 +106,7 @@ def generate_parser ():
     generate_highlight_subparser(subparsers)
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
+    generate_prepare_subparser(subparsers)
     generate_report_subparser(subparsers)
     generate_supplied_diff_subparser(subparsers)
     generate_search_subparser(subparsers)
@@ -231,6 +231,19 @@ def generate_ngrams_subparser (subparsers):
                         metavar='MINIMUM', type=int)
     parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
                         metavar='MAXIMUM', type=int)
+
+def generate_prepare_subparser (subparsers):
+    """Adds a sub-command parser to `subparsers` to prepare source XML
+    files for stripping."""
+    parser = subparsers.add_parser(
+        'prepare', description=constants.PREPARE_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.PREPARE_HELP)
+    parser.set_defaults(func=prepare_xml)
+    add_common_arguments(parser)
+    parser.add_argument('input', help=constants.PREPARE_INPUT_HELP,
+                        metavar='INPUT')
+    parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
+                        metavar='OUTPUT')
 
 def generate_report (args):
     if args.results == '-':
@@ -388,9 +401,7 @@ def get_data_store (args):
     return tacl.DataStore(args.db, args.memory, args.ram)
 
 def get_input_fh (arg):
-    """Returns an open file of CSV data, or None if `arg` is None.
-
-    """
+    """Returns an open file of CSV data, or None if `arg` is None."""
     input_fh = None
     if arg:
         input_fh = open(arg, 'r', encoding='utf-8', newline='')
@@ -434,6 +445,16 @@ def ngram_intersection (args):
     store.validate(corpus, catalogue)
     store.intersection(catalogue, sys.stdout)
 
+def prepare_xml (args):
+    """Prepares XML texts for stripping.
+
+    This process creates a single, normalised TEI XML file for each
+    text.
+
+    """
+    corpus = tacl.TEICorpus(args.input, args.output)
+    corpus.tidy()
+
 def search_texts (args):
     """Searches texts for presence of n-grams."""
     store = get_data_store(args)
@@ -447,14 +468,10 @@ def search_texts (args):
     store.search(catalogue, ngrams, sys.stdout)
 
 def strip_texts (args):
-    """Processes texts for use with the tacl ngrams command."""
-    xml_output_dir = os.path.join(args.output, 'tacl_xml')
-    stripped_output_dir = args.output
-    corpus = tacl.TEICorpus(args.input, xml_output_dir)
-    corpus.tidy()
-    stripper = tacl.Stripper(xml_output_dir, stripped_output_dir)
+    """Processes prepared XML texts for use with the tacl ngrams
+    command."""
+    stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
-    shutil.rmtree(xml_output_dir)
 
 def supplied_diff (args):
     labels = args.labels

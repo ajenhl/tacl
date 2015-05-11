@@ -7,7 +7,7 @@ from lxml import etree
 import tacl
 
 
-class StripTestCase (unittest.TestCase):
+class TEICorpusTestCase (unittest.TestCase):
 
     def setUp (self):
         self.transform = etree.XSLT(etree.XML(tacl.tei_corpus.SIMPLIFY_XSLT))

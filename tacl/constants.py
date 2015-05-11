@@ -131,6 +131,14 @@ NGRAMS_HELP = 'Generate n-grams from a corpus.'
 NGRAMS_MAXIMUM_HELP = 'Maximum size of n-gram to generate (integer).'
 NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
+PREPARE_DESCRIPTION = '''\
+    Convert CBETA TEI XML files (which may have multiple files per
+    text) into XML suitable for processing via the tacl strip
+    command.'''
+PREPARE_HELP = 'Convert CBETA TEI XML files into an XML form suitable for stripping.'
+PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
+PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
+
 REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
     the new set of results.'''
