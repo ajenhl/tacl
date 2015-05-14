@@ -4,8 +4,6 @@ texts."""
 import argparse
 import io
 import logging
-import os
-import shutil
 import sys
 
 import tacl
@@ -187,7 +185,8 @@ def generate_highlight_subparser (subparsers):
     its matches in a result."""
     parser = subparsers.add_parser(
         'highlight', description=constants.HIGHLIGHT_DESCRIPTION,
-        epilog=constants.HIGHLIGHT_EPILOG, help=constants.HIGHLIGHT_HELP)
+        epilog=constants.HIGHLIGHT_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.HIGHLIGHT_HELP)
     parser.set_defaults(func=highlight_text)
     add_common_arguments(parser)
     add_corpus_arguments(parser)
@@ -318,7 +317,7 @@ def generate_search_subparser (subparsers):
     results for a set of n-grams."""
     parser = subparsers.add_parser(
         'search', description=constants.SEARCH_DESCRIPTION,
-        help=constants.SEARCH_HELP)
+        formatter_class=ParagraphFormatter, help=constants.SEARCH_HELP)
     parser.set_defaults(func=search_texts)
     add_common_arguments(parser)
     add_db_arguments(parser)
@@ -352,7 +351,8 @@ def generate_strip_subparser (subparsers):
     texts for use with the tacl ngrams command."""
     parser = subparsers.add_parser(
         'strip', description=constants.STRIP_DESCRIPTION,
-        epilog=constants.STRIP_EPILOG, help=constants.STRIP_HELP)
+        epilog=constants.STRIP_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.STRIP_HELP)
     parser.set_defaults(func=strip_texts)
     add_common_arguments(parser)
     parser.add_argument('input', help=constants.STRIP_INPUT_HELP,
