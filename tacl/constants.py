@@ -387,14 +387,14 @@ VACUUM_SQL = 'VACUUM'
 HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>{base_name} {base_siglum} with matches from each other text highlighted</title>
     <style>
       body {{ margin-left: 4em; color: black; background-color: white; }}
       div.text-list {{ float: right; width: 15em; margin-left: 3em; }}
       ul {{ list-style-type: none; }}
     </style>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
   </head>
   <body>
     <h1>{base_name} {base_siglum} with matches from each other text highlighted</h1>
@@ -414,7 +414,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
       var max = $("input").length;
 
       function recalculateHeat (textname, change) {{
-        $("span[data-texts~='" + textname + "']").each(function () {{
+        $("span[data-texts~='" + textname.replace('\\', '\\\\') + "']").each(function () {{
           $(this).attr("data-count", function () {{
             return parseInt($(this).attr("data-count")) + change;
           }});
@@ -450,7 +450,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
 
 FILE_SEQUENCES_HTML = '''<html lang="zh">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title lang="en">Alignment between {l1} and {l2}</title>
     <style>
       :lang(en) {{ overflow-wrap: normal; word-break: normal; }}

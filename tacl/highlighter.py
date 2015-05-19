@@ -84,7 +84,7 @@ class Highlighter:
     def _generate_text_list_html (texts):
         widgets = []
         for text in texts:
-            widgets.append('<li><input type="checkbox" name="text" value="{0}"> {0}'.format(text))
+            widgets.append('<li><input type="checkbox" name="text" value="{0}"/> {0}</li>'.format(text))
         text_list = '<form><ul>{}</ul></form>'.format(''.join(widgets))
         return text_list
 
