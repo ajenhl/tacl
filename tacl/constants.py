@@ -212,7 +212,7 @@ SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not ma
 SUPPLIED_DIFF_DESCRIPTION = '''\
     List n-grams unique to each set of results (as defined by the
     specified results files).'''
-SUPPLIED_DIFF_HELP = 'List n-grams unqiue to each results file.'
+SUPPLIED_DIFF_HELP = 'List n-grams unique to each results file.'
 SUPPLIED_EPILOG = '''\
     The number of labels supplied must match the number of results
     files. The first label is assigned to all results in the first
