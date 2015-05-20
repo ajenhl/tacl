@@ -414,7 +414,7 @@ HIGHLIGHT_TEMPLATE = '''<!DOCTYPE html>
       var max = $("input").length;
 
       function recalculateHeat (textname, change) {{
-        $("span[data-texts~='" + textname.replace('\\', '\\\\') + "']").each(function () {{
+        $("span[data-texts~='" + textname.replace('\\\\', '\\\\\\\\') + "']").each(function () {{
           $(this).attr("data-count", function () {{
             return parseInt($(this).attr("data-count")) + change;
           }});
