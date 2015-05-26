@@ -36,6 +36,7 @@ LABEL_FIELDNAME = 'label'
 NAME_FIELDNAME = 'text name'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
+NUMBER_FIELDNAME = 'number'
 PERCENTAGE_FIELDNAME = 'percentage'
 SIGLUM_FIELDNAME = 'siglum'
 SIZE_FIELDNAME = 'size'
@@ -49,7 +50,7 @@ COUNTS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
 SEARCH_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
-                     LABEL_FIELDNAME, NGRAMS_FIELDNAME]
+                     LABEL_FIELDNAME, NGRAMS_FIELDNAME, NUMBER_FIELDNAME]
 STATISTICS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME,
                          COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
                          PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
@@ -183,8 +184,13 @@ REPORT_SORT_HELP = 'Sort the results.'
 
 SEARCH_DESCRIPTION = '''\
     List texts containing at least one of the supplied n-grams, along
-    with a count of how many of the n-grams are present in each
-    text.'''
+    with a total count of how many occurrences of the n-grams are
+    present in each text, and the number of n-grams that match in each
+    text.
+
+    Specifying a catalogue file will not restrict the search to only
+    those labelled texts, but rather adds the labels to any
+    appropriate texts in the results.'''
 SEARCH_HELP = 'List texts containing at least one of the supplied n-grams.'
 SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
@@ -371,7 +377,8 @@ SELECT ngram FROM temp.InputResults
 GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)'''
 SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
     'SUM(TextNGram.count) AS count, ' \
-    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams " \
+    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, " \
+    'count(TextNGram.ngram) AS number ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \

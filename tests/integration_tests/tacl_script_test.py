@@ -421,11 +421,11 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # row) is arbitrary, which means this test may sometimes fail
         # in its current form.
         expected_rows = [
-            ('T1', 'base', '1', '', 'he'),
-            ('T1', 'a', '1', '', 'he'),
-            ('T2', 'base', '4', '', 'ese, he'),
-            ('T2', 'a', '3', '', 'ese, he'),
-            ('T4', 'base', '1', '', 'he')]
+            ('T1', 'base', '1', '', 'he', '1'),
+            ('T1', 'a', '1', '', 'he', '1'),
+            ('T2', 'base', '4', '', 'ese, he', '2'),
+            ('T2', 'a', '3', '', 'ese, he', '2'),
+            ('T4', 'base', '1', '', 'he', '1')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_search_with_catalogue (self):
@@ -440,11 +440,11 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # row) is arbitrary, which means this test may sometimes fail
         # in its current form.
         expected_rows = [
-            ('T1', 'base', '1', 'A', 'he'),
-            ('T1', 'a', '1', 'A', 'he'),
-            ('T2', 'base', '4', '', 'ese, he'),
-            ('T2', 'a', '3', '', 'ese, he'),
-            ('T4', 'base', '1', 'B', 'he')]
+            ('T1', 'base', '1', 'A', 'he', '1'),
+            ('T1', 'a', '1', 'A', 'he', '1'),
+            ('T2', 'base', '4', '', 'ese, he', '2'),
+            ('T2', 'a', '3', '', 'ese, he', '2'),
+            ('T4', 'base', '1', 'B', 'he', '1')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 
