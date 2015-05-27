@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup
 
@@ -7,7 +7,7 @@ with open('README.rst') as fh:
     long_description = fh.read()
 
 setup(name='tacl',
-      version='1.1.0',
+      version='2.0.0',
       description='Text analyser for corpus linguistics',
       long_description=long_description,
       author='Jamie Norrish',
