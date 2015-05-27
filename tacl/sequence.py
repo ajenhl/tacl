@@ -76,7 +76,7 @@ class Sequencer:
             for secondary_label in labels[index+1:]:
                 self._generate_sequences(primary_label, secondary_label, ngrams)
 
-    def _generate_sequences(self, primary_label, secondary_label, ngrams):
+    def _generate_sequences (self, primary_label, secondary_label, ngrams):
         self._substitutes = {}
         self._char_code = 61440
         cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME]
@@ -91,7 +91,7 @@ class Sequencer:
                 self._generate_sequences_for_texts(label1, text1, label2, text2,
                                                    ngrams)
 
-    def _generate_sequences_for_texts(self, l1, t1, l2, t2, ngrams):
+    def _generate_sequences_for_texts (self, l1, t1, l2, t2, ngrams):
         self._r_substitutes = dict((v, k) for k, v in self._substitutes.items())
         sequences = []
         covered_spans = [[], []]
@@ -144,7 +144,7 @@ class Sequencer:
                 tokens[i] = substitute
         return self._tokenizer.joiner.join(tokens)
 
-    def _get_text_sequence(self, text, span, context_length):
+    def _get_text_sequence (self, text, span, context_length):
         start = max(0, span[0] - context_length)
         end = min(len(text), span[1] + context_length)
         return text[start:end], (start, end)
