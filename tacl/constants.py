@@ -118,7 +118,11 @@ HIGHLIGHT_EPILOG = '''\
     The scope of the supplied results may have a dramatic influence on
     the amount of highlighting. Results containing 1-grams are very
     likely to be almost entirely highlighted. Results may be
-    restricted by using the tacl report command.'''
+    restricted by using the tacl report command.
+
+    Example:
+
+        tacl highlight corpus/stripped/ intersect.csv T0001 元'''
 HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
 
 INTERSECT_DESCRIPTION = '''\
