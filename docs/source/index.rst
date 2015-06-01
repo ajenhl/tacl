@@ -39,12 +39,14 @@ of their `n-grams`_. There are several steps in the preparation and
 analysis of the corpus, as listed with example commands:
 
 1. Preprocess the texts in the corpus in order to remove material that
-   is not relevant to the analysis (the :doc:`tacl strip
-   </scripts/tacl-strip>` command). This creates modified files in a
+   is not relevant to the analysis (the :doc:`tacl prepare
+   </scripts/tacl-prepare>` and :doc:`tacl strip
+   </scripts/tacl-strip>` commands). This creates modified files in a
    separate directory, and it is this directory and these files that
    are the considered the corpus for the remaining steps. ::
 
-       tacl strip path/XML/dir path/stripped/dir
+       tacl prepare path/XML/dir path/prepared/dir
+       tacl strip path/prepared/dir path/stripped/dir
 
    Note that the output format is simply plain text. If you already
    have plain text files, then this step is not necessary. The
