@@ -273,6 +273,9 @@ VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''
 
 
+CATALOGUE_TEXT_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+
+
 # SQL statements.
 ANALYSE_SQL = 'ANALYZE {}'
 CREATE_INDEX_INPUT_RESULTS_SQL = 'CREATE INDEX IF NOT EXISTS ' \

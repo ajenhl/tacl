@@ -1,6 +1,9 @@
 import csv
 import os
 
+from .constants import CATALOGUE_TEXT_RELABELLED_ERROR
+from .exceptions import MalformedCatalogueError
+
 
 class Catalogue (dict):
 
@@ -24,11 +27,17 @@ class Catalogue (dict):
         :type path: `str`
 
         """
+        fieldnames = ['text', 'label']
         with open(path, 'r', encoding='utf-8', newline='') as fh:
-            reader = csv.reader(fh, delimiter=' ', skipinitialspace=True)
+            reader = csv.DictReader(fh, delimiter=' ', fieldnames=fieldnames,
+                                    skipinitialspace=True)
             for row in reader:
-                if len(row) > 1 and row[1]:
-                    self[row[0]] = row[1]
+                text, label = row['text'], row['label']
+                if label:
+                    if text in self:
+                        raise MalformedCatalogueError(
+                            CATALOGUE_TEXT_RELABELLED_ERROR.format(text))
+                    self[text] = label
 
     def save (self, path):
         """Saves this catalogue's data to `path`.
