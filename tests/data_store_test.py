@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import call, MagicMock, sentinel
 
 import tacl
+from tacl.exceptions import MalformedQueryError
 from .tacl_test_case import TaclTestCase
 
 
@@ -193,7 +194,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(store._conn.mock_calls, expected_calls)
 
     def test_diff (self):
-        labels = {sentinel.label: 1}
+        labels = {sentinel.label: 2, sentinel.label2: 1}
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
         get_placeholders = self._create_patch(
@@ -210,12 +211,14 @@ class DataStoreTestCase (TaclTestCase):
         cursor = store._conn.execute.return_value
         output_fh = store.diff(catalogue, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
-        get_placeholders.assert_called_once_with(list(labels))
+        get_placeholders.assert_called_once_with(
+            [sentinel.label, sentinel.label2])
         log_query_plan.assert_called_once()
         sql = tacl.constants.SELECT_DIFF_SQL.format(sentinel.placeholders,
                                                     sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
-                         [call.execute(sql, [sentinel.label, sentinel.label])])
+                         [call.execute(sql, [sentinel.label, sentinel.label2,
+                                             sentinel.label, sentinel.label2])])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
@@ -250,6 +253,31 @@ class DataStoreTestCase (TaclTestCase):
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
+
+    def test_diff_asymmetric_one_label (self):
+        catalogue = {'T1': 'A', 'T2': 'A'}
+        store = tacl.DataStore(':memory:')
+        input_fh = MagicMock(name='fh')
+        set_labels = self._create_patch('tacl.DataStore._set_labels')
+        set_labels.return_value = {'A': 2}
+        self.assertRaises(MalformedQueryError, store.diff_asymmetric,
+                          catalogue, 'A', input_fh)
+
+    def test_diff_one_label (self):
+        catalogue = {'T1': 'A', 'T2': 'A'}
+        store = tacl.DataStore(':memory:')
+        output_fh = MagicMock(name='fh')
+        set_labels = self._create_patch('tacl.DataStore._set_labels')
+        set_labels.return_value = {'A': 2}
+        self.assertRaises(MalformedQueryError, store.diff, catalogue, output_fh)
+
+    def test_diff_supplied_one_label (self):
+        filenames = ['a.csv']
+        labels = ['A']
+        store = tacl.DataStore(':memory:')
+        output_fh = MagicMock(name='fh')
+        self.assertRaises(MalformedQueryError, store.diff_supplied, filenames,
+                          labels, output_fh)
 
     def test_drop_indices (self):
         store = tacl.DataStore(':memory:')
@@ -387,6 +415,26 @@ class DataStoreTestCase (TaclTestCase):
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
+
+    def test_intersection_one_label (self):
+        labels = [sentinel.label1]
+        set_labels = self._create_patch('tacl.DataStore._set_labels')
+        set_labels.return_value = {}
+        sort_labels = self._create_patch('tacl.DataStore._sort_labels', False)
+        sort_labels.return_value = labels
+        output_fh = MagicMock(name='fh')
+        catalogue = MagicMock(name='catalogue')
+        store = tacl.DataStore(':memory:')
+        self.assertRaises(MalformedQueryError, store.intersection, catalogue,
+                          output_fh)
+
+    def test_intersection_supplied_one_label (self):
+        filenames = ['a.csv']
+        labels = ['A']
+        store = tacl.DataStore(':memory:')
+        output_fh = MagicMock(name='fh')
+        self.assertRaises(MalformedQueryError, store.intersection_supplied,
+                          filenames, labels, output_fh)
 
     def test_set_labels (self):
         catalogue = collections.OrderedDict(

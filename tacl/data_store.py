@@ -7,6 +7,7 @@ import sqlite3
 import sys
 
 from . import constants
+from .exceptions import MalformedQueryError
 
 
 class DataStore:
@@ -68,8 +69,12 @@ class DataStore:
                                [(ngram,) for ngram in ngrams])
 
     def _add_temporary_results_sets (self, results_filenames, labels):
+        if len(labels) < 2:
+            raise MalformedQueryError(
+                constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         if len(results_filenames) != len(labels):
-            raise IndexError(constants.SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR)
+            raise MalformedQueryError(
+                constants.SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR)
         self._create_temporary_results_table()
         for results_filename, label in zip(results_filenames, labels):
             with open(results_filename, encoding='utf-8', newline='') as fh:
@@ -248,7 +253,9 @@ class DataStore:
         :rtype: file-like object
 
         """
-        labels = list(self._set_labels(catalogue))
+        labels = self._sort_labels(self._set_labels(catalogue))
+        if len(labels) < 2:
+            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_SQL.format(label_placeholders,
                                                  label_placeholders)
@@ -275,6 +282,8 @@ class DataStore:
 
         """
         labels = list(self._set_labels(catalogue))
+        if len(labels) < 2:
+            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         labels.remove(prime_label)
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
@@ -416,6 +425,8 @@ class DataStore:
 
         """
         labels = self._sort_labels(self._set_labels(catalogue))
+        if len(labels) < 2:
+            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         label_placeholders = self._get_placeholders(labels)
         subquery = self._get_intersection_subquery(labels)
         query = constants.SELECT_INTERSECT_SQL.format(label_placeholders,

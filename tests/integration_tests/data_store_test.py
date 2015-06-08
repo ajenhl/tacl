@@ -3,6 +3,7 @@ import os.path
 import unittest
 
 import tacl
+from tacl.exceptions import MalformedQueryError
 from ..tacl_test_case import TaclTestCase
 
 class DataStoreIntegrationTestCase (TaclTestCase):
@@ -276,8 +277,8 @@ class DataStoreIntegrationTestCase (TaclTestCase):
                    os.path.join(supplied_dir, 'diff_input_2.csv'),
                    os.path.join(supplied_dir, 'diff_input_3.csv')]
         labels = ('A', 'B')
-        self.assertRaises(IndexError, self._store.diff_supplied, results,
-                          labels, io.StringIO(newline=''))
+        self.assertRaises(MalformedQueryError, self._store.diff_supplied,
+                          results, labels, io.StringIO(newline=''))
 
     def test_intersection (self):
         actual_rows = self._get_rows_from_csv(self._store.intersection(
@@ -329,8 +330,9 @@ class DataStoreIntegrationTestCase (TaclTestCase):
                    os.path.join(supplied_dir, 'intersect_input_2.csv'),
                    os.path.join(supplied_dir, 'intersect_input_3.csv')]
         labels = ('A', 'B')
-        self.assertRaises(IndexError, self._store.intersection_supplied,
-                          results, labels, io.StringIO(newline=''))
+        self.assertRaises(
+            MalformedQueryError, self._store.intersection_supplied,
+            results, labels, io.StringIO(newline=''))
 
     def test_validate_missing_text (self):
         self._catalogue['missing'] = 'A'

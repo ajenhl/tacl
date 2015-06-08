@@ -218,7 +218,6 @@ STRIP_HELP = 'Generate texts for use with TACL from a corpus of TEI XML.'
 STRIP_INPUT_HELP = 'Directory containing files to strip.'
 STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'
 
-SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
 SUPPLIED_DIFF_DESCRIPTION = '''\
     List n-grams unique to each set of results (as defined by the
     specified results files).'''
@@ -273,7 +272,10 @@ VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''
 
 
+# Error messages.
 CATALOGUE_TEXT_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+INSUFFICIENT_LABELS_QUERY_ERROR = 'Not running query with less than two defined labels'
+SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
 
 
 # SQL statements.

@@ -10,3 +10,8 @@ class TACLError (Exception):
 class MalformedCatalogueError (TACLError):
 
     pass
+
+
+class MalformedQueryError (TACLError):
+
+    pass
