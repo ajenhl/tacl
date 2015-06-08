@@ -275,6 +275,7 @@ VERBOSE_HELP = '''\
 # Error messages.
 CATALOGUE_TEXT_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
 INSUFFICIENT_LABELS_QUERY_ERROR = 'Not running query with less than two defined labels'
+LABEL_NOT_IN_CATALOGUE_ERROR = 'Supplied label is not present in the supplied catalogue'
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
 
 

@@ -254,6 +254,18 @@ class DataStoreTestCase (TaclTestCase):
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
 
+    def test_diff_asymmetric_invalid_label (self):
+        # Tests that the right error is raised when the supplied label
+        # is not present in the catalogue.
+        catalogue = {'T1': 'A', 'T2': 'B'}
+        prime_label = 'C'
+        input_fh = MagicMock(name='fh')
+        store = tacl.DataStore(':memory:')
+        set_labels = self._create_patch('tacl.DataStore._set_labels')
+        set_labels.return_value = {'A': 1, 'B': 1}
+        self.assertRaises(MalformedQueryError, store.diff_asymmetric,
+                          catalogue, prime_label, input_fh)
+
     def test_diff_asymmetric_one_label (self):
         catalogue = {'T1': 'A', 'T2': 'A'}
         store = tacl.DataStore(':memory:')
