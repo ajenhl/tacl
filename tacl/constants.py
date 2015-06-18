@@ -258,6 +258,12 @@ TACL_HELPER_AGAINST_A_HELP = '''\
 TACL_HELPER_AGAINST_B_HELP = '''\
     File containing corpus text names to be compared against (one per
     line).'''
+TACL_HELPER_COLLAPSE_DESCRIPTION = '''
+    Collapse result rows for multiple witnesses having the same count
+    for an n-gram. Instead of the "siglum" column, all of the
+    witnesses (per text) with the same n-gram count are listed, space
+    separated, in the "sigla" column.'''
+TACL_HELPER_COLLAPSE_HELP = 'Collapse result rows for multiple witnesses having the same count for an n-gram'
 TACL_HELPER_IN_DESCRIPTION = '''\
     Generate a script to compare each text of a corpus with all the
     other texts of that corpus.'''
@@ -267,6 +273,7 @@ TACL_HELPER_IN_HELP = '''\
 TACL_HELPER_IN_TEXTS_HELP = '''\
     File containing text names to examine (one per line).'''
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
+TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
 
 VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''
