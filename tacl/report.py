@@ -52,7 +52,7 @@ class Report:
         for index, (text_name, siglum, label) in \
             matches[cols].drop_duplicates().iterrows():
             extended_ngrams = self._generate_extended_ngrams(
-                matches, text_name, siglum, corpus, highest_n)
+                matches, text_name, siglum, label, corpus, highest_n)
             extended_matches = pd.concat(
                 [extended_matches, self._generate_extended_matches(
                     extended_ngrams, highest_n, text_name, siglum, label)])
@@ -69,8 +69,8 @@ class Report:
         This extended match data are the counts for all intermediate
         n-grams within each extended n-gram.
 
-        :param extended_ngrams:
-        :type extended_ngrams:
+        :param extended_ngrams: extended n-grams
+        :type extended_ngrams: `list` of `str`
         :param highest_n: the highest degree of n-grams in the original results
         :type highest_n: `int`
         :param name: name of the text bearing `extended_ngrams`
@@ -116,18 +116,20 @@ class Report:
                 groupby_fields).sum().reset_index()
         return extended_matches
 
-    def _generate_extended_ngrams (self, matches, name, siglum, corpus,
+    def _generate_extended_ngrams (self, matches, name, siglum, label, corpus,
                                    highest_n):
-        """Returns the n-grams of the largest size that exist in `filename`\'s
-        text, generated from adding together overlapping n-grams in
-        `matches`.
+        """Returns the n-grams of the largest size that exist in `siglum`
+        witness to `name` text under `label`, generated from adding
+        together overlapping n-grams in `matches`.
 
         :param matches: n-gram matches
         :type matches: `pandas.DataFrame`
         :param name: name of text whose results are being processed
         :type name: `str`
-        :param siglum: siglum of text whose results are being processed
+        :param siglum: siglum of witness whose results are being processed
         :type siglum: `str`
+        :param label: label of witness whose results are being processed
+        :type label: `str`
         :param corpus: corpus to which `filename` belongs
         :type corpus: `Corpus`
         :param highest_n: highest degree of n-gram in `matches`
@@ -139,8 +141,10 @@ class Report:
         # processing within the for loop, so optimise even small
         # things, such as aliasing dotted calls here and below.
         t_join = self._tokenizer.joiner.join
-        witness_matches = matches[(matches[constants.NAME_FIELDNAME] == name) &
-                                  (matches[constants.SIGLUM_FIELDNAME] == siglum)]
+        witness_matches = matches[
+            (matches[constants.NAME_FIELDNAME] == name) &
+            (matches[constants.SIGLUM_FIELDNAME] == siglum) &
+            (matches[constants.LABEL_FIELDNAME] == label)]
         text = t_join(corpus.get_text(name, siglum).get_tokens())
         ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
                   list(witness_matches[constants.NGRAM_FIELDNAME])]
@@ -164,9 +168,9 @@ class Report:
         while working_ngrams:
             removals = set()
             ngram_size += 1
-            self._logger.debug('Iterating over {} n-grams to produce '
-                               '{}-grams'.format(len(working_ngrams),
-                                                 ngram_size))
+            self._logger.debug(
+                'Iterating over {} n-grams to produce {}-grams'.format(
+                    len(working_ngrams), ngram_size))
             for base in working_ngrams:
                 remove_base = False
                 base_overlap = base[-overlap:]

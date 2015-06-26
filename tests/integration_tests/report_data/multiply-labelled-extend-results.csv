@@ -1,0 +1,11 @@
+ngram,size,text name,siglum,count,label
+abc,3,t1,base,1,A
+bcd,3,t1,base,2,A
+cde,3,t1,base,2,A
+deg,3,t1,base,1,A
+abc,3,t1,base,2,B
+bcd,3,t1,base,1,B
+bce,3,t1,base,1,B
+cef,3,t1,base,1,B
+abcd,4,t1,base,1,A
+abcd,4,t1,base,1,B
