@@ -1,3 +1,21 @@
+2.1.0  2015-06-27  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added zero-fill option to tacl report, supplying result rows with
+    a count of zero to witnesses of a text that has at least one
+    witness with a non-zero count.
+
+  * Added collapse-witnesses subcommand to tacl-helper, to collapse
+    result rows for witnesses to the same text with the same count
+    into a single row.
+
+  * Fixed a bug in tacl report's extend if the same witness is
+    associated with more than one label in the results.
+
+  * Added check for texts being relabelled in a catalogue file.
+
+  * Added check for only a single label being supplied to a query.
+
+
 2.0.0  2015-05-27  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Added support for multiple witnesses to a text. Witnesses are
