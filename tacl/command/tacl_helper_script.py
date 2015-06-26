@@ -39,7 +39,8 @@ def add_db_arguments (parser):
                         metavar='CORPUS')
 
 def collapse_witnesses (args):
-    _collapse_witnesses(args.results, sys.stdout)
+    results = open(args.results, 'r', encoding='utf-8', newline='')
+    _collapse_witnesses(results, sys.stdout)
 
 def _collapse_witnesses (results_fh, output_fh):
     logger.debug('Loading results')
@@ -117,7 +118,7 @@ def generate_collapse_witness_results_subparser (subparsers):
     parser.set_defaults(func=collapse_witnesses)
     add_common_arguments(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
-                        metavar='RESULTS', type=argparse.FileType('r'))
+                        metavar='RESULTS')
 
 def generate_text_against_corpus_subparser (subparsers):
     parser = subparsers.add_parser(
