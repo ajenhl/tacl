@@ -288,8 +288,9 @@ class Report:
         """
         self._logger.info('Pruning results by text count')
         count_fieldname = 'tmp_count'
-        counts = pd.DataFrame(self._matches.groupby(
-            constants.NGRAM_FIELDNAME)[constants.NAME_FIELDNAME].nunique())
+        filtered = self._matches[self._matches[constants.COUNT_FIELDNAME] > 0]
+        grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
+        counts = pd.DataFrame(grouped[constants.NAME_FIELDNAME].nunique())
         counts.rename(columns={constants.NAME_FIELDNAME: count_fieldname},
                       inplace=True)
         if minimum:
@@ -310,7 +311,8 @@ class Report:
 
     def _reciprocal_remove (self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
-        grouped = matches.groupby(constants.NGRAM_FIELDNAME)
+        filtered = matches[matches[constants.COUNT_FIELDNAME] > 0]
+        grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
         return grouped.filter(
             lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 
@@ -393,3 +395,39 @@ class Report:
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
                 constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME],
             ascending=[False, True, False, True, True, True], inplace=True)
+
+    def zero_fill (self, corpus, catalogue):
+        """Adds rows to the results to ensure that, for every n-gram that is
+        attested in at least one witness, every witness for that text
+        has a row, with added rows having a count of zero.
+
+        :param corpus: corpus containing the texts appearing in the results
+        :type corpus: `Corpus`
+        :param catalogue: catalogue used in the generation of the results
+        :type catalogue: `Catalogue`
+
+        """
+        zero_rows = []
+        # Get all of the texts, and their witnesses, for each label.
+        data = {}
+        for text, label in iter(catalogue.items()):
+            data.setdefault(label, {})[text] = []
+            for siglum in corpus.get_sigla(text):
+                data[label][text].append(siglum)
+        grouping_cols = [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME,
+                         constants.SIZE_FIELDNAME, constants.NAME_FIELDNAME]
+        grouped = self._matches.groupby(grouping_cols, sort=False)
+        for (label, ngram, size, text), group in grouped:
+            row_data = {
+                constants.NGRAM_FIELDNAME: ngram,
+                constants.LABEL_FIELDNAME: label,
+                constants.SIZE_FIELDNAME: size,
+                constants.COUNT_FIELDNAME: 0,
+                constants.NAME_FIELDNAME: text,
+            }
+            for siglum in data[label][text]:
+                if group[group[constants.SIGLUM_FIELDNAME] == siglum].empty:
+                    row_data[constants.SIGLUM_FIELDNAME] = siglum
+                    zero_rows.append(row_data)
+        zero_df = pd.DataFrame(zero_rows, columns=constants.QUERY_FIELDNAMES)
+        self._matches = pd.concat([self._matches, zero_df])

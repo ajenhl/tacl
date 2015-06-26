@@ -12,6 +12,12 @@ class CorpusIntegrationTestCase (unittest.TestCase):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_get_sigla (self):
+        corpus = tacl.Corpus(self._data_dir, self._tokenizer)
+        actual_sigla = corpus.get_sigla('T1')
+        expected_sigla = ['base', 'a']
+        self.assertEqual(set(actual_sigla), set(expected_sigla))
+
     def test_get_text (self):
         corpus = tacl.Corpus(self._data_dir, self._tokenizer)
         actual_text = corpus.get_text('T1', 'base')

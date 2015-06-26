@@ -1,0 +1,7 @@
+ngram,size,text name,siglum,count,label
+th,2,T1,a,0,A
+th,2,T1,base,1,A
+he,2,T2,a,2,B
+he,2,T2,base,0,B
+th,2,T5,base,1,A
+th,2,T3,base,1,C

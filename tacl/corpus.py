@@ -21,6 +21,17 @@ class Corpus:
         self._path = os.path.abspath(path)
         self._tokenizer = tokenizer
 
+    def get_sigla (self, name):
+        """Returns a list of all of the sigla for the named text.
+
+        :param name: name of text
+        :type name: `str`
+        :rtype: `list` of `str`
+
+        """
+        return [os.path.splitext(os.path.basename(path))[0]
+                for path in glob.glob(os.path.join(self._path, name, '*.txt'))]
+
     def get_text (self, name, siglum):
         """Returns a `Text` representing the file associated with `name` and
         `siglum`.

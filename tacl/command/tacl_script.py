@@ -20,7 +20,7 @@ def main ():
     if hasattr(args, 'verbose'):
         configure_logging(args.verbose)
     if hasattr(args, 'func'):
-        args.func(args)
+        args.func(args, parser)
     else:
         parser.print_help()
 
@@ -64,7 +64,7 @@ def add_tokenizer_argument (parser):
                         default=constants.TOKENIZER_CHOICE_CBETA,
                         help=constants.DB_TOKENIZER_HELP)
 
-def align_results (args):
+def align_results (args, parser):
     if args.results == '-':
         results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
                                    newline='')
@@ -130,7 +130,7 @@ def generate_align_subparser (subparsers):
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
 
-def generate_catalogue (args):
+def generate_catalogue (args, parser):
     """Generates and saves a catalogue file."""
     catalogue = tacl.Catalogue()
     catalogue.generate(args.corpus, args.label)
@@ -210,7 +210,7 @@ def generate_intersect_subparser (subparsers):
     add_corpus_arguments(parser)
     add_query_arguments(parser)
 
-def generate_ngrams (args):
+def generate_ngrams (args, parser):
     """Adds n-grams data to the data store."""
     store = get_data_store(args)
     corpus = get_corpus(args)
@@ -244,33 +244,6 @@ def generate_prepare_subparser (subparsers):
     parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
                         metavar='OUTPUT')
 
-def generate_report (args):
-    if args.results == '-':
-        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
-                                   newline='')
-    else:
-        results = open(args.results, 'r', encoding='utf-8', newline='')
-    tokenizer = get_tokenizer(args)
-    report = tacl.Report(results, tokenizer)
-    if args.extend:
-        corpus = tacl.Corpus(args.extend, tokenizer)
-        report.extend(corpus)
-    if args.reduce:
-        report.reduce()
-    if args.reciprocal:
-        report.reciprocal_remove()
-    if args.min_texts or args.max_texts:
-        report.prune_by_text_count(args.min_texts, args.max_texts)
-    if args.min_size or args.max_size:
-        report.prune_by_ngram_size(args.min_size, args.max_size)
-    if args.min_count or args.max_count:
-        report.prune_by_ngram_count(args.min_count, args.max_count)
-    if args.remove:
-        report.remove_label(args.remove)
-    if args.sort:
-        report.sort()
-    report.csv(sys.stdout)
-
 def generate_report_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to manipulate CSV
     results data."""
@@ -279,7 +252,10 @@ def generate_report_subparser (subparsers):
         epilog=constants.REPORT_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.REPORT_HELP)
     add_common_arguments(parser)
-    parser.set_defaults(func=generate_report)
+    parser.set_defaults(func=report)
+    parser.add_argument('-c', '--catalogue', dest='catalogue',
+                        help=constants.REPORT_CATALOGUE_HELP,
+                        metavar='CATALOGUE')
     parser.add_argument('-e', '--extend', dest='extend',
                         help=constants.REPORT_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--min-count', dest='min_count',
@@ -309,6 +285,8 @@ def generate_report_subparser (subparsers):
     parser.add_argument('--sort', action='store_true',
                         help=constants.REPORT_SORT_HELP)
     add_tokenizer_argument(parser)
+    parser.add_argument('-z', '--zero-fill', dest='zero_fill',
+                        help=constants.REPORT_ZERO_FILL_HELP, metavar='CORPUS')
     parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -327,7 +305,7 @@ def generate_search_subparser (subparsers):
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
                         metavar='NGRAMS')
 
-def generate_statistics (args):
+def generate_statistics (args, parser):
     corpus = get_corpus(args)
     tokenizer = get_tokenizer(args)
     report = tacl.StatisticsReport(corpus, tokenizer, args.results)
@@ -390,10 +368,10 @@ def get_corpus (args):
     tokenizer = get_tokenizer(args)
     return tacl.Corpus(args.corpus, tokenizer)
 
-def get_catalogue (args):
+def get_catalogue (path):
     """Returns a `tacl.Catalogue`."""
     catalogue = tacl.Catalogue()
-    catalogue.load(args.catalogue)
+    catalogue.load(path)
     return catalogue
 
 def get_data_store (args):
@@ -410,7 +388,7 @@ def get_input_fh (arg):
 def get_tokenizer (args):
     return tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])
 
-def highlight_text (args):
+def highlight_text (args, parser):
     """Outputs the result of highlighting a text."""
     tokenizer = get_tokenizer(args)
     corpus = get_corpus(args)
@@ -418,34 +396,34 @@ def highlight_text (args):
     text = highlighter.highlight(args.results, args.base_name, args.base_siglum)
     print(text)
 
-def ngram_counts (args):
+def ngram_counts (args, parser):
     """Outputs the results of performing a counts query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
-    catalogue = get_catalogue(args)
+    catalogue = get_catalogue(args.catalogue)
     store.validate(corpus, catalogue)
     store.counts(catalogue, sys.stdout)
 
-def ngram_diff (args):
+def ngram_diff (args, parser):
     """Outputs the results of performing a diff query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
-    catalogue = get_catalogue(args)
+    catalogue = get_catalogue(args.catalogue)
     store.validate(corpus, catalogue)
     if args.asymmetric:
         store.diff_asymmetric(catalogue, args.asymmetric, sys.stdout)
     else:
         store.diff(catalogue, sys.stdout)
 
-def ngram_intersection (args):
+def ngram_intersection (args, parser):
     """Outputs the results of performing an intersection query."""
     store = get_data_store(args)
     corpus = get_corpus(args)
-    catalogue = get_catalogue(args)
+    catalogue = get_catalogue(args.catalogue)
     store.validate(corpus, catalogue)
     store.intersection(catalogue, sys.stdout)
 
-def prepare_xml (args):
+def prepare_xml (args, parser):
     """Prepares XML texts for stripping.
 
     This process creates a single, normalised TEI XML file for each
@@ -455,7 +433,40 @@ def prepare_xml (args):
     corpus = tacl.TEICorpus(args.input, args.output)
     corpus.tidy()
 
-def search_texts (args):
+def report (args, parser):
+    if args.results == '-':
+        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
+                                   newline='')
+    else:
+        results = open(args.results, 'r', encoding='utf-8', newline='')
+    tokenizer = get_tokenizer(args)
+    report = tacl.Report(results, tokenizer)
+    if args.extend:
+        corpus = tacl.Corpus(args.extend, tokenizer)
+        report.extend(corpus)
+    if args.reduce:
+        report.reduce()
+    if args.reciprocal:
+        report.reciprocal_remove()
+    if args.zero_fill:
+        if not args.catalogue:
+            parser.error('The zero-fill option requires that the -c option also be supplied.')
+        corpus = tacl.Corpus(args.zero_fill, tokenizer)
+        catalogue = get_catalogue(args.catalogue)
+        report.zero_fill(corpus, catalogue)
+    if args.min_texts or args.max_texts:
+        report.prune_by_text_count(args.min_texts, args.max_texts)
+    if args.min_size or args.max_size:
+        report.prune_by_ngram_size(args.min_size, args.max_size)
+    if args.min_count or args.max_count:
+        report.prune_by_ngram_count(args.min_count, args.max_count)
+    if args.remove:
+        report.remove_label(args.remove)
+    if args.sort:
+        report.sort()
+    report.csv(sys.stdout)
+
+def search_texts (args, parser):
     """Searches texts for presence of n-grams."""
     store = get_data_store(args)
     corpus = get_corpus(args)
@@ -467,19 +478,19 @@ def search_texts (args):
         ngrams = [ngram.strip() for ngram in fh.readlines()]
     store.search(catalogue, ngrams, sys.stdout)
 
-def strip_texts (args):
+def strip_texts (args, parser):
     """Processes prepared XML texts for use with the tacl ngrams
     command."""
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
 
-def supplied_diff (args):
+def supplied_diff (args, parser):
     labels = args.labels
     results = args.supplied
     store = get_data_store(args)
     store.diff_supplied(results, labels, sys.stdout)
 
-def supplied_intersect (args):
+def supplied_intersect (args, parser):
     labels = args.labels
     results = args.supplied
     store = get_data_store(args)

@@ -144,6 +144,8 @@ PREPARE_HELP = 'Convert CBETA TEI XML files into an XML form suitable for stripp
 PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 
+REPORT_CATALOGUE_HELP = '''\
+    Path to the catalogue file used to generate the results'''
 REPORT_DESCRIPTION = '''\
     Modify a query results file by removing certain results. Outputs
     the new set of results.'''
@@ -154,8 +156,8 @@ REPORT_EXTEND_HELP = '''\
     the results contain only 1-grams.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --extend, --reduce, --reciprocal, --min/max-texts,
-    --min/max-size, --min/max-count, --remove.
+    following order: --extend, --reduce, --reciprocal, --zero-fill,
+    --min/max-texts, --min/max-size, --min/max-count, --remove.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -185,6 +187,11 @@ REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 REPORT_REMOVE_HELP = 'Remove labelled results.'
 REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 REPORT_SORT_HELP = 'Sort the results.'
+REPORT_ZERO_FILL_HELP = '''\
+    Add rows with a count of 0 for each n-gram in each witness of a
+    text that has at least one witness bearing that n-gram. The
+    catalogue used to generate the results must also be specified with
+    the -c option.'''
 
 SEARCH_DESCRIPTION = '''\
     List texts containing at least one of the supplied n-grams, along

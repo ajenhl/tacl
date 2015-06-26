@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import io
+import os
 import unittest
 
 import tacl
@@ -97,9 +98,10 @@ class ReportTestCase (TaclTestCase):
             ['ABC', '3', 'b', 'base', '5', 'A'],
             ['ABC', '3', 'c', 'base', '1', 'B'],
             ['BA', '2', 'a', 'base', '6', 'A'],
-            ['B', '2', 'a', 'base', '5', 'A'],
-            ['B', '2', 'b', 'base', '3', 'A'],
-            ['B', '2', 'b', 'wit', '3', 'A'])
+            ['B', '1', 'a', 'base', '5', 'A'],
+            ['B', '1', 'b', 'base', '3', 'A'],
+            ['B', '1', 'b', 'wit', '3', 'A'],
+            ['B', '1', 'c', 'base', '0', 'B'])
         fh = self._create_csv(input_data)
         report = tacl.Report(fh, self._tokenizer)
         report.prune_by_text_count(minimum=3)
@@ -122,9 +124,11 @@ class ReportTestCase (TaclTestCase):
             ('ABC', '3', 'b', 'base', '5', 'A'),
             ('ABC', '3', 'c', 'base', '1', 'B'),
             ('BA', '2', 'a', 'base', '6', 'A'),
-            ('B', '2', 'a', 'base', '5', 'A'),
-            ('B', '2', 'b', 'base', '3', 'A'),
-            ('B', '2', 'b', 'wit', '3', 'A')]
+            ('B', '1', 'a', 'base', '5', 'A'),
+            ('B', '1', 'b', 'base', '3', 'A'),
+            ('B', '1', 'b', 'wit', '3', 'A'),
+            ('B', '1', 'c', 'base', '0', 'B'),
+        ]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
@@ -135,9 +139,10 @@ class ReportTestCase (TaclTestCase):
             ('ABC', '3', 'a', 'base', '3', 'A'),
             ('ABC', '3', 'b', 'base', '5', 'A'),
             ('ABC', '3', 'c', 'base', '1', 'B'),
-            ('B', '2', 'a', 'base', '5', 'A'),
-            ('B', '2', 'b', 'base', '3', 'A'),
-            ('B', '2', 'b', 'wit', '3', 'A')]
+            ('B', '1', 'a', 'base', '5', 'A'),
+            ('B', '1', 'b', 'base', '3', 'A'),
+            ('B', '1', 'b', 'wit', '3', 'A'),
+            ('B', '1', 'c', 'base', '0', 'B'),]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
@@ -148,6 +153,7 @@ class ReportTestCase (TaclTestCase):
             ['ABCDEF', '6', 'a', 'base', '7', 'A'],
             ['DEF', '3', 'a', 'base', '2', 'A'],
             ['GHIJ', '4', 'a', 'base', '3', 'A'],
+            ['KLM', '3', 'b', 'base', '0', 'A'],
             ['ABCDEF', '6', 'b', 'base', '3', 'B'],
             ['GHIJ', '4', 'b', 'base', '2', 'B'],
             ['KLM', '3', 'b', 'base', '17', 'B'])
@@ -169,6 +175,7 @@ class ReportTestCase (TaclTestCase):
             ['DEF', '3', 'a', 'base', '2', 'A'],
             ['AB', '2', 'b', 'base', '6', 'A'],
             ['GHIJ', '4', 'b', 'base', '3', 'A'],
+            ['KLM', '3', 'b', 'base', '0', 'A'],
             ['ABCDEF', '6', 'c', 'base', '3', 'B'],
             ['KLM', '3', 'c', 'base', '17', 'B'],
             ['GHIJ', '4', 'd', 'base', '2', 'B'],
@@ -195,6 +202,7 @@ class ReportTestCase (TaclTestCase):
             ['DEF', '3', 'a', 'base', '2', 'A'],
             ['AB', '2', 'b', 'base', '6', 'A'],
             ['GHIJ', '4', 'b', 'base', '3', 'A'],
+            ['KLM', '3', 'b', 'base', '0', 'A'],
             ['ABCDEF', '6', 'c', 'base', '3', 'B'],
             ['KLM', '3', 'c', 'base', '17', 'B'],
             ['GHIJ', '4', 'd', 'base', '2', 'B'],
@@ -390,6 +398,33 @@ class ReportTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_zero_fill (self):
+        tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
+                                   tacl.constants.TOKENIZER_JOINER_CBETA)
+        input_data = (
+            ['AB', '2', 'T1', 'base', '7', 'A'],
+            ['AB', '2', 'T2', 'a', '3', 'B'],
+            ['ABC', '3', 'T5', 'base', '1', 'A'],
+        )
+        base_dir = os.path.dirname(__file__)
+        stripped_dir = os.path.join(base_dir, 'integration_tests', 'data',
+                                    'stripped')
+        corpus = tacl.Corpus(stripped_dir, tokenizer)
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh, tokenizer)
+        catalogue = {'T1': 'A', 'T2': 'B', 'T3': 'C', 'T5': 'A'}
+        report.zero_fill(corpus, catalogue)
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        expected_rows = [
+            ('AB', '2', 'T1', 'base', '7', 'A'),
+            ('AB', '2', 'T1', 'a', '0', 'A'),
+            ('AB', '2', 'T2', 'a', '3', 'B'),
+            ('AB', '2', 'T2', 'base', '0', 'B'),
+            ('ABC', '3', 'T5', 'base', '1', 'A'),
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
 
 if __name__ == '__main__':
