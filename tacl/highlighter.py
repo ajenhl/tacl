@@ -33,6 +33,20 @@ class Highlighter:
                     span.set('data-texts', new_value)
         return etree.tostring(root, encoding='unicode')[5:-6]
 
+    def _format_text (self, text):
+        """Returns `text` with consecutive spaces converted to non-break
+        spaces, and linebreak converted into HTML br elements.
+
+        :param text: text to format
+        :type text: `str`
+        :rtype: `str`
+
+        """
+        text = re.sub(r'\n', '<br/>\n', text)
+        text = re.sub(r'  ', '&#160;&#160;', text)
+        text = re.sub(r'&#160; ', '&#160;&#160;', text)
+        return text
+
     def generate_base (self, matches, text_name, siglum, all=True):
         """Returns an XML document containing the text of `filename`
         marked up with its n-grams in `matches`.
@@ -59,6 +73,7 @@ class Highlighter:
         if not all:
             matches = matches[matches[constants.NAME_FIELDNAME] == filename]
         content = self._highlight(content, matches)
+        content = self._format_text(content)
         root = etree.fromstring('<div>{}</div>'.format(content))
         return root
 
