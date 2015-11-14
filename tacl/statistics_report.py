@@ -17,7 +17,7 @@ class StatisticsReport:
         self._stats = pd.DataFrame()
 
     def csv (self, fh):
-        self._stats.to_csv(fh, cols=constants.STATISTICS_FIELDNAMES,
+        self._stats.to_csv(fh, columns=constants.STATISTICS_FIELDNAMES,
                            encoding='utf-8', index=False)
         return fh
 
