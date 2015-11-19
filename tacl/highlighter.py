@@ -3,11 +3,13 @@
 import logging
 import re
 
+from jinja2 import Environment, PackageLoader
 from lxml import etree
 import pandas as pd
 
 from . import constants
 from .text import Text
+
 
 class Highlighter:
 
@@ -20,7 +22,7 @@ class Highlighter:
         match = match_obj.group(0)
         root = etree.fromstring('<div>{}</div>'.format(match))
         for span in root.xpath('//span'):
-            # The resuls are not guaranteed to have non-base matches
+            # The results are not guaranteed to have non-base matches
             # in it, so do not rely on being able to derive base
             # matches from them.
             if self._match_source == self._base_filename:
@@ -78,11 +80,13 @@ class Highlighter:
         return root
 
     def _generate_html (self, matches, text_name, siglum, text):
+        loader = PackageLoader('tacl', 'assets/templates')
+        env = Environment(loader=loader)
         text_list = self._generate_text_list(matches, text_name, siglum)
-        text_list_html = self._generate_text_list_html(text_list)
         text_data = {'base_name': text_name, 'base_siglum': siglum,
-                     'text': text, 'text_list': text_list_html}
-        return constants.HIGHLIGHT_TEMPLATE.format(**text_data)
+                     'text': text, 'text_list': text_list}
+        template = env.get_template('highlight.html')
+        return template.render(text_data)
 
     @staticmethod
     def _generate_text_list (matches, base_name, base_siglum):
@@ -93,14 +97,6 @@ class Highlighter:
             if not(name == base_name and siglum == base_siglum):
                 text_list.append(Text.assemble_filename(name, siglum))
         text_list.sort()
-        return text_list
-
-    @staticmethod
-    def _generate_text_list_html (texts):
-        widgets = []
-        for text in texts:
-            widgets.append('<li><input type="checkbox" name="text" value="{0}"/> {0}</li>'.format(text))
-        text_list = '<form><ul>{}</ul></form>'.format(''.join(widgets))
         return text_list
 
     def _get_regexp_pattern (self, ngram):

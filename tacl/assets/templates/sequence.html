@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8"/>
+    <title lang="en">Alignment between {{ l1 }} and {{ l2 }}</title>
+    <style>
+      :lang(en) { overflow-wrap: normal; word-break: normal; }
+      :lang(zh) { overflow-wrap: break-word; word-break: break-all; }
+      table { border-style: dotted; border-width: 1px; margin-bottom: 3em; }
+      td { border-style: dotted; border-width: 1px; line-height: 1.5;
+            padding: 0.5em; vertical-align: top; }
+      .match { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1 lang="en">Alignment between {{ l1 }} and {{ l2 }}</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>{{ l1 }}</th>
+          <th>{{ l2 }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sequence in sequences %}
+        <tr>
+          <td>{{ sequence.0 }}</td>
+          <td>{{ sequence.1 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

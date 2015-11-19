@@ -20,7 +20,10 @@ setup(name='tacl',
               'tacl-helper=tacl.command.tacl_helper_script:main',
           ],
       },
-      install_requires=['biopython', 'lxml', 'pandas'],
+      package_data = {
+          'tacl': ['assets/templates/*.html'],
+      },
+      install_requires=['biopython', 'Jinja2', 'lxml', 'pandas'],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',

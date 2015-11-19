@@ -5,6 +5,7 @@ import os
 import re
 
 from Bio import pairwise2
+from jinja2 import Environment, PackageLoader
 import pandas as pd
 
 from . import constants
@@ -27,10 +28,11 @@ class Sequence:
         return ''.join(html)
 
     def render (self):
-        """Returns an HTML fragment rendering the sequence."""
+        """Returns a tuple of HTML fragments rendering each element of the
+        sequence."""
         f1 = self._format_alignment(self._alignment[0], self._alignment[1])
         f2 = self._format_alignment(self._alignment[1], self._alignment[0])
-        return constants.SEQUENCE_HTML.format(f1, f2)
+        return f1, f2
 
 
 class Sequencer:
@@ -68,15 +70,20 @@ class Sequencer:
         return Sequence(alignment, self._r_substitutes)
 
     def generate_sequences (self, minimum_size):
+        loader = PackageLoader('tacl', 'assets/templates')
+        env = Environment(loader=loader)
+        template = env.get_template('sequence.html')
         # Get a list of the files in the matches, grouped by label
         # (ordered by number of texts).
         labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[constants.NAME_FIELDNAME].nunique().index)
         ngrams = self._matches[self._matches[constants.SIZE_FIELDNAME] >= minimum_size].sort(constants.SIZE_FIELDNAME, ascending=False)[constants.NGRAM_FIELDNAME].unique()
         for index, primary_label in enumerate(labels):
             for secondary_label in labels[index+1:]:
-                self._generate_sequences(primary_label, secondary_label, ngrams)
+                self._generate_sequences(primary_label, secondary_label, ngrams,
+                                         template)
 
-    def _generate_sequences (self, primary_label, secondary_label, ngrams):
+    def _generate_sequences (self, primary_label, secondary_label, ngrams,
+                             template):
         self._substitutes = {}
         self._char_code = 61440
         cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME]
@@ -89,9 +96,9 @@ class Sequencer:
                 text2 = self._get_text(name2, siglum2)
                 label2 = '{}_{}'.format(name2, siglum2)
                 self._generate_sequences_for_texts(label1, text1, label2, text2,
-                                                   ngrams)
+                                                   ngrams, template)
 
-    def _generate_sequences_for_texts (self, l1, t1, l2, t2, ngrams):
+    def _generate_sequences_for_texts (self, l1, t1, l2, t2, ngrams, template):
         self._r_substitutes = dict((v, k) for k, v in self._substitutes.items())
         sequences = []
         covered_spans = [[], []]
@@ -102,8 +109,7 @@ class Sequencer:
             sequences.extend(self._generate_sequences_for_ngram(
                 t1, t2, ngram, covered_spans))
         if sequences:
-            html = constants.FILE_SEQUENCES_HTML.format(
-                l1=l1, l2=l2, sequences='\n'.join(sequences))
+            html = template.render(l1=l1, l2=l2, sequences=sequences)
             os.makedirs(self._output_dir, exist_ok=True)
             output_name = os.path.join(self._output_dir,
                                        '{}-{}.html'.format(l1, l2))
