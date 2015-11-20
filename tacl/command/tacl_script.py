@@ -36,15 +36,28 @@ def add_corpus_arguments (parser):
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
 
-def add_db_arguments (parser):
+def add_db_arguments (parser, db_option=False):
     """Adds common arguments for the database sub-commands to
-    `parser`."""
+    `parser`.
+
+    `db_option` provides a means to work around
+    https://bugs.python.org/issue9338 whereby a positional argument
+    that follows an optional argument with nargs='+' will not be
+    recognised. When `db_optional` is True, create the database
+    argument as a required optional argument, rather than a positional
+    argument.
+
+    """
     parser.add_argument('-m', '--memory', action='store_true',
                         help=constants.DB_MEMORY_HELP)
     parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
                         type=int)
-    parser.add_argument('db', help=constants.DB_DATABASE_HELP,
-                        metavar='DATABASE')
+    if db_option:
+        parser.add_argument('-d', '--db', help=constants.DB_DATABASE_HELP,
+                            metavar='DATABASE', required=True)
+    else:
+        parser.add_argument('db', help=constants.DB_DATABASE_HELP,
+                            metavar='DATABASE')
 
 def add_query_arguments (parser):
     """Adds common arguments for query sub-commonads to `parser`."""
@@ -55,9 +68,9 @@ def add_supplied_query_arguments (parser):
     """Adds common arguments for supplied query sub-commands to
     `parser`."""
     parser.add_argument('-l', '--labels', help=constants.SUPPLIED_LABELS_HELP,
-                        nargs='*', required=True)
+                        nargs='+', required=True)
     parser.add_argument('-s', '--supplied', help=constants.SUPPLIED_RESULTS_HELP,
-                        metavar='RESULTS', nargs='*', required=True)
+                        metavar='RESULTS', nargs='+', required=True)
 
 def add_tokenizer_argument (parser):
     parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
@@ -347,7 +360,7 @@ def generate_supplied_diff_subparser (subparsers):
         formatter_class=ParagraphFormatter, help=constants.SUPPLIED_DIFF_HELP)
     parser.set_defaults(func=supplied_diff)
     add_common_arguments(parser)
-    add_db_arguments(parser)
+    add_db_arguments(parser, True)
     add_supplied_query_arguments(parser)
 
 def generate_supplied_intersect_subparser (subparsers):
@@ -360,7 +373,7 @@ def generate_supplied_intersect_subparser (subparsers):
         help=constants.SUPPLIED_INTERSECT_HELP)
     parser.set_defaults(func=supplied_intersect)
     add_common_arguments(parser)
-    add_db_arguments(parser)
+    add_db_arguments(parser, True)
     add_supplied_query_arguments(parser)
 
 def get_corpus (args):

@@ -234,13 +234,7 @@ SUPPLIED_EPILOG = '''\
     files. The first label is assigned to all results in the first
     results file, the second label to all results in the second
     results file, etc. The labels specified in the results files are
-    replaced with the supplied labels in the output.
-
-    Due to the variable number of labels and results files that can be
-    specified, the database argument must preceed both the -l and -s
-    options. Eg:
-
-        tacl {} cbeta.sqlite3 -l A B -s results1.csv results2.csv'''
+    replaced with the supplied labels in the output.'''
 SUPPLIED_DIFF_EPILOG = SUPPLIED_EPILOG.format('sdiff')
 SUPPLIED_INTERSECT_EPILOG = SUPPLIED_EPILOG.format('sintersect')
 SUPPLIED_INTERSECT_DESCRIPTION = '''\

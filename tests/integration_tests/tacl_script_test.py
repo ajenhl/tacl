@@ -347,7 +347,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         results1 = os.path.join(supplied_dir, 'diff_input_1.csv')
         results2 = os.path.join(supplied_dir, 'diff_input_2.csv')
         results3 = os.path.join(supplied_dir, 'diff_input_3.csv')
-        diff_command = 'tacl sdiff {} -l A B C -s {} {} {}'.format(
+        diff_command = 'tacl sdiff -d {} -l A B C -s {} {} {}'.format(
             self._db_path, results1, results2, results3)
         data = subprocess.check_output(shlex.split(diff_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
@@ -395,7 +395,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         results1 = os.path.join(supplied_dir, 'intersect_input_1.csv')
         results2 = os.path.join(supplied_dir, 'intersect_input_2.csv')
         results3 = os.path.join(supplied_dir, 'intersect_input_3.csv')
-        intersect_command = 'tacl sintersect {} -l A B C -s {} {} {}'.format(
+        intersect_command = 'tacl sintersect -d {} -l A B C -s {} {} {}'.format(
             self._db_path, results1, results2, results3)
         data = subprocess.check_output(shlex.split(intersect_command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
