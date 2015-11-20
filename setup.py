@@ -7,7 +7,7 @@ with open('README.rst') as fh:
     long_description = fh.read()
 
 setup(name='tacl',
-      version='2.1.0',
+      version='2.2.0',
       description='Text analyser for corpus linguistics',
       long_description=long_description,
       author='Jamie Norrish',
@@ -23,7 +23,7 @@ setup(name='tacl',
       package_data = {
           'tacl': ['assets/templates/*.html'],
       },
-      install_requires=['biopython', 'Jinja2', 'lxml', 'pandas'],
+      install_requires=['biopython', 'Jinja2', 'lxml', 'pandas>=0.17.0'],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',

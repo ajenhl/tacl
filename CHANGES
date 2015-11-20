@@ -1,3 +1,23 @@
+2.2.0  2015-11-20  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added basic formatting of highlighted text to match that of the
+    stripped text.
+
+  * Changed calls to pandas' to_csv method to keep up with current API
+    (use 'columns' instead of 'cols').
+
+  * Changed call to pandas' sort_index to sort_values to keep up with
+    current API.
+
+  * Specified minimum version of pandas (0.17.0) in setup.py.
+
+  * Changed arguments to sdiff and sintersect subcommands, to work
+    around Python bug https://bugs.python.org/issue9338
+
+  * Changed tacl highlight and align to use Jinja2 templates. This
+    paves the way for the HTML/CSS/JS-rich output of future scripts.
+
+
 2.1.0  2015-06-27  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Added zero-fill option to tacl report, supplying result rows with
