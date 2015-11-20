@@ -390,7 +390,7 @@ class Report:
         self._logger.info('Removed {} labelled results'.format(count))
 
     def sort (self):
-        self._matches.sort_index(
+        self._matches.sort_values(
             by=[constants.SIZE_FIELDNAME, constants.NGRAM_FIELDNAME,
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
                 constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME],
