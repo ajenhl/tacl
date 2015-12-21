@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import collections
+import io
 import sqlite3
 import unittest
 from unittest.mock import call, MagicMock, sentinel
+
+import pandas as pd
 
 import tacl
 from tacl.exceptions import MalformedQueryError
@@ -203,13 +206,17 @@ class DataStoreTestCase (TaclTestCase):
         log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
                                             False)
         input_fh = MagicMock(name='fh')
+        results_fh = MagicMock(name='results_fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = input_fh
+        csv.return_value = results_fh
         catalogue = MagicMock(name='catalogue')
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
-        cursor = store._conn.execute.return_value
-        output_fh = store.diff(catalogue, input_fh)
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        reduce_diff_results = self._create_patch(
+            'tacl.DataStore._reduce_diff_results', False)
+        reduce_diff_results.return_value = input_fh
+        output_fh = store.diff(catalogue, tokenizer, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(
             [sentinel.label, sentinel.label2])
@@ -219,8 +226,9 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, [sentinel.label, sentinel.label2,
                                              sentinel.label, sentinel.label2])])
-        csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
-                                    input_fh)
+        self.assertEqual(csv.call_count, 1)
+        reduce_diff_results.assert_called_once_with(results_fh, tokenizer,
+                                                    input_fh)
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric (self):
@@ -232,15 +240,19 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders.return_value = sentinel.placeholders
         log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
                                             False)
+        results_fh = MagicMock(name='results_fh')
         input_fh = MagicMock(name='fh')
         csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = input_fh
+        csv.return_value = results_fh
         catalogue = MagicMock(name='catalogue')
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
-        cursor = store._conn.execute.return_value
+        tokenizer = MagicMock(name='tokenizer')
+        reduce_diff_results = self._create_patch(
+            'tacl.DataStore._reduce_diff_results', False)
+        reduce_diff_results.return_value = input_fh
         output_fh = store.diff_asymmetric(catalogue, sentinel.prime_label,
-                                          input_fh)
+                                          tokenizer, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with([sentinel.label])
         log_query_plan.assert_called_once()
@@ -250,8 +262,9 @@ class DataStoreTestCase (TaclTestCase):
                          [call.execute(sql, [sentinel.prime_label,
                                              sentinel.prime_label,
                                              sentinel.label])])
-        csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
-                                    input_fh)
+        self.assertEqual(csv.call_count, 1)
+        reduce_diff_results.assert_called_once_with(results_fh, tokenizer,
+                                                    input_fh)
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric_invalid_label (self):
@@ -261,35 +274,40 @@ class DataStoreTestCase (TaclTestCase):
         prime_label = 'C'
         input_fh = MagicMock(name='fh')
         store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = {'A': 1, 'B': 1}
         self.assertRaises(MalformedQueryError, store.diff_asymmetric,
-                          catalogue, prime_label, input_fh)
+                          catalogue, prime_label, tokenizer, input_fh)
 
     def test_diff_asymmetric_one_label (self):
         catalogue = {'T1': 'A', 'T2': 'A'}
         store = tacl.DataStore(':memory:')
         input_fh = MagicMock(name='fh')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = {'A': 2}
         self.assertRaises(MalformedQueryError, store.diff_asymmetric,
-                          catalogue, 'A', input_fh)
+                          catalogue, 'A', tokenizer, input_fh)
 
     def test_diff_one_label (self):
         catalogue = {'T1': 'A', 'T2': 'A'}
         store = tacl.DataStore(':memory:')
         output_fh = MagicMock(name='fh')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = {'A': 2}
-        self.assertRaises(MalformedQueryError, store.diff, catalogue, output_fh)
+        self.assertRaises(MalformedQueryError, store.diff, catalogue,
+                          tokenizer, output_fh)
 
     def test_diff_supplied_one_label (self):
         filenames = ['a.csv']
         labels = ['A']
         store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         output_fh = MagicMock(name='fh')
         self.assertRaises(MalformedQueryError, store.diff_supplied, filenames,
-                          labels, output_fh)
+                          labels, tokenizer, output_fh)
 
     def test_drop_indices (self):
         store = tacl.DataStore(':memory:')
@@ -447,6 +465,208 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = MagicMock(name='fh')
         self.assertRaises(MalformedQueryError, store.intersection_supplied,
                           filenames, labels, output_fh)
+
+    def test_check_diff_result (self):
+        # Test the various possibilities that
+        # DataStore._reduce_diff_results must handle.
+        store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        tokenize = tokenizer.tokenize
+        join = tokenizer.joiner.join
+        row = pd.Series(['ABC', 3, 'a', 'base', 1, 'A'],
+                        index=tacl.constants.QUERY_FIELDNAMES)
+        # N-gram is not composed of any existing (n-1)-gram.
+        matches = {'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 1)
+        # N-gram is composed entirely of existing (n-1)-grams.
+        matches = {'AB': 1, 'BC': 1, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 1)
+        # N-gram is composed partly by existing (n-1)-grams.
+        matches = {'AB': 1, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 0)
+        matches = {'BC': 1, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 0)
+        # N-gram is composed of one or more n-grams with count 0.
+        matches = {'AB': 0, 'BC': 1, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 0)
+        matches = {'AB': 1, 'BC': 0, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 0)
+        matches = {'AB': 0, 'BC': 0, 'CD': 1}
+        actual_row = store._check_diff_result(row, matches, tokenize, join)
+        self.assertEqual(actual_row['count'], 0)
+
+    def test_reduce_diff_results_composed (self):
+        # Consider the diff between a text "abcdefg" and
+        # "abcABCDEFdGHIefg". Only fully composed n-grams (those made
+        # up of two (n-1)-grams that are in the results) should be
+        # kept.
+        store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        input_data = (
+            ['cA', '2', 'a', 'base', '1', 'A'],
+            ['AB', '2', 'a', 'base', '1', 'A'],
+            ['B[C]', '2', 'a', 'base', '1', 'A'],
+            ['[C]D', '2', 'a', 'base', '1', 'A'],
+            ['DE', '2', 'a', 'base', '1', 'A'],
+            ['EF', '2', 'a', 'base', '1', 'A'],
+            ['Fd', '2', 'a', 'base', '1', 'A'],
+            ['dG', '2', 'a', 'base', '1', 'A'],
+            ['GH', '2', 'a', 'base', '1', 'A'],
+            ['HI', '2', 'a', 'base', '1', 'A'],
+            ['Ie', '2', 'a', 'base', '1', 'A'],
+            ['cd', '2', 'b', 'base', '1', 'B'],
+            ['de', '2', 'b', 'base', '1', 'B'],
+            ['bcA', '3', 'a', 'base', '1', 'A'],
+            ['cAB', '3', 'a', 'base', '1', 'A'],
+            ['AB[C]', '3', 'a', 'base', '1', 'A'],
+            ['B[C]D', '3', 'a', 'base', '1', 'A'],
+            ['[C]DE', '3', 'a', 'base', '1', 'A'],
+            ['DEF', '3', 'a', 'base', '1', 'A'],
+            ['EFd', '3', 'a', 'base', '1', 'A'],
+            ['FdG', '3', 'a', 'base', '1', 'A'],
+            ['dGH', '3', 'a', 'base', '1', 'A'],
+            ['GHI', '3', 'a', 'base', '1', 'A'],
+            ['HIe', '3', 'a', 'base', '1', 'A'],
+            ['Ief', '3', 'a', 'base', '1', 'A'],
+            ['bcd', '3', 'b', 'base', '1', 'B'],
+            ['cde', '3', 'b', 'base', '1', 'B'],
+            ['def', '3', 'b', 'base', '1', 'B'],
+            ['abcA', '4', 'a', 'base', '1', 'A'],
+            ['bcAB', '4', 'a', 'base', '1', 'A'],
+            ['cAB[C]', '4', 'a', 'base', '1', 'A'],
+            ['AB[C]D', '4', 'a', 'base', '1', 'A'],
+            ['B[C]DE', '4', 'a', 'base', '1', 'A'],
+            ['[C]DEF', '4', 'a', 'base', '1', 'A'],
+            ['DEFd', '4', 'a', 'base', '1', 'A'],
+            ['EFdG', '4', 'a', 'base', '1', 'A'],
+            ['FdGH', '4', 'a', 'base', '1', 'A'],
+            ['dGHI', '4', 'a', 'base', '1', 'A'],
+            ['GHIe', '4', 'a', 'base', '1', 'A'],
+            ['HIef', '4', 'a', 'base', '1', 'A'],
+            ['Iefg', '4', 'a', 'base', '1', 'A'],
+            ['abcd', '4', 'b', 'base', '1', 'B'],
+            ['bcde', '4', 'b', 'base', '1', 'B'],
+            ['cdef', '4', 'b', 'base', '1', 'B'],
+            ['defg', '4', 'b', 'base', '1', 'B'],
+            ['abcde', '5', 'b', 'base', '1', 'B'],
+            ['bcdef', '5', 'b', 'base', '1', 'B'],
+            ['cdefg', '5', 'b', 'base', '1', 'B'])
+        expected_rows = set(
+            (('cA', '2', 'a', 'base', '1', 'A'),
+             ('AB', '2', 'a', 'base', '1', 'A'),
+             ('B[C]', '2', 'a', 'base', '1', 'A'),
+             ('[C]D', '2', 'a', 'base', '1', 'A'),
+             ('DE', '2', 'a', 'base', '1', 'A'),
+             ('EF', '2', 'a', 'base', '1', 'A'),
+             ('Fd', '2', 'a', 'base', '1', 'A'),
+             ('dG', '2', 'a', 'base', '1', 'A'),
+             ('GH', '2', 'a', 'base', '1', 'A'),
+             ('HI', '2', 'a', 'base', '1', 'A'),
+             ('Ie', '2', 'a', 'base', '1', 'A'),
+             ('cd', '2', 'b', 'base', '1', 'B'),
+             ('de', '2', 'b', 'base', '1', 'B'),
+             ('cAB', '3', 'a', 'base', '1', 'A'),
+             ('AB[C]', '3', 'a', 'base', '1', 'A'),
+             ('B[C]D', '3', 'a', 'base', '1', 'A'),
+             ('[C]DE', '3', 'a', 'base', '1', 'A'),
+             ('DEF', '3', 'a', 'base', '1', 'A'),
+             ('EFd', '3', 'a', 'base', '1', 'A'),
+             ('FdG', '3', 'a', 'base', '1', 'A'),
+             ('dGH', '3', 'a', 'base', '1', 'A'),
+             ('GHI', '3', 'a', 'base', '1', 'A'),
+             ('HIe', '3', 'a', 'base', '1', 'A'),
+             ('cde', '3', 'b', 'base', '1', 'B'),
+             ('cAB[C]', '4', 'a', 'base', '1', 'A'),
+             ('AB[C]D', '4', 'a', 'base', '1', 'A'),
+             ('B[C]DE', '4', 'a', 'base', '1', 'A'),
+             ('[C]DEF', '4', 'a', 'base', '1', 'A'),
+             ('DEFd', '4', 'a', 'base', '1', 'A'),
+             ('EFdG', '4', 'a', 'base', '1', 'A'),
+             ('FdGH', '4', 'a', 'base', '1', 'A'),
+             ('dGHI', '4', 'a', 'base', '1', 'A'),
+             ('GHIe', '4', 'a', 'base', '1', 'A')))
+        actual_rows = self._reduce_diff(store, input_data, tokenizer)
+        self.assertEqual(set(actual_rows), expected_rows)
+
+    def test_reduce_diff_no_overlap (self):
+        # An n-gram that does not overlap at all with any (n-1)-gram
+        # should be kept:
+        #   abdef vs abcbde
+        store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        input_data = (
+            ['ef', '2', 'a', 'base', '1', 'A'],
+            ['abd', '3', 'a', 'base', '1', 'A'],
+            ['def', '3', 'a', 'base', '1', 'A'],
+            ['abde', '4', 'a', 'base', '1', 'A'],
+            ['bdef', '4', 'a', 'base', '1', 'A'],
+            ['abdef', '5', 'a', 'base', '1', 'A'],
+            ['bc', '2', 'b', 'base', '1', 'B'],
+            ['cb', '2', 'b', 'base', '1', 'B'],
+            ['abc', '3', 'b', 'base', '1', 'B'],
+            ['bcb', '3', 'b', 'base', '1', 'B'],
+            ['cbd', '3', 'b', 'base', '1', 'B'],
+            ['abcb', '4', 'b', 'base', '1', 'B'],
+            ['bcbd', '4', 'b', 'base', '1', 'B'],
+            ['cbde', '4', 'b', 'base', '1', 'B'],
+            ['abcbd', '5', 'b', 'base', '1', 'B'],
+            ['bcbde', '5', 'b', 'base', '1', 'B'],
+            ['cbdef', '5', 'b', 'base', '1', 'B'],
+            ['abcbde', '6', 'b', 'base', '1', 'B'],
+            ['bcbdef', '6', 'b', 'base', '1', 'B'],
+            ['abcbdef', '7', 'b', 'base', '1', 'B'])
+        expected_rows = set(
+            (('ef', '2', 'a', 'base', '1', 'A'),
+             ('abd', '3', 'a', 'base', '1', 'A'),
+             ('bc', '2', 'b', 'base', '1', 'B'),
+             ('cb', '2', 'b', 'base', '1', 'B'),
+             ('bcb', '3', 'b', 'base', '1', 'B')))
+        actual_rows = self._reduce_diff(store, input_data, tokenizer)
+        self.assertEqual(set(actual_rows), expected_rows)
+
+    def test_reduce_diff_size (self):
+        # Consider a diff where the smallest gram for a witness is
+        # larger than the smallest gram across all witnesses:
+        #   abdef vs abcbdef
+        store = tacl.DataStore(':memory:')
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        input_data = (
+            ['abd', '3', 'a', 'base', '1', 'A'],
+            ['abde', '4', 'a', 'base', '1', 'A'],
+            ['abdef', '5', 'a', 'base', '1', 'A'],
+            ['bc', '2', 'b', 'base', '1', 'B'],
+            ['cb', '2', 'b', 'base', '1', 'B'],
+            ['abc', '3', 'b', 'base', '1', 'B'],
+            ['bcb', '3', 'b', 'base', '1', 'B'],
+            ['cbd', '3', 'b', 'base', '1', 'B'],
+            ['abcb', '4', 'b', 'base', '1', 'B'],
+            ['bcbd', '4', 'b', 'base', '1', 'B'],
+            ['cbde', '4', 'b', 'base', '1', 'B'],
+            ['abcbd', '5', 'b', 'base', '1', 'B'],
+            ['bcbde', '5', 'b', 'base', '1', 'B'],
+            ['cbdef', '5', 'b', 'base', '1', 'B'],
+            ['abcbde', '6', 'b', 'base', '1', 'B'],
+            ['bcbdef', '6', 'b', 'base', '1', 'B'],
+            ['abcbdef', '7', 'b', 'base', '1', 'B'])
+        expected_rows = set(
+            (('abd', '3', 'a', 'base', '1', 'A'),
+             ('bc', '2', 'b', 'base', '1', 'B'),
+             ('cb', '2', 'b', 'base', '1', 'B'),
+             ('bcb', '3', 'b', 'base', '1', 'B')))
+        actual_rows = self._reduce_diff(store, input_data, tokenizer)
+        self.assertEqual(set(actual_rows), expected_rows)
+
+    def _reduce_diff (self, store, input_data, tokenizer):
+        in_fh = self._create_csv(input_data)
+        out_fh = io.StringIO(newline='')
+        return self._get_rows_from_csv(store._reduce_diff_results(
+            in_fh, tokenizer, out_fh))
 
     def test_set_labels (self):
         catalogue = collections.OrderedDict(

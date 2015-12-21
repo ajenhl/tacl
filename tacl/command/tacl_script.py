@@ -360,6 +360,7 @@ def generate_supplied_diff_subparser (subparsers):
         formatter_class=ParagraphFormatter, help=constants.SUPPLIED_DIFF_HELP)
     parser.set_defaults(func=supplied_diff)
     add_common_arguments(parser)
+    add_tokenizer_argument(parser)
     add_db_arguments(parser, True)
     add_supplied_query_arguments(parser)
 
@@ -422,11 +423,12 @@ def ngram_diff (args, parser):
     store = get_data_store(args)
     corpus = get_corpus(args)
     catalogue = get_catalogue(args.catalogue)
+    tokenizer = get_tokenizer(args)
     store.validate(corpus, catalogue)
     if args.asymmetric:
-        store.diff_asymmetric(catalogue, args.asymmetric, sys.stdout)
+        store.diff_asymmetric(catalogue, args.asymmetric, tokenizer, sys.stdout)
     else:
-        store.diff(catalogue, sys.stdout)
+        store.diff(catalogue, tokenizer, sys.stdout)
 
 def ngram_intersection (args, parser):
     """Outputs the results of performing an intersection query."""
@@ -501,7 +503,8 @@ def supplied_diff (args, parser):
     labels = args.labels
     results = args.supplied
     store = get_data_store(args)
-    store.diff_supplied(results, labels, sys.stdout)
+    tokenizer = get_tokenizer(args)
+    store.diff_supplied(results, labels, tokenizer, sys.stdout)
 
 def supplied_intersect (args, parser):
     labels = args.labels

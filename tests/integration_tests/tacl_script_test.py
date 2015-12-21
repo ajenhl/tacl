@@ -278,41 +278,11 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('we', '2', 'T1', 'base', '2', 'A'),
             ('we', '2', 'T1', 'a', '2', 'A'),
             ('we', '2', 'T5', 'base', '1', 'A'),
-            ('es', '2', 'T2', 'base', '2', 'B'),
-            ('es', '2', 'T2', 'a', '1', 'B'),
-            ('se', '2', 'T2', 'base', '2', 'B'),
-            ('se', '2', 'T2', 'a', '1', 'B'),
-            ('ws', '2', 'T2', 'a', '1', 'B'),
-            ('sh', '2', 'T2', 'a', '1', 'B'),
             ('eh', '2', 'T2', 'base', '1', 'B'),
-            ('ha', '2', 'T3', 'base', '1', 'C'),
-            ('at', '2', 'T3', 'base', '1', 'C'),
-            ('el', '2', 'T5', 'base', '1', 'A'),
             ('ll', '2', 'T5', 'base', '1', 'A'),
             ('hen', '3', 'T1', 'base', '1', 'A'),
-            ('enw', '3', 'T1', 'base', '1', 'A'),
             ('nwe', '3', 'T1', 'base', '1', 'A'),
-            ('wew', '3', 'T1', 'base', '1', 'A'),
-            ('wew', '3', 'T1', 'a', '1', 'A'),
-            ('ewe', '3', 'T1', 'base', '1', 'A'),
-            ('ewe', '3', 'T1', 'a', '2', 'A'),
-            ('wen', '3', 'T1', 'base', '1', 'A'),
-            ('wen', '3', 'T1', 'a', '1', 'A'),
-            ('hes', '3', 'T2', 'base', '2', 'B'),
-            ('hes', '3', 'T2', 'a', '1', 'B'),
-            ('ese', '3', 'T2', 'base', '2', 'B'),
-            ('ese', '3', 'T2', 'a', '1', 'B'),
-            ('ews', '3', 'T2', 'a', '1', 'B'),
-            ('seh', '3', 'T2', 'base', '1', 'B'),
-            ('wsh', '3', 'T2', 'a', '1', 'B'),
-            ('ehe', '3', 'T2', 'base', '1', 'B'),
-            ('she', '3', 'T2', 'a', '1', 'B'),
-            ('sen', '3', 'T2', 'base', '1', 'B'),
-            ('sen', '3', 'T2', 'a', '1', 'B'),
-            ('tha', '3', 'T3', 'base', '1', 'C'),
-            ('hat', '3', 'T3', 'base', '1', 'C'),
-            ('wel', '3', 'T5', 'base', '1', 'A'),
-            ('ell', '3', 'T5', 'base', '1', 'A')]
+        ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_asymmetric (self):
@@ -327,19 +297,10 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('we', '2', 'T1', 'base', '2', 'A'),
             ('we', '2', 'T1', 'a', '2', 'A'),
             ('we', '2', 'T5', 'base', '1', 'A'),
-            ('el', '2', 'T5', 'base', '1', 'A'),
             ('ll', '2', 'T5', 'base', '1', 'A'),
             ('hen', '3', 'T1', 'base', '1', 'A'),
-            ('enw', '3', 'T1', 'base', '1', 'A'),
             ('nwe', '3', 'T1', 'base', '1', 'A'),
-            ('wew', '3', 'T1', 'base', '1', 'A'),
-            ('wew', '3', 'T1', 'a', '1', 'A'),
-            ('ewe', '3', 'T1', 'base', '1', 'A'),
-            ('ewe', '3', 'T1', 'a', '2', 'A'),
-            ('wen', '3', 'T1', 'base', '1', 'A'),
-            ('wen', '3', 'T1', 'a', '1', 'A'),
-            ('wel', '3', 'T5', 'base', '1', 'A'),
-            ('ell', '3', 'T5', 'base', '1', 'A')]
+        ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_diff_supplied (self):

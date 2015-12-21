@@ -140,7 +140,9 @@ PREPARE_DESCRIPTION = '''\
     Convert CBETA TEI XML files (which may have multiple files per
     text) into XML suitable for processing via the tacl strip
     command.'''
-PREPARE_HELP = 'Convert CBETA TEI XML files into an XML form suitable for stripping.'
+PREPARE_HELP = '''\
+    Convert CBETA TEI XML files into an XML form suitable for
+    stripping.'''
 PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 
@@ -152,8 +154,7 @@ REPORT_DESCRIPTION = '''\
 REPORT_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
-    database. This has no effect on the results of a diff query, or if
-    the results contain only 1-grams.'''
+    database. This has no effect if the results contain only 1-grams.'''
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --zero-fill,

@@ -1,10 +1,13 @@
 """Module containing the DataStore class."""
 
 import csv
+import io
 import logging
 import os.path
 import sqlite3
 import sys
+
+import pandas as pd
 
 from . import constants
 from .exceptions import MalformedQueryError
@@ -176,6 +179,52 @@ class DataStore:
         self._conn.execute(constants.ANALYSE_SQL.format(table))
         self._logger.info('Analysis of database complete')
 
+    @staticmethod
+    def _check_diff_result (row, matches, tokenize, join):
+        """Returns `row`, possibly with its count changed to 0, depending on
+        the status of the n-grams that compose it.
+
+        The n-gram represented in `row` can be decomposed into two
+        (n-1)-grams. If neither sub-n-gram is present in `matches`, do
+        not change the count since this is a new difference.
+
+        If both sub-n-grams are present with a positive count, do not
+        change the count as it is composed entirely of sub-ngrams and
+        therefore not filler.
+
+        Otherwise, change the count to 0 as the n-gram is filler.
+
+        :param row: result row of the n-gram to check
+        :type row: pandas.Series
+        :param matches: (n-1)-grams and their associated counts to check against
+        :type matches: `dict`
+        :param tokenize: function to tokenize a string
+        :type tokenize: `function`
+        :param join: function to join tokens into a string
+        :type join: `function`
+        :rtype: pandas.Series
+
+        """
+        ngram_tokens = tokenize(row[constants.NGRAM_FIELDNAME])
+        sub_ngram1 = join(ngram_tokens[:-1])
+        sub_ngram2 = join(ngram_tokens[1:])
+        count = constants.COUNT_FIELDNAME
+        discard = False
+        # For performance reasons, avoid searching through matches
+        # unless necessary.
+        status1 = matches.get(sub_ngram1)
+        if status1 == 0:
+            discard = True
+        else:
+            status2 = matches.get(sub_ngram2)
+            if status2 == 0:
+                discard = True
+            elif (status1 is None) ^ (status2 is None):
+                discard = True
+        if discard:
+            row[count] = 0
+        return row
+
     def counts (self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving
         n-gram counts of the texts in `catalogue`.
@@ -238,7 +287,7 @@ class DataStore:
         self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
         self._conn.commit()
 
-    def diff (self, catalogue, output_fh):
+    def diff (self, catalogue, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are unique to each labelled set of texts in `catalogue`.
 
@@ -248,6 +297,8 @@ class DataStore:
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
+        :param tokenizer: tokenizer for the n-grams
+        :type tokenizer: `Tokenizer`
         :param output_fh: object to output results to
         :type output_fh: file-like object
         :rtype: file-like object
@@ -264,9 +315,11 @@ class DataStore:
         self._logger.debug('Query: {}\nLabels: {}'.format(query, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
+                               io.StringIO(newline=''))
+        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
 
-    def diff_asymmetric (self, catalogue, prime_label, output_fh):
+    def diff_asymmetric (self, catalogue, prime_label, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the
         difference in n-grams between the labelled sets of texts in
         `catalogue`, limited to those texts labelled with
@@ -276,6 +329,8 @@ class DataStore:
         :type catalogue: `Catalogue`
         :param prime_label: label to limit results to
         :type prime_label: `str`
+        :param tokenizer: tokenizer for the n-grams
+        :type tokenizer: `Tokenizer`
         :param output_fh: object to output results to
         :type output_fh: file-like object
         :rtype: file-like object
@@ -296,9 +351,11 @@ class DataStore:
             query, labels, prime_label))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
+                               io.StringIO(newline=''))
+        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
 
-    def diff_supplied (self, results_filenames, labels, output_fh):
+    def diff_supplied (self, results_filenames, labels, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are unique to each set of texts in `results_sets`, using
         the labels in `labels`.
@@ -311,6 +368,8 @@ class DataStore:
         :type results_filenames: `list` of `str`
         :param labels: labels to be applied to the results_sets
         :type labels: `list`
+        :param tokenizer: tokenizer for the n-grams
+        :type tokenizer: `Tokenizer`
         :param output_fh: object to output results to
         :type output_fh: file-like object
         :rtype: file-like object
@@ -322,7 +381,9 @@ class DataStore:
         self._logger.debug('Query: {}'.format(query))
         self._log_query_plan(query, [])
         cursor = self._conn.execute(query)
-        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
+        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
+                               io.StringIO(newline=''))
+        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
 
     def _drop_indices (self):
         """Drops the database indices relating to n-grams."""
@@ -471,6 +532,77 @@ class DataStore:
         for row in cursor.fetchall():
             query_plan += '|'.join([str(value) for value in row]) + '\n'
         self._logger.debug(query_plan)
+
+    def _reduce_diff_results (self, matches_fh, tokenizer, output_fh):
+        """Returns `output_fh` populated with a reduced set of data from
+        `matches_fh`.
+
+        Diff results typically contain a lot of filler results that
+        serve only to hide real differences. If one text has a single
+        extra token than another, the diff between them will have
+        results for every n-gram containing that extra token, which is
+        not helpful. This method removes these filler results by
+        'reducing down' the results.
+
+        :param matches_fh: holder of CSV results to be reduced
+        :type matches_fh: `io.StringIO`
+        :param tokenizer: tokenizer for the n-grams
+        :type tokenizer: `Tokenizer`
+        :param output_fh: file to write results to
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
+        self._logger.info('Removing filler results')
+        # For performance, perform the attribute accesses once.
+        tokenize = tokenizer.tokenize
+        join = tokenizer.joiner.join
+        results = []
+        previous_witness = (None, None)
+        previous_data = {}
+        # Calculate the index of ngram and count columns in a Pandas
+        # named tuple row, as used below. The +1 is due to the tuple
+        # having the row index as the first element.
+        ngram_index = constants.QUERY_FIELDNAMES.index(
+            constants.NGRAM_FIELDNAME) + 1
+        count_index = constants.QUERY_FIELDNAMES.index(
+            constants.COUNT_FIELDNAME) + 1
+        matches_fh.seek(0)
+        # Operate over individual witnesses and sizes, so that there
+        # is no possible results pollution between them.
+        grouped = pd.read_csv(matches_fh, encoding='utf-8',
+                              na_filter=False).groupby(
+            [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
+             constants.SIZE_FIELDNAME])
+        for (text, siglum, size), group in grouped:
+            if (text, siglum) != previous_witness:
+                previous_matches = group
+                previous_witness = (text, siglum)
+            else:
+                self._logger.debug('Reducing down {} {}-grams for {} {}'.format(
+                    len(group.index), size, text, siglum))
+                if previous_matches.empty:
+                    reduced_count = 0
+                else:
+                    previous_matches = group.apply(
+                        self._check_diff_result, axis=1,
+                        args=(previous_data, tokenize, join))
+                    reduced_count = len(previous_matches[previous_matches[constants.COUNT_FIELDNAME] != 0].index)
+                self._logger.debug('Reduced down to {} grams'.format(
+                    reduced_count))
+            # Put the previous matches into a form that is more
+            # performant for the lookups made in _check_diff_result.
+            previous_data = {}
+            for row in previous_matches.itertuples():
+                previous_data[row[ngram_index]] = row[count_index]
+            if not previous_matches.empty:
+                results.append(previous_matches[previous_matches[
+                    constants.COUNT_FIELDNAME] != 0])
+        reduced_results = pd.concat(results, ignore_index=True).reindex(
+            columns=constants.QUERY_FIELDNAMES)
+        reduced_results.to_csv(output_fh, encoding='utf-8', float_format='%d',
+                               index=False)
+        return output_fh
 
     def search (self, catalogue, ngrams, output_fh):
         self._set_labels(catalogue)

@@ -313,15 +313,11 @@ class ReportTestCase (TaclTestCase):
             ['nan', '1', 'text1', 'base', '2', 'A'],
             ['nan dus', '2', 'text1', 'base', '1', 'A'],
             ['pa', '1', 'text2', 'base', '1', 'B'])
-        fh = self._create_csv(input_data)
-        report = tacl.Report(fh, tokenizer)
-        report.reduce()
-        actual_rows = self._get_rows_from_csv(report.csv(
-            io.StringIO(newline='')))
         expected_rows = (
             ('nan', '1', 'text1', 'base', '1', 'A'),
             ('nan dus', '2', 'text1', 'base', '1', 'A'),
             ('pa', '1', 'text2', 'base', '1', 'B'))
+        actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reduce_pagel (self):
