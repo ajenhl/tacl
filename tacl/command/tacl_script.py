@@ -234,7 +234,8 @@ def generate_ngrams_subparser (subparsers):
     to the data store."""
     parser = subparsers.add_parser(
         'ngrams', description=constants.NGRAMS_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.NGRAMS_HELP)
+        epilog=constants.NGRAMS_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.NGRAMS_HELP)
     parser.set_defaults(func=generate_ngrams)
     add_common_arguments(parser)
     add_db_arguments(parser)

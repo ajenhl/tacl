@@ -106,7 +106,19 @@ DB_TOKENIZER_HELP = '''\
 DIFF_DESCRIPTION = '''\
     List n-grams unique to each sub-corpus (as defined by the labels
     in the specified catalogue file).'''
-DIFF_EPILOG = ENCODING_EPILOG
+DIFF_EPILOG = '''\
+    examples:
+
+      Make a diff query against a CBETA corpus.
+        tacl diff cbeta2-10.db corpus/cbeta/ dhr-vs-rest.txt > output.csv
+
+      Make an asymmetrical diff query against a CBETA corpus.
+        tacl diff -a Dhr cbeta2-10.db corpus/cbeta/ dhr-vs-rest.txt > output.csv
+
+      Make a diff query against a Pagel corpus.
+        tacl diff -t pagel pagel1-7.db corpus/pagel/ by-author.txt > output.csv
+
+''' + ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
 HIGHLIGHT_BASE_NAME_HELP = 'Name of text to display.'
@@ -120,18 +132,37 @@ HIGHLIGHT_EPILOG = '''\
     likely to be almost entirely highlighted. Results may be
     restricted by using the tacl report command.
 
-    Example:
+    examples:
 
-        tacl highlight corpus/stripped/ intersect.csv T0001 元'''
+      tacl highlight corpus/stripped/ intersect.csv T0001 元'''
 HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
 
 INTERSECT_DESCRIPTION = '''\
     List n-grams common to all sub-corpora (as defined by the labels
     in the specified catalogue file).'''
-INTERSECT_EPILOG = ENCODING_EPILOG
+INTERSECT_EPILOG = '''\
+    examples:
+
+      Make an intersect query against a CBETA corpus.
+        tacl intersect cbeta2-10.db corpus/cbeta/ dhr-vs-rest.txt > output.csv
+
+      Make an intersect query against a Pagel corpus.
+        tacl intersect -t pagel pagel1-7.db corpus/pagel/ by-author.txt > output.csv
+
+''' + ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
+NGRAMS_EPILOG = '''\
+    examples:
+
+      Create a database of 2 to 10-grams from a CBETA corpus.
+        tacl ngrams cbeta2-10.db corpus/cbeta/ 2 10
+
+      Create a database of 1 to 7-grams from a Pagel corpus.
+        tacl ngrams pagel1-7.db corpus/pagel/ 1 7
+
+'''
 NGRAMS_HELP = 'Generate n-grams from a corpus.'
 NGRAMS_MAXIMUM_HELP = 'Maximum size of n-gram to generate (integer).'
 NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
@@ -171,8 +202,20 @@ REPORT_EPILOG = '''\
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
-        tacl report --recriprocal results.csv | tacl report --reduce -\n\n''' \
-            + ENCODING_EPILOG
+        tacl report --recriprocal results.csv | tacl report --reduce -
+
+    examples:
+
+      Extend CBETA results and set a minimum total count.
+        tacl report -e corpus/cbeta/ --min-count 9 output.csv > mod-output.csv
+
+      Zero-fill CBETA results.
+        tacl report -c dhr-vs-rest.txt -z corpus/cbeta/ output.csv > mod-output.csv
+
+      Reduce Pagel results.
+        tacl report --reduce -t pagel output.csv > mod-output.csv
+
+''' + ENCODING_EPILOG
 REPORT_HELP = 'Modify a query results file.'
 REPORT_MINIMUM_COUNT_HELP = 'Minimum total count of n-gram to include.'
 REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count of n-gram to include.'
