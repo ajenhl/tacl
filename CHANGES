@@ -1,3 +1,16 @@
+2.3.0  2015-12-23  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added automatic removal of filler n-grams from diff results. Only
+    n-grams that are entirely composed of (n-1)-grams, or which do not
+    overlap with any (n-1)-grams, are kept. This then allows for
+    reduce and extend to work correctly on diff results.
+
+    As a result of this change, the API for all difference queries has
+    changed.
+
+  * Add example invocations of tacl subcommands. (#30)
+
+
 2.2.0  2015-11-20  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Added basic formatting of highlighted text to match that of the
