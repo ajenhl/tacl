@@ -14,6 +14,25 @@ class ReportTestCase (TaclTestCase):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_is_intersect_results (self):
+        # Test that _is_intersect_results correctly identifies diff
+        # and intersect results.
+        intersect_results = (
+            ['AB', '2', 'a', 'base', '7', 'A'],
+            ['AB', '2', 'b', 'base', '2', 'B'],
+            ['AB', '2', 'c', 'base', '5', 'C'])
+        fh = self._create_csv(intersect_results)
+        report = tacl.Report(fh, self._tokenizer)
+        self.assertTrue(report._is_intersect_results(report._matches))
+        diff_results = (
+            ['AB', '2', 'a', 'base', '7', 'A'],
+            ['AB', '2', 'a', 'other', '1', 'A'],
+            ['AB', '2', 'b', 'base', '5', 'A'],
+            ['BA', '2', 'c', 'base', '2', 'B'])
+        fh = self._create_csv(diff_results)
+        report = tacl.Report(fh, self._tokenizer)
+        self.assertFalse(report._is_intersect_results(report._matches))
+
     def test_prune_by_ngram_count (self):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],

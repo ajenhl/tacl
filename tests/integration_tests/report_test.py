@@ -60,6 +60,20 @@ class ReportIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_extend_diff (self):
+        # Test that diff results are correctly extended.
+        results = os.path.join(self._data_dir, 'diff-non-extend-results.csv')
+        command = 'tacl report -e {} -t {} {}'.format(
+            os.path.join(self._stripped_dir, 'diff-extend'),
+            tacl.constants.TOKENIZER_CHOICE_CBETA, results)
+        data = subprocess.check_output(shlex.split(command))
+        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        expected_results = os.path.join(self._data_dir,
+                                        'diff-extend-results.csv')
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_zero_fill (self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         corpus = os.path.join(data_dir, 'stripped')

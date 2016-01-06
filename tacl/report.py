@@ -42,6 +42,14 @@ class Report:
                 'Extending results that contain only 1-grams is unsupported; '
                 'the original results will be used')
             return
+        # Determine if we are dealing with diff or intersect
+        # results. In the latter case, we need to perform a reciprocal
+        # remove as the final stage (since extended n-grams may exist
+        # in texts from more than one label). This test will think
+        # that intersect results that have had all but one label
+        # removed are difference results, which will cause the results
+        # to be potentially incorrect.
+        is_intersect = self._is_intersect_results(self._matches)
         # Supply the extender with only matches on the largest
         # n-grams.
         matches = self._matches[
@@ -59,7 +67,8 @@ class Report:
             extended_ngrams = None
         extended_matches = extended_matches.reindex_axis(
             constants.QUERY_FIELDNAMES, axis=1)
-        extended_matches = self._reciprocal_remove(extended_matches)
+        if is_intersect:
+            extended_matches = self._reciprocal_remove(extended_matches)
         self._matches = self._matches.append(extended_matches)
 
     def _generate_extended_matches (self, extended_ngrams, highest_n, name,
@@ -228,7 +237,24 @@ class Report:
                 substrings.extend([sub_ngram] * count)
         return substrings
 
+    @staticmethod
+    def _is_intersect_results (results):
+        """Returns False if `results` has an n-gram that exists in only one
+        label, True otherwise.
+
+        :param results: results to analyze
+        :type results: `pandas.DataFrame`
+        :rtype: `bool`
+
+        """
+        sample = results.iloc[0]
+        ngram = sample[constants.NGRAM_FIELDNAME]
+        label = sample[constants.LABEL_FIELDNAME]
+        return not(results[(results[constants.NGRAM_FIELDNAME] == ngram) &
+                           (results[constants.LABEL_FIELDNAME] != label)].empty)
+
     def prune_by_ngram_count (self, minimum=None, maximum=None):
+
         """Removes results rows whose total n-gram count (across all
         texts bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
