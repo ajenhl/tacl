@@ -197,6 +197,9 @@ REPORT_EPILOG = '''\
     on a set of results more than once will make the results
     inaccurate!
 
+    --extend applies before --reduce because it may generate results
+    that are also amenable to reduction.
+
     Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
     chain commands together without creating an intermediate file,
