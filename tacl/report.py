@@ -254,7 +254,6 @@ class Report:
                            (results[constants.LABEL_FIELDNAME] != label)].empty)
 
     def prune_by_ngram_count (self, minimum=None, maximum=None):
-
         """Removes results rows whose total n-gram count (across all
         texts bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
