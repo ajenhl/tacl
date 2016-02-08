@@ -154,7 +154,7 @@ class Report:
             (matches[constants.NAME_FIELDNAME] == name) &
             (matches[constants.SIGLUM_FIELDNAME] == siglum) &
             (matches[constants.LABEL_FIELDNAME] == label)]
-        text = t_join(corpus.get_text(name, siglum).get_tokens())
+        text = corpus.get_text(name, siglum).get_token_content()
         ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
                   list(witness_matches[constants.NGRAM_FIELDNAME])]
         # Go through the list of n-grams, and create a list of

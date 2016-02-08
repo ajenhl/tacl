@@ -105,7 +105,7 @@ class StatisticsReport:
         # create a Text using that text, which can then be tokenised
         # and the tokens counted.
         tokens = text.get_tokens()
-        full_text = self._tokenizer.joiner.join(tokens)
+        full_text = text.get_token_content()
         fields = [constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME]
         match_slices = []
         for index, (ngram, size) in matches[fields].iterrows():

@@ -41,8 +41,21 @@ class BaseText:
                 ngrams = collections.Counter(self._ngrams(tokens, size))
                 yield (size, ngrams)
 
+    def get_token_content (self):
+        """Returns a string of the tokens in this text joined using the
+        tokenizer joiner string.
+
+        :rtype: `str`
+
+        """
+        return self._tokenizer.joiner.join(self.get_tokens())
+
     def get_tokens (self):
-        """Returns a list of tokens in this text."""
+        """Returns a list of tokens in this text.
+
+        :rtype: `list` of `str`
+
+        """
         return self._tokenizer.tokenize(self._content)
 
     def _ngrams (self, sequence, degree):
@@ -57,7 +70,7 @@ class BaseText:
         :param sequence: the source data to be converted into n-grams
         :type sequence: sequence
         :param degree: the degree of the n-grams
-        :type degree: int
+        :type degree: `int`
         :rtype: `list` of `str`
 
         """
