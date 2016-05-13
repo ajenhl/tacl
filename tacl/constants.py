@@ -154,6 +154,19 @@ INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
 NGRAMS_EPILOG = '''\
+    This command can be safely interrupted and subsequently rerun;
+    texts that have already had their n-grams added will be skipped.
+
+    If new texts need to be added after a database was generated, this
+    command can be run again. However, the speed at which n-grams from
+    these new texts are added will be much less than to a new
+    database, due to the existing indices.
+
+    If a text has changed since a database was generated, this command
+    will not update the database. In this case, generate a new
+    database or manipulate the existing dataase directly to remove the
+    text and its associated n-grams.
+
     examples:
 
       Create a database of 2 to 10-grams from a CBETA corpus.
@@ -199,6 +212,10 @@ REPORT_EPILOG = '''\
 
     --extend applies before --reduce because it may generate results
     that are also amenable to reduction.
+
+    --extend applies before --remove because it depends on there being
+    at least two labels in the results in order to give correct
+    results.
 
     Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
