@@ -6,6 +6,7 @@ import logging
 import os.path
 import sqlite3
 import sys
+import tempfile
 
 import pandas as pd
 
@@ -252,7 +253,7 @@ class DataStore:
         """Writes the rows of `cursor` in CSV format to `output_fh`
         and returns it.
 
-        :param cursor: database cursor containing data to be be output
+        :param cursor: database cursor containing data to be output
         :type cursor: `sqlite3.Cursor`
         :param fieldnames: row headings
         :type fieldnames: `list`
@@ -287,6 +288,28 @@ class DataStore:
         self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
         self._conn.commit()
 
+    def _diff (self, cursor, tokenizer, output_fh):
+        """Returns output_fh with diff results that have been reduced.
+
+        Uses a temporary file to store the results from `cursor`
+        before being reduced, in order to not have the results stored
+        in memory twice.
+
+        :param cursor: database cursor containing raw diff data
+        :type cursor: `sqlite3.Cursor`
+        :param tokenizer: tokenizer for the n-grams
+        :type tokenizer: `Tokenizer`
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
+        temp_fd, temp_path = tempfile.mkstemp(text=True)
+        with open(temp_path, 'w', newline='') as results_fh:
+            self._csv(cursor, constants.QUERY_FIELDNAMES, results_fh)
+        output_fh = self._reduce_diff_results(temp_path, tokenizer, output_fh)
+        os.remove(temp_path)
+        return output_fh
+
     def diff (self, catalogue, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are unique to each labelled set of texts in `catalogue`.
@@ -315,9 +338,7 @@ class DataStore:
         self._logger.debug('Query: {}\nLabels: {}'.format(query, labels))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
-        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
-                               io.StringIO(newline=''))
-        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
+        return self._diff(cursor, tokenizer, output_fh)
 
     def diff_asymmetric (self, catalogue, prime_label, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the
@@ -351,9 +372,7 @@ class DataStore:
             query, labels, prime_label))
         self._log_query_plan(query, parameters)
         cursor = self._conn.execute(query, parameters)
-        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
-                               io.StringIO(newline=''))
-        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
+        return self._diff(cursor, tokenizer, output_fh)
 
     def diff_supplied (self, results_filenames, labels, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
@@ -381,9 +400,7 @@ class DataStore:
         self._logger.debug('Query: {}'.format(query))
         self._log_query_plan(query, [])
         cursor = self._conn.execute(query)
-        results_fh = self._csv(cursor, constants.QUERY_FIELDNAMES,
-                               io.StringIO(newline=''))
-        return self._reduce_diff_results(results_fh, tokenizer, output_fh)
+        return self._diff(cursor, tokenizer, output_fh)
 
     def _drop_indices (self):
         """Drops the database indices relating to n-grams."""
@@ -533,7 +550,7 @@ class DataStore:
             query_plan += '|'.join([str(value) for value in row]) + '\n'
         self._logger.debug(query_plan)
 
-    def _reduce_diff_results (self, matches_fh, tokenizer, output_fh):
+    def _reduce_diff_results (self, matches_path, tokenizer, output_fh):
         """Returns `output_fh` populated with a reduced set of data from
         `matches_fh`.
 
@@ -544,8 +561,8 @@ class DataStore:
         not helpful. This method removes these filler results by
         'reducing down' the results.
 
-        :param matches_fh: holder of CSV results to be reduced
-        :type matches_fh: `io.StringIO`
+        :param matches_path: filepath or buffer of CSV results to be reduced
+        :type matches_path: `str` or file-like object
         :param tokenizer: tokenizer for the n-grams
         :type tokenizer: `Tokenizer`
         :param output_fh: file to write results to
@@ -567,10 +584,9 @@ class DataStore:
             constants.NGRAM_FIELDNAME) + 1
         count_index = constants.QUERY_FIELDNAMES.index(
             constants.COUNT_FIELDNAME) + 1
-        matches_fh.seek(0)
         # Operate over individual witnesses and sizes, so that there
         # is no possible results pollution between them.
-        grouped = pd.read_csv(matches_fh, encoding='utf-8',
+        grouped = pd.read_csv(matches_path, encoding='utf-8',
                               na_filter=False).groupby(
             [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
              constants.SIZE_FIELDNAME])

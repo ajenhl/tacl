@@ -206,29 +206,23 @@ class DataStoreTestCase (TaclTestCase):
         log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
                                             False)
         input_fh = MagicMock(name='fh')
-        results_fh = MagicMock(name='results_fh')
-        csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = results_fh
         catalogue = MagicMock(name='catalogue')
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
-        reduce_diff_results = self._create_patch(
-            'tacl.DataStore._reduce_diff_results', False)
-        reduce_diff_results.return_value = input_fh
+        _diff = self._create_patch('tacl.DataStore._diff', False)
+        _diff.return_value = input_fh
         output_fh = store.diff(catalogue, tokenizer, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(
             [sentinel.label, sentinel.label2])
-        log_query_plan.assert_called_once()
+        self.assertTrue(log_query_plan.called)
         sql = tacl.constants.SELECT_DIFF_SQL.format(sentinel.placeholders,
                                                     sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, [sentinel.label, sentinel.label2,
                                              sentinel.label, sentinel.label2])])
-        self.assertEqual(csv.call_count, 1)
-        reduce_diff_results.assert_called_once_with(results_fh, tokenizer,
-                                                    input_fh)
+        self.assertTrue(_diff.called)
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric (self):
@@ -240,31 +234,25 @@ class DataStoreTestCase (TaclTestCase):
         get_placeholders.return_value = sentinel.placeholders
         log_query_plan = self._create_patch('tacl.DataStore._log_query_plan',
                                             False)
-        results_fh = MagicMock(name='results_fh')
         input_fh = MagicMock(name='fh')
-        csv = self._create_patch('tacl.DataStore._csv', False)
-        csv.return_value = results_fh
         catalogue = MagicMock(name='catalogue')
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         tokenizer = MagicMock(name='tokenizer')
-        reduce_diff_results = self._create_patch(
-            'tacl.DataStore._reduce_diff_results', False)
-        reduce_diff_results.return_value = input_fh
+        _diff = self._create_patch('tacl.DataStore._diff', False)
+        _diff.return_value = input_fh
         output_fh = store.diff_asymmetric(catalogue, sentinel.prime_label,
                                           tokenizer, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with([sentinel.label])
-        log_query_plan.assert_called_once()
+        self.assertTrue(log_query_plan.called)
         sql = tacl.constants.SELECT_DIFF_ASYMMETRIC_SQL.format(
             sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, [sentinel.prime_label,
                                              sentinel.prime_label,
                                              sentinel.label])])
-        self.assertEqual(csv.call_count, 1)
-        reduce_diff_results.assert_called_once_with(results_fh, tokenizer,
-                                                    input_fh)
+        self.assertTrue(_diff.called)
         self.assertEqual(input_fh, output_fh)
 
     def test_diff_asymmetric_invalid_label (self):
@@ -438,7 +426,7 @@ class DataStoreTestCase (TaclTestCase):
         output_fh = store.intersection(catalogue, input_fh)
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
-        log_query_plan.assert_called_once()
+        self.assertTrue(log_query_plan.called)
         sql = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, Text.name AS "text name", Text.siglum, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, labels * 2)])
