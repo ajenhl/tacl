@@ -400,7 +400,7 @@ SELECT_COUNTS_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
     'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
     'ORDER BY Text.name, TextHasNGram.size'
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
+    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
@@ -409,16 +409,16 @@ SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'EXCEPT ' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
-SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, TextNGram.count, ' \
-    'Text.name AS "text name", Text.siglum, Text.label ' \
+SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
+    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
-SELECT_DIFF_SUPPLIED_SQL = '''SELECT ngram, size, count, name AS "text name",
-siglum, label
+SELECT_DIFF_SUPPLIED_SQL = '''SELECT ngram, size, name AS "text name",
+siglum, count, label
 FROM temp.InputResults
 WHERE ngram IN (
 SELECT ngram FROM temp.InputResults
@@ -426,7 +426,7 @@ GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)'''
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'TextNGram.count, Text.name AS "text name", Text.siglum, Text.label ' \
+    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN ({})'
@@ -434,8 +434,8 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = '''SELECT ngram, size, count,
-name AS "text name", siglum, label
+SELECT_INTERSECT_SUPPLIED_SQL = '''SELECT ngram, size, name AS "text name",
+siglum, count, label
 FROM temp.InputResults
 WHERE ngram IN (
 SELECT ngram FROM temp.InputResults

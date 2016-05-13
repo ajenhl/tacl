@@ -1,7 +1,6 @@
 """Module containing the DataStore class."""
 
 import csv
-import io
 import logging
 import os.path
 import sqlite3
@@ -272,7 +271,7 @@ class DataStore:
             writer = csv.writer(output_fh)
         writer.writerow(fieldnames)
         for row in cursor:
-            writer.writerow([row[fieldname] for fieldname in fieldnames])
+            writer.writerow(row)
         self._logger.info('Finished outputting results')
         return output_fh
 
