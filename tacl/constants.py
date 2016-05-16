@@ -217,6 +217,12 @@ REPORT_EPILOG = '''\
     at least two labels in the results in order to give correct
     results.
 
+    --min-count and --max-count set the range within which the total
+    count of each n-gram, across all texts, must fall. For each text,
+    its count is taken as the highest count among its witnesses.
+
+    --min-texts and --max-texts count texts rather than witnesses.
+
     Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
     chain commands together without creating an intermediate file,
@@ -237,8 +243,8 @@ REPORT_EPILOG = '''\
 
 ''' + ENCODING_EPILOG
 REPORT_HELP = 'Modify a query results file.'
-REPORT_MINIMUM_COUNT_HELP = 'Minimum total count of n-gram to include.'
-REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count of n-gram to include.'
+REPORT_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
+REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
 REPORT_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
 REPORT_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
 REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'

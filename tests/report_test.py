@@ -37,14 +37,17 @@ class ReportTestCase (TaclTestCase):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],
             ['BA', '2', 'a', 'wit', '1', 'A'],
-            ['BA', '2', 'b', 'base', '3', 'B'])
+            ['BA', '2', 'b', 'base', '3', 'B'],
+            ['BA', '2', 'b', 'wit', '3', 'B'])
         fh = self._create_csv(input_data)
         report = tacl.Report(fh, self._tokenizer)
         report.prune_by_ngram_count(minimum=3)
         expected_rows = [
             ('AB', '2', 'a', 'base', '7', 'A'),
             ('BA', '2', 'a', 'wit', '1', 'A'),
-            ('BA', '2', 'b', 'base', '3', 'B')]
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '3', 'B')
+        ]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
@@ -52,7 +55,9 @@ class ReportTestCase (TaclTestCase):
         report = tacl.Report(fh, self._tokenizer)
         report.prune_by_ngram_count(maximum=4)
         expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
-                         ('BA', '2', 'b', 'base', '3', 'B')]
+                         ('BA', '2', 'b', 'base', '3', 'B'),
+                         ('BA', '2', 'b', 'wit', '3', 'B')
+        ]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
@@ -60,7 +65,9 @@ class ReportTestCase (TaclTestCase):
         report = tacl.Report(fh, self._tokenizer)
         report.prune_by_ngram_count(minimum=4, maximum=5)
         expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
-                         ('BA', '2', 'b', 'base', '3', 'B')]
+                         ('BA', '2', 'b', 'base', '3', 'B'),
+                         ('BA', '2', 'b', 'wit', '3', 'B')
+        ]
         actual_rows = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)

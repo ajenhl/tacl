@@ -258,6 +258,9 @@ class Report:
         texts bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
 
+        For each text, the count used as part of the sum across all
+        texts is the maximum count across the witnesses for that text.
+
         :param minimum: minimum n-gram count
         :type minimum: `int`
         :param maximum: maximum n-gram count
@@ -265,18 +268,20 @@ class Report:
 
         """
         self._logger.info('Pruning results by n-gram count')
-        counts = pd.DataFrame(self._matches.groupby(constants.NGRAM_FIELDNAME)[
-            constants.COUNT_FIELDNAME].sum())
-        counts.rename(columns={constants.COUNT_FIELDNAME: 'tmp_count'},
-                      inplace=True)
+        def calculate_total (group):
+            text_grouped = group.groupby(constants.NAME_FIELDNAME)
+            total_count = text_grouped[constants.COUNT_FIELDNAME].max().sum()
+            group['total_count'] = pd.Series([total_count] * len(group.index),
+                                             index=group.index)
+            return group
+        matches = self._matches.groupby(constants.NGRAM_FIELDNAME).apply(
+            calculate_total)
         if minimum:
-            counts = counts[counts['tmp_count'] >= minimum]
+            matches = matches[matches['total_count'] >= minimum]
         if maximum:
-            counts = counts[counts['tmp_count'] <= maximum]
-        self._matches = pd.merge(self._matches, counts,
-                                 left_on=constants.NGRAM_FIELDNAME,
-                                 right_index=True)
-        del self._matches['tmp_count']
+            matches = matches[matches['total_count'] <= maximum]
+        del matches['total_count']
+        self._matches = matches
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
