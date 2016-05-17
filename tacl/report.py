@@ -274,14 +274,15 @@ class Report:
             group['total_count'] = pd.Series([total_count] * len(group.index),
                                              index=group.index)
             return group
-        matches = self._matches.groupby(constants.NGRAM_FIELDNAME).apply(
+        self._matches = self._matches.groupby(constants.NGRAM_FIELDNAME).apply(
             calculate_total)
         if minimum:
-            matches = matches[matches['total_count'] >= minimum]
+            self._matches = self._matches[
+                self._matches['total_count'] >= minimum]
         if maximum:
-            matches = matches[matches['total_count'] <= maximum]
-        del matches['total_count']
-        self._matches = matches
+            self._matches = self._matches[
+                self._matches['total_count'] <= maximum]
+        del self._matches['total_count']
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
