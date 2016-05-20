@@ -284,7 +284,44 @@ class Report:
                 self._matches['total_count'] <= maximum]
         del self._matches['total_count']
 
+    def prune_by_ngram_count_per_text (self, minimum=None, maximum=None):
+        """Removes results rows if the n-gram count for all texts bearing that
+        n-gram is outside the range specified by `minimum` and
+        `maximum`.
+
+        That is, if a single witness of a single text has an n-gram
+        count that falls within the specified range, all result rows
+        for that n-gram are kept.
+
+        :param minimum: minimum n-gram count
+        :type minimum: `int`
+        :param maximum: maximum n-gram count
+        :type maximum: `int`
+
+        """
+        self._logger.info('Pruning results by n-gram count per text')
+        if minimum and maximum:
+            keep_ngrams = set(self._matches[
+                (self._matches[constants.COUNT_FIELDNAME] >= minimum) &
+                (self._matches[constants.COUNT_FIELDNAME] <= maximum)][
+                    constants.NGRAM_FIELDNAME])
+            self._matches = self._matches[self._matches[
+                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+        elif minimum:
+            keep_ngrams = set(self._matches[
+                self._matches[constants.COUNT_FIELDNAME] >= minimum][
+                    constants.NGRAM_FIELDNAME])
+            self._matches = self._matches[self._matches[
+                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+        elif maximum:
+            keep_ngrams = set(self._matches[
+                self._matches[constants.COUNT_FIELDNAME] <= maximum][
+                    constants.NGRAM_FIELDNAME])
+            self._matches = self._matches[self._matches[
+                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+
     def prune_by_ngram_size (self, minimum=None, maximum=None):
+
         """Removes results rows whose n-gram size is outside the
         range specified by `minimum` and `maximum`.
 

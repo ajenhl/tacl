@@ -202,7 +202,8 @@ REPORT_EXTEND_HELP = '''\
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --zero-fill,
-    --min/max-texts, --min/max-size, --min/max-count, --remove.
+    --min/max-texts, --min/max-size, --min/max-count,
+    --min/max-count-text, --remove, --sort.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -222,6 +223,10 @@ REPORT_EPILOG = '''\
     its count is taken as the highest count among its witnesses.
 
     --min-texts and --max-texts count texts rather than witnesses.
+
+    If both --min-count-text and --max-count-text are specified, only
+    those n-grams are kept that have at least one witness whose count
+    falls within that range.
 
     Since this command always outputs a valid results file, its output
     can be used as input for a subsequent tacl report command. To
@@ -244,7 +249,16 @@ REPORT_EPILOG = '''\
 ''' + ENCODING_EPILOG
 REPORT_HELP = 'Modify a query results file.'
 REPORT_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
+REPORT_MINIMUM_COUNT_TEXT_HELP = '''\
+    Minimum count per n-gram per text to include; if a single witness
+    meets this criterion for an n-gram, all instances of that n-gram
+    are kept.'''
 REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
+REPORT_MAXIMUM_COUNT_TEXT_HELP = '''\
+
+    Maximum count per n-gram per text to include; if a single witness
+    meets this criterion for an n-gram, all instances of that n-gram
+    are kept.'''
 REPORT_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
 REPORT_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
 REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'

@@ -278,6 +278,12 @@ def generate_report_subparser (subparsers):
     parser.add_argument('--max-count', dest='max_count',
                         help=constants.REPORT_MAXIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
+    parser.add_argument('--min-count-text', dest='min_count_text',
+                        help=constants.REPORT_MINIMUM_COUNT_TEXT_HELP,
+                        metavar='COUNT', type=int)
+    parser.add_argument('--max-count-text', dest='max_count_text',
+                        help=constants.REPORT_MAXIMUM_COUNT_TEXT_HELP,
+                        metavar='COUNT', type=int)
     parser.add_argument('--min-size', dest='min_size',
                         help=constants.REPORT_MINIMUM_SIZE_HELP, metavar='SIZE',
                         type=int)
@@ -476,6 +482,9 @@ def report (args, parser):
         report.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
         report.prune_by_ngram_count(args.min_count, args.max_count)
+    if args.min_count_text or args.max_count_text:
+        report.prune_by_ngram_count_per_text(args.min_count_text,
+                                             args.max_count_text)
     if args.remove:
         report.remove_label(args.remove)
     if args.sort:

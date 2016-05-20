@@ -72,6 +72,69 @@ class ReportTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_prune_by_ngram_count_per_text (self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '7', 'A'],
+            ['AB', '2', 'a', 'wit', '1', 'A'],
+            ['AB', '2', 'b', 'base', '1', 'B'],
+            ['BA', '2', 'a', 'base', '2', 'A'],
+            ['BA', '2', 'a', 'wit', '3', 'A'],
+            ['BA', '2', 'b', 'base', '3', 'B'],
+            ['BA', '2', 'b', 'wit', '1', 'B'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh, self._tokenizer)
+        report.prune_by_ngram_count_per_text(minimum=3)
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '7', 'A'),
+            ('AB', '2', 'a', 'wit', '1', 'A'),
+            ('AB', '2', 'b', 'base', '1', 'B'),
+            ('BA', '2', 'a', 'base', '2', 'A'),
+            ('BA', '2', 'a', 'wit', '3', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '1', 'B')
+        ]
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh, self._tokenizer)
+        report.prune_by_ngram_count_per_text(minimum=4)
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '7', 'A'),
+            ('AB', '2', 'a', 'wit', '1', 'A'),
+            ('AB', '2', 'b', 'base', '1', 'B')
+        ]
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh, self._tokenizer)
+        report.prune_by_ngram_count_per_text(maximum=3)
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '7', 'A'),
+            ('AB', '2', 'a', 'wit', '1', 'A'),
+            ('AB', '2', 'b', 'base', '1', 'B'),
+            ('BA', '2', 'a', 'base', '2', 'A'),
+            ('BA', '2', 'a', 'wit', '3', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '1', 'B')
+        ]
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+        fh.seek(0)
+        report = tacl.Report(fh, self._tokenizer)
+        report.prune_by_ngram_count_per_text(minimum=3, maximum=4)
+        expected_rows = [
+            ('BA', '2', 'a', 'base', '2', 'A'),
+            ('BA', '2', 'a', 'wit', '3', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '1', 'B')
+        ]
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_prune_by_ngram_size (self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
