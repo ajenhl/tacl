@@ -359,6 +359,8 @@ TACL_HELPER_IN_TEXTS_HELP = '''\
     File containing text names to examine (one per line).'''
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
+TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = ''
+TACL_HELPER_VALIDATE_CATALOGUE_HELP = ''
 
 VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''

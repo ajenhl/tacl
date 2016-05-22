@@ -6,6 +6,7 @@ import sys
 import pandas as pd
 
 import tacl
+import tacl.command.utils as utils
 from tacl import constants
 
 
@@ -16,27 +17,11 @@ def main ():
     parser = generate_parser()
     args = parser.parse_args()
     if hasattr(args, 'verbose'):
-        configure_logging(args.verbose)
+        utils.configure_logging(args.verbose, logger)
     if hasattr(args, 'func'):
         args.func(args)
     else:
         parser.print_help()
-
-def add_common_arguments (parser):
-    """Adds common arguments for all parsers."""
-    parser.add_argument('-v', '--verbose', action='count',
-                        help=constants.VERBOSE_HELP)
-
-def add_db_arguments (parser):
-    """Adds common arguments for the database subcommands to `parser`."""
-    parser.add_argument('-m', '--memory', action='store_true',
-                        help=constants.DB_MEMORY_HELP)
-    parser.add_argument('-r', '--ram', default=3, help=constants.DB_RAM_HELP,
-                        type=int)
-    parser.add_argument('db', help=constants.DB_DATABASE_HELP,
-                        metavar='DATABASE')
-    parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
-                        metavar='CORPUS')
 
 def collapse_witnesses (args):
     results = open(args.results, 'r', encoding='utf-8', newline='')
@@ -74,21 +59,6 @@ def _collapse_witnesses (results_fh, output_fh):
     out_df.to_csv(output_fh, encoding='utf-8', index=False)
     return output_fh
 
-def configure_logging (verbose):
-    if not verbose:
-        log_level = logging.WARNING
-    elif verbose == 1:
-        log_level = logging.INFO
-    else:
-        log_level = logging.DEBUG
-    logger.setLevel(log_level)
-    ch = logging.StreamHandler()
-    ch.setLevel(log_level)
-    formatter = logging.Formatter(
-        '%(asctime)s %(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
 def _copy_options (args):
     """Returns a string form of the options in `args`."""
     options = []
@@ -105,9 +75,10 @@ def generate_parser ():
         description=constants.TACL_HELPER_DESCRIPTION,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
+    generate_collapse_witness_results_subparser(subparsers)
     generate_text_against_corpus_subparser(subparsers)
     generate_text_in_corpus_subparser(subparsers)
-    generate_collapse_witness_results_subparser(subparsers)
+    generate_validate_catalogue_subparser(subparsers)
     return parser
 
 def generate_collapse_witness_results_subparser (subparsers):
@@ -116,7 +87,7 @@ def generate_collapse_witness_results_subparser (subparsers):
         description=constants.TACL_HELPER_COLLAPSE_DESCRIPTION,
         help=constants.TACL_HELPER_COLLAPSE_HELP)
     parser.set_defaults(func=collapse_witnesses)
-    add_common_arguments(parser)
+    utils.add_common_arguments(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -127,8 +98,8 @@ def generate_text_against_corpus_subparser (subparsers):
         help=constants.TACL_HELPER_AGAINST_HELP,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.set_defaults(func=text_against_corpus)
-    add_common_arguments(parser)
-    add_db_arguments(parser)
+    utils.add_common_arguments(parser)
+    utils.add_db_arguments(parser)
     parser.add_argument('a_texts', help=constants.TACL_HELPER_AGAINST_A_HELP,
                         metavar='FILES_LIST', type=argparse.FileType('r'))
     parser.add_argument('b_texts', help=constants.TACL_HELPER_AGAINST_B_HELP,
@@ -143,12 +114,23 @@ def generate_text_in_corpus_subparser (subparsers):
         help=constants.TACL_HELPER_IN_HELP,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.set_defaults(func=text_in_corpus)
-    add_common_arguments(parser)
-    add_db_arguments(parser)
+    utils.add_common_arguments(parser)
+    utils.add_db_arguments(parser)
     parser.add_argument('texts', help=constants.TACL_HELPER_IN_TEXTS_HELP,
                         metavar='FILE_LIST', type=argparse.FileType('r'))
     parser.add_argument('output_dir', help=constants.TACL_HELPER_OUTPUT,
                         metavar='OUTPUT_DIR')
+
+def generate_validate_catalogue_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'validate-catalogue',
+        description=constants.TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION,
+        help=constants.TACL_HELPER_VALIDATE_CATALOGUE_HELP,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.set_defaults(func=validate_catalogue)
+    utils.add_common_arguments(parser)
+    utils.add_corpus_arguments(parser)
+    utils.add_query_arguments(parser)
 
 def text_against_corpus (args):
     a_texts = args.a_texts.read().strip().split()
@@ -206,3 +188,24 @@ def text_in_corpus (args):
     commands_path = os.path.join(output_dir, 'commands')
     with open(commands_path, 'w') as fh:
         fh.writelines(commands)
+
+def validate_catalogue (args):
+    try:
+        catalogue = utils.get_catalogue(args.catalogue)
+    except tacl.exceptions.MalformedCatalogueError as e:
+        print('Error: {}'.format(e))
+        print('Other errors may be present; re-run this validation after correcting the above problem.')
+        sys.exit(1)
+    corpus = utils.get_corpus(args)
+    has_error = False
+    for name in catalogue:
+        count = 0
+        for text in corpus.get_texts(name):
+            count += 1
+            break
+        if not count:
+            has_error = True
+            print('Error: Catalogue references text {} that does not '
+                  'exist in the corpus'.format(name))
+    if has_error:
+        sys.exit(1)
