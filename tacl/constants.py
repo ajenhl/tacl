@@ -291,10 +291,11 @@ SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''
 
-STATISTICS_DESCRIPTION = '''
-    Generate summary statistics for a set of results. This gives the
-    counts of all tokens and matching tokens in each witness and the
-    percentage of the witness that is encompassed by the matches.'''
+STATISTICS_DESCRIPTION = '''\
+    Generate summary statistics for a set of results. This gives, for
+    each witness, the total number of tokens and the count of matching
+    tokens, and derived from these the percentage of the witness that
+    is encompassed by the matches.'''
 STATISTICS_HELP = 'Generate summary statistics for a set of results.'
 STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 
