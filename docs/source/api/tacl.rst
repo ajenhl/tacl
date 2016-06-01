@@ -1,6 +1,13 @@
 tacl package
 ============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    tacl.command
+
 Submodules
 ----------
 
