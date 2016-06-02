@@ -199,8 +199,8 @@ PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 REPORT_CATALOGUE_HELP = '''\
     Path to the catalogue file used to generate the results'''
 REPORT_DESCRIPTION = '''\
-    Modify a query results file by removing certain results. Outputs
-    the new set of results.'''
+    Modify a query results file by adding, removing or sorting result
+    rows. Outputs the new set of results.'''
 REPORT_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
