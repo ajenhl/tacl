@@ -43,6 +43,32 @@ class DataStoreTestCase (TaclTestCase):
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
+    def test_add_ngrams_with_catalogue (self):
+        add_indices = self._create_patch('tacl.DataStore._add_indices')
+        add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
+        analyse = self._create_patch('tacl.DataStore._analyse')
+        initialise = self._create_patch('tacl.DataStore._initialise_database')
+        text1 = MagicMock(spec_set=tacl.Text)
+        text1.get_names = MagicMock(name='get_names')
+        text1.get_names.return_value = ['T1', 'base']
+        text2 = MagicMock(spec_set=tacl.Text)
+        text2.get_names = MagicMock(name='get_names')
+        text2.get_names.return_value = ['T2', 'base']
+        corpus = MagicMock(spec_set=tacl.Corpus)
+        corpus.get_texts = MagicMock(name='get_texts')
+        corpus.get_texts.return_value = iter([text1, text2])
+        store = tacl.DataStore(':memory:')
+        catalogue = tacl.Catalogue()
+        catalogue['T1'] = 'A'
+        store.add_ngrams(corpus, 2, 3, catalogue)
+        initialise.assert_called_once_with(store)
+        corpus.get_texts.assert_called_once_with()
+        text1.get_names.assert_called_once_with()
+        text2.get_names.assert_called_once_with()
+        add_text_ngrams.assert_called_once_with(store, text1, 2, 3)
+        add_indices.assert_called_once_with(store)
+        analyse.assert_called_once_with(store)
+
     def test_add_temporary_ngrams (self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)

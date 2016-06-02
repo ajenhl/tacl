@@ -159,7 +159,11 @@ def generate_ngrams (args, parser):
     """Adds n-grams data to the data store."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    store.add_ngrams(corpus, args.min_size, args.max_size)
+    if args.catalogue:
+        catalogue = utils.get_catalogue(args.catalogue)
+    else:
+        catalogue = None
+    store.add_ngrams(corpus, args.min_size, args.max_size, catalogue)
 
 def generate_ngrams_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to add n-grams data
@@ -170,6 +174,9 @@ def generate_ngrams_subparser (subparsers):
         help=constants.NGRAMS_HELP)
     parser.set_defaults(func=generate_ngrams)
     utils.add_common_arguments(parser)
+    parser.add_argument('-c', '--catalogue', dest='catalogue',
+                        help=constants.NGRAMS_CATALOGUE_HELP,
+                        metavar='CATALOGUE')
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     parser.add_argument('min_size', help=constants.NGRAMS_MINIMUM_HELP,

@@ -152,6 +152,9 @@ INTERSECT_EPILOG = '''\
 ''' + ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
+NGRAMS_CATALOGUE_HELP = '''\
+    Path to a catalogue file used to restrict which texts in the
+    corpus are added'''
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
 NGRAMS_EPILOG = '''\
     This command can be safely interrupted and subsequently rerun;
@@ -174,6 +177,9 @@ NGRAMS_EPILOG = '''\
 
       Create a database of 1 to 7-grams from a Pagel corpus.
         tacl ngrams pagel1-7.db corpus/pagel/ 1 7
+
+      Create a database of 1 to 7-grams from a subset of the CBETA corpus.
+        tacl ngrams -c dhr-texts.txt cbeta-dhr1-7.db corpus/cbeta/ 1 7
 
 '''
 NGRAMS_HELP = 'Generate n-grams from a corpus.'

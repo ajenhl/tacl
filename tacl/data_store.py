@@ -47,7 +47,7 @@ class DataStore:
         self._conn.execute(constants.CREATE_INDEX_TEXTNGRAM_SQL)
         self._logger.info('Indices added')
 
-    def add_ngrams (self, corpus, minimum, maximum):
+    def add_ngrams (self, corpus, minimum, maximum, catalogue=None):
         """Adds n-gram data from `corpus` to the data store.
 
         :param corpus: corpus of texts
@@ -56,10 +56,14 @@ class DataStore:
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
+        :param catalogue: optional catalogue to limit corpus to
+        :type catalogue: `Catalogue`
 
         """
         self._initialise_database()
         for text in corpus.get_texts():
+            if catalogue and not catalogue.get(text.get_names()[0]):
+                continue
             self._add_text_ngrams(text, minimum, maximum)
         self._add_indices()
         self._analyse()
