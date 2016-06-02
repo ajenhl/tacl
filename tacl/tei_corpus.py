@@ -222,6 +222,8 @@ class TEICorpus:
         tree.write(output_filename, encoding='utf-8', pretty_print=True)
 
     def tidy (self):
+        """Transforms the files in the input directory into standardised XML
+        and writes the output to output directory."""
         if not os.path.exists(self._output_dir):
             try:
                 os.makedirs(self._output_dir)

@@ -568,7 +568,7 @@ class DataStore:
         :type matches_path: `str` or file-like object
         :param tokenizer: tokenizer for the n-grams
         :type tokenizer: `Tokenizer`
-        :param output_fh: file to write results to
+        :param output_fh: object to write results to
         :type output_fh: file-like object
         :rtype: file-like object
 
@@ -624,6 +624,18 @@ class DataStore:
         return output_fh
 
     def search (self, catalogue, ngrams, output_fh):
+        """Returns `output_fh` populated with CSV results for each witness
+        that contains at least one of the n-grams in `ngrams`.
+
+        :param catalogue:
+        :type catalogue: `Catalogue`
+        :param ngrams: n-grams to search for
+        :type ngrams: `list`
+        :param output_fh: object to write results to
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
         self._set_labels(catalogue)
         self._add_temporary_ngrams(ngrams)
         query = constants.SELECT_SEARCH_SQL

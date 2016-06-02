@@ -70,6 +70,12 @@ class Sequencer:
         return Sequence(alignment, self._r_substitutes)
 
     def generate_sequences (self, minimum_size):
+        """Generates sequence reports and writes them to the output directory.
+
+        :param minimum_size: minimum size of n-grams to create sequences for
+        :type minimum_size: `int`
+
+        """
         loader = PackageLoader('tacl', 'assets/templates')
         env = Environment(loader=loader)
         template = env.get_template('sequence.html')

@@ -23,11 +23,22 @@ class Tokenizer:
 
     @property
     def joiner (self):
+        """The string used to join tokens together when reconstructing a
+        text."""
         return self._joiner
 
     @property
     def pattern (self):
+        """The regular expression pattern used to divide the text into
+        tokens."""
         return self._pattern
 
     def tokenize (self, text):
+        """Returns all tokens in `text`.
+
+        :param text: text to be tokenized
+        :type text: `str`
+        :rtype: `list` of `str`
+
+        """
         return self._regexp.findall(text)

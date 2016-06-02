@@ -33,6 +33,15 @@ class Report:
         return fh
 
     def extend (self, corpus):
+        """Adds rows for all longer forms of n-grams in the results that are
+        present in the witnesses.
+
+        This works with both diff and intersect results.
+
+        :param corpus: corpus of texts to which results belong
+        :type corpus: `Corpus`
+
+        """
         self._logger.info('Extending results')
         if self._matches.empty:
             return
@@ -451,6 +460,12 @@ class Report:
                 substring_data['count'] -= count
 
     def remove_label (self, label):
+        """Removes all results rows associated with `label`.
+
+        :param label: label to filter results on
+        :type label: `str`
+
+        """
         self._logger.info('Removing label "{}"'.format(label))
         count = self._matches[constants.LABEL_FIELDNAME].value_counts()[label]
         self._matches = self._matches[
@@ -458,6 +473,12 @@ class Report:
         self._logger.info('Removed {} labelled results'.format(count))
 
     def sort (self):
+        """Sorts all results rows.
+
+        Sorts by: size (descending), n-gram, count (descending), label,
+        text name, siglum.
+
+        """
         self._matches.sort_values(
             by=[constants.SIZE_FIELDNAME, constants.NGRAM_FIELDNAME,
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,

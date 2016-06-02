@@ -128,6 +128,8 @@ class Stripper:
                 output_file.write(witnesses[witness].encode('utf-8'))
 
     def strip_files (self):
+        """Strips XML markup from the input files and writes the results to
+        the output directory."""
         if not os.path.exists(self._output_dir):
             try:
                 os.makedirs(self._output_dir)
@@ -142,16 +144,24 @@ class Stripper:
                         os.path.join(dirpath, filename))
                     self._output_file(text_name, witnesses)
 
-    def strip_file (self, filename):
-        file_path = os.path.join(self._input_dir, filename)
-        text_name = os.path.splitext(os.path.basename(filename))[0]
+    def strip_file (self, filepath):
+        """Returns the text name and a dictionary of siglum and plain witness
+        text pairs generated from the XML file at `filepath`.
+
+        :param filepath: path of source XML document
+        :type filepath: `str`
+        :rtype: `tuple` of `str` and `dict`
+
+        """
+        file_path = os.path.join(self._input_dir, filepath)
+        text_name = os.path.splitext(os.path.basename(filepath))[0]
         stripped_file_path = os.path.join(self._output_dir, text_name)
         self._logger.info('Stripping file {} into {}'.format(
                 file_path, stripped_file_path))
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError:
-            logging.warning('XML file "{}" is invalid'.format(filename))
+            logging.warning('XML file "{}" is invalid'.format(filepath))
             return
         text_witnesses = self._texts.setdefault(stripped_file_path, {})
         for witness in self.get_witnesses(tei_doc):

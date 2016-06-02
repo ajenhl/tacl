@@ -112,7 +112,7 @@ class Highlighter:
         :param results: file containing matches to highlight
         :type results: `TextIOWrapper`
         :param corpus: corpus of documents containing `text_filename`
-        :type corpus: `tacl.Corpus`
+        :type corpus: `Corpus`
         :param text_name: name of text to highlight
         :type text_name: `str`
         :param siglum: siglum of text to highlight

@@ -17,6 +17,13 @@ class StatisticsReport:
         self._stats = pd.DataFrame()
 
     def csv (self, fh):
+        """Writes the report data to `fh` in CSV format and returns it.
+
+        :param fh: file to write data to
+        :type fh: file object
+        :rtype: file object
+
+        """
         self._stats.to_csv(fh, columns=constants.STATISTICS_FIELDNAMES,
                            encoding='utf-8', index=False)
         return fh
