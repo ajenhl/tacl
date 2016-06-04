@@ -16,12 +16,14 @@ setup(name='tacl',
       packages=['tacl', 'tacl.command'],
       entry_points = {
           'console_scripts': [
+              'jitc=tacl.command.jitc_script:main',
               'tacl=tacl.command.tacl_script:main',
               'tacl-helper=tacl.command.tacl_helper_script:main',
           ],
       },
       package_data = {
-          'tacl': ['assets/templates/*.html'],
+          'tacl': ['assets/jitc/*.js', 'assets/jitc/*.css',
+                   'assets/templates/*.html'],
       },
       install_requires=['biopython', 'Jinja2', 'lxml', 'pandas>=0.17.0'],
       classifiers=[

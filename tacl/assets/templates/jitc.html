@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JitC Report</title>
+    <link rel="stylesheet" href="report_assets{{ sep }}report.css" />
+    <script src="http://d3js.org/d3.v2.min.js?2.8.1"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+</head>
+  <body>
+    <h1>Jewel in the Clouds Report</h1>
+
+    <p>The following report shows the amount of overlap between pairs
+    of texts within a set, after removing those overlaps that also
+    occur when comparing the texts with a second set of texts.</p>
+
+    <p>The content of each text, in comparison with another text, has
+    three categories:</p>
+
+    <dl>
+      <dt>common</dt>
+      <dd>Text that is shared between both texts, and that also occurs
+      in at least one text in the second set of texts.</dd>
+
+      <dt>shared</dt>
+      <dd>Text that is shared between both texts, and that does not
+      occur in any of the texts in the second set of texts.</dd>
+
+      <dt>unique</dt>
+      <dd>Text that is unique to the text, occuring neither in the
+      other text, nor in any of the texts in the second set of
+      texts.</dt>
+    </dl>
+
+    <h2>Texts analysed for overlap</h2>
+
+    <ul>
+      {% for index, text in texts %}
+      <li><a href="#text-{{ index }}">{{ text }}</a></li>
+      {% endfor %}
+    </ul>
+
+    <h2>Texts used to find unwanted overlap</h2>
+
+    <ul>
+      {% for text in other_texts %}
+      <li>{{ text }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Shared tokens: chord</h2>
+
+    <div id="chord"></div>
+
+    <h2>Shared tokens: matrix</h2>
+
+    <p>Order: <select id="order">
+      <option value="name">by text name</option>
+      <option value="count">by most overlapping</option>
+    </select></p>
+
+    <div id="matrix"></div>
+
+    {% for index, text in texts %}
+    <div id="text-{{ index }}" type="text">
+      <h2>{{ text }}</h2>
+
+      {{ tables[index] }}
+
+      <div id="breakdown_{{ index }}"></div>
+
+      <div id="related_{{ index }}"></div>
+    </div>
+    {% endfor %}
+
+    <script src="report_data{{ sep }}matrix_data.js"></script>
+    <script src="report_assets{{ sep }}matrix.js"></script>
+    <script src="report_data{{ sep }}chord_data.js"></script>
+    <script src="report_assets{{ sep }}chord.js"></script>
+    <script src="report_assets{{ sep }}stacked_bar.js"></script>
+    <script src="report_assets{{ sep }}grouped_bar.js"></script>
+    {% for index, text in texts %}
+    <script>
+      var breakdown_chart_{{ index }} = stackedBarChart();
+      d3.csv("report_data{{ sep }}breakdown_{{ text }}.csv", function(data) {
+        d3.select("#breakdown_{{ index }}").datum(data).call(
+          breakdown_chart_{{ index }});
+      });
+    </script>
+    <script>
+      var related_chart_{{ index }} = groupedBarChart();
+      d3.csv("report_data{{ sep }}related_{{ text }}.csv", function(data) {
+        d3.select("#related_{{ index }}").datum(data).call(
+          related_chart_{{ index }});
+      });
+    </script>
+    {% endfor %}
+  </body>
+</html>
