@@ -91,5 +91,11 @@ def get_data_store (args):
     """Returns a `tacl.DataStore`."""
     return tacl.DataStore(args.db, args.memory, args.ram)
 
+def get_ngrams (args):
+    """Returns a list of n-grams read from a file."""
+    with open(args.ngrams, encoding='utf-8') as fh:
+        ngrams = [ngram.strip() for ngram in fh.readlines()]
+    return ngrams
+
 def get_tokenizer (args):
     return tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])

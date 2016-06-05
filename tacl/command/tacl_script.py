@@ -413,8 +413,7 @@ def search_texts (args, parser):
     if args.catalogue:
         catalogue.load(args.catalogue)
     store.validate(corpus, catalogue)
-    with open(args.ngrams, 'r', encoding='utf-8') as fh:
-        ngrams = [ngram.strip() for ngram in fh.readlines()]
+    ngrams = utils.get_ngrams(args)
     store.search(catalogue, ngrams, sys.stdout)
 
 def strip_texts (args, parser):
