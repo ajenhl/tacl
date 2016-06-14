@@ -307,10 +307,13 @@ class DataStore:
 
         """
         temp_fd, temp_path = tempfile.mkstemp(text=True)
-        with open(temp_path, 'w', encoding='utf-8', newline='') as results_fh:
+        with open(temp_fd, 'w', encoding='utf-8', newline='') as results_fh:
             self._csv(cursor, constants.QUERY_FIELDNAMES, results_fh)
         output_fh = self._reduce_diff_results(temp_path, tokenizer, output_fh)
-        os.remove(temp_path)
+        try:
+            os.remove(temp_path)
+        except OSError as e:
+            self._logger.error('Failed to remove temporary file containing unreduced results: {}'.format(e))
         return output_fh
 
     def diff (self, catalogue, tokenizer, output_fh):
