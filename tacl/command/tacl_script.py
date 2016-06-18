@@ -235,6 +235,8 @@ def generate_report_subparser (subparsers):
     parser.add_argument('--max-texts', dest='max_texts',
                         help=constants.REPORT_MAXIMUM_TEXT_HELP,
                         metavar='COUNT', type=int)
+    parser.add_argument('--ngrams', dest='ngrams',
+                        help=constants.REPORT_NGRAMS_HELP, metavar='NGRAMS')
     parser.add_argument('--reciprocal', action='store_true',
                         help=constants.REPORT_RECIPROCAL_HELP)
     parser.add_argument('--reduce', action='store_true',
@@ -390,6 +392,10 @@ def report (args, parser):
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
         catalogue = utils.get_catalogue(args.catalogue)
         report.zero_fill(corpus, catalogue)
+    if args.ngrams:
+        with open(args.ngrams, encoding='utf-8') as fh:
+            ngrams = fh.read().split()
+        report.prune_by_ngram(ngrams)
     if args.min_texts or args.max_texts:
         report.prune_by_text_count(args.min_texts, args.max_texts)
     if args.min_size or args.max_size:

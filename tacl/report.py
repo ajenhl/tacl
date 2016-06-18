@@ -262,6 +262,17 @@ class Report:
         return not(results[(results[constants.NGRAM_FIELDNAME] == ngram) &
                            (results[constants.LABEL_FIELDNAME] != label)].empty)
 
+    def prune_by_ngram (self, ngrams):
+        """Removes results rows whose n-gram is in `ngrams`.
+
+        :param ngrams: n-grams to remove
+        :type ngrams: `list` of `str`
+
+        """
+        self._logger.info('Pruning results by n-gram')
+        self._matches = self._matches[
+            ~self._matches[constants.NGRAM_FIELDNAME].isin(ngrams)]
+
     def prune_by_ngram_count (self, minimum=None, maximum=None):
         """Removes results rows whose total n-gram count (across all
         texts bearing this n-gram) is outside the range specified by
@@ -330,7 +341,6 @@ class Report:
                 constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
 
     def prune_by_ngram_size (self, minimum=None, maximum=None):
-
         """Removes results rows whose n-gram size is outside the
         range specified by `minimum` and `maximum`.
 

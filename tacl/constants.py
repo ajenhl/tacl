@@ -208,7 +208,7 @@ REPORT_EXTEND_HELP = '''\
 REPORT_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --zero-fill,
-    --min/max-texts, --min/max-size, --min/max-count,
+    --ngrams, --min/max-texts, --min/max-size, --min/max-count,
     --min/max-count-text, --remove, --sort.
 
     It is important to be careful with the use of --reduce. Coupled
@@ -269,6 +269,7 @@ REPORT_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
 REPORT_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
 REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'
 REPORT_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
+REPORT_NGRAMS_HELP = 'Path to file containing n-grams (one per line) to exclude.'
 REPORT_RECIPROCAL_HELP = '''\
     Remove n-grams that are not attested by at least one text in each
     labelled set of texts. This can be useful after reducing a set of

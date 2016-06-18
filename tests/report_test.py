@@ -33,6 +33,27 @@ class ReportTestCase (TaclTestCase):
         report = tacl.Report(fh, self._tokenizer)
         self.assertFalse(report._is_intersect_results(report._matches))
 
+    def test_prune_by_ngram (self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['ABC', '3', 'a', 'base', '2', 'A'],
+            ['ABD', '3', 'a', 'wit', '1', 'A'],
+            ['ABCD', '4', 'a', 'base', '2', 'A'],
+            ['AB', '2', 'b', 'base', '2', 'A'],
+            ['ABC', '3', 'b', 'wit', '2', 'A'])
+        fh = self._create_csv(input_data)
+        report = tacl.Report(fh, self._tokenizer)
+        ngrams = ['AB', 'ABD']
+        report.prune_by_ngram(ngrams)
+        expected_rows = [
+            ('ABC', '3', 'a', 'base', '2', 'A'),
+            ('ABCD', '4', 'a', 'base', '2', 'A'),
+            ('ABC', '3', 'b', 'wit', '2', 'A')
+        ]
+        actual_rows = self._get_rows_from_csv(report.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_prune_by_ngram_count (self):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],
