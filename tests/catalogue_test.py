@@ -19,7 +19,14 @@ class CatalogueTestCase (TaclTestCase):
         self.assertEqual(catalogue.get(sentinel.filename2), sentinel.label)
         self.assertEqual(catalogue.get(sentinel.filename3), None)
 
-    def test_laod (self):
+    def test_labels (self):
+        catalogue = tacl.Catalogue()
+        catalogue['T0123'] = 'label1'
+        catalogue['T3210'] = 'label2'
+        catalogue['T2301'] = 'label1'
+        self.assertEqual(catalogue.labels, ['label1', 'label2'])
+
+    def test_load (self):
         # Unfortunately I can't see how to get mock_open to return
         # suitable data on iteration, so this test is extremely
         # limited.

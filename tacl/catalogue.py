@@ -20,6 +20,15 @@ class Catalogue (dict):
         for filename in os.listdir(path):
             self[filename] = label
 
+    @property
+    def labels (self):
+        """Returns the distinct labels defined in the catalogue.
+
+        :rtype: `list`
+
+        """
+        return sorted(set(self.values()))
+
     def load (self, path):
         """Loads the data from `path` into the catalogue.
 
