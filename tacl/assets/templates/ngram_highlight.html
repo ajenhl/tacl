@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ base_name }} {{ base_siglum }} with highlighted n-grams</title>
+    <style>
+      body { margin-left: 4em; color: black; background-color: white; }
+      ul { list-style-type: none; }
+    </style>
+  </head>
+  <body>
+    <h1>{{ base_name }} {{ base_siglum }} with highlighted n-grams</h1>
+
+    <p>Lists of <a href="#highlighted">highlighted</a>
+    and <a href="#unhighlighted">unhighlighted</a> n-grams is supplied
+    after the highlighted text.</p>
+
+    <h2>Text</h2>
+
+    <div class="text">{{ text }}</div>
+
+    <h2 id="highlighted">Highlighted n-grams</h2>
+
+    <ul>
+      {% for ngram in ngrams %}
+      <li>{{ ngram }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2 id="unhighlighted">Unhighlighted n-grams</h2>
+
+    <ul>
+      {% for ngram in minus_ngrams %}
+      <li>{{ ngram }}</li>
+      {% endfor %}
+    </ul>
+
+  </body>
+</html>

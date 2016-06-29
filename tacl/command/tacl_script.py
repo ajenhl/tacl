@@ -134,9 +134,14 @@ def generate_highlight_subparser (subparsers):
         help=constants.HIGHLIGHT_HELP)
     parser.set_defaults(func=highlight_text)
     utils.add_common_arguments(parser)
+    parser.add_argument('-m', '--minus-ngrams', metavar='NGRAMS',
+                        help=constants.HIGHLIGHT_MINUS_NGRAMS_HELP)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-n', '--ngrams', metavar='NGRAMS',
+                       help=constants.HIGHLIGHT_NGRAMS_HELP)
+    group.add_argument('-r', '--results', metavar='RESULTS',
+                        help=constants.HIGHLIGHT_RESULTS_HELP)
     utils.add_corpus_arguments(parser)
-    parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
-                        metavar='RESULTS')
     parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
                         metavar='BASE_NAME')
     parser.add_argument('base_siglum', metavar='BASE_SIGLUM',
@@ -329,8 +334,16 @@ def highlight_text (args, parser):
     """Outputs the result of highlighting a text."""
     tokenizer = utils.get_tokenizer(args)
     corpus = utils.get_corpus(args)
-    highlighter = tacl.Highlighter(corpus, tokenizer)
-    text = highlighter.highlight(args.results, args.base_name, args.base_siglum)
+    if args.ngrams:
+        highlighter = tacl.NgramHighlighter(corpus, tokenizer)
+        ngrams = utils.get_ngrams(args.ngrams)
+        minus_ngrams = utils.get_ngrams(args.minus_ngrams)
+        text = highlighter.highlight(args.base_name, args.base_siglum,
+                                     ngrams, minus_ngrams)
+    else:
+        highlighter = tacl.ResultsHighlighter(corpus, tokenizer)
+        text = highlighter.highlight(args.base_name, args.base_siglum,
+                                     args.results)
     print(text)
 
 def ngram_counts (args, parser):
@@ -419,7 +432,7 @@ def search_texts (args, parser):
     if args.catalogue:
         catalogue.load(args.catalogue)
     store.validate(corpus, catalogue)
-    ngrams = utils.get_ngrams(args)
+    ngrams = utils.get_ngrams(args.ngrams)
     store.search(catalogue, ngrams, sys.stdout)
 
 def strip_texts (args, parser):

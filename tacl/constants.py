@@ -124,18 +124,39 @@ DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 HIGHLIGHT_BASE_NAME_HELP = 'Name of text to display.'
 HIGHLIGHT_BASE_SIGLUM_HELP = 'Siglum of text to display.'
 HIGHLIGHT_DESCRIPTION = '''\
-    Output an HTML document showing a text with its matches visually
+    Output an HTML document showing a text with supplied n-grams visually
     highlighted.'''
 HIGHLIGHT_EPILOG = '''\
-    The scope of the supplied results may have a dramatic influence on
-    the amount of highlighting. Results containing 1-grams are very
-    likely to be almost entirely highlighted. Results may be
-    restricted by using the tacl report command.
+
+    There are two possible outputs available, depending on whether the
+    -n or -r option is specified.
+
+    If n-grams are supplied via the -n/--ngrams option, the resulting
+    HTML shows the specified witness text with those n-grams
+    highlighted. Any n-grams that are specified via the
+    -m/--minus-ngrams option will have had its constituent tokens
+    unhighlighted.
+
+    If results are supplied via the -r/--results option, the resulting
+    HTML contains an interactive heatmap of the results, allowing the
+    user to select which witness' matches should be highlighted in the
+    text. Multiple selections are possible, and the colour of the
+    highlight of a token reflects how many witnesses have matches
+    containing that token.
 
     examples:
 
-      tacl highlight corpus/stripped/ intersect.csv T0001 元'''
+      tacl highlight -r intersect.csv corpus/stripped/ T0001 元 > heatmap.html
+
+      tacl highlight -n author_markers.csv corpus/stripped/ T0001 元 > highlight.html'''
 HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
+HIGHLIGHT_MINUS_NGRAMS_HELP = '''\
+    Path to file containing n-grams (one per line) to remove
+    highlighting from. This applies only when -n is used.'''
+HIGHLIGHT_NGRAMS_HELP = '''\
+    Path to file containing n-grams (one per line) to highlight.'''
+HIGHLIGHT_RESULTS_HELP = 'Path to CSV results; creates heatmap highlighting'
+
 
 INTERSECT_DESCRIPTION = '''\
     List n-grams common to all sub-corpora (as defined by the labels
