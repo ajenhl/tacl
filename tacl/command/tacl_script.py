@@ -337,7 +337,9 @@ def highlight_text (args, parser):
     if args.ngrams:
         highlighter = tacl.NgramHighlighter(corpus, tokenizer)
         ngrams = utils.get_ngrams(args.ngrams)
-        minus_ngrams = utils.get_ngrams(args.minus_ngrams)
+        minus_ngrams = []
+        if args.minus_ngrams:
+            minus_ngrams = utils.get_ngrams(args.minus_ngrams)
         text = highlighter.highlight(args.base_name, args.base_siglum,
                                      ngrams, minus_ngrams)
     else:
