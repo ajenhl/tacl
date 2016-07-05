@@ -107,6 +107,21 @@ DIFF_DESCRIPTION = '''\
     List n-grams unique to each sub-corpus (as defined by the labels
     in the specified catalogue file).'''
 DIFF_EPILOG = '''\
+    Many of the n-grams that are distinct to each sub-corpus are
+    uninteresting - if a 2-gram is distinct, then so is every gram
+    larger than 2 that contains that 2-gram. Therefore the results
+    output by this command are filtered to keep only the most
+    distinctive n-grams, according to the following rules (which apply
+    within the context of a given witness):
+
+    * If an n-gram is not composed of any (n-1)-grams found in the
+      results, it is kept.
+
+    * If both of the (n-1)-grams that comprise an n-gram are found in
+      the results, that n-gram is kept.
+
+    * Otherwise, the n-gram is removed from the results.
+
     examples:
 
       Make a diff query against a CBETA corpus.
