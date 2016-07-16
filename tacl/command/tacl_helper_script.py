@@ -24,12 +24,8 @@ def main ():
         parser.print_help()
 
 def collapse_witnesses (args):
-    results = open(args.results, 'r', encoding='utf-8', newline='')
-    _collapse_witnesses(results, sys.stdout)
-
-def _collapse_witnesses (results_fh, output_fh):
     logger.debug('Loading results')
-    results = pd.read_csv(results_fh, encoding='utf-8')
+    results = pd.read_csv(args.results, encoding='utf-8', na_filter=False)
     logger.debug('Loaded results')
     grouped = results.groupby(
         [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
@@ -56,8 +52,7 @@ def _collapse_witnesses (results_fh, output_fh):
                constants.NAME_FIELDNAME, 'sigla', constants.COUNT_FIELDNAME,
                constants.LABEL_FIELDNAME]
     out_df = pd.DataFrame(output_rows, columns=columns)
-    out_df.to_csv(output_fh, encoding='utf-8', index=False)
-    return output_fh
+    out_df.to_csv(sys.stdout, encoding='utf-8', index=False)
 
 def _copy_options (args):
     """Returns a string form of the options in `args`."""
@@ -76,6 +71,7 @@ def generate_parser ():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
     generate_collapse_witness_results_subparser(subparsers)
+    generate_label_count_subparser(subparsers)
     generate_text_against_corpus_subparser(subparsers)
     generate_text_in_corpus_subparser(subparsers)
     generate_validate_catalogue_subparser(subparsers)
@@ -87,6 +83,16 @@ def generate_collapse_witness_results_subparser (subparsers):
         description=constants.TACL_HELPER_COLLAPSE_DESCRIPTION,
         help=constants.TACL_HELPER_COLLAPSE_HELP)
     parser.set_defaults(func=collapse_witnesses)
+    utils.add_common_arguments(parser)
+    parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
+                        metavar='RESULTS')
+
+def generate_label_count_subparser (subparsers):
+    parser = subparsers.add_parser(
+        'label-count',
+        description=constants.TACL_HELPER_LABEL_COUNT_DESCRIPTION,
+        help=constants.TACL_HELPER_LABEL_COUNT_HELP)
+    parser.set_defaults(func=label_count)
     utils.add_common_arguments(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
                         metavar='RESULTS')
@@ -131,6 +137,21 @@ def generate_validate_catalogue_subparser (subparsers):
     utils.add_common_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
+
+def label_count (args):
+    results = pd.read_csv(args.results, encoding='utf-8', na_filter=False)
+    results.loc[:, 'label count'] = 0
+    def add_label_count (df):
+        # For each n-gram and label pair, we need the maximum count
+        # among all witnesses to each text, and then the sum of those
+        # across all texts.
+        text_maxima = df.groupby(constants.NAME_FIELDNAME).max()
+        df.loc[:, 'label count'] = text_maxima[constants.COUNT_FIELDNAME].sum()
+        return df
+    out_df = results.groupby(
+        [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME]).apply(
+            add_label_count)
+    out_df.to_csv(sys.stdout, encoding='utf-8', index=False)
 
 def text_against_corpus (args):
     a_texts = args.a_texts.read().strip().split()

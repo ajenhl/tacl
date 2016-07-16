@@ -297,7 +297,6 @@ REPORT_MINIMUM_COUNT_TEXT_HELP = '''\
     are kept.'''
 REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
 REPORT_MAXIMUM_COUNT_TEXT_HELP = '''\
-
     Maximum count per n-gram per text to include; if a single witness
     meets this criterion for an n-gram, all instances of that n-gram
     are kept.'''
@@ -401,6 +400,14 @@ TACL_HELPER_IN_HELP = '''\
     other texts of that corpus.'''
 TACL_HELPER_IN_TEXTS_HELP = '''\
     File containing text names to examine (one per line).'''
+TACL_HELPER_LABEL_COUNT_DESCRIPTION = '''\
+    Output the supplied results with an additional column, "label
+    count", giving the total count for each n-gram within the
+    label. The maximum count across all of a text's witnesses is used
+    in the sum.'''
+TACL_HELPER_LABEL_COUNT_HELP = '''\
+    Add a "label count" column to results giving the count per
+    label.'''
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
 TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = ''
