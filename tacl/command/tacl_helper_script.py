@@ -24,8 +24,12 @@ def main ():
         parser.print_help()
 
 def collapse_witnesses (args):
+    # This split is to make it easier to test the functionality.
+    _collapse_witnesses(args.results, sys.stdout)
+
+def _collapse_witnesses (input_fh, output_fh):
     logger.debug('Loading results')
-    results = pd.read_csv(args.results, encoding='utf-8', na_filter=False)
+    results = pd.read_csv(input_fh, encoding='utf-8', na_filter=False)
     logger.debug('Loaded results')
     grouped = results.groupby(
         [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
@@ -52,7 +56,8 @@ def collapse_witnesses (args):
                constants.NAME_FIELDNAME, 'sigla', constants.COUNT_FIELDNAME,
                constants.LABEL_FIELDNAME]
     out_df = pd.DataFrame(output_rows, columns=columns)
-    out_df.to_csv(sys.stdout, encoding='utf-8', index=False)
+    out_df.to_csv(output_fh, encoding='utf-8', index=False)
+    return output_fh
 
 def _copy_options (args):
     """Returns a string form of the options in `args`."""
