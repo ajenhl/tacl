@@ -10,43 +10,24 @@ import tacl
 class StripTestCase (unittest.TestCase):
 
     def setUp (self):
-        self.transform = etree.XSLT(etree.XML(tacl.stripper.STRIP_XSLT))
-
-    def test_get_witnesses (self):
-        """Tests that all of the witnesses of variant readings are extracted
-        from a text.
-
-        """
-        stripper = tacl.Stripper('.', '.')
-        input_xml = '''
-<div>
-  <app><lem wit="【CBETA】">念</lem><rdg wit="【大】">忘</rdg></app>
-  <app n="0001008"><lem wit="【大】">閹</lem><rdg resp="Taisho" wit="【宋】【元】">掩</rdg></app>
-  <app n="0001012"><lem wit="【大】">後秦弘始年</lem><rdg resp="Taisho" wit="【宋】【元】【明】">姚秦三藏法師</rdg></app>
-  <app><lem with="【三】">毗</lem><rdg wit="【大】">毘</rdg></app>
-</div>
-        '''
-        expected_witnesses = set(('大', '宋', '元', '明',
-                                  tacl.stripper.BASE_WITNESS))
-        actual_witnesses = stripper.get_witnesses(etree.XML(input_xml))
-        self.assertEqual(expected_witnesses, actual_witnesses)
+        self.stripper = tacl.Stripper('.', '.')
 
     def test_foreign (self):
         """Tests that foreign elements with @place="foot" are stripped."""
         foreign_data = (
-            ('<foreign n="0018011" resp="Taisho" lang="san">Saalva</foreign>',
+            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" resp="Taisho" lang="san">Saalva</foreign>',
              'Saalva'),
-            ('<foreign n="0018011" resp="Taisho" lang="san" place="foot">Saalva</foreign>',
+            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" resp="Taisho" lang="san" place="foot">Saalva</foreign>',
              ''),
             )
         for input_xml, expected_output in foreign_data:
-            actual_output = str(self.transform(etree.XML(input_xml)))
+            actual_output = str(self.stripper.transform(etree.XML(input_xml)))
             self.assertEqual(expected_output, actual_output)
 
     def test_no_header (self):
         """Tests that the TEI header is stripped."""
         input_xml = '''
-<TEI.2>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
@@ -71,64 +52,65 @@ class StripTestCase (unittest.TestCase):
   </teiHeader>
   <text>
   </text>
-</TEI.2>'''
+</TEI>'''
         expected_output = ''
-        actual_output = str(self.transform(etree.XML(input_xml)))
+        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
     def test_note (self):
         """Tests that notes, unless inline, are stripped."""
         input_xml = '''
-<body>
+<body xmlns="http://www.tei-c.org/ns/1.0">
   <p>苑。其為典也。淵博弘富。<note n="0001005" resp="Taisho" place="foot text" type="orig">韞＝溫【宋】【元】</note></p>
   <p><note place="inline">釋。秦言能在直樹林。故名釋。釋。秦言亦言直</note></p>
 </body>'''
         expected_output = '''
 苑。其為典也。淵博弘富。
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
-        actual_output = str(self.transform(etree.XML(input_xml)))
+        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
     def test_tt (self):
         """Tests that tt is stripped down to the content of
         t[@lang='chi']."""
-        input_xml = '''<tt n="0001011" type="app"><t resp="Taisho" lang="chi">長阿含經</t><t resp="Taisho" lang="san" place="foot">Dīrgha-āgama</t><t resp="Taisho" lang="pli" place="foot">Dīgha-nikāya</t></tt>'''
+        input_xml = '''<tt xmlns="http://www.cbeta.org/ns/1.0" n="0001011" type="app"><t resp="Taisho" xml:lang="zh">長阿含經</t><t resp="Taisho" xml:lang="sa" place="foot">Dīrgha-āgama</t><t resp="Taisho" xml:lang="pi" place="foot">Dīgha-nikāya</t></tt>'''
         expected_output = '長阿含經'
-        actual_output = str(self.transform(etree.XML(input_xml)))
+        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
     def test_variants (self):
         """Tests that lem/rdg is stripped when it doesn't match the supplied
         witness name."""
         input_xml = '''
-<body>
-  <p><app n="0083004"><lem wit="【大】">釋。秦言能在直樹林。故名釋。釋。秦言亦言直</lem><rdg resp="Taisho" wit="【明】【？】">在直樹林故名釋懿</rdg><rdg resp="Taisho" wit="【甲】">佛法</rdg></app></p>
+<body xmlns="http://www.tei-c.org/ns/1.0">
+  <p><app n="0083004"><lem>釋。秦言能在直樹林。故名釋。釋。秦言亦言直</lem><rdg resp="Taisho" wit="#wit1 #wit2">在直樹林故名釋懿</rdg><rdg resp="Taisho" wit="#wit3">佛法</rdg></app></p>
 </body>'''
         # With the base witness name provided (ie, use the lem).
         expected_output = '''
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
         actual_output = str(
-            self.transform(etree.XML(input_xml),
-                           witness="'{}'".format(tacl.stripper.BASE_WITNESS)))
+            self.stripper.transform(etree.XML(input_xml),
+                                    witness_ref="'{}'".format(
+                                        tacl.constants.BASE_WITNESS_ID)))
+        self.assertEqual(expected_output, actual_output)
+        # With a witness ref provided that occurs in a rdg.
+        expected_output = '''
+在直樹林故名釋懿'''
+        actual_output = str(self.stripper.transform(etree.XML(input_xml),
+                                                    witness_id="'wit2'"))
         self.assertEqual(expected_output, actual_output)
         # With a witness name provided that occurs in a rdg.
         expected_output = '''
-在直樹林故名釋懿'''
-        actual_output = str(self.transform(etree.XML(input_xml),
-                                           witness="'明'"))
-        self.assertEqual(expected_output, actual_output)
-        # With a witness name provided that occurs in the lem.
-        expected_output = '''
-釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
-        actual_output = str(self.transform(etree.XML(input_xml),
-                                           witness="'大'"))
+佛法'''
+        actual_output = str(self.stripper.transform(etree.XML(input_xml),
+                                                    witness_id="'wit3'"))
         self.assertEqual(expected_output, actual_output)
         # A particular witness may not be listed either in the lem or
         # a rdg, in which case the lem must be used.
         expected_output = '''
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
-        actual_output = str(self.transform(etree.XML(input_xml),
-                                           witness="'元'"))
+        actual_output = str(self.stripper.transform(etree.XML(input_xml),
+                                                    witness_id="'wit4'"))
         self.assertEqual(expected_output, actual_output)
 
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T07n0220d"><teiHeader><fileDesc>
+<titleStmt>
+<title>Taisho Tripitaka, Electronic version, No. 0220d 大般若波羅蜜多經(第401卷-第600卷)</title>
+<author>唐 玄奘譯</author>
+<respStmt>
+<resp>Electronic Version by</resp><name>CBETA</name></respStmt></titleStmt>
+<editionStmt><edition>$Revision: 1.28 $<date>$Date: 2012/08/27 03:14:13 $</date>新式標點版</edition>
+		<respStmt xml:id="resp1"><resp>corrections</resp><name>CBETA.maha</name></respStmt>
+		<respStmt xml:id="resp2"><resp>corrections</resp><name>Taisho</name></respStmt>
+		<respStmt xml:id="resp3"><resp>corrections</resp><name>CBETA</name></respStmt>
+		<respStmt xml:id="resp4"><resp>corrections</resp><name>CBETA.say</name></respStmt></editionStmt>
+<extent>28卷</extent>
+<publicationStmt><distributor><name>中華電子佛典協會 (CBETA)</name>
+<address><addrLine>service@cbeta.org</addrLine></address>
+</distributor>
+<availability><p>Available for non-commercial use when distributed with this header intact.</p></availability>
+<date>$Date: 2012/08/27 03:14:13 $</date></publicationStmt>
+<sourceDesc><bibl>Taisho Tripitaka Vol. 07, No. 220d</bibl><listWit>
+		<witness xml:id="wit1">【CBETA】</witness>
+		<witness xml:id="wit2">【麗】</witness>
+		<witness xml:id="wit3">【磧砂】</witness>
+		<witness xml:id="wit4">【大】</witness>
+		<witness xml:id="wit5">【明】</witness>
+		<witness xml:id="wit6">【宋】</witness>
+		<witness xml:id="wit7">【元】</witness>
+	</listWit>
+	</sourceDesc></fileDesc>
+<encodingDesc><projectDesc>
+<p xml:lang="en" cb:type="ly">Text as provided by Miao-Yuan Aranya, Text as provided by Chung Sheng Publishing Company, Text as provided by SAT, Japan, Punctuated text as provided by Chung Sheng Publishing Company</p>
+<p xml:lang="zh" cb:type="ly">妙雲蘭若提供，眾生出版社提供，日本 SAT 組織提供，眾生出版社提供新式標點</p>
+</projectDesc>
+<charDecl>
+<char xml:id="CB00044">
+	<charName>CBETA CHARACTER CB00400</charName>
+	<charProp>
+		<localName>composition</localName>
+		<value>[泳-永+(而/而)]</value>
+	</charProp>
+	<charProp>
+		<localName>normalized form</localName>
+		<value>濡</value>
+	</charProp>
+	<mapping type="unicode">U+23F48</mapping>
+	<mapping cb:dec="983440" type="PUA">U+F0190</mapping>
+</char>
+</charDecl>
+</encodingDesc>
+<profileDesc>
+		<langUsage>
+			<language ident="en">English</language>
+			<language ident="zh">Chinese</language>
+		</langUsage>
+	</profileDesc>
+        <revisionDesc>
+                <change when="2013-05-20"><name>CW</name><name>Ray Chou 周邦信</name>P4 to P5 conversion by p4top5a.py, intended for publication</change>
+ </revisionDesc>
+</teiHeader>
+<text><body>
+<pb n="0763a" ed="T" xml:id="T07.0220d.0763a"/>
+<lb n="0763a01" ed="T"/>
+<milestone n="538" unit="juan"/>
+<lb n="0763a02" ed="T"/><cb:div n="04" type="hui"><cb:mulu level="1" n="3" type="會">4 會</cb:mulu><head><title>大般若經</title>第四會</head><cb:div type="xu"><cb:mulu level="2" type="序">序</cb:mulu><head>序</head>
+<lb n="0763a03" ed="T"/>
+<lb n="0763a04" ed="T"/><byline>西明寺沙門玄則撰</byline>
+<lb n="0763a05" ed="T"/><p xml:id="pT07p0763a0501">若夫識之所識曷嘗非識、如之所如未始不
+<lb n="0763a06" ed="T"/>如，是故能行與所行兼空，則攝受之理廢；自
+<lb n="0763a07" ed="T"/>性與無性不異，則執取之念忘。若忘執而有
+<lb n="0763a08" ed="T"/>恃，或存概以墮業，知盛修而不行，乃虛己而
+<lb n="0763a09" ed="T"/>制<g ref="#CB00044">勝</g>，恐野馬之情未戢，故靈鷲之談復敞。
+<lb n="0763a10" ed="T"/>或曰：其在名也，每切有行之誡；其於實也，必
+<lb n="0763a11" ed="T"/>警無行之怠。塗致或爽，折中奚歸？竊應之曰：
+<lb n="0763a12" ed="T"/>一切凡夫，剖名相之符、保癡愛之宅，所以措
+</p>
+</cb:div>
+</cb:div>
+</body>
+</text>
+</TEI>

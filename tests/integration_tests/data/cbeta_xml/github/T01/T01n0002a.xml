@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T07n0220c"><teiHeader><fileDesc>
+<titleStmt>
+<title>Taisho Tripitaka, Electronic version, No. 0220c 大般若波羅蜜多經(第401卷-第600卷)</title>
+<author>唐 玄奘譯</author>
+<respStmt>
+<resp>Electronic Version by</resp><name>CBETA</name></respStmt></titleStmt>
+<editionStmt><edition>$Revision: 1.44 $<date>$Date: 2012/08/27 03:14:12 $</date>新式標點版</edition>
+                <respStmt xml:id="resp1"><resp>corrections</resp><name>Taisho</name></respStmt>
+                <respStmt xml:id="resp2"><resp>corrections</resp><name>CBETA.maha</name></respStmt>
+                <respStmt xml:id="resp3"><resp>corrections</resp><name>CBETA</name></respStmt>
+                <respStmt xml:id="resp4"><resp>corrections</resp><name>CBETA.say</name></respStmt></editionStmt>
+<extent>137卷</extent>
+<publicationStmt><distributor><name>中華電子佛典協會 (CBETA)</name>
+<address><addrLine>service@cbeta.org</addrLine></address>
+</distributor>
+<availability><p>Available for non-commercial use when distributed with this header intact.</p></availability>
+<date>$Date: 2012/08/27 03:14:12 $</date></publicationStmt>
+<sourceDesc><bibl>Taisho Tripitaka Vol. 07, No. 220c</bibl><listWit>
+                <witness xml:id="wit1">【大】</witness>
+                <witness xml:id="wit2">【明】</witness>
+                <witness xml:id="wit3">【CBETA】</witness>
+                <witness xml:id="wit4">【麗】</witness>
+                <witness xml:id="wit5">【磧砂】</witness>
+                <witness xml:id="wit6">【宋】</witness>
+                <witness xml:id="wit7">【元】</witness>
+                <witness xml:id="wit8">【unknown】</witness>
+        </listWit>
+        </sourceDesc></fileDesc>
+<encodingDesc><projectDesc>
+<p xml:lang="en" cb:type="ly">Text as provided by Miao-Yuan Aranya, Text as provided by Chung Sheng Publishing Company, Text as provided by SAT, Japan, Punctuated text as provided by Chung Sheng Publishing Company</p>
+<p xml:lang="zh" cb:type="ly">妙雲蘭若提供，眾生出版社提供，日本 SAT 組織提供，眾生出版社提供新式標點</p>
+</projectDesc>
+<charDecl>
+<char xml:id="CB00044">
+        <charName>CBETA CHARACTER CB00044</charName>
+        <charProp>
+                <localName>composition</localName>
+                <value>[亡/虫]</value>
+        </charProp>
+        <charProp>
+                <localName>normalized form</localName>
+                <value>虻</value>
+        </charProp>
+        <mapping type="unicode">U+459F</mapping>
+        <mapping cb:dec="983084" type="PUA">U+F002C</mapping>
+</char>
+</charDecl>
+</encodingDesc>
+<profileDesc>
+                <langUsage>
+                        <language ident="sa">Sanskrit</language>
+                        <language ident="en">English</language>
+                        <language ident="zh">Chinese</language>
+                </langUsage>
+        </profileDesc>
+        <revisionDesc>
+                <change when="2013-05-20"><name>CW</name><name>Ray Chou 周邦信</name>P4 to P5 convion by p4top5a.py, intended for publication</change>
+ </revisionDesc>
+</teiHeader>
+<text><body>
+<pb n="0001a" ed="T" xml:id="T07.0220c.0001a"/>
+<lb n="0001a01" ed="T"/><milestone n="401" unit="juan"/><head type="added">No. 220</head>
+<lb n="0001a02" ed="T"/><cb:div n="02" type="hui"><cb:mulu level="1" n="1" type="會">2 會</cb:mulu><head><title>大般若經</title>第二會</head><cb:div type="xu"><cb:mulu level="2" type="序">序</cb:mulu><head>序</head>
+<lb n="0001a03" ed="T"/>
+<lb n="0001a04" ed="T"/><byline>沙門玄則撰</byline>
+<lb n="0001a05" ed="T"/><p xml:id="pT07p0001a0501">觀夫委契中道攄妙軌於無垠，流賞一歸漾
+<lb n="0001a06" ed="T"/>玄津於有截，何嘗不首情而汲悟、即事以排
+<lb n="0001a07" ed="T"/>疑。疑繁而誨自廣、悟初而訪逾篤，所以重指
+<lb n="0001a08" ed="T"/>鷲阿、再扣龍眾。慧命相聚則善現居宗，法忍
+<lb n="0001a09" ed="T"/>為群則妙祥端首，既而搖區示警、闢<g ref="#CB00044">㝢</g>開嚴，
+</p>
+</cb:div>
+</cb:div>
+</body>
+</text>
+</TEI>

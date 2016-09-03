@@ -12,8 +12,6 @@ from tacl.command.formatters import ParagraphFormatter
 import tacl.command.utils as utils
 
 
-
-
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
@@ -194,9 +192,15 @@ def generate_prepare_subparser (subparsers):
     files for stripping."""
     parser = subparsers.add_parser(
         'prepare', description=constants.PREPARE_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.PREPARE_HELP)
+        epilog=constants.PREPARE_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.PREPARE_HELP)
     parser.set_defaults(func=prepare_xml)
     utils.add_common_arguments(parser)
+    parser.add_argument('-s', '--source', dest='source',
+                        choices=constants.TEI_SOURCE_CHOICES,
+                        default=constants.TEI_SOURCE_CBETA_GITHUB,
+                        help=constants.PREPARE_SOURCE_HELP,
+                        metavar='SOURCE')
     parser.add_argument('input', help=constants.PREPARE_INPUT_HELP,
                         metavar='INPUT')
     parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
@@ -383,7 +387,13 @@ def prepare_xml (args, parser):
     text.
 
     """
-    corpus = tacl.TEICorpus(args.input, args.output)
+    if args.source == constants.TEI_SOURCE_CBETA_2011:
+        corpus_class = tacl.TEICorpusCBETA2011
+    elif args.source == constants.TEI_SOURCE_CBETA_GITHUB:
+        corpus_class = tacl.TEICorpusCBETAGitHub
+    else:
+        raise Exception('Unsupported TEI source option provided')
+    corpus = corpus_class(args.input, args.output)
     corpus.tidy()
 
 def report (args, parser):

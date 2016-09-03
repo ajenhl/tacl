@@ -1,5 +1,9 @@
 """Module containing constants."""
 
+TEI_SOURCE_CBETA_2011 = 'cbeta-2011'
+TEI_SOURCE_CBETA_GITHUB = 'cbeta-github'
+TEI_SOURCE_CHOICES = [TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB]
+
 TOKENIZER_CHOICE_CBETA = 'cbeta'
 TOKENIZER_CHOICE_PAGEL = 'pagel'
 TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
@@ -18,6 +22,13 @@ TOKENIZERS = {
     TOKENIZER_CHOICE_CBETA: [TOKENIZER_PATTERN_CBETA, TOKENIZER_JOINER_CBETA],
     TOKENIZER_CHOICE_PAGEL: [TOKENIZER_PATTERN_PAGEL, TOKENIZER_JOINER_PAGEL],
 }
+
+BASE_WITNESS = 'base'
+BASE_WITNESS_ID = ''
+# XML namespaces.
+NAMESPACES = {'tei': 'http://www.tei-c.org/ns/1.0',
+              'xml': 'http://www.w3.org/XML/1998/namespace'}
+XML = '{{{}}}'.format(NAMESPACES['xml'])
 
 # Sequencer scoring values.
 IDENTICAL_CHARACTER_SCORE = 1
@@ -226,11 +237,21 @@ PREPARE_DESCRIPTION = '''\
     Convert CBETA TEI XML files (which may have multiple files per
     text) into XML suitable for processing via the tacl strip
     command.'''
+PREPARE_EPILOG = '''\
+    The TEI source options are:
+
+    * {}: the CBETA TEI files as found on their 2011 DVD release
+
+    * {}: the CBETA TEI files as distruted on their GitHub repository
+      at https://github.com/cbeta-org/xml-p5.git'''.format(
+          TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB)
+
 PREPARE_HELP = '''\
     Convert CBETA TEI XML files into an XML form suitable for
     stripping.'''
 PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
+PREPARE_SOURCE_HELP = 'Source of TEI files'
 
 REPORT_CATALOGUE_HELP = '''\
     Path to the catalogue file used to generate the results'''

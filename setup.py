@@ -23,7 +23,7 @@ setup(name='tacl',
       },
       package_data = {
           'tacl': ['assets/jitc/*.js', 'assets/jitc/*.css',
-                   'assets/templates/*.html'],
+                   'assets/templates/*.html', 'assets/xslt/*.xsl'],
       },
       install_requires=['biopython', 'Jinja2', 'lxml', 'pandas>=0.17.0'],
       classifiers=[
