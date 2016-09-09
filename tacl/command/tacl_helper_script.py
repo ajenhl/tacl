@@ -1,8 +1,8 @@
 import argparse
-import logging
 import os
 import sys
 
+import colorlog
 import pandas as pd
 
 import tacl
@@ -10,7 +10,7 @@ import tacl.command.utils as utils
 from tacl import constants
 
 
-logger = logging.getLogger('tacl')
+logger = colorlog.getLogger('tacl')
 
 
 def main ():

@@ -3,8 +3,9 @@ texts."""
 
 import argparse
 import io
-import logging
 import sys
+
+import colorlog
 
 import tacl
 from tacl import constants
@@ -15,7 +16,7 @@ import tacl.command.utils as utils
 def main ():
     parser = generate_parser()
     args = parser.parse_args()
-    logger = logging.getLogger('tacl')
+    logger = colorlog.getLogger('tacl')
     if hasattr(args, 'verbose'):
         utils.configure_logging(args.verbose, logger)
     if hasattr(args, 'func'):

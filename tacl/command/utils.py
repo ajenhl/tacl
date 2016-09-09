@@ -3,6 +3,8 @@ with tacl."""
 
 import logging
 
+import colorlog
+
 import tacl
 from tacl import constants
 
@@ -69,10 +71,10 @@ def configure_logging (verbose, logger):
     else:
         log_level = logging.DEBUG
     logger.setLevel(log_level)
-    ch = logging.StreamHandler()
+    ch = colorlog.StreamHandler()
     ch.setLevel(log_level)
-    formatter = logging.Formatter(
-        '%(asctime)s %(name)s %(levelname)s: %(message)s')
+    formatter = colorlog.ColoredFormatter(
+        '%(log_color)s%(asctime)s %(name)s %(levelname)s: %(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
