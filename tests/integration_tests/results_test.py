@@ -11,16 +11,16 @@ import tacl
 from ..tacl_test_case import TaclTestCase
 
 
-class ReportIntegrationTestCase (TaclTestCase):
+class ResultsIntegrationTestCase (TaclTestCase):
 
     def setUp (self):
         base_dir = os.path.dirname(__file__)
-        self._data_dir = os.path.join(base_dir, 'report_data')
+        self._data_dir = os.path.join(base_dir, 'results_data')
         self._stripped_dir = os.path.join(self._data_dir, 'stripped')
 
     def test_extend_cbeta (self):
         results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
-        command = 'tacl report -e {} -t {} {}'.format(
+        command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'cbeta'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
@@ -33,7 +33,7 @@ class ReportIntegrationTestCase (TaclTestCase):
 
     def test_extend_pagel (self):
         results = os.path.join(self._data_dir, 'pagel-non-extend-results.csv')
-        command = 'tacl report -e {} -t {} {}'.format(
+        command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'pagel'),
             tacl.constants.TOKENIZER_CHOICE_PAGEL, results)
         data = subprocess.check_output(shlex.split(command))
@@ -49,7 +49,7 @@ class ReportIntegrationTestCase (TaclTestCase):
         # properly extended.
         results = os.path.join(self._data_dir,
                                'multiply-labelled-non-extend-results.csv')
-        command = 'tacl report -e {} -t {} {}'.format(
+        command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'multiply-labelled'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
@@ -63,7 +63,7 @@ class ReportIntegrationTestCase (TaclTestCase):
     def test_extend_diff (self):
         # Test that diff results are correctly extended.
         results = os.path.join(self._data_dir, 'diff-non-extend-results.csv')
-        command = 'tacl report -e {} -t {} {}'.format(
+        command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'diff-extend'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
@@ -79,8 +79,8 @@ class ReportIntegrationTestCase (TaclTestCase):
         corpus = os.path.join(data_dir, 'stripped')
         catalogue = os.path.join(data_dir, 'catalogue.txt')
         results = os.path.join(data_dir, 'non-zero-fill-results.csv')
-        command = 'tacl report -c {} -z {} {}'.format(catalogue, corpus,
-                                                      results)
+        command = 'tacl results -c {} -z {} {}'.format(catalogue, corpus,
+                                                       results)
         data = subprocess.check_output(shlex.split(command))
         actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(data_dir, 'zero-fill-results.csv')

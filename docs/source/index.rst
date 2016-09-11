@@ -95,9 +95,9 @@ analysis of the corpus, as listed with example commands:
 
 5. Optionally perform functions on the results of a difference or
    intersection query, to limit the scope of the results (:doc:`tacl
-   report </scripts/tacl-report>`). ::
+   results </scripts/tacl-results>`). ::
 
-       tacl report --reduce --min-count 5 diff-results.csv > reduced-diff-results.csv
+       tacl results --reduce --min-count 5 diff-results.csv > reduced-diff-results.csv
 
 6. Display a side by side comparison of matching parts of pairs of
    texts in a set of intersection query results (:doc:`tacl align

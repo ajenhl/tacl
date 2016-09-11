@@ -1,4 +1,4 @@
-"""Module containing the Report class."""
+"""Module containing the Results class."""
 
 import logging
 import re
@@ -9,7 +9,7 @@ from . import constants
 from .text import BaseText
 
 
-class Report:
+class Results:
 
     def __init__ (self, matches, tokenizer):
         self._logger = logging.getLogger(__name__)

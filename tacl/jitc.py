@@ -11,7 +11,7 @@ import pandas as pd
 from pkg_resources import resource_filename, resource_listdir
 
 from . import constants
-from .report import Report
+from .results import Results
 from .statistics_report import StatisticsReport
 
 
@@ -132,9 +132,9 @@ class JITCProcessor:
 
         """
         results.seek(0)
-        report = Report(results, self._tokenizer)
-        report.remove_label(self._no_label)
-        report.csv(fh)
+        results = Results(results, self._tokenizer)
+        results.remove_label(self._no_label)
+        results.csv(fh)
 
     def _generate_statistics (self, out_path, results_path):
         """Write a statistics report for `results_path` to `out_path`."""

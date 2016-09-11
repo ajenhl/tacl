@@ -4,7 +4,7 @@ from .corpus import Corpus
 from .data_store import DataStore
 from .highlighter import NgramHighlighter, ResultsHighlighter
 from .jitc import JITCProcessor
-from .report import Report
+from .results import Results
 from .sequence import Sequencer
 from .statistics_report import StatisticsReport
 from .stripper import Stripper

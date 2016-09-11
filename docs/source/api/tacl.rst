@@ -59,10 +59,10 @@ tacl.highlighter module
     :undoc-members:
     :show-inheritance:
 
-tacl.report module
+tacl.results module
 ------------------
 
-.. automodule:: tacl.report
+.. automodule:: tacl.results
     :members:
     :undoc-members:
     :show-inheritance:

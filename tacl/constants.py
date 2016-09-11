@@ -49,6 +49,7 @@ NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
 NUMBER_FIELDNAME = 'number'
 PERCENTAGE_FIELDNAME = 'percentage'
+SIGLA_FIELDNAME = 'sigla'
 SIGLUM_FIELDNAME = 'siglum'
 SIZE_FIELDNAME = 'size'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
@@ -253,16 +254,16 @@ PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 PREPARE_SOURCE_HELP = 'Source of TEI files'
 
-REPORT_CATALOGUE_HELP = '''\
+RESULTS_CATALOGUE_HELP = '''\
     Path to the catalogue file used to generate the results'''
-REPORT_DESCRIPTION = '''\
-    Modify a query results file by adding, removing or sorting result
-    rows. Outputs the new set of results.'''
-REPORT_EXTEND_HELP = '''\
+RESULTS_DESCRIPTION = '''\
+    Modify a query results file by adding, removing or otherwise
+    manipulating result rows. Outputs the new set of results.'''
+RESULTS_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
     database. This has no effect if the results contain only 1-grams.'''
-REPORT_EPILOG = '''\
+RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --zero-fill,
     --ngrams, --min/max-texts, --min/max-size, --min/max-count,
@@ -292,49 +293,49 @@ REPORT_EPILOG = '''\
     falls within that range.
 
     Since this command always outputs a valid results file, its output
-    can be used as input for a subsequent tacl report command. To
+    can be used as input for a subsequent tacl results command. To
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
-        tacl report --recriprocal results.csv | tacl report --reduce -
+        tacl results --recriprocal results.csv | tacl results --reduce -
 
     examples:
 
       Extend CBETA results and set a minimum total count.
-        tacl report -e corpus/cbeta/ --min-count 9 output.csv > mod-output.csv
+        tacl results -e corpus/cbeta/ --min-count 9 output.csv > mod-output.csv
 
       Zero-fill CBETA results.
-        tacl report -c dhr-vs-rest.txt -z corpus/cbeta/ output.csv > mod-output.csv
+        tacl results -c dhr-vs-rest.txt -z corpus/cbeta/ output.csv > mod-output.csv
 
       Reduce Pagel results.
-        tacl report --reduce -t pagel output.csv > mod-output.csv
+        tacl results --reduce -t pagel output.csv > mod-output.csv
 
 ''' + ENCODING_EPILOG
-REPORT_HELP = 'Modify a query results file.'
-REPORT_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
-REPORT_MINIMUM_COUNT_TEXT_HELP = '''\
+RESULTS_HELP = 'Modify a query results file.'
+RESULTS_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
+RESULTS_MINIMUM_COUNT_TEXT_HELP = '''\
     Minimum count per n-gram per text to include; if a single witness
     meets this criterion for an n-gram, all instances of that n-gram
     are kept.'''
-REPORT_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
-REPORT_MAXIMUM_COUNT_TEXT_HELP = '''\
+RESULTS_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
+RESULTS_MAXIMUM_COUNT_TEXT_HELP = '''\
     Maximum count per n-gram per text to include; if a single witness
     meets this criterion for an n-gram, all instances of that n-gram
     are kept.'''
-REPORT_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
-REPORT_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
-REPORT_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'
-REPORT_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
-REPORT_NGRAMS_HELP = 'Path to file containing n-grams (one per line) to exclude.'
-REPORT_RECIPROCAL_HELP = '''\
+RESULTS_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
+RESULTS_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
+RESULTS_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'
+RESULTS_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
+RESULTS_NGRAMS_HELP = 'Path to file containing n-grams (one per line) to exclude.'
+RESULTS_RECIPROCAL_HELP = '''\
     Remove n-grams that are not attested by at least one text in each
     labelled set of texts. This can be useful after reducing a set of
     intersection results.'''
-REPORT_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
-REPORT_REMOVE_HELP = 'Remove labelled results.'
-REPORT_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
-REPORT_SORT_HELP = 'Sort the results.'
-REPORT_ZERO_FILL_HELP = '''\
+RESULTS_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
+RESULTS_REMOVE_HELP = 'Remove labelled results.'
+RESULTS_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
+RESULTS_SORT_HELP = 'Sort the results.'
+RESULTS_ZERO_FILL_HELP = '''\
     Add rows with a count of 0 for each n-gram in each witness of a
     text that has at least one witness bearing that n-gram. The
     catalogue used to generate the results must also be specified with

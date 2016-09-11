@@ -49,7 +49,7 @@ def generate_parser ():
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_prepare_subparser(subparsers)
-    generate_report_subparser(subparsers)
+    generate_results_subparser(subparsers)
     generate_supplied_diff_subparser(subparsers)
     generate_search_subparser(subparsers)
     generate_supplied_intersect_subparser(subparsers)
@@ -71,7 +71,7 @@ def generate_align_subparser (subparsers):
     utils.add_corpus_arguments(parser)
     parser.add_argument('output', help=constants.ALIGN_OUTPUT_HELP,
                         metavar='OUTPUT')
-    parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
+    parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
 
 def generate_catalogue (args, parser):
@@ -207,58 +207,58 @@ def generate_prepare_subparser (subparsers):
     parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
                         metavar='OUTPUT')
 
-def generate_report_subparser (subparsers):
+def generate_results_subparser (subparsers):
     """Adds a sub-command parser to `subparsers` to manipulate CSV
     results data."""
     parser = subparsers.add_parser(
-        'report', description=constants.REPORT_DESCRIPTION,
-        epilog=constants.REPORT_EPILOG, formatter_class=ParagraphFormatter,
-        help=constants.REPORT_HELP)
+        'results', description=constants.RESULTS_DESCRIPTION,
+        epilog=constants.RESULTS_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.RESULTS_HELP)
     utils.add_common_arguments(parser)
-    parser.set_defaults(func=report)
+    parser.set_defaults(func=results)
     parser.add_argument('-c', '--catalogue', dest='catalogue',
-                        help=constants.REPORT_CATALOGUE_HELP,
+                        help=constants.RESULTS_CATALOGUE_HELP,
                         metavar='CATALOGUE')
     parser.add_argument('-e', '--extend', dest='extend',
-                        help=constants.REPORT_EXTEND_HELP, metavar='CORPUS')
+                        help=constants.RESULTS_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--min-count', dest='min_count',
-                        help=constants.REPORT_MINIMUM_COUNT_HELP,
+                        help=constants.RESULTS_MINIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--max-count', dest='max_count',
-                        help=constants.REPORT_MAXIMUM_COUNT_HELP,
+                        help=constants.RESULTS_MAXIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--min-count-text', dest='min_count_text',
-                        help=constants.REPORT_MINIMUM_COUNT_TEXT_HELP,
+                        help=constants.RESULTS_MINIMUM_COUNT_TEXT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--max-count-text', dest='max_count_text',
-                        help=constants.REPORT_MAXIMUM_COUNT_TEXT_HELP,
+                        help=constants.RESULTS_MAXIMUM_COUNT_TEXT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--min-size', dest='min_size',
-                        help=constants.REPORT_MINIMUM_SIZE_HELP, metavar='SIZE',
+                        help=constants.RESULTS_MINIMUM_SIZE_HELP, metavar='SIZE',
                         type=int)
     parser.add_argument('--max-size', dest='max_size',
-                        help=constants.REPORT_MAXIMUM_SIZE_HELP, metavar='SIZE',
+                        help=constants.RESULTS_MAXIMUM_SIZE_HELP, metavar='SIZE',
                         type=int)
     parser.add_argument('--min-texts', dest='min_texts',
-                        help=constants.REPORT_MINIMUM_TEXT_HELP,
+                        help=constants.RESULTS_MINIMUM_TEXT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--max-texts', dest='max_texts',
-                        help=constants.REPORT_MAXIMUM_TEXT_HELP,
+                        help=constants.RESULTS_MAXIMUM_TEXT_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--ngrams', dest='ngrams',
-                        help=constants.REPORT_NGRAMS_HELP, metavar='NGRAMS')
+                        help=constants.RESULTS_NGRAMS_HELP, metavar='NGRAMS')
     parser.add_argument('--reciprocal', action='store_true',
-                        help=constants.REPORT_RECIPROCAL_HELP)
+                        help=constants.RESULTS_RECIPROCAL_HELP)
     parser.add_argument('--reduce', action='store_true',
-                        help=constants.REPORT_REDUCE_HELP)
-    parser.add_argument('--remove', help=constants.REPORT_REMOVE_HELP,
+                        help=constants.RESULTS_REDUCE_HELP)
+    parser.add_argument('--remove', help=constants.RESULTS_REMOVE_HELP,
                         metavar='LABEL', type=str)
     parser.add_argument('--sort', action='store_true',
-                        help=constants.REPORT_SORT_HELP)
+                        help=constants.RESULTS_SORT_HELP)
     utils.add_tokenizer_argument(parser)
     parser.add_argument('-z', '--zero-fill', dest='zero_fill',
-                        help=constants.REPORT_ZERO_FILL_HELP, metavar='CORPUS')
-    parser.add_argument('results', help=constants.REPORT_RESULTS_HELP,
+                        help=constants.RESULTS_ZERO_FILL_HELP, metavar='CORPUS')
+    parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
 
 def generate_search_subparser (subparsers):
@@ -397,45 +397,45 @@ def prepare_xml (args, parser):
     corpus = corpus_class(args.input, args.output)
     corpus.tidy()
 
-def report (args, parser):
+def results (args, parser):
     if args.results == '-':
-        results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
-                                   newline='')
+        results_fh = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
+                                      newline='')
     else:
-        results = open(args.results, 'r', encoding='utf-8', newline='')
+        results_fh = open(args.results, 'r', encoding='utf-8', newline='')
     tokenizer = utils.get_tokenizer(args)
-    report = tacl.Report(results, tokenizer)
+    results = tacl.Results(results_fh, tokenizer)
     if args.extend:
         corpus = tacl.Corpus(args.extend, tokenizer)
-        report.extend(corpus)
+        results.extend(corpus)
     if args.reduce:
-        report.reduce()
+        results.reduce()
     if args.reciprocal:
-        report.reciprocal_remove()
+        results.reciprocal_remove()
     if args.zero_fill:
         if not args.catalogue:
             parser.error('The zero-fill option requires that the -c option also be supplied.')
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
         catalogue = utils.get_catalogue(args.catalogue)
-        report.zero_fill(corpus, catalogue)
+        results.zero_fill(corpus, catalogue)
     if args.ngrams:
         with open(args.ngrams, encoding='utf-8') as fh:
             ngrams = fh.read().split()
-        report.prune_by_ngram(ngrams)
+        results.prune_by_ngram(ngrams)
     if args.min_texts or args.max_texts:
-        report.prune_by_text_count(args.min_texts, args.max_texts)
+        results.prune_by_text_count(args.min_texts, args.max_texts)
     if args.min_size or args.max_size:
-        report.prune_by_ngram_size(args.min_size, args.max_size)
+        results.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
-        report.prune_by_ngram_count(args.min_count, args.max_count)
+        results.prune_by_ngram_count(args.min_count, args.max_count)
     if args.min_count_text or args.max_count_text:
-        report.prune_by_ngram_count_per_text(args.min_count_text,
-                                             args.max_count_text)
+        results.prune_by_ngram_count_per_text(args.min_count_text,
+                                              args.max_count_text)
     if args.remove:
-        report.remove_label(args.remove)
+        results.remove_label(args.remove)
     if args.sort:
-        report.sort()
-    report.csv(sys.stdout)
+        results.sort()
+    results.csv(sys.stdout)
 
 def search_texts (args, parser):
     """Searches texts for presence of n-grams."""
