@@ -11,6 +11,18 @@ from .text import BaseText
 
 class Results:
 
+    """Class representing a set of n-gram results.
+
+    Provides methods for manipulating those results in ways that
+    maintain the same structure (CSV, same field names). Those methods
+    that modify the fields do so in relatively minor ways that often
+    allow for the other methods to still operate on the results.
+
+    A method's modifications to the field names, if any, are specified
+    in that method's docstring.
+
+    """
+
     def __init__ (self, matches, tokenizer):
         self._logger = logging.getLogger(__name__)
         self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
@@ -19,6 +31,38 @@ class Results:
         # actual row.
         self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
+
+    def collapse_witnesses (self):
+        """Groups together witnesses for the same n-gram and text that has the
+        same count, and outputs a single row for each group.
+
+        This output replaces the siglum field with a sigla field that
+        provides a space-separated list of the witness sigla. Due to
+        this, it is not necessarily possible to run other Results
+        methods on results that have had their witnesses collapsed.
+
+        """
+        grouped = self._matches.groupby(
+            [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
+             constants.COUNT_FIELDNAME], sort=False)
+        output_rows = []
+        for indices in iter(grouped.groups.values()):
+            sigla = []
+            for index in indices:
+                row_data = dict(self._matches.iloc[index])
+                siglum = row_data[constants.SIGLUM_FIELDNAME]
+                if ' ' in siglum:
+                    siglum = '"{}"'.format(siglum)
+                sigla.append(siglum)
+            sigla.sort()
+            # This does not even try to escape sigla that contain spaces.
+            row_data[constants.SIGLA_FIELDNAME] = ' '.join(sigla)
+            del row_data[constants.SIGLUM_FIELDNAME]
+            output_rows.append(row_data)
+        columns = [constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                   constants.NAME_FIELDNAME, constants.SIGLA_FIELDNAME,
+                   constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME]
+        self._matches = pd.DataFrame(output_rows, columns=columns)
 
     def csv (self, fh):
         """Writes the report data to `fh` in CSV format and returns it.

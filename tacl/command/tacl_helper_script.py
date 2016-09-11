@@ -24,40 +24,9 @@ def main ():
         parser.print_help()
 
 def collapse_witnesses (args):
-    # This split is to make it easier to test the functionality.
-    _collapse_witnesses(args.results, sys.stdout)
-
-def _collapse_witnesses (input_fh, output_fh):
-    logger.debug('Loading results')
-    results = pd.read_csv(input_fh, encoding='utf-8', na_filter=False)
-    logger.debug('Loaded results')
-    grouped = results.groupby(
-        [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
-         constants.COUNT_FIELDNAME], sort=False)
-    logger.debug('Grouped results')
-    output_rows = []
-    for indices in iter(grouped.groups.values()):
-        logger.debug('Handling group')
-        sigla = []
-        for index in indices:
-            row_data = dict(results.iloc[index])
-            siglum = row_data['siglum']
-            if ' ' in siglum:
-                siglum = '"{}"'.format(siglum)
-            sigla.append(siglum)
-        sigla.sort()
-        # This does not even try to escape sigla that contain spaces.
-        row_data['sigla'] = ' '.join(sigla)
-        del row_data['siglum']
-        output_rows.append(row_data)
-    results = None
-    logger.debug('Building new results')
-    columns = [constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
-               constants.NAME_FIELDNAME, 'sigla', constants.COUNT_FIELDNAME,
-               constants.LABEL_FIELDNAME]
-    out_df = pd.DataFrame(output_rows, columns=columns)
-    out_df.to_csv(output_fh, encoding='utf-8', index=False)
-    return output_fh
+    results = tacl.Results(args.results, utils.get_tokenizer(args))
+    results.collapse_witnesses()
+    results.csv(sys.stdout)
 
 def _copy_options (args):
     """Returns a string form of the options in `args`."""
@@ -89,6 +58,7 @@ def generate_collapse_witness_results_subparser (subparsers):
         help=constants.TACL_HELPER_COLLAPSE_HELP)
     parser.set_defaults(func=collapse_witnesses)
     utils.add_common_arguments(parser)
+    utils.add_tokenizer_argument(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
                         metavar='RESULTS')
 
