@@ -17,24 +17,24 @@ class ResultsTestCase (TaclTestCase):
     def test_collapse_witnesses (self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
-            ['AB', '2', 'a', 'wit1', '4', 'A'],
-            ['AB', '2', 'a', 'wit2', '3', 'A'],
+            ['AB', '2', 'a', 'wit 1', '4', 'A'],
+            ['AB', '2', 'a', 'wit 2', '3', 'A'],
             ['AB', '2', 'b', 'base', '4', 'A'],
-            ['AB', '2', 'b', 'wit1', '3', 'A'],
+            ['AB', '2', 'b', 'wit 1', '3', 'A'],
             ['BC', '2', 'a', 'base', '4', 'A'],
-            ['BC', '2', 'a', 'wit1', '3', 'A'],
-            ['BC', '2', 'a', 'wit2', '3', 'A'],
+            ['BC', '2', 'a', 'wit 1', '3', 'A'],
+            ['BC', '2', 'a', 'wit 2', '3', 'A'],
         )
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, self._tokenizer)
         results.collapse_witnesses()
         expected_rows = [
-            ('AB', '2', 'a', 'base wit1', '4', 'A'),
-            ('AB', '2', 'a', 'wit2', '3', 'A'),
+            ('AB', '2', 'a', 'base "wit 1"', '4', 'A'),
+            ('AB', '2', 'a', '"wit 2"', '3', 'A'),
             ('AB', '2', 'b', 'base', '4', 'A'),
-            ('AB', '2', 'b', 'wit1', '3', 'A'),
+            ('AB', '2', 'b', '"wit 1"', '3', 'A'),
             ('BC', '2', 'a', 'base', '4', 'A'),
-            ('BC', '2', 'a', 'wit1 wit2', '3', 'A'),
+            ('BC', '2', 'a', '"wit 1" "wit 2"', '3', 'A'),
         ]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
