@@ -44,6 +44,7 @@ SCORE_THRESHOLD = 0.75
 COUNT_FIELDNAME = 'count'
 COUNT_TOKENS_FIELDNAME = 'matching tokens'
 LABEL_FIELDNAME = 'label'
+LABEL_COUNT_FIELDNAME = 'label count'
 NAME_FIELDNAME = 'text name'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'

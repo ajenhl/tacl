@@ -32,6 +32,28 @@ class Results:
         self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
 
+    def add_label_count (self):
+        """Adds to each result row a count of the number occurrences of that
+        n-gram across all texts within the label.
+
+        This count uses the highest witness count for each text.
+
+        """
+        self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
+
+        def add_label_count (df):
+            # For each n-gram and label pair, we need the maximum count
+            # among all witnesses to each text, and then the sum of those
+            # across all texts.
+            text_maxima = df.groupby(constants.NAME_FIELDNAME).max()
+            df.loc[:, constants.LABEL_COUNT_FIELDNAME] = text_maxima[
+                constants.COUNT_FIELDNAME].sum()
+            return df
+
+        self._matches = self._matches.groupby(
+            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME]).apply(
+                add_label_count)
+
     def collapse_witnesses (self):
         """Groups together witnesses for the same n-gram and text that has the
         same count, and outputs a single row for each group.

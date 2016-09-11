@@ -69,6 +69,7 @@ def generate_label_count_subparser (subparsers):
         help=constants.TACL_HELPER_LABEL_COUNT_HELP)
     parser.set_defaults(func=label_count)
     utils.add_common_arguments(parser)
+    utils.add_tokenizer_argument(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -114,19 +115,9 @@ def generate_validate_catalogue_subparser (subparsers):
     utils.add_query_arguments(parser)
 
 def label_count (args):
-    results = pd.read_csv(args.results, encoding='utf-8', na_filter=False)
-    results.loc[:, 'label count'] = 0
-    def add_label_count (df):
-        # For each n-gram and label pair, we need the maximum count
-        # among all witnesses to each text, and then the sum of those
-        # across all texts.
-        text_maxima = df.groupby(constants.NAME_FIELDNAME).max()
-        df.loc[:, 'label count'] = text_maxima[constants.COUNT_FIELDNAME].sum()
-        return df
-    out_df = results.groupby(
-        [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME]).apply(
-            add_label_count)
-    out_df.to_csv(sys.stdout, encoding='utf-8', index=False)
+    results = tacl.Results(args.results, utils.get_tokenizer(args))
+    results.add_label_count()
+    results.csv(sys.stdout)
 
 def text_against_corpus (args):
     a_texts = args.a_texts.read().strip().split()

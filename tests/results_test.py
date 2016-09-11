@@ -14,6 +14,30 @@ class ResultsTestCase (TaclTestCase):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_add_label_count (self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'a', 'wit1', '5', 'A'],
+            ['AB', '2', 'b', 'base', '3', 'A'],
+            ['AB', '2', 'b', 'wit1', '3', 'A'],
+            ['AB', '2', 'c', 'base', '2', 'B'],
+            ['BC', '2', 'a', 'base', '2', 'A']
+        )
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.add_label_count()
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '4', 'A', '8'),
+            ('AB', '2', 'a', 'wit1', '5', 'A', '8'),
+            ('AB', '2', 'b', 'base', '3', 'A', '8'),
+            ('AB', '2', 'b', 'wit1', '3', 'A', '8'),
+            ('AB', '2', 'c', 'base', '2', 'B', '2'),
+            ('BC', '2', 'a', 'base', '2', 'A', '2')
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertTrue(actual_rows, expected_rows)
+
     def test_collapse_witnesses (self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
