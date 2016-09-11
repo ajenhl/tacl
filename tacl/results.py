@@ -42,27 +42,28 @@ class Results:
         methods on results that have had their witnesses collapsed.
 
         """
+        # This code makes the not unwarranted assumption that the same
+        # n-gram means the same size and that the same text means the
+        # same label.
         grouped = self._matches.groupby(
             [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
              constants.COUNT_FIELDNAME], sort=False)
-        output_rows = []
-        for indices in iter(grouped.groups.values()):
+
+        def merge_sigla (df):
+            # Take the first result row arbitrarily; only the siglum
+            # should differ between them.
+            merged = df[0:1]
             sigla = []
-            for index in indices:
-                row_data = dict(self._matches.iloc[index])
-                siglum = row_data[constants.SIGLUM_FIELDNAME]
+            for siglum in list(df[constants.SIGLUM_FIELDNAME]):
                 if ' ' in siglum:
                     siglum = '"{}"'.format(siglum)
                 sigla.append(siglum)
             sigla.sort()
-            # This does not even try to escape sigla that contain spaces.
-            row_data[constants.SIGLA_FIELDNAME] = ' '.join(sigla)
-            del row_data[constants.SIGLUM_FIELDNAME]
-            output_rows.append(row_data)
-        columns = [constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
-                   constants.NAME_FIELDNAME, constants.SIGLA_FIELDNAME,
-                   constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME]
-        self._matches = pd.DataFrame(output_rows, columns=columns)
+            merged[constants.SIGLA_FIELDNAME] = ' '.join(sigla)
+            return merged
+
+        self._matches = grouped.apply(merge_sigla)
+        del self._matches[constants.SIGLUM_FIELDNAME]
 
     def csv (self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
