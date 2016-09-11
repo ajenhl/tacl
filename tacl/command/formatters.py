@@ -13,18 +13,18 @@ class ParagraphFormatter (argparse.ArgumentDefaultsHelpFormatter):
 
     """
 
-    def _split_lines (self, text, width):
+    def _split_lines(self, text, width):
         return self._para_reformat(text, width, multiline=True)
 
-    def _fill_text (self, text, width, indent):
+    def _fill_text(self, text, width, indent):
         lines = self._para_reformat(text, width, indent, True)
         return '\n'.join(lines)
 
-    def _para_reformat (self, text, width, indent='', multiline=False):
+    def _para_reformat(self, text, width, indent='', multiline=False):
         new_lines = list()
         main_indent = len(re.match(r'( *)', text).group(1))
 
-        def blocker (text):
+        def blocker(text):
             """On each call yields 2-tuple consisting of a boolean and
             the next block of text from 'text'.  A block is either a
             single line, or a group of contiguous lines.  The former

@@ -16,12 +16,12 @@ class BaseHighlighter:
     _base_token_markup = r'<span>\1</span>'
     _template = 'highlight.html'
 
-    def __init__ (self, corpus, tokenizer):
+    def __init__(self, corpus, tokenizer):
         self._logger = logging.getLogger(__name__)
         self._corpus = corpus
         self._tokenizer = tokenizer
 
-    def _format_content (self, content):
+    def _format_content(self, content):
         """Returns `content` with consecutive spaces converted to non-break
         spaces, and linebreak converted into HTML br elements.
 
@@ -35,12 +35,12 @@ class BaseHighlighter:
         content = re.sub(r'&#160; ', '&#160;&#160;', content)
         return content
 
-    def _generate_base (self, text_name, siglum):
+    def _generate_base(self, text_name, siglum):
         text = self._corpus.get_text(text_name, siglum)
         content = text.get_content().strip()
         return self._prepare_text(content)
 
-    def _generate_html (self, text_name, siglum, text, **kwargs):
+    def _generate_html(self, text_name, siglum, text, **kwargs):
         loader = PackageLoader('tacl', 'assets/templates')
         env = Environment(loader=loader)
         text_data = {'base_name': text_name, 'base_siglum': siglum,
@@ -49,16 +49,16 @@ class BaseHighlighter:
         template = env.get_template(self._template)
         return template.render(text_data)
 
-    def _get_regexp_pattern (self, ngram):
+    def _get_regexp_pattern(self, ngram):
         inter_token_pattern = r'</span>\W*<span[^>]*>'
         pattern = inter_token_pattern.join(
             [re.escape(token) for token in self._tokenizer.tokenize(ngram)])
         return r'(<span[^>]*>{}</span>)'.format(pattern)
 
-    def highlight (self, text_name, siglum, *args):
+    def highlight(self, text_name, siglum, *args):
         raise NotImplementedError
 
-    def _prepare_text (self, text):
+    def _prepare_text(self, text):
         """Returns `text` with each consituent token wrapped in HTML markup
         for later match annotation.
 
@@ -80,7 +80,7 @@ class NgramHighlighter (BaseHighlighter):
     _base_token_markup = r'<span>\1</span>'
     _template = 'ngram_highlight.html'
 
-    def _annotate_tokens (self, match_obj):
+    def _annotate_tokens(self, match_obj):
         match = match_obj.group(0)
         root = etree.fromstring('<div>{}</div>'.format(match))
         for span in root.xpath('//span'):
@@ -90,7 +90,7 @@ class NgramHighlighter (BaseHighlighter):
                 del span.attrib['class']
         return etree.tostring(root, encoding='unicode')[5:-6]
 
-    def highlight (self, text_name, siglum, ngrams, minus_ngrams):
+    def highlight(self, text_name, siglum, ngrams, minus_ngrams):
         """Returns the text of `siglum` witness to `text_name` as an HTML
         document with its n-grams in `ngrams` highlighted.
 
@@ -115,7 +115,7 @@ class NgramHighlighter (BaseHighlighter):
         return self._generate_html(text_name, siglum, content, ngrams=ngrams,
                                    minus_ngrams=minus_ngrams)
 
-    def _highlight (self, content, ngrams, highlight):
+    def _highlight(self, content, ngrams, highlight):
         """Returns `content` with its n-grams from `ngrams` highlighted (if
         `add_class` is True) or unhighlighted.
 
@@ -140,7 +140,7 @@ class ResultsHighlighter (BaseHighlighter):
     _base_token_markup = r'<span data-count="0" data-texts=" ">\1</span>'
     _template = 'results_highlight.html'
 
-    def _annotate_tokens (self, match_obj):
+    def _annotate_tokens(self, match_obj):
         match = match_obj.group(0)
         root = etree.fromstring('<div>{}</div>'.format(match))
         for span in root.xpath('//span'):
@@ -151,7 +151,7 @@ class ResultsHighlighter (BaseHighlighter):
         return etree.tostring(root, encoding='unicode')[5:-6]
 
     @staticmethod
-    def _generate_text_list (matches):
+    def _generate_text_list(matches):
         texts = matches[[constants.NAME_FIELDNAME,
                          constants.SIGLUM_FIELDNAME]].drop_duplicates()
         text_list = []
@@ -160,7 +160,7 @@ class ResultsHighlighter (BaseHighlighter):
         text_list.sort()
         return text_list
 
-    def highlight (self, text_name, siglum, matches_filename):
+    def highlight(self, text_name, siglum, matches_filename):
         """Returns the text of `siglum` witness to `text_name` as an HTML
         document with its matches in `matches` highlighted.
 
@@ -183,7 +183,7 @@ class ResultsHighlighter (BaseHighlighter):
         return self._generate_html(text_name, siglum, content,
                                    text_list=text_list)
 
-    def _highlight (self, content, matches):
+    def _highlight(self, content, matches):
         for row_index, row in matches.iterrows():
             ngram = row[constants.NGRAM_FIELDNAME]
             self._match_source = Text.assemble_filename(

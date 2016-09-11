@@ -9,7 +9,7 @@ import tacl
 
 class StripperIntegrationTestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         base_dir = os.path.dirname(__file__)
         self._data_dir = os.path.join(base_dir, 'data')
         self._xml_dir = os.path.join(self._data_dir, 'expected_corpus_output')
@@ -21,11 +21,11 @@ class StripperIntegrationTestCase (unittest.TestCase):
             raise Exception('{} exists; aborting test that would create '
                             'this directory'.format(self._expected_output_dir))
 
-    def tearDown (self):
+    def tearDown(self):
         if os.path.exists(self._actual_output_dir):
             shutil.rmtree(self._actual_output_dir)
 
-    def test_2011_strip_files (self):
+    def test_2011_strip_files(self):
         xml_dir = os.path.join(self._xml_dir, '2011')
         stripper = tacl.Stripper(xml_dir, self._actual_output_dir)
         stripper.strip_files()

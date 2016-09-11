@@ -10,11 +10,11 @@ from .tacl_test_case import TaclTestCase
 
 class CorpusTestCase (TaclTestCase):
 
-    def setUp (self):
+    def setUp(self):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
-    def test_get_text (self):
+    def test_get_text(self):
         Text = self._create_patch('tacl.corpus.Text')
         path = '/test'
         name = 'foo'
@@ -30,7 +30,7 @@ class CorpusTestCase (TaclTestCase):
         Text.assert_called_once_with(name, siglum, content, self._tokenizer)
         assert isinstance(actual_text, tacl.Text)
 
-    def test_get_texts (self):
+    def test_get_texts(self):
         path = '/test'
         name1 = 'T1'
         name2 = 'T2'

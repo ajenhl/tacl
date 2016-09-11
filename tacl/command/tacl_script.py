@@ -13,7 +13,7 @@ from tacl.command.formatters import ParagraphFormatter
 import tacl.command.utils as utils
 
 
-def main ():
+def main():
     parser = generate_parser()
     args = parser.parse_args()
     logger = colorlog.getLogger('tacl')
@@ -24,7 +24,8 @@ def main ():
     else:
         parser.print_help()
 
-def align_results (args, parser):
+
+def align_results(args, parser):
     if args.results == '-':
         results = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
                                    newline='')
@@ -35,7 +36,8 @@ def align_results (args, parser):
     s = tacl.Sequencer(corpus, tokenizer, results, args.output)
     s.generate_sequences(args.minimum)
 
-def generate_parser ():
+
+def generate_parser():
     """Returns a parser configured with sub-commands and arguments."""
     parser = argparse.ArgumentParser(
         description=constants.TACL_DESCRIPTION,
@@ -57,7 +59,8 @@ def generate_parser ():
     generate_strip_subparser(subparsers)
     return parser
 
-def generate_align_subparser (subparsers):
+
+def generate_align_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to generate aligned
     sequences from a set of results."""
     parser = subparsers.add_parser(
@@ -74,13 +77,15 @@ def generate_align_subparser (subparsers):
     parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
 
-def generate_catalogue (args, parser):
+
+def generate_catalogue(args, parser):
     """Generates and saves a catalogue file."""
     catalogue = tacl.Catalogue()
     catalogue.generate(args.corpus, args.label)
     catalogue.save(args.catalogue)
 
-def generate_catalogue_subparser (subparsers):
+
+def generate_catalogue_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to generate and save
     a catalogue file."""
     parser = subparsers.add_parser(
@@ -95,7 +100,8 @@ def generate_catalogue_subparser (subparsers):
     parser.add_argument('-l', '--label', default='',
                         help=constants.CATALOGUE_LABEL_HELP)
 
-def generate_counts_subparser (subparsers):
+
+def generate_counts_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to make a counts
     query."""
     parser = subparsers.add_parser(
@@ -108,7 +114,8 @@ def generate_counts_subparser (subparsers):
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
 
-def generate_diff_subparser (subparsers):
+
+def generate_diff_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to make a diff
     query."""
     parser = subparsers.add_parser(
@@ -124,7 +131,8 @@ def generate_diff_subparser (subparsers):
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
 
-def generate_highlight_subparser (subparsers):
+
+def generate_highlight_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to highlight a text with
     its matches in a result."""
     parser = subparsers.add_parser(
@@ -139,14 +147,15 @@ def generate_highlight_subparser (subparsers):
     group.add_argument('-n', '--ngrams', metavar='NGRAMS',
                        help=constants.HIGHLIGHT_NGRAMS_HELP)
     group.add_argument('-r', '--results', metavar='RESULTS',
-                        help=constants.HIGHLIGHT_RESULTS_HELP)
+                       help=constants.HIGHLIGHT_RESULTS_HELP)
     utils.add_corpus_arguments(parser)
     parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
                         metavar='BASE_NAME')
     parser.add_argument('base_siglum', metavar='BASE_SIGLUM',
                         help=constants.HIGHLIGHT_BASE_SIGLUM_HELP)
 
-def generate_intersect_subparser (subparsers):
+
+def generate_intersect_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to make an
     intersection query."""
     parser = subparsers.add_parser(
@@ -159,7 +168,8 @@ def generate_intersect_subparser (subparsers):
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
 
-def generate_ngrams (args, parser):
+
+def generate_ngrams(args, parser):
     """Adds n-grams data to the data store."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
@@ -169,7 +179,8 @@ def generate_ngrams (args, parser):
         catalogue = None
     store.add_ngrams(corpus, args.min_size, args.max_size, catalogue)
 
-def generate_ngrams_subparser (subparsers):
+
+def generate_ngrams_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to add n-grams data
     to the data store."""
     parser = subparsers.add_parser(
@@ -188,7 +199,8 @@ def generate_ngrams_subparser (subparsers):
     parser.add_argument('max_size', help=constants.NGRAMS_MAXIMUM_HELP,
                         metavar='MAXIMUM', type=int)
 
-def generate_prepare_subparser (subparsers):
+
+def generate_prepare_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to prepare source XML
     files for stripping."""
     parser = subparsers.add_parser(
@@ -207,7 +219,8 @@ def generate_prepare_subparser (subparsers):
     parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
                         metavar='OUTPUT')
 
-def generate_results_subparser (subparsers):
+
+def generate_results_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to manipulate CSV
     results data."""
     parser = subparsers.add_parser(
@@ -261,7 +274,8 @@ def generate_results_subparser (subparsers):
     parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
 
-def generate_search_subparser (subparsers):
+
+def generate_search_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to generate search
     results for a set of n-grams."""
     parser = subparsers.add_parser(
@@ -276,14 +290,16 @@ def generate_search_subparser (subparsers):
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
                         metavar='NGRAMS')
 
-def generate_statistics (args, parser):
+
+def generate_statistics(args, parser):
     corpus = utils.get_corpus(args)
     tokenizer = utils.get_tokenizer(args)
     report = tacl.StatisticsReport(corpus, tokenizer, args.results)
     report.generate_statistics()
     report.csv(sys.stdout)
 
-def generate_statistics_subparser (subparsers):
+
+def generate_statistics_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to generate statistics
     from a set of results."""
     parser = subparsers.add_parser(
@@ -295,7 +311,8 @@ def generate_statistics_subparser (subparsers):
     parser.add_argument('results', help=constants.STATISTICS_RESULTS_HELP,
                         metavar='RESULTS')
 
-def generate_strip_subparser (subparsers):
+
+def generate_strip_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to process original
     texts for use with the tacl ngrams command."""
     parser = subparsers.add_parser(
@@ -309,7 +326,8 @@ def generate_strip_subparser (subparsers):
     parser.add_argument('output', help=constants.STRIP_OUTPUT_HELP,
                         metavar='OUTPUT')
 
-def generate_supplied_diff_subparser (subparsers):
+
+def generate_supplied_diff_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to run a diff query using
     the supplied results sets."""
     parser = subparsers.add_parser(
@@ -322,7 +340,8 @@ def generate_supplied_diff_subparser (subparsers):
     utils.add_db_arguments(parser, True)
     utils.add_supplied_query_arguments(parser)
 
-def generate_supplied_intersect_subparser (subparsers):
+
+def generate_supplied_intersect_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to run an intersect query
     using the supplied results sets."""
     parser = subparsers.add_parser(
@@ -335,7 +354,8 @@ def generate_supplied_intersect_subparser (subparsers):
     utils.add_db_arguments(parser, True)
     utils.add_supplied_query_arguments(parser)
 
-def highlight_text (args, parser):
+
+def highlight_text(args, parser):
     """Outputs the result of highlighting a text."""
     tokenizer = utils.get_tokenizer(args)
     corpus = utils.get_corpus(args)
@@ -353,7 +373,8 @@ def highlight_text (args, parser):
                                      args.results)
     print(text)
 
-def ngram_counts (args, parser):
+
+def ngram_counts(args, parser):
     """Outputs the results of performing a counts query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
@@ -361,7 +382,8 @@ def ngram_counts (args, parser):
     store.validate(corpus, catalogue)
     store.counts(catalogue, sys.stdout)
 
-def ngram_diff (args, parser):
+
+def ngram_diff(args, parser):
     """Outputs the results of performing a diff query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
@@ -373,7 +395,8 @@ def ngram_diff (args, parser):
     else:
         store.diff(catalogue, tokenizer, sys.stdout)
 
-def ngram_intersection (args, parser):
+
+def ngram_intersection(args, parser):
     """Outputs the results of performing an intersection query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
@@ -381,7 +404,8 @@ def ngram_intersection (args, parser):
     store.validate(corpus, catalogue)
     store.intersection(catalogue, sys.stdout)
 
-def prepare_xml (args, parser):
+
+def prepare_xml(args, parser):
     """Prepares XML texts for stripping.
 
     This process creates a single, normalised TEI XML file for each
@@ -397,7 +421,8 @@ def prepare_xml (args, parser):
     corpus = corpus_class(args.input, args.output)
     corpus.tidy()
 
-def results (args, parser):
+
+def results(args, parser):
     if args.results == '-':
         results_fh = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8',
                                       newline='')
@@ -414,7 +439,8 @@ def results (args, parser):
         results.reciprocal_remove()
     if args.zero_fill:
         if not args.catalogue:
-            parser.error('The zero-fill option requires that the -c option also be supplied.')
+            parser.error(
+                'The zero-fill option requires that the -c option also be supplied.')
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
         catalogue = utils.get_catalogue(args.catalogue)
         results.zero_fill(corpus, catalogue)
@@ -437,7 +463,8 @@ def results (args, parser):
         results.sort()
     results.csv(sys.stdout)
 
-def search_texts (args, parser):
+
+def search_texts(args, parser):
     """Searches texts for presence of n-grams."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
@@ -448,20 +475,23 @@ def search_texts (args, parser):
     ngrams = utils.get_ngrams(args.ngrams)
     store.search(catalogue, ngrams, sys.stdout)
 
-def strip_texts (args, parser):
+
+def strip_texts(args, parser):
     """Processes prepared XML texts for use with the tacl ngrams
     command."""
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()
 
-def supplied_diff (args, parser):
+
+def supplied_diff(args, parser):
     labels = args.labels
     results = args.supplied
     store = utils.get_data_store(args)
     tokenizer = utils.get_tokenizer(args)
     store.diff_supplied(results, labels, tokenizer, sys.stdout)
 
-def supplied_intersect (args, parser):
+
+def supplied_intersect(args, parser):
     labels = args.labels
     results = args.supplied
     store = utils.get_data_store(args)

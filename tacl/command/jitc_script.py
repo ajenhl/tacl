@@ -10,12 +10,13 @@ import os
 
 import tacl
 import tacl.command.utils as utils
+from tacl import constants
 
 
 logger = logging.getLogger('tacl')
 
 
-def main ():
+def main():
     parser = generate_parser()
     args = parser.parse_args()
     if hasattr(args, 'verbose'):
@@ -35,7 +36,8 @@ def main ():
                                    tokenizer, output_dir)
     processor.process()
 
-def check_catalogue (catalogue, label):
+
+def check_catalogue(catalogue, label):
     """Raise an exception if `catalogue` contains more than two labels, or
     if `label` is not used in the `catalogue`."""
     labels = set(catalogue.values())
@@ -45,14 +47,15 @@ def check_catalogue (catalogue, label):
     elif len(labels) != 2:
         raise Exception('The catalogue must specify only two labels.')
 
-def generate_parser ():
-    parser = argparse.ArgumentParser(description='Generate a report showing the amount of overlap between a set of texts, ignoring those parts that overlap with texts in a second set of texts.')
+
+def generate_parser():
+    parser = argparse.ArgumentParser(description=constants.JITC_DESCRIPTION)
     utils.add_common_arguments(parser)
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
-    parser.add_argument('label', metavar='LABEL',
-                        help='Label of texts to compare with each other')
-    parser.add_argument('output', help='Directory to output results into',
+    parser.add_argument('label', help=constants.JITC_LABEL_HELP,
+                        metavar='LABEL')
+    parser.add_argument('output', help=constants.JITC_OUTPUT_HELP,
                         metavar='OUTPUT')
     return parser

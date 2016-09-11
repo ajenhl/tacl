@@ -9,19 +9,21 @@ import tacl
 from tacl import constants
 
 
-def add_common_arguments (parser):
+def add_common_arguments(parser):
     """Adds common arguments for all parsers."""
     parser.add_argument('-v', '--verbose', action='count',
                         help=constants.VERBOSE_HELP)
 
-def add_corpus_arguments (parser):
+
+def add_corpus_arguments(parser):
     """Adds common arguments for commands making use of a corpus to
     `parser`."""
     add_tokenizer_argument(parser)
     parser.add_argument('corpus', help=constants.DB_CORPUS_HELP,
                         metavar='CORPUS')
 
-def add_db_arguments (parser, db_option=False):
+
+def add_db_arguments(parser, db_option=False):
     """Adds common arguments for the database sub-commands to
     `parser`.
 
@@ -44,12 +46,14 @@ def add_db_arguments (parser, db_option=False):
         parser.add_argument('db', help=constants.DB_DATABASE_HELP,
                             metavar='DATABASE')
 
-def add_query_arguments (parser):
+
+def add_query_arguments(parser):
     """Adds common arguments for query sub-commonads to `parser`."""
     parser.add_argument('catalogue', help=constants.CATALOGUE_CATALOGUE_HELP,
                         metavar='CATALOGUE')
 
-def add_supplied_query_arguments (parser):
+
+def add_supplied_query_arguments(parser):
     """Adds common arguments for supplied query sub-commands to
     `parser`."""
     parser.add_argument('-l', '--labels', help=constants.SUPPLIED_LABELS_HELP,
@@ -57,12 +61,14 @@ def add_supplied_query_arguments (parser):
     parser.add_argument('-s', '--supplied', help=constants.SUPPLIED_RESULTS_HELP,
                         metavar='RESULTS', nargs='+', required=True)
 
-def add_tokenizer_argument (parser):
+
+def add_tokenizer_argument(parser):
     parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
                         default=constants.TOKENIZER_CHOICE_CBETA,
                         help=constants.DB_TOKENIZER_HELP)
 
-def configure_logging (verbose, logger):
+
+def configure_logging(verbose, logger):
     """Configures the logging used."""
     if not verbose:
         log_level = logging.WARNING
@@ -78,26 +84,31 @@ def configure_logging (verbose, logger):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-def get_corpus (args):
+
+def get_corpus(args):
     """Returns a `tacl.Corpus`."""
     tokenizer = get_tokenizer(args)
     return tacl.Corpus(args.corpus, tokenizer)
 
-def get_catalogue (path):
+
+def get_catalogue(path):
     """Returns a `tacl.Catalogue`."""
     catalogue = tacl.Catalogue()
     catalogue.load(path)
     return catalogue
 
-def get_data_store (args):
+
+def get_data_store(args):
     """Returns a `tacl.DataStore`."""
     return tacl.DataStore(args.db, args.memory, args.ram)
 
-def get_ngrams (path):
+
+def get_ngrams(path):
     """Returns a list of n-grams read from the file at `path`."""
     with open(path, encoding='utf-8') as fh:
         ngrams = [ngram.strip() for ngram in fh.readlines()]
     return ngrams
 
-def get_tokenizer (args):
+
+def get_tokenizer(args):
     return tacl.Tokenizer(*constants.TOKENIZERS[args.tokenizer])

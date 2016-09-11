@@ -10,11 +10,12 @@ from .tacl_test_case import TaclTestCase
 
 class ResultsTestCase (TaclTestCase):
 
-    def setUp (self):
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+    def setUp(self):
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
 
-    def test_add_label_count (self):
+    def test_add_label_count(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'a', 'wit1', '5', 'A'],
@@ -38,7 +39,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertTrue(actual_rows, expected_rows)
 
-    def test_collapse_witnesses (self):
+    def test_collapse_witnesses(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'a', 'wit 1', '4', 'A'],
@@ -64,7 +65,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertTrue(actual_rows, expected_rows)
 
-    def test_is_intersect_results (self):
+    def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
         # and intersect results.
         intersect_results = (
@@ -83,7 +84,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         self.assertFalse(results._is_intersect_results(results._matches))
 
-    def test_prune_by_ngram (self):
+    def test_prune_by_ngram(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['ABC', '3', 'a', 'base', '2', 'A'],
@@ -104,7 +105,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_prune_by_ngram_count (self):
+    def test_prune_by_ngram_count(self):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],
             ['BA', '2', 'a', 'wit', '1', 'A'],
@@ -127,8 +128,7 @@ class ResultsTestCase (TaclTestCase):
         results.prune_by_ngram_count(maximum=4)
         expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
                          ('BA', '2', 'b', 'base', '3', 'B'),
-                         ('BA', '2', 'b', 'wit', '3', 'B')
-        ]
+                         ('BA', '2', 'b', 'wit', '3', 'B')]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
@@ -137,13 +137,12 @@ class ResultsTestCase (TaclTestCase):
         results.prune_by_ngram_count(minimum=4, maximum=5)
         expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
                          ('BA', '2', 'b', 'base', '3', 'B'),
-                         ('BA', '2', 'b', 'wit', '3', 'B')
-        ]
+                         ('BA', '2', 'b', 'wit', '3', 'B')]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_prune_by_ngram_count_per_text (self):
+    def test_prune_by_ngram_count_per_text(self):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],
             ['AB', '2', 'a', 'wit', '1', 'A'],
@@ -206,7 +205,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_prune_by_ngram_size (self):
+    def test_prune_by_ngram_size(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['ABC', '3', 'a', 'base', '2', 'A'],
@@ -248,7 +247,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_prune_by_text_count (self):
+    def test_prune_by_text_count(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'b', 'base', '7', 'A'],
@@ -302,12 +301,12 @@ class ResultsTestCase (TaclTestCase):
             ('B', '1', 'a', 'base', '5', 'A'),
             ('B', '1', 'b', 'base', '3', 'A'),
             ('B', '1', 'b', 'wit', '3', 'A'),
-            ('B', '1', 'c', 'base', '0', 'B'),]
+            ('B', '1', 'c', 'base', '0', 'B')]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_reciprocal_remove (self):
+    def test_reciprocal_remove(self):
         input_data = (
             ['AB', '2', 'a', 'base', '5', 'A'],
             ['ABCDEF', '6', 'a', 'base', '7', 'A'],
@@ -383,7 +382,7 @@ class ResultsTestCase (TaclTestCase):
                 io.StringIO(newline='')))
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_reduce_cbeta (self):
+    def test_reduce_cbeta(self):
         tokenizer = self._tokenizer
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
@@ -465,7 +464,7 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
 
-    def test_reduce_nan (self):
+    def test_reduce_nan(self):
         # Check that the n-gram "nan" is not interpreted as NaN.
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)
@@ -480,7 +479,7 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_reduce_pagel (self):
+    def test_reduce_pagel(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)
         input_data = (
@@ -498,13 +497,13 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def _perform_reduce (self, input_data, tokenizer):
+    def _perform_reduce(self, input_data, tokenizer):
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, tokenizer)
         results.reduce()
         return self._get_rows_from_csv(results.csv(io.StringIO(newline='')))
 
-    def test_remove_label (self):
+    def test_remove_label(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'a', 'wit', '3', 'A'],
@@ -527,7 +526,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_sort (self):
+    def test_sort(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'a', 'wit', '3', 'A'],
@@ -555,7 +554,7 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_zero_fill (self):
+    def test_zero_fill(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                    tacl.constants.TOKENIZER_JOINER_CBETA)
         input_data = (

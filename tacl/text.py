@@ -7,11 +7,11 @@ import os.path
 
 class BaseText:
 
-    def __init__ (self, content, tokenizer):
+    def __init__(self, content, tokenizer):
         self._content = content
         self._tokenizer = tokenizer
 
-    def get_content (self):
+    def get_content(self):
         """Returns the content of this text.
 
         :rtype: `str`
@@ -19,7 +19,7 @@ class BaseText:
         """
         return self._content
 
-    def get_ngrams (self, minimum, maximum, skip_sizes=None):
+    def get_ngrams(self, minimum, maximum, skip_sizes=None):
         """Returns a generator supplying the n-grams (`minimum` <= n
         <= `maximum`) for this text.
 
@@ -41,7 +41,7 @@ class BaseText:
                 ngrams = collections.Counter(self._ngrams(tokens, size))
                 yield (size, ngrams)
 
-    def get_token_content (self):
+    def get_token_content(self):
         """Returns a string of the tokens in this text joined using the
         tokenizer joiner string.
 
@@ -50,7 +50,7 @@ class BaseText:
         """
         return self._tokenizer.joiner.join(self.get_tokens())
 
-    def get_tokens (self):
+    def get_tokens(self):
         """Returns a list of tokens in this text.
 
         :rtype: `list` of `str`
@@ -58,7 +58,7 @@ class BaseText:
         """
         return self._tokenizer.tokenize(self._content)
 
-    def _ngrams (self, sequence, degree):
+    def _ngrams(self, sequence, degree):
         """Returns the n-grams generated from `sequence`.
 
         Based on the ngrams function from the Natural Language
@@ -84,17 +84,17 @@ class BaseText:
 
 class Text (BaseText):
 
-    def __init__ (self, name, siglum, content, tokenizer):
+    def __init__(self, name, siglum, content, tokenizer):
         super().__init__(content, tokenizer)
         self._name = name
         self._siglum = siglum
         self._filename = self.assemble_filename(name, siglum)
 
     @staticmethod
-    def assemble_filename (name, siglum):
+    def assemble_filename(name, siglum):
         return os.path.join(name, siglum + '.txt')
 
-    def get_checksum (self):
+    def get_checksum(self):
         """Returns the checksum for the content of this text.
 
         :rtype: `str`
@@ -102,7 +102,7 @@ class Text (BaseText):
         """
         return hashlib.md5(self._content.encode('utf-8')).hexdigest()
 
-    def get_filename (self):
+    def get_filename(self):
         """Returns the filename of this text.
 
         :rtype: `str`
@@ -110,7 +110,7 @@ class Text (BaseText):
         """
         return self._filename
 
-    def get_names (self):
+    def get_names(self):
         """Returns the name and siglum of this text.
 
         :rtype: `tuple`

@@ -10,13 +10,13 @@ from .text import BaseText
 
 class StatisticsReport:
 
-    def __init__ (self, corpus, tokenizer, matches):
+    def __init__(self, corpus, tokenizer, matches):
         self._corpus = corpus
         self._tokenizer = tokenizer
         self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
         self._stats = pd.DataFrame()
 
-    def csv (self, fh):
+    def csv(self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
 
         :param fh: file to write data to
@@ -28,7 +28,7 @@ class StatisticsReport:
                            encoding='utf-8', index=False)
         return fh
 
-    def generate_statistics (self):
+    def generate_statistics(self):
         """Replaces result rows with summary statistics about the results.
 
         These statistics give the filename, total matching tokens,
@@ -57,7 +57,7 @@ class StatisticsReport:
                          constants.LABEL_FIELDNAME: label})
         self._stats = pd.DataFrame(rows)
 
-    def _generate_text_from_slices (self, full_text, slices):
+    def _generate_text_from_slices(self, full_text, slices):
         """Return a single string consisting of the parts specified in
         `slices` joined together by the tokenizer's joining string.
 
@@ -74,7 +74,7 @@ class StatisticsReport:
         return self._tokenizer.joiner.join(sliced_text)
 
     @staticmethod
-    def _merge_slices (match_slices):
+    def _merge_slices(match_slices):
         """Return a list of slice indices lists derived from `match_slices`
         with no overlaps."""
         # Sort by earliest range, then by largest range.
@@ -89,7 +89,7 @@ class StatisticsReport:
                 merged_slices.append(slice_indices)
         return merged_slices
 
-    def _process_witness (self, text, matches):
+    def _process_witness(self, text, matches):
         """Return the counts of total tokens and matching tokens in `text`.
 
         :param text: witness text

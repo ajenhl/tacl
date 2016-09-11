@@ -7,7 +7,7 @@ from .exceptions import MalformedCatalogueError
 
 class Catalogue (dict):
 
-    def generate (self, path, label):
+    def generate(self, path, label):
         """Creates default data from the corpus at `path`, marking all
         texts with `label`.
 
@@ -21,7 +21,7 @@ class Catalogue (dict):
             self[filename] = label
 
     @property
-    def labels (self):
+    def labels(self):
         """Returns the distinct labels defined in the catalogue.
 
         :rtype: `list`
@@ -29,7 +29,7 @@ class Catalogue (dict):
         """
         return sorted(set(self.values()))
 
-    def load (self, path):
+    def load(self, path):
         """Loads the data from `path` into the catalogue.
 
         :param path: path to catalogue file
@@ -48,7 +48,7 @@ class Catalogue (dict):
                             CATALOGUE_TEXT_RELABELLED_ERROR.format(text))
                     self[text] = label
 
-    def save (self, path):
+    def save(self, path):
         """Saves this catalogue's data to `path`.
 
         :param path: file path to save catalogue data to

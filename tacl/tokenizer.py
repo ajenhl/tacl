@@ -11,8 +11,8 @@ class Tokenizer:
 
     """
 
-    def __init__ (self, pattern, joiner, flags=re.UNICODE | re.MULTILINE |
-                  re.DOTALL):
+    def __init__(self, pattern, joiner, flags=re.UNICODE | re.MULTILINE |
+                 re.DOTALL):
         try:
             self._regexp = re.compile(pattern, flags)
         except re.error as err:
@@ -22,18 +22,18 @@ class Tokenizer:
         self._pattern = pattern
 
     @property
-    def joiner (self):
+    def joiner(self):
         """The string used to join tokens together when reconstructing a
         text."""
         return self._joiner
 
     @property
-    def pattern (self):
+    def pattern(self):
         """The regular expression pattern used to divide the text into
         tokens."""
         return self._pattern
 
-    def tokenize (self, text):
+    def tokenize(self, text):
         """Returns all tokens in `text`.
 
         :param text: text to be tokenized

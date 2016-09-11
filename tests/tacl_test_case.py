@@ -8,7 +8,7 @@ import tacl
 
 class TaclTestCase (unittest.TestCase):
 
-    def _create_csv (self, data, fieldnames=tacl.constants.QUERY_FIELDNAMES):
+    def _create_csv(self, data, fieldnames=tacl.constants.QUERY_FIELDNAMES):
         fh = io.StringIO(newline='')
         writer = csv.writer(fh)
         writer.writerow(fieldnames)
@@ -17,13 +17,13 @@ class TaclTestCase (unittest.TestCase):
         fh.seek(0)
         return fh
 
-    def _create_patch (self, name, spec=True):
+    def _create_patch(self, name, spec=True):
         patcher = unittest.mock.patch(name, autospec=spec, spec_set=spec)
         thing = patcher.start()
         self.addCleanup(patcher.stop)
         return thing
 
-    def _get_rows_from_csv (self, fh):
+    def _get_rows_from_csv(self, fh):
         rows = []
         fh.seek(0)
         reader = csv.reader(fh)

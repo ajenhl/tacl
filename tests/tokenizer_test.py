@@ -7,22 +7,22 @@ import tacl
 
 class TokenizerTestCase (unittest.TestCase):
 
-    def test_init (self):
+    def test_init(self):
         self.assertRaises(ValueError, tacl.Tokenizer, r'[broken', '')
 
-    def test_joiner (self):
+    def test_joiner(self):
         expected_joiner = ' '
         tokenizer = tacl.Tokenizer(r'[\w]+', expected_joiner)
         actual_joiner = tokenizer.joiner
         self.assertEqual(actual_joiner, expected_joiner)
 
-    def test_pattern (self):
+    def test_pattern(self):
         expected_pattern = r'[\w]+'
         tokenizer = tacl.Tokenizer(expected_pattern, ' ')
         actual_pattern = tokenizer.pattern
         self.assertEqual(actual_pattern, expected_pattern)
 
-    def test_tokenize_cbeta (self):
+    def test_tokenize_cbeta(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                    tacl.constants.TOKENIZER_JOINER_CBETA)
         data = (
@@ -37,7 +37,7 @@ class TokenizerTestCase (unittest.TestCase):
             actual_tokens = tokenizer.tokenize(input_text)
             self.assertEqual(actual_tokens, expected_tokens)
 
-    def test_tokenize_pagel (self):
+    def test_tokenize_pagel(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)
         data = (

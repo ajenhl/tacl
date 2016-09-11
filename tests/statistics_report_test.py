@@ -8,7 +8,7 @@ from .tacl_test_case import TaclTestCase
 
 class ReportTestCase (TaclTestCase):
 
-    def test_merge_slices (self):
+    def test_merge_slices(self):
         input_slices = [
             [4, 7], [6, 12], [4, 6], [13, 14], [1, 2], [12, 13], [15, 18]
         ]

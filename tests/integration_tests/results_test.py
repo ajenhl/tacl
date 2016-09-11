@@ -13,12 +13,12 @@ from ..tacl_test_case import TaclTestCase
 
 class ResultsIntegrationTestCase (TaclTestCase):
 
-    def setUp (self):
+    def setUp(self):
         base_dir = os.path.dirname(__file__)
         self._data_dir = os.path.join(base_dir, 'results_data')
         self._stripped_dir = os.path.join(self._data_dir, 'stripped')
 
-    def test_extend_cbeta (self):
+    def test_extend_cbeta(self):
         results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'cbeta'),
@@ -31,7 +31,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_extend_pagel (self):
+    def test_extend_pagel(self):
         results = os.path.join(self._data_dir, 'pagel-non-extend-results.csv')
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'pagel'),
@@ -44,7 +44,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_extend_multiply_labelled (self):
+    def test_extend_multiply_labelled(self):
         # Test that a witness that exists under more than one label is
         # properly extended.
         results = os.path.join(self._data_dir,
@@ -60,7 +60,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_extend_diff (self):
+    def test_extend_diff(self):
         # Test that diff results are correctly extended.
         results = os.path.join(self._data_dir, 'diff-non-extend-results.csv')
         command = 'tacl results -e {} -t {} {}'.format(
@@ -74,7 +74,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_zero_fill (self):
+    def test_zero_fill(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         corpus = os.path.join(data_dir, 'stripped')
         catalogue = os.path.join(data_dir, 'catalogue.txt')

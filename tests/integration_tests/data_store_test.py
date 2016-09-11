@@ -6,9 +6,10 @@ import tacl
 from tacl.exceptions import MalformedQueryError
 from ..tacl_test_case import TaclTestCase
 
+
 class DataStoreIntegrationTestCase (TaclTestCase):
 
-    def setUp (self):
+    def setUp(self):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -19,7 +20,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         self._store = tacl.DataStore(':memory:')
         self._store.add_ngrams(self._corpus, 1, 3)
 
-    def test_add_ngrams (self):
+    def test_add_ngrams(self):
         self._store._conn.row_factory = None
         actual_rows = self._store._conn.execute(
             'SELECT Text.name, Text.siglum, Text.checksum, Text.label, '
@@ -149,7 +150,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_counts (self):
+    def test_counts(self):
         actual_rows = self._get_rows_from_csv(self._store.counts(
                 self._catalogue, io.StringIO(newline='')))
         expected_rows = [
@@ -173,7 +174,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('T5', 'base', '3', '2', '2', '4', 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff (self):
+    def test_diff(self):
         tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         actual_rows = self._get_rows_from_csv(self._store.diff(
                 self._catalogue, tokenizer, io.StringIO(newline='')))
@@ -193,7 +194,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff_asymmetric (self):
+    def test_diff_asymmetric(self):
         tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         actual_rows = self._get_rows_from_csv(self._store.diff_asymmetric(
                 self._catalogue, 'A', tokenizer, io.StringIO(newline='')))
@@ -209,7 +210,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff_supplied (self):
+    def test_diff_supplied(self):
         tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
         supplied_dir = os.path.join(self._data_dir, 'supplied_input')
         results = [os.path.join(supplied_dir, 'diff_input_1.csv'),
@@ -234,7 +235,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('人子', '2', 'T0007', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff_supplied_argument_mismatch (self):
+    def test_diff_supplied_argument_mismatch(self):
         # Supplying a list of labels that differs in length from the
         # list of results should raise an exception.
         tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
@@ -246,7 +247,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, self._store.diff_supplied,
                           results, labels, tokenizer, io.StringIO(newline=''))
 
-    def test_intersection (self):
+    def test_intersection(self):
         actual_rows = self._get_rows_from_csv(self._store.intersection(
                 self._catalogue, io.StringIO(newline='')))
         expected_rows = [
@@ -267,7 +268,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('th', '2', 'T3', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_intersection_supplied (self):
+    def test_intersection_supplied(self):
         supplied_dir = os.path.join(self._data_dir, 'supplied_input')
         results = [os.path.join(supplied_dir, 'intersect_input_1.csv'),
                    os.path.join(supplied_dir, 'intersect_input_2.csv'),
@@ -288,7 +289,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_intersection_supplied_argument_mismatch (self):
+    def test_intersection_supplied_argument_mismatch(self):
         # Supplying a list of labels that differs in length from the
         # list of results should raise an exception.
         supplied_dir = os.path.join(self._data_dir, 'supplied_input')
@@ -300,7 +301,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             MalformedQueryError, self._store.intersection_supplied,
             results, labels, io.StringIO(newline=''))
 
-    def test_validate_missing_text (self):
+    def test_validate_missing_text(self):
         self._catalogue['missing'] = 'A'
         with self.assertRaises(FileNotFoundError):
             self._store.validate(self._corpus, self._catalogue)

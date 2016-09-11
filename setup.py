@@ -14,14 +14,14 @@ setup(name='tacl',
       author_email='jamie@artefact.org.nz',
       url='https://github.com/ajenhl/tacl',
       packages=['tacl', 'tacl.command'],
-      entry_points = {
+      entry_points={
           'console_scripts': [
               'jitc=tacl.command.jitc_script:main',
               'tacl=tacl.command.tacl_script:main',
               'tacl-helper=tacl.command.tacl_helper_script:main',
           ],
       },
-      package_data = {
+      package_data={
           'tacl': ['assets/jitc/*.js', 'assets/jitc/*.css',
                    'assets/templates/*.html', 'assets/xslt/*.xsl'],
       },
@@ -34,5 +34,5 @@ setup(name='tacl',
           'Programming Language :: Python :: 3',
           'Topic :: Text Processing :: Linguistic',
       ],
-      test_suite = 'tests',
-)
+      test_suite='tests',
+      )

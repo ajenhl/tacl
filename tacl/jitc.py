@@ -48,8 +48,8 @@ class JITCProcessor:
 
     """
 
-    def __init__ (self, store, corpus, catalogue, maybe_label, tokenizer,
-                  output_dir):
+    def __init__(self, store, corpus, catalogue, maybe_label, tokenizer,
+                 output_dir):
         self._logger = logging.getLogger(__name__)
         self._corpus = corpus
         self._maybe_label = maybe_label
@@ -66,13 +66,13 @@ class JITCProcessor:
         self._ym_intersects_dir = os.path.join(self._output_data_dir,
                                                'ym_intersects')
 
-    def _copy_static_assets (self, output_dir):
+    def _copy_static_assets(self, output_dir):
         for asset in resource_listdir(__name__, 'assets/jitc'):
             filename = resource_filename(__name__, 'assets/jitc/{}'.format(
                 asset))
             shutil.copy2(filename, output_dir)
 
-    def _create_breakdown_chart (self, data, text, output_dir):
+    def _create_breakdown_chart(self, data, text, output_dir):
         # Create a stacked bar chart that shows the percentage of the
         # content consisting of shared tokens that aren't in the no
         # corpus, shared tokens that are also in the no corpus, and
@@ -83,7 +83,7 @@ class JITCProcessor:
             text))
         chart_data.to_csv(csv_path)
 
-    def _create_chord_chart (self, data, output_dir):
+    def _create_chord_chart(self, data, output_dir):
         matrix = []
         chord_data = data.unstack('main_text')['shared']
         for index, row_data in chord_data.fillna(value=0).iterrows():
@@ -95,7 +95,7 @@ class JITCProcessor:
         with open(os.path.join(output_dir, 'chord_data.js'), 'w') as fh:
             fh.write('var chordData = {}'.format(json_data))
 
-    def _create_matrix_chart (self, data, output_dir):
+    def _create_matrix_chart(self, data, output_dir):
         nodes = [{'name': name, 'group': 1} for name in self._maybe_texts]
         weights = data.stack().unstack('related_text').max()
         seen = []
@@ -110,7 +110,7 @@ class JITCProcessor:
         with open(os.path.join(output_dir, 'matrix_data.js'), 'w') as fh:
             fh.write('var matrixData = {}'.format(json_data))
 
-    def _create_related_chart (self, data, text, output_dir):
+    def _create_related_chart(self, data, text, output_dir):
         # Create a chart that has two bars per text on x-axis: one for
         # the percentage of that text that overlaps with the base
         # text, and one for the percentage of the base text that
@@ -121,7 +121,7 @@ class JITCProcessor:
         csv_path = os.path.join(output_dir, 'related_{}.csv'.format(text))
         chart_data.to_csv(csv_path)
 
-    def _drop_no_label_results (self, results, fh):
+    def _drop_no_label_results(self, results, fh):
         """Writes `results` to `fh` minus those results associated with the
         'no' label.
 
@@ -136,7 +136,7 @@ class JITCProcessor:
         results.remove_label(self._no_label)
         results.csv(fh)
 
-    def _generate_statistics (self, out_path, results_path):
+    def _generate_statistics(self, out_path, results_path):
         """Write a statistics report for `results_path` to `out_path`."""
         if not os.path.exists(out_path):
             report = StatisticsReport(self._corpus, self._tokenizer,
@@ -145,7 +145,7 @@ class JITCProcessor:
             with open(out_path, mode='w', encoding='utf-8', newline='') as fh:
                 report.csv(fh)
 
-    def _get_reversed_data (self, data):
+    def _get_reversed_data(self, data):
         reverse_data = data.unstack('main_text')['shared']
         tuples = list(zip(['shared_related_text'] * len(reverse_data.columns),
                           reverse_data.columns))
@@ -156,8 +156,8 @@ class JITCProcessor:
                 'shared_related_text'].loc[text].tolist()
         return reverse_data.swaplevel('text', 'main_text', axis=1)
 
-    def _process_maybe_text (self, yes_text, maybe_text, work_dir,
-                             yn_results_path):
+    def _process_maybe_text(self, yes_text, maybe_text, work_dir,
+                            yn_results_path):
         if maybe_text == yes_text:
             return
         self._logger.info(
@@ -205,7 +205,7 @@ class JITCProcessor:
                     self._stats[yes_text]['shared'][witness] = ratio
                     self._stats[yes_text]['common'][witness] -= ratio
 
-    def _process_yes_text (self, yes_text, no_catalogue, output_dir):
+    def _process_yes_text(self, yes_text, no_catalogue, output_dir):
         self._logger.info('Processing "maybe" text {} as "yes".'.format(
             yes_text))
         self._stats[yes_text] = {'common': {}, 'shared': {}, 'unique': {}}
@@ -217,7 +217,7 @@ class JITCProcessor:
             self._process_maybe_text(yes_text, maybe_text, yes_work_dir,
                                      results_path)
 
-    def process (self):
+    def process(self):
         no_catalogue = {text: self._no_label for text in self._no_texts}
         data = {}
         os.makedirs(self._ym_intersects_dir, exist_ok=True)
@@ -270,7 +270,7 @@ class JITCProcessor:
             fh.write(report)
         self._copy_static_assets(report_assets_dir)
 
-    def _run_query (self, path, query, query_args, drop_no=True):
+    def _run_query(self, path, query, query_args, drop_no=True):
         if os.path.exists(path):
             return
         output_results = io.StringIO(newline='')
@@ -282,7 +282,7 @@ class JITCProcessor:
                 fh.write(output_results.getvalue())
 
 
-def rgb_colour (h, f):
+def rgb_colour(h, f):
     """Convert a colour specified by h-value and f-value to an RGB string."""
     v = 1
     p = 0
@@ -300,7 +300,8 @@ def rgb_colour (h, f):
         colour = v, p, 1 - f
     return 'rgb({}, {}, {})'.format(*[round(value * 255) for value in colour])
 
-def generate_colours (n):
+
+def generate_colours(n):
     """Return a list of distinct colours, each of which is represented as
     an RGB string suitable for use in CSS."""
     hues = [360 / n * i for i in range(n)]

@@ -17,7 +17,7 @@ class Stripper:
     The intention is to keep the stripped text as close in formatting
     to the original as possible, including whitespace."""
 
-    def __init__ (self, input_dir, output_dir):
+    def __init__(self, input_dir, output_dir):
         self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
@@ -25,7 +25,7 @@ class Stripper:
         self.transform = etree.XSLT(etree.parse(xslt_filename))
         self._texts = {}
 
-    def get_witnesses (self, source_tree):
+    def get_witnesses(self, source_tree):
         """Returns a list of all witnesses of variant readings in
         `source_tree` along with their XML ids.
 
@@ -36,13 +36,13 @@ class Stripper:
         """
         witnesses = [(constants.BASE_WITNESS, constants.BASE_WITNESS_ID)]
         witness_elements = source_tree.xpath('/tei:teiCorpus/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:listWit/tei:witness',
-                                           namespaces=constants.NAMESPACES)
+                                             namespaces=constants.NAMESPACES)
         for witness_element in witness_elements:
             witnesses.append((witness_element.text,
                               witness_element.get(constants.XML + 'id')))
         return witnesses
 
-    def _output_file (self, text_name, witnesses):
+    def _output_file(self, text_name, witnesses):
         text_dir = os.path.join(self._output_dir, text_name)
         try:
             os.makedirs(text_dir)
@@ -56,7 +56,7 @@ class Stripper:
             with open(witness_file_path, 'wb') as output_file:
                 output_file.write(witnesses[witness].encode('utf-8'))
 
-    def strip_files (self):
+    def strip_files(self):
         if not os.path.exists(self._output_dir):
             try:
                 os.makedirs(self._output_dir)
@@ -71,7 +71,7 @@ class Stripper:
                         os.path.join(dirpath, filename))
                     self._output_file(text_name, witnesses)
 
-    def strip_file (self, filename):
+    def strip_file(self, filename):
         file_path = os.path.join(self._input_dir, filename)
         text_name = os.path.splitext(os.path.basename(filename))[0]
         stripped_file_path = os.path.join(self._output_dir, text_name)

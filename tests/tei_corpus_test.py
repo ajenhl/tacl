@@ -9,10 +9,10 @@ import tacl
 
 class TEICorpusCBETA2011TestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         self.corpus = tacl.TEICorpusCBETA2011('/', '/')
 
-    def test_gaiji (self):
+    def test_gaiji(self):
         """Tests that the correct gaiji alternative is used."""
         gaiji_data = (
             ('''<p><gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/></p>''', 'Ā'),
@@ -26,7 +26,7 @@ class TEICorpusCBETA2011TestCase (unittest.TestCase):
                                            encoding='unicode')
             self.assertEqual(expected_output, actual_output)
 
-    def test_get_witnesses (self):
+    def test_get_witnesses(self):
         """Tests that all of the witnesses of variant readings are extracted
         from a text."""
         input_xml = '''
@@ -44,10 +44,10 @@ class TEICorpusCBETA2011TestCase (unittest.TestCase):
 
 class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         self.corpus = tacl.TEICorpusCBETAGitHub('/', '/')
 
-    def test_get_witnesses (self):
+    def test_get_witnesses(self):
         """Tests that all of the witnesses of variant readings are extracted
         from a text."""
         input_xml = '''
@@ -62,7 +62,7 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         actual_witnesses = self.corpus.get_witnesses(etree.XML(input_xml))[0]
         self.assertEqual(expected_witnesses, actual_witnesses)
 
-    def test_get_resps (self):
+    def test_get_resps(self):
         """Tests that all resps are extracted from a text."""
         input_xml = '''
 <div xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
@@ -80,7 +80,7 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         actual_resps = self.corpus.get_resps(etree.XML(input_xml))[0]
         self.assertEqual(expected_resps, actual_resps)
 
-    def test_glyph (self):
+    def test_glyph(self):
         """Tests that the correct alternative for characters not in Unicode is
         used."""
         base_xml = '''<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">

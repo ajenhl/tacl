@@ -9,10 +9,10 @@ import tacl
 
 class StripTestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         self.stripper = tacl.Stripper('.', '.')
 
-    def test_foreign (self):
+    def test_foreign(self):
         """Tests that foreign elements with @place="foot" are stripped."""
         foreign_data = (
             ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" resp="Taisho" lang="san">Saalva</foreign>',
@@ -24,7 +24,7 @@ class StripTestCase (unittest.TestCase):
             actual_output = str(self.stripper.transform(etree.XML(input_xml)))
             self.assertEqual(expected_output, actual_output)
 
-    def test_no_header (self):
+    def test_no_header(self):
         """Tests that the TEI header is stripped."""
         input_xml = '''
 <TEI xmlns="http://www.tei-c.org/ns/1.0">
@@ -57,7 +57,7 @@ class StripTestCase (unittest.TestCase):
         actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
-    def test_note (self):
+    def test_note(self):
         """Tests that notes, unless inline, are stripped."""
         input_xml = '''
 <body xmlns="http://www.tei-c.org/ns/1.0">
@@ -70,7 +70,7 @@ class StripTestCase (unittest.TestCase):
         actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
-    def test_tt (self):
+    def test_tt(self):
         """Tests that tt is stripped down to the content of
         t[@lang='chi']."""
         input_xml = '''<tt xmlns="http://www.cbeta.org/ns/1.0" n="0001011" type="app"><t resp="Taisho" xml:lang="zh">長阿含經</t><t resp="Taisho" xml:lang="sa" place="foot">Dīrgha-āgama</t><t resp="Taisho" xml:lang="pi" place="foot">Dīgha-nikāya</t></tt>'''
@@ -78,7 +78,7 @@ class StripTestCase (unittest.TestCase):
         actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
 
-    def test_variants (self):
+    def test_variants(self):
         """Tests that lem/rdg is stripped when it doesn't match the supplied
         witness name."""
         input_xml = '''

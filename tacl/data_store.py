@@ -22,7 +22,7 @@ class DataStore:
 
     """
 
-    def __init__ (self, db_name, use_memory=True, ram=0):
+    def __init__(self, db_name, use_memory=True, ram=0):
         self._logger = logging.getLogger(__name__)
         if db_name == ':memory:':
             self._db_name = db_name
@@ -41,13 +41,13 @@ class DataStore:
         self._conn.execute(constants.PRAGMA_LOCKING_MODE_SQL)
         self._conn.execute(constants.PRAGMA_SYNCHRONOUS_SQL)
 
-    def _add_indices (self):
+    def _add_indices(self):
         """Adds the database indices relating to n-grams."""
         self._logger.info('Adding database indices')
         self._conn.execute(constants.CREATE_INDEX_TEXTNGRAM_SQL)
         self._logger.info('Indices added')
 
-    def add_ngrams (self, corpus, minimum, maximum, catalogue=None):
+    def add_ngrams(self, corpus, minimum, maximum, catalogue=None):
         """Adds n-gram data from `corpus` to the data store.
 
         :param corpus: corpus of texts
@@ -68,14 +68,14 @@ class DataStore:
         self._add_indices()
         self._analyse()
 
-    def _add_temporary_ngrams (self, ngrams):
+    def _add_temporary_ngrams(self, ngrams):
         """Adds `ngrams` to a temporary table."""
         self._conn.execute(constants.DROP_TEMPORARY_NGRAMS_TABLE_SQL)
         self._conn.execute(constants.CREATE_TEMPORARY_NGRAMS_TABLE_SQL)
         self._conn.executemany(constants.INSERT_TEMPORARY_NGRAM_SQL,
                                [(ngram,) for ngram in ngrams])
 
-    def _add_temporary_results_sets (self, results_filenames, labels):
+    def _add_temporary_results_sets(self, results_filenames, labels):
         if len(labels) < 2:
             raise MalformedQueryError(
                 constants.INSUFFICIENT_LABELS_QUERY_ERROR)
@@ -89,7 +89,7 @@ class DataStore:
         self._add_temporary_results_index()
         self._analyse('temp.InputResults')
 
-    def _add_temporary_results (self, results, label):
+    def _add_temporary_results(self, results, label):
         """Adds `results` to a temporary table with `label`.
 
         :param results: results file
@@ -104,12 +104,12 @@ class DataStore:
                  label) for row in reader]
         self._conn.executemany(constants.INSERT_TEMPORARY_RESULTS_SQL, data)
 
-    def _add_temporary_results_index (self):
+    def _add_temporary_results_index(self):
         self._logger.info('Adding index to temporary results table')
         self._conn.execute(constants.CREATE_INDEX_INPUT_RESULTS_SQL)
         self._logger.info('Index added')
 
-    def _add_text_ngrams (self, text, minimum, maximum):
+    def _add_text_ngrams(self, text, minimum, maximum):
         """Adds n-gram data from `text` to the data store.
 
         :param text: text to get n-grams from
@@ -132,7 +132,7 @@ class DataStore:
         for size, ngrams in text.get_ngrams(minimum, maximum, skip_sizes):
             self._add_text_size_ngrams(text_id, size, ngrams)
 
-    def _add_text_record (self, text):
+    def _add_text_record(self, text):
         """Adds a Text record for `text`.
 
         :param text: text to add a record for
@@ -149,7 +149,7 @@ class DataStore:
         self._conn.commit()
         return cursor.lastrowid
 
-    def _add_text_size_ngrams (self, text_id, size, ngrams):
+    def _add_text_size_ngrams(self, text_id, size, ngrams):
         """Adds `ngrams`, that are of size `size`, to the data store.
 
         The added `ngrams` are associated with `text_id`.
@@ -172,7 +172,7 @@ class DataStore:
         self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
         self._conn.commit()
 
-    def _analyse (self, table=''):
+    def _analyse(self, table=''):
         """Analyses the database, or `table` if it is supplied.
 
         :param table: optional name of table analyse
@@ -184,7 +184,7 @@ class DataStore:
         self._logger.info('Analysis of database complete')
 
     @staticmethod
-    def _check_diff_result (row, matches, tokenize, join):
+    def _check_diff_result(row, matches, tokenize, join):
         """Returns `row`, possibly with its count changed to 0, depending on
         the status of the n-grams that compose it.
 
@@ -229,7 +229,7 @@ class DataStore:
             row[count] = 0
         return row
 
-    def counts (self, catalogue, output_fh):
+    def counts(self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving
         n-gram counts of the texts in `catalogue`.
 
@@ -248,11 +248,11 @@ class DataStore:
         cursor = self._conn.execute(query, labels)
         return self._csv(cursor, constants.COUNTS_FIELDNAMES, output_fh)
 
-    def _create_temporary_results_table (self):
+    def _create_temporary_results_table(self):
         self._conn.execute(constants.DROP_TEMPORARY_RESULTS_TABLE_SQL)
         self._conn.execute(constants.CREATE_TEMPORARY_RESULTS_TABLE_SQL)
 
-    def _csv (self, cursor, fieldnames, output_fh):
+    def _csv(self, cursor, fieldnames, output_fh):
         """Writes the rows of `cursor` in CSV format to `output_fh`
         and returns it.
 
@@ -279,7 +279,7 @@ class DataStore:
         self._logger.info('Finished outputting results')
         return output_fh
 
-    def _delete_text_ngrams (self, text_id):
+    def _delete_text_ngrams(self, text_id):
         """Deletes all n-grams associated with `text_id` from the data
         store.
 
@@ -291,7 +291,7 @@ class DataStore:
         self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
         self._conn.commit()
 
-    def _diff (self, cursor, tokenizer, output_fh):
+    def _diff(self, cursor, tokenizer, output_fh):
         """Returns output_fh with diff results that have been reduced.
 
         Uses a temporary file to store the results from `cursor`
@@ -313,10 +313,11 @@ class DataStore:
         try:
             os.remove(temp_path)
         except OSError as e:
-            self._logger.error('Failed to remove temporary file containing unreduced results: {}'.format(e))
+            self._logger.error(
+                'Failed to remove temporary file containing unreduced results: {}'.format(e))
         return output_fh
 
-    def diff (self, catalogue, tokenizer, output_fh):
+    def diff(self, catalogue, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are unique to each labelled set of texts in `catalogue`.
 
@@ -346,7 +347,7 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._diff(cursor, tokenizer, output_fh)
 
-    def diff_asymmetric (self, catalogue, prime_label, tokenizer, output_fh):
+    def diff_asymmetric(self, catalogue, prime_label, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the
         difference in n-grams between the labelled sets of texts in
         `catalogue`, limited to those texts labelled with
@@ -380,7 +381,7 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._diff(cursor, tokenizer, output_fh)
 
-    def diff_supplied (self, results_filenames, labels, tokenizer, output_fh):
+    def diff_supplied(self, results_filenames, labels, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are unique to each set of texts in `results_sets`, using
         the labels in `labels`.
@@ -408,14 +409,14 @@ class DataStore:
         cursor = self._conn.execute(query)
         return self._diff(cursor, tokenizer, output_fh)
 
-    def _drop_indices (self):
+    def _drop_indices(self):
         """Drops the database indices relating to n-grams."""
         self._logger.info('Dropping database indices')
         self._conn.execute(constants.DROP_TEXTNGRAM_INDEX_SQL)
         self._logger.info('Finished dropping database indices')
 
     @staticmethod
-    def _get_intersection_subquery (labels):
+    def _get_intersection_subquery(labels):
         # Create nested subselects.
         subquery = constants.SELECT_INTERSECT_SUB_SQL
         # The subqueries are nested in reverse order of 'size', so
@@ -428,7 +429,7 @@ class DataStore:
         return subquery
 
     @staticmethod
-    def _get_placeholders (items):
+    def _get_placeholders(items):
         """Returns a string of placeholders, one for each item in
         `items`.
 
@@ -439,7 +440,7 @@ class DataStore:
         """
         return ('?,' * len(items)).strip(',')
 
-    def _get_text_id (self, text):
+    def _get_text_id(self, text):
         """Returns the database ID of the Text record for `text`.
 
         This may require creating such a record.
@@ -469,7 +470,7 @@ class DataStore:
                 self._delete_text_ngrams(text_id)
         return text_id
 
-    def _has_ngrams (self, text_id, size):
+    def _has_ngrams(self, text_id, size):
         """Returns True if a text has existing records for n-grams of
         size `size`.
 
@@ -485,7 +486,7 @@ class DataStore:
             return False
         return True
 
-    def _initialise_database (self):
+    def _initialise_database(self):
         """Creates the database schema.
 
         This will not create tables or indices that already exist and
@@ -499,7 +500,7 @@ class DataStore:
         self._conn.execute(constants.CREATE_INDEX_TEXTHASNGRAM_SQL)
         self._conn.execute(constants.CREATE_INDEX_TEXT_SQL)
 
-    def intersection (self, catalogue, output_fh):
+    def intersection(self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving the
         intersection in n-grams of the labelled sets of texts in
         `catalogue`.
@@ -525,7 +526,7 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def intersection_supplied (self, results_filenames, labels, output_fh):
+    def intersection_supplied(self, results_filenames, labels, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
         that are common to every set of texts in `results_sets`, using
         the labels in `labels`.
@@ -549,14 +550,14 @@ class DataStore:
         cursor = self._conn.execute(query, parameters)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def _log_query_plan (self, query, parameters):
+    def _log_query_plan(self, query, parameters):
         cursor = self._conn.execute('EXPLAIN QUERY PLAN ' + query, parameters)
         query_plan = 'Query plan:\n'
         for row in cursor.fetchall():
             query_plan += '|'.join([str(value) for value in row]) + '\n'
         self._logger.debug(query_plan)
 
-    def _reduce_diff_results (self, matches_path, tokenizer, output_fh):
+    def _reduce_diff_results(self, matches_path, tokenizer, output_fh):
         """Returns `output_fh` populated with a reduced set of data from
         `matches_fh`.
 
@@ -609,7 +610,8 @@ class DataStore:
                     previous_matches = group.apply(
                         self._check_diff_result, axis=1,
                         args=(previous_data, tokenize, join))
-                    reduced_count = len(previous_matches[previous_matches[constants.COUNT_FIELDNAME] != 0].index)
+                    reduced_count = len(previous_matches[previous_matches[
+                                        constants.COUNT_FIELDNAME] != 0].index)
                 self._logger.debug('Reduced down to {} grams'.format(
                     reduced_count))
             # Put the previous matches into a form that is more
@@ -626,7 +628,7 @@ class DataStore:
                                index=False)
         return output_fh
 
-    def search (self, catalogue, ngrams, output_fh):
+    def search(self, catalogue, ngrams, output_fh):
         """Returns `output_fh` populated with CSV results for each witness
         that contains at least one of the n-grams in `ngrams`.
 
@@ -649,7 +651,7 @@ class DataStore:
         cursor = self._conn.execute(query)
         return self._csv(cursor, constants.SEARCH_FIELDNAMES, output_fh)
 
-    def _set_labels (self, catalogue):
+    def _set_labels(self, catalogue):
         """Returns a dictionary of the unique labels in `catalogue` and the
         number of their associated texts, and sets the record of each
         Text to the corresponding label.
@@ -677,7 +679,7 @@ class DataStore:
         return labels
 
     @staticmethod
-    def _sort_labels (label_data):
+    def _sort_labels(label_data):
         """Returns the labels in `label_data` sorted in descending order
         according to the 'size' (total token count) of their referent
         corpora.
@@ -691,7 +693,7 @@ class DataStore:
         labels.sort(key=label_data.get, reverse=True)
         return labels
 
-    def _update_text_record (self, text, text_id):
+    def _update_text_record(self, text, text_id):
         """Updates the record with `text_id` with `text`\'s checksum and
         token count.
 
@@ -707,7 +709,7 @@ class DataStore:
                            [checksum, token_count, text_id])
         self._conn.commit()
 
-    def validate (self, corpus, catalogue):
+    def validate(self, corpus, catalogue):
         """Returns True if all of the files labelled in `catalogue`
         are up-to-date in the database.
 

@@ -16,12 +16,12 @@ class Corpus:
 
     """
 
-    def __init__ (self, path, tokenizer):
+    def __init__(self, path, tokenizer):
         self._logger = logging.getLogger(__name__)
         self._path = os.path.abspath(path)
         self._tokenizer = tokenizer
 
-    def get_sigla (self, name):
+    def get_sigla(self, name):
         """Returns a list of all of the sigla for the named text.
 
         :param name: name of text
@@ -32,7 +32,7 @@ class Corpus:
         return [os.path.splitext(os.path.basename(path))[0]
                 for path in glob.glob(os.path.join(self._path, name, '*.txt'))]
 
-    def get_text (self, name, siglum):
+    def get_text(self, name, siglum):
         """Returns a `Text` representing the file associated with `name` and
         `siglum`.
 
@@ -52,7 +52,7 @@ class Corpus:
             content = text.read()
         return Text(name, siglum, content, self._tokenizer)
 
-    def get_texts (self, name='*'):
+    def get_texts(self, name='*'):
         """Returns a generator supplying `Text` objects for each file
         in the corpus.
 

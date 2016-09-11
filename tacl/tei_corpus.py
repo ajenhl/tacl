@@ -48,7 +48,7 @@ class TEICorpus:
 
     xslt = ''
 
-    def __init__ (self, input_dir, output_dir):
+    def __init__(self, input_dir, output_dir):
         self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
@@ -56,7 +56,7 @@ class TEICorpus:
             self.xslt))
         self.transform = etree.XSLT(etree.parse(xslt_filename))
 
-    def _assemble_parts (self, text_name, paths):
+    def _assemble_parts(self, text_name, paths):
         parts = list(paths.keys())
         parts.sort()
         # If the whitespace between tags in the supplied document is
@@ -71,7 +71,7 @@ class TEICorpus:
             corpus_root.append(xml_part)
         return corpus_root
 
-    def _assemble_part_list (self):
+    def _assemble_part_list(self):
         # The CBETA texts are organised into directories, and each
         # text may be in multiple numbered parts. Crucially, these
         # parts may be split over multiple directories. Since it is
@@ -94,10 +94,10 @@ class TEICorpus:
                             dirpath, filename)
         return texts
 
-    def _extract_text_name (self, filename):
+    def _extract_text_name(self, filename):
         raise NotImplementedError
 
-    def get_witnesses (self, source_tree):
+    def get_witnesses(self, source_tree):
         """Returns a sorted list of all witnesses of variant readings in
         `source_tree`, and the elements that bear @wit attributes.
 
@@ -120,10 +120,10 @@ class TEICorpus:
                     witnesses.add(witness)
         return sorted(witnesses), bearers
 
-    def _handle_resps (self, root):
+    def _handle_resps(self, root):
         raise NotImplementedError
 
-    def _handle_witnesses (self, root):
+    def _handle_witnesses(self, root):
         """Returns `root` with a witness list added to the TEI header and @wit
         values changed to references."""
         witnesses, bearers = self.get_witnesses(root)
@@ -142,13 +142,13 @@ class TEICorpus:
             self._update_refs(root, bearers, 'wit', full_siglum, xml_id)
         return root
 
-    def _output_text (self, text_name, root):
+    def _output_text(self, text_name, root):
         """Saves the TEI XML document `root` at the path `text_name`."""
         output_filename = os.path.join(self._output_dir, text_name)
         tree = etree.ElementTree(root)
         tree.write(output_filename, encoding='utf-8', pretty_print=True)
 
-    def _populate_header (self, root):
+    def _populate_header(self, root):
         """Populate the teiHeader of the teiCorpus with useful information
         from the teiHeader of the first TEI part."""
         # If this gets more complicated, it should be handled via an XSLT.
@@ -171,7 +171,7 @@ class TEICorpus:
             pass
         return root
 
-    def tidy (self):
+    def tidy(self):
         if not os.path.exists(self._output_dir):
             try:
                 os.makedirs(self._output_dir)
@@ -187,10 +187,10 @@ class TEICorpus:
             root = self._handle_witnesses(root)
             self._output_text(text_name, root)
 
-    def _tidy (self, *args, **kwargs):
+    def _tidy(self, *args, **kwargs):
         raise NotImplementedError
 
-    def _update_refs (self, root, bearers, attribute, ref_text, xml_id):
+    def _update_refs(self, root, bearers, attribute, ref_text, xml_id):
         """Change `ref_text` on `bearers` to xml:id references.
 
         :param root: root of TEI document
@@ -221,7 +221,7 @@ class TEICorpusCBETA2011 (TEICorpus):
     xslt = 'prepare_tei_cbeta_2011.xsl'
 
     @staticmethod
-    def _correct_entity_file (file_path):
+    def _correct_entity_file(file_path):
         """Adds an unused entity declaration to the entity file for
         `file_path`, in the hopes that this will make it not cause a
         validation failure."""
@@ -234,7 +234,7 @@ class TEICorpusCBETA2011 (TEICorpus):
             output_file.write(text)
             output_file.write(b'<!ENTITY DUMMY_ENTITY "" >')
 
-    def _extract_text_name (self, filename):
+    def _extract_text_name(self, filename):
         """Returns the name of the text in `filename`.
 
         Many texts are divided into multiple parts that need to be
@@ -250,11 +250,11 @@ class TEICorpusCBETA2011 (TEICorpus):
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
         return text_name, int(match.group('part'))
 
-    def _handle_resps (self, root):
+    def _handle_resps(self, root):
         # Resp information is not extracted for 2011 CBETA files.
         return root
 
-    def _tidy (self, text_name, file_path, tried=False):
+    def _tidy(self, text_name, file_path, tried=False):
         """Transforms the file at `file_path` into simpler XML and returns
         it."""
         output_file = os.path.join(self._output_dir, text_name)
@@ -287,7 +287,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<text>[A-Z]?\d+)(?P<part>[A-Za-z]?)$')
     xslt = 'prepare_tei_cbeta_github.xsl'
 
-    def _extract_text_name (self, filename):
+    def _extract_text_name(self, filename):
         """Returns the name of the text in `filename`.
 
         Some texts are divided into multiple parts that need to be
@@ -307,7 +307,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
         return text_name, match.group('part')
 
-    def get_resps (self, source_tree):
+    def get_resps(self, source_tree):
         """Returns a sorted list of all resps in `source_tree`, and the
         elements that bear @resp attributes.
 
@@ -325,7 +325,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
                     resps.add(tuple(resp.split('|', maxsplit=1)))
         return sorted(resps), bearers
 
-    def _handle_resps (self, root):
+    def _handle_resps(self, root):
         """Returns `root` with a resp list added to the TEI header and @resp
         values changed to references."""
         resps, bearers = self.get_resps(root)
@@ -348,8 +348,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._update_refs(root, bearers, 'resp', resp_data, xml_id)
         return root
 
-    def _tidy (self, text_name, file_path):
-
+    def _tidy(self, text_name, file_path):
         """Transforms the file at `file_path` into simpler XML and returns
         that.
 

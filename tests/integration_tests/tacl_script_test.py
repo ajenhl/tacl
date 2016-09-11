@@ -22,7 +22,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
 
     """
 
-    def setUp (self):
+    def setUp(self):
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data')
         self._corpus_dir = os.path.join(self._data_dir, 'stripped')
         self._db_path = os.path.join(self._data_dir, 'test.db')
@@ -37,14 +37,14 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, self._corpus_dir, minimum, maximum)
         self._ngrams_command_args = shlex.split(ngrams_command)
         if os.path.exists(self._db_path):
-            raise Exception('{} exists; aborting tests that would create ' \
-                                'this file'.format(self._db_path))
+            raise Exception('{} exists; aborting tests that would create '
+                            'this file'.format(self._db_path))
 
-    def tearDown (self):
+    def tearDown(self):
         if os.path.exists(self._db_path):
             os.remove(self._db_path)
 
-    def test_add_ngrams_cbeta (self):
+    def test_add_ngrams_cbeta(self):
         subprocess.call(self._ngrams_command_args)
         conn = sqlite3.connect(self._db_path)
         actual_rows = conn.execute(
@@ -175,7 +175,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_add_ngrams_pagel (self):
+    def test_add_ngrams_pagel(self):
         ngrams_command = 'tacl ngrams -t {} {} {} {} {}'.format(
             constants.TOKENIZER_CHOICE_PAGEL, self._db_path,
             self._corpus_dir, 1, 3)
@@ -236,7 +236,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_counts (self):
+    def test_counts(self):
         subprocess.call(self._ngrams_command_args)
         counts_command = 'tacl counts {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
@@ -263,7 +263,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T5', 'base', '3', '2', '2', '4', 'A')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff (self):
+    def test_diff(self):
         subprocess.call(self._ngrams_command_args)
         diff_command = 'tacl diff {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
@@ -285,7 +285,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff_asymmetric (self):
+    def test_diff_asymmetric(self):
         subprocess.call(self._ngrams_command_args)
         diff_command = 'tacl diff -a {} {} {} {}'.format(
             'A', self._db_path, self._corpus_dir, self._catalogue_path)
@@ -303,7 +303,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_diff_supplied (self):
+    def test_diff_supplied(self):
         supplied_dir = os.path.join(self._data_dir, 'supplied_input')
         results1 = os.path.join(supplied_dir, 'diff_input_1.csv')
         results2 = os.path.join(supplied_dir, 'diff_input_2.csv')
@@ -327,7 +327,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('人子', '2', 'T0007', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_intersection (self):
+    def test_intersection(self):
         subprocess.call(self._ngrams_command_args)
         intersect_command = 'tacl intersect {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
@@ -351,7 +351,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('th', '2', 'T3', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_intersection_supplied (self):
+    def test_intersection_supplied(self):
         supplied_dir = os.path.join(self._data_dir, 'supplied_input')
         results1 = os.path.join(supplied_dir, 'intersect_input_1.csv')
         results2 = os.path.join(supplied_dir, 'intersect_input_2.csv')
@@ -371,7 +371,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('[月*劦]生', '2', 'T0053', '大', '2', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_search (self):
+    def test_search(self):
         subprocess.call(self._ngrams_command_args)
         search_command = 'tacl search {} {} {}'.format(
             self._db_path, self._corpus_dir, self._ngrams_path)
@@ -389,7 +389,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T4', 'base', '1', '', 'he', '1')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_search_with_catalogue (self):
+    def test_search_with_catalogue(self):
         subprocess.call(self._ngrams_command_args)
         catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
         search_command = 'tacl search -c {} {} {} {}'.format(

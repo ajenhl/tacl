@@ -23,7 +23,7 @@ class Results:
 
     """
 
-    def __init__ (self, matches, tokenizer):
+    def __init__(self, matches, tokenizer):
         self._logger = logging.getLogger(__name__)
         self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
         # Work around a problem with CSV files produced on Windows
@@ -32,7 +32,7 @@ class Results:
         self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
 
-    def add_label_count (self):
+    def add_label_count(self):
         """Adds to each result row a count of the number occurrences of that
         n-gram across all texts within the label.
 
@@ -41,7 +41,7 @@ class Results:
         """
         self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
 
-        def add_label_count (df):
+        def add_label_count(df):
             # For each n-gram and label pair, we need the maximum count
             # among all witnesses to each text, and then the sum of those
             # across all texts.
@@ -54,7 +54,7 @@ class Results:
             [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME]).apply(
                 add_label_count)
 
-    def collapse_witnesses (self):
+    def collapse_witnesses(self):
         """Groups together witnesses for the same n-gram and text that has the
         same count, and outputs a single row for each group.
 
@@ -71,7 +71,7 @@ class Results:
             [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
              constants.COUNT_FIELDNAME], sort=False)
 
-        def merge_sigla (df):
+        def merge_sigla(df):
             # Take the first result row arbitrarily; only the siglum
             # should differ between them.
             merged = df[0:1]
@@ -87,7 +87,7 @@ class Results:
         self._matches = grouped.apply(merge_sigla)
         del self._matches[constants.SIGLUM_FIELDNAME]
 
-    def csv (self, fh):
+    def csv(self, fh):
         """Writes the report data to `fh` in CSV format and returns it.
 
         :param fh: file to write data to
@@ -99,7 +99,7 @@ class Results:
                              index=False)
         return fh
 
-    def extend (self, corpus):
+    def extend(self, corpus):
         """Adds rows for all longer forms of n-grams in the results that are
         present in the witnesses.
 
@@ -134,7 +134,7 @@ class Results:
         cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
                 constants.LABEL_FIELDNAME]
         for index, (text_name, siglum, label) in \
-            matches[cols].drop_duplicates().iterrows():
+                matches[cols].drop_duplicates().iterrows():
             extended_ngrams = self._generate_extended_ngrams(
                 matches, text_name, siglum, label, corpus, highest_n)
             extended_matches = pd.concat(
@@ -147,8 +147,8 @@ class Results:
             extended_matches = self._reciprocal_remove(extended_matches)
         self._matches = self._matches.append(extended_matches)
 
-    def _generate_extended_matches (self, extended_ngrams, highest_n, name,
-                                    siglum, label):
+    def _generate_extended_matches(self, extended_ngrams, highest_n, name,
+                                   siglum, label):
         """Returns extended match data derived from `extended_ngrams`.
 
         This extended match data are the counts for all intermediate
@@ -201,8 +201,8 @@ class Results:
                 groupby_fields).sum().reset_index()
         return extended_matches
 
-    def _generate_extended_ngrams (self, matches, name, siglum, label, corpus,
-                                   highest_n):
+    def _generate_extended_ngrams(self, matches, name, siglum, label, corpus,
+                                  highest_n):
         """Returns the n-grams of the largest size that exist in `siglum`
         witness to `name` text under `label`, generated from adding
         together overlapping n-grams in `matches`.
@@ -296,7 +296,7 @@ class Results:
                            '{} distinct n-grams exist'.format(len(ngrams)))
         return ngrams
 
-    def _generate_substrings (self, ngram, size):
+    def _generate_substrings(self, ngram, size):
         """Returns a list of all substrings of `ngram`.
 
         :param ngram: n-gram to generate substrings of
@@ -314,7 +314,7 @@ class Results:
         return substrings
 
     @staticmethod
-    def _is_intersect_results (results):
+    def _is_intersect_results(results):
         """Returns False if `results` has an n-gram that exists in only one
         label, True otherwise.
 
@@ -329,7 +329,7 @@ class Results:
         return not(results[(results[constants.NGRAM_FIELDNAME] == ngram) &
                            (results[constants.LABEL_FIELDNAME] != label)].empty)
 
-    def prune_by_ngram (self, ngrams):
+    def prune_by_ngram(self, ngrams):
         """Removes results rows whose n-gram is in `ngrams`.
 
         :param ngrams: n-grams to remove
@@ -340,7 +340,7 @@ class Results:
         self._matches = self._matches[
             ~self._matches[constants.NGRAM_FIELDNAME].isin(ngrams)]
 
-    def prune_by_ngram_count (self, minimum=None, maximum=None):
+    def prune_by_ngram_count(self, minimum=None, maximum=None):
         """Removes results rows whose total n-gram count (across all
         texts bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
@@ -355,7 +355,8 @@ class Results:
 
         """
         self._logger.info('Pruning results by n-gram count')
-        def calculate_total (group):
+
+        def calculate_total(group):
             text_grouped = group.groupby(constants.NAME_FIELDNAME)
             total_count = text_grouped[constants.COUNT_FIELDNAME].max().sum()
             group['total_count'] = pd.Series([total_count] * len(group.index),
@@ -371,7 +372,7 @@ class Results:
                 self._matches['total_count'] <= maximum]
         del self._matches['total_count']
 
-    def prune_by_ngram_count_per_text (self, minimum=None, maximum=None):
+    def prune_by_ngram_count_per_text(self, minimum=None, maximum=None):
         """Removes results rows if the n-gram count for all texts bearing that
         n-gram is outside the range specified by `minimum` and
         `maximum`.
@@ -407,7 +408,7 @@ class Results:
             self._matches = self._matches[self._matches[
                 constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
 
-    def prune_by_ngram_size (self, minimum=None, maximum=None):
+    def prune_by_ngram_size(self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
         range specified by `minimum` and `maximum`.
 
@@ -425,7 +426,7 @@ class Results:
             self._matches = self._matches[
                 self._matches[constants.SIZE_FIELDNAME] <= maximum]
 
-    def prune_by_text_count (self, minimum=None, maximum=None):
+    def prune_by_text_count(self, minimum=None, maximum=None):
         """Removes results rows for n-grams that are not attested in a
         number of texts in the range specified by `minimum` and
         `maximum`.
@@ -456,21 +457,21 @@ class Results:
                                  right_index=True)
         del self._matches[count_fieldname]
 
-    def reciprocal_remove (self):
+    def reciprocal_remove(self):
         """Removes results rows for which the n-gram is not present in
         at least one text in each labelled set of texts."""
         self._logger.info(
             'Removing n-grams that are not attested in all labels')
         self._matches = self._reciprocal_remove(self._matches)
 
-    def _reciprocal_remove (self, matches):
+    def _reciprocal_remove(self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
         filtered = matches[matches[constants.COUNT_FIELDNAME] > 0]
         grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
         return grouped.filter(
             lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 
-    def reduce (self):
+    def reduce(self):
         """Removes results rows whose n-grams are contained in larger
         n-grams."""
         self._logger.info('Reducing the n-grams')
@@ -513,7 +514,7 @@ class Results:
         else:
             self._matches = pd.DataFrame()
 
-    def _reduce_by_ngram (self, data, ngram):
+    def _reduce_by_ngram(self, data, ngram):
         """Lowers the counts of all n-grams in `data` that are
         substrings of `ngram` by `ngram`\'s count.
 
@@ -536,7 +537,7 @@ class Results:
             else:
                 substring_data['count'] -= count
 
-    def remove_label (self, label):
+    def remove_label(self, label):
         """Removes all results rows associated with `label`.
 
         :param label: label to filter results on
@@ -549,7 +550,7 @@ class Results:
             self._matches[constants.LABEL_FIELDNAME] != label]
         self._logger.info('Removed {} labelled results'.format(count))
 
-    def sort (self):
+    def sort(self):
         """Sorts all results rows.
 
         Sorts by: size (descending), n-gram, count (descending), label,
@@ -562,7 +563,7 @@ class Results:
                 constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME],
             ascending=[False, True, False, True, True, True], inplace=True)
 
-    def zero_fill (self, corpus, catalogue):
+    def zero_fill(self, corpus, catalogue):
         """Adds rows to the results to ensure that, for every n-gram that is
         attested in at least one witness, every witness for that text
         has a row, with added rows having a count of zero.

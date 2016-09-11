@@ -10,12 +10,12 @@ from ..tacl_test_case import TaclTestCase
 
 class StatisticsReportIntegrationTestCase (TaclTestCase):
 
-    def setUp (self):
+    def setUp(self):
         base_dir = os.path.dirname(__file__)
         self._data_dir = os.path.join(base_dir, 'stats_data')
         self._stripped_dir = os.path.join(self._data_dir, 'stripped')
 
-    def test_generate_statistics (self):
+    def test_generate_statistics(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                    tacl.constants.TOKENIZER_JOINER_CBETA)
         corpus = tacl.Corpus(self._stripped_dir, tokenizer)

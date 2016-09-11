@@ -6,18 +6,18 @@ import tacl
 
 class TextIntegrationTestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
-    def test_get_checksum (self):
+    def test_get_checksum(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.Text('test', 'base', content, self._tokenizer)
         actual_checksum = text.get_checksum()
         expected_checksum = 'b8f33a481780c4128c1b852488cede88'
         self.assertEqual(actual_checksum, expected_checksum)
 
-    def test_get_filename (self):
+    def test_get_filename(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         filename = 'test/base.txt'
         text = tacl.Text('test', 'base', content, self._tokenizer)
@@ -25,7 +25,7 @@ class TextIntegrationTestCase (unittest.TestCase):
         expected_filename = filename
         self.assertEqual(actual_filename, expected_filename)
 
-    def test_get_ngrams (self):
+    def test_get_ngrams(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.Text('test', 'base', content, self._tokenizer)
         expected_ngrams = [
@@ -42,14 +42,14 @@ class TextIntegrationTestCase (unittest.TestCase):
             self.assertEqual(actual[0], expected[0])
             self.assertEqual(actual[1], collections.Counter(expected[1]))
 
-    def test_get_token_content_cbeta (self):
+    def test_get_token_content_cbeta(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.Text('test', 'base', content, self._tokenizer)
         expected_content = '阿闍世[(禾*尤)\n/上/日]首佛足敬強阿闍世耶又'
         actual_content = text.get_token_content()
         self.assertEqual(actual_content, expected_content)
 
-    def test_get_token_content_pagel (self):
+    def test_get_token_content_pagel(self):
         content = "bka' stsal pa  | rigs kyi\nbu dag de'i || rigs kyi"
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)
@@ -58,7 +58,7 @@ class TextIntegrationTestCase (unittest.TestCase):
         actual_content = text.get_token_content()
         self.assertEqual(actual_content, expected_content)
 
-    def test_get_tokens_cbeta (self):
+    def test_get_tokens_cbeta(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.Text('test', 'base', content, self._tokenizer)
         expected_tokens = ['阿', '闍', '世', '[(禾*尤)\n/上/日]', '首', '佛',
@@ -66,7 +66,7 @@ class TextIntegrationTestCase (unittest.TestCase):
         actual_tokens = text.get_tokens()
         self.assertEqual(actual_tokens, expected_tokens)
 
-    def test_get_tokens_pagel (self):
+    def test_get_tokens_pagel(self):
         content = "bka' stsal pa | rigs kyi\nbu dag de'i || rigs kyi"
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,
                                    tacl.constants.TOKENIZER_JOINER_PAGEL)

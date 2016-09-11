@@ -9,7 +9,7 @@ import tacl
 
 class TEICorpusIntegrationTestCase (unittest.TestCase):
 
-    def setUp (self):
+    def setUp(self):
         base_dir = os.path.dirname(__file__)
         self._data_dir = os.path.join(base_dir, 'data')
         self._cbeta_xml_dir = os.path.join(self._data_dir, 'cbeta_xml',
@@ -29,12 +29,12 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
         shutil.copytree(self._cbeta_xml_dir, self._xml_dir)
         self.maxDiff = None
 
-    def tearDown (self):
+    def tearDown(self):
         for path in (self._xml_dir, self._actual_output_dir):
             if os.path.exists(path):
                 shutil.rmtree(path)
 
-    def check_tidy_results (self, expected_files):
+    def check_tidy_results(self, expected_files):
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             expected_path = os.path.join(self._expected_output_dir, filename)
@@ -56,11 +56,11 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
 
 class TEICorpusCBETA2011IntegrationTestCase (TEICorpusIntegrationTestCase):
 
-    def setUp (self):
+    def setUp(self):
         self._corpus_name = '2011'
         super().setUp()
 
-    def test_tidy (self):
+    def test_tidy(self):
         corpus = tacl.TEICorpusCBETA2011(self._xml_dir, self._actual_output_dir)
         corpus.tidy()
         expected_files = ['T0001.xml', 'T0002.xml', 'T0003.xml']
@@ -69,11 +69,11 @@ class TEICorpusCBETA2011IntegrationTestCase (TEICorpusIntegrationTestCase):
 
 class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):
 
-    def setUp (self):
+    def setUp(self):
         self._corpus_name = 'github'
         super().setUp()
 
-    def test_tidy (self):
+    def test_tidy(self):
         corpus = tacl.TEICorpusCBETAGitHub(self._xml_dir,
                                            self._actual_output_dir)
         corpus.tidy()

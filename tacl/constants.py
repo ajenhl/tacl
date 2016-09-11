@@ -201,6 +201,13 @@ INTERSECT_EPILOG = '''\
 ''' + ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
+JITC_DESCRIPTION = '''\
+    Generate a report showing the amount of overlap between a set of
+    texts, ignoring those parts that overlap with texts in a second
+    set of texts.'''
+JITC_LABEL_HELP = 'Label of texts to compare with each other'
+JITC_OUTPUT_HELP = 'Directory to output results into'
+
 NGRAMS_CATALOGUE_HELP = '''\
     Path to a catalogue file used to restrict which texts in the
     corpus are added'''

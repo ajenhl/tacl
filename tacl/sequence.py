@@ -13,11 +13,11 @@ from . import constants
 
 class Sequence:
 
-    def __init__ (self, alignment, substitutes):
+    def __init__(self, alignment, substitutes):
         self._alignment = alignment
         self._substitutes = substitutes
 
-    def _format_alignment (self, a1, a2):
+    def _format_alignment(self, a1, a2):
         html = []
         for index, char in enumerate(a1):
             output = self._substitutes.get(char, char)
@@ -27,7 +27,7 @@ class Sequence:
                 html.append(output)
         return ''.join(html)
 
-    def render (self):
+    def render(self):
         """Returns a tuple of HTML fragments rendering each element of the
         sequence."""
         f1 = self._format_alignment(self._alignment[0], self._alignment[1])
@@ -37,15 +37,15 @@ class Sequence:
 
 class Sequencer:
 
-    def __init__ (self, corpus, tokenizer, results, output_dir):
+    def __init__(self, corpus, tokenizer, results, output_dir):
         self._logger = logging.getLogger(__name__)
         self._corpus = corpus
         self._tokenizer = tokenizer
         self._matches = pd.read_csv(results, encoding='utf-8', na_filter=False)
         self._output_dir = output_dir
 
-    def _generate_sequence (self, t1, t1_span, t2, t2_span, context_length,
-                            covered_spans):
+    def _generate_sequence(self, t1, t1_span, t2, t2_span, context_length,
+                           covered_spans):
         old_length = 0
         self._logger.debug('Match found; generating new sequence')
         while True:
@@ -69,7 +69,7 @@ class Sequencer:
         covered_spans[1].append(span2)
         return Sequence(alignment, self._r_substitutes)
 
-    def generate_sequences (self, minimum_size):
+    def generate_sequences(self, minimum_size):
         """Generates sequence reports and writes them to the output directory.
 
         :param minimum_size: minimum size of n-grams to create sequences for
@@ -81,30 +81,38 @@ class Sequencer:
         template = env.get_template('sequence.html')
         # Get a list of the files in the matches, grouped by label
         # (ordered by number of texts).
-        labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[constants.NAME_FIELDNAME].nunique().index)
-        ngrams = self._matches[self._matches[constants.SIZE_FIELDNAME] >= minimum_size].sort(constants.SIZE_FIELDNAME, ascending=False)[constants.NGRAM_FIELDNAME].unique()
+        labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[
+            constants.NAME_FIELDNAME].nunique().index)
+        ngrams = self._matches[
+            self._matches[constants.SIZE_FIELDNAME] >= minimum_size].sort(
+                constants.SIZE_FIELDNAME, ascending=False)[
+                    constants.NGRAM_FIELDNAME].unique()
         for index, primary_label in enumerate(labels):
             for secondary_label in labels[index+1:]:
-                self._generate_sequences(primary_label, secondary_label, ngrams,
-                                         template)
+                self._generate_sequences(primary_label, secondary_label,
+                                         ngrams, template)
 
-    def _generate_sequences (self, primary_label, secondary_label, ngrams,
-                             template):
+    def _generate_sequences(self, primary_label, secondary_label, ngrams,
+                            template):
         self._substitutes = {}
         self._char_code = 61440
         cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME]
-        primary_texts = self._matches[self._matches[constants.LABEL_FIELDNAME] == primary_label][cols].drop_duplicates()
-        secondary_texts = self._matches[self._matches[constants.LABEL_FIELDNAME] == secondary_label][cols].drop_duplicates()
+        primary_texts = self._matches[self._matches[
+            constants.LABEL_FIELDNAME] == primary_label][
+                cols].drop_duplicates()
+        secondary_texts = self._matches[self._matches[
+            constants.LABEL_FIELDNAME] == secondary_label][
+                cols].drop_duplicates()
         for index, (name1, siglum1) in primary_texts.iterrows():
             text1 = self._get_text(name1, siglum1)
             label1 = '{}_{}'.format(name1, siglum1)
             for index, (name2, siglum2) in secondary_texts.iterrows():
                 text2 = self._get_text(name2, siglum2)
                 label2 = '{}_{}'.format(name2, siglum2)
-                self._generate_sequences_for_texts(label1, text1, label2, text2,
-                                                   ngrams, template)
+                self._generate_sequences_for_texts(label1, text1, label2,
+                                                   text2, ngrams, template)
 
-    def _generate_sequences_for_texts (self, l1, t1, l2, t2, ngrams, template):
+    def _generate_sequences_for_texts(self, l1, t1, l2, t2, ngrams, template):
         self._r_substitutes = dict((v, k) for k, v in self._substitutes.items())
         sequences = []
         covered_spans = [[], []]
@@ -122,7 +130,7 @@ class Sequencer:
             with open(output_name, 'w', encoding='utf-8') as fh:
                 fh.write(html)
 
-    def _generate_sequences_for_ngram (self, t1, t2, ngram, covered_spans):
+    def _generate_sequences_for_ngram(self, t1, t2, ngram, covered_spans):
         self._logger.debug('Generating sequences for n-gram "{}"'.format(ngram))
         pattern = re.compile(re.escape(ngram))
         context_length = len(ngram)
@@ -132,7 +140,8 @@ class Sequencer:
         for t1_span in t1_spans:
             for t2_span in t2_spans:
                 if self._is_inside(t1_span, t2_span, covered_spans):
-                    self._logger.debug('Skipping match due to existing coverage')
+                    self._logger.debug(
+                        'Skipping match due to existing coverage')
                     continue
                 sequence = self._generate_sequence(
                     t1, t1_span, t2, t2_span, context_length, covered_spans)
@@ -140,7 +149,7 @@ class Sequencer:
                     sequences.append(sequence.render())
         return sequences
 
-    def _get_text (self, name, siglum):
+    def _get_text(self, name, siglum):
         """Returns the text identified by `name` and `siglum`, with all []
         tokens replaced with a single character. Substitutions are
         recorded in self._substitutes.
@@ -156,12 +165,12 @@ class Sequencer:
                 tokens[i] = substitute
         return self._tokenizer.joiner.join(tokens)
 
-    def _get_text_sequence (self, text, span, context_length):
+    def _get_text_sequence(self, text, span, context_length):
         start = max(0, span[0] - context_length)
         end = min(len(text), span[1] + context_length)
         return text[start:end], (start, end)
 
-    def _is_inside (self, span1, span2, covered_spans):
+    def _is_inside(self, span1, span2, covered_spans):
         """Returns True if both `span1` and `span2` fall within
         `covered_spans`."""
         if self._is_span_inside(span1, covered_spans[0]) and \
@@ -169,7 +178,7 @@ class Sequencer:
             return True
         return False
 
-    def _is_span_inside (self, span, covered_spans):
+    def _is_span_inside(self, span, covered_spans):
         start = span[0]
         end = span[1]
         for c_start, c_end in covered_spans:

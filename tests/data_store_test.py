@@ -17,14 +17,14 @@ class DataStoreTestCase (TaclTestCase):
 
     """Unit tests of the DataStore class."""
 
-    def test_add_indices (self):
+    def test_add_indices(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._add_indices()
         store._conn.execute.assert_called_once_with(
             tacl.constants.CREATE_INDEX_TEXTNGRAM_SQL)
 
-    def test_add_ngrams (self):
+    def test_add_ngrams(self):
         add_indices = self._create_patch('tacl.DataStore._add_indices')
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
@@ -43,7 +43,7 @@ class DataStoreTestCase (TaclTestCase):
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
-    def test_add_ngrams_with_catalogue (self):
+    def test_add_ngrams_with_catalogue(self):
         add_indices = self._create_patch('tacl.DataStore._add_indices')
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
@@ -69,7 +69,7 @@ class DataStoreTestCase (TaclTestCase):
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
-    def test_add_temporary_ngrams (self):
+    def test_add_temporary_ngrams(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._add_temporary_ngrams([sentinel.ngram1, sentinel.ngram2])
@@ -80,7 +80,7 @@ class DataStoreTestCase (TaclTestCase):
              call.executemany(tacl.constants.INSERT_TEMPORARY_NGRAM_SQL,
                               [(sentinel.ngram1,), (sentinel.ngram2,)])])
 
-    def test_add_temporary_ngrams_twice (self):
+    def test_add_temporary_ngrams_twice(self):
         # Test that multiple calls to the method succeed.
         store = tacl.DataStore(':memory:')
         input_ngrams = ['禁律', '律藏也']
@@ -96,7 +96,7 @@ class DataStoreTestCase (TaclTestCase):
         actual_ngrams = set([row['ngram'] for row in cursor.fetchall()])
         self.assertEqual(actual_ngrams, expected_ngrams)
 
-    def test_add_text_ngrams_existing (self):
+    def test_add_text_ngrams_existing(self):
         get_text_id = self._create_patch('tacl.DataStore._get_text_id')
         get_text_id.return_value = sentinel.text_id
         has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
@@ -115,7 +115,7 @@ class DataStoreTestCase (TaclTestCase):
         text.get_ngrams.assert_called_once_with(2, 3, [2, 3])
         add_text_size_ngrams.assert_has_calls([])
 
-    def test_add_text_ngrams_not_existing (self):
+    def test_add_text_ngrams_not_existing(self):
         get_text_id = self._create_patch('tacl.DataStore._get_text_id')
         get_text_id.return_value = sentinel.text_id
         has_ngrams = self._create_patch('tacl.DataStore._has_ngrams')
@@ -136,7 +136,7 @@ class DataStoreTestCase (TaclTestCase):
             call(store, sentinel.text_id, 2, sentinel.two_grams),
             call(store, sentinel.text_id, 3, sentinel.three_grams)])
 
-    def test_add_text_record (self):
+    def test_add_text_record(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock()
         text = MagicMock(spec_set=tacl.Text)
@@ -157,7 +157,7 @@ class DataStoreTestCase (TaclTestCase):
         store._conn.commit.assert_called_once_with()
         self.assertEqual(actual_text_id, sentinel.text_id)
 
-    def test_add_text_size_ngrams (self):
+    def test_add_text_size_ngrams(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         size = 1
@@ -172,7 +172,7 @@ class DataStoreTestCase (TaclTestCase):
                                [sentinel.text_id, 'b', size, 1]]),
              call.commit()])
 
-    def test_analyse (self):
+    def test_analyse(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._analyse()
@@ -183,7 +183,7 @@ class DataStoreTestCase (TaclTestCase):
         store._conn.execute.assert_called_once_with(
             tacl.constants.ANALYSE_SQL.format(sentinel.table))
 
-    def test_counts (self):
+    def test_counts(self):
         labels = [sentinel.label]
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
@@ -207,10 +207,10 @@ class DataStoreTestCase (TaclTestCase):
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
 
-    def test_csv (self):
+    def test_csv(self):
         pass
 
-    def test_delete_text_ngrams (self):
+    def test_delete_text_ngrams(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._delete_text_ngrams(sentinel.text_id)
@@ -222,7 +222,7 @@ class DataStoreTestCase (TaclTestCase):
             call.commit()]
         self.assertEqual(store._conn.mock_calls, expected_calls)
 
-    def test_diff (self):
+    def test_diff(self):
         labels = {sentinel.label: 2, sentinel.label2: 1}
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
@@ -251,7 +251,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertTrue(_diff.called)
         self.assertEqual(input_fh, output_fh)
 
-    def test_diff_asymmetric (self):
+    def test_diff_asymmetric(self):
         labels = {sentinel.label: 1, sentinel.prime_label: 1}
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = labels
@@ -281,7 +281,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertTrue(_diff.called)
         self.assertEqual(input_fh, output_fh)
 
-    def test_diff_asymmetric_invalid_label (self):
+    def test_diff_asymmetric_invalid_label(self):
         # Tests that the right error is raised when the supplied label
         # is not present in the catalogue.
         catalogue = {'T1': 'A', 'T2': 'B'}
@@ -294,7 +294,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.diff_asymmetric,
                           catalogue, prime_label, tokenizer, input_fh)
 
-    def test_diff_asymmetric_one_label (self):
+    def test_diff_asymmetric_one_label(self):
         catalogue = {'T1': 'A', 'T2': 'A'}
         store = tacl.DataStore(':memory:')
         input_fh = MagicMock(name='fh')
@@ -304,7 +304,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.diff_asymmetric,
                           catalogue, 'A', tokenizer, input_fh)
 
-    def test_diff_one_label (self):
+    def test_diff_one_label(self):
         catalogue = {'T1': 'A', 'T2': 'A'}
         store = tacl.DataStore(':memory:')
         output_fh = MagicMock(name='fh')
@@ -314,7 +314,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.diff, catalogue,
                           tokenizer, output_fh)
 
-    def test_diff_supplied_one_label (self):
+    def test_diff_supplied_one_label(self):
         filenames = ['a.csv']
         labels = ['A']
         store = tacl.DataStore(':memory:')
@@ -323,21 +323,21 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.diff_supplied, filenames,
                           labels, tokenizer, output_fh)
 
-    def test_drop_indices (self):
+    def test_drop_indices(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._drop_indices()
         store._conn.execute.assert_called_once_with(
             tacl.constants.DROP_TEXTNGRAM_INDEX_SQL)
 
-    def test_get_placeholders (self):
+    def test_get_placeholders(self):
         store = tacl.DataStore(':memory:')
         data = [(['A'], '?'), (['A', 'B'], '?,?'), (['A', 'B', 'C'], '?,?,?')]
         for labels, expected_placeholders in data:
             actual_placeholders = store._get_placeholders(labels)
             self.assertEqual(actual_placeholders, expected_placeholders)
 
-    def test_get_text_id (self):
+    def test_get_text_id(self):
         add_text = self._create_patch('tacl.DataStore._add_text_record')
         add_text.return_value = sentinel.new_text_id
         update_text = self._create_patch('tacl.DataStore._update_text_record')
@@ -404,7 +404,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertEqual(add_text.mock_calls, [])
         self.assertEqual(actual_text_id, sentinel.old_text_id)
 
-    def test_has_ngrams (self):
+    def test_has_ngrams(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         cursor = store._conn.execute.return_value
@@ -428,10 +428,10 @@ class DataStoreTestCase (TaclTestCase):
                           call.execute().fetchone()])
         self.assertEqual(actual_result, False)
 
-    def test_initialise_database (self):
+    def test_initialise_database(self):
         pass
 
-    def test_intersection (self):
+    def test_intersection(self):
         labels = [sentinel.label1, sentinel.label2]
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = {}
@@ -460,7 +460,7 @@ class DataStoreTestCase (TaclTestCase):
                                     input_fh)
         self.assertEqual(input_fh, output_fh)
 
-    def test_intersection_one_label (self):
+    def test_intersection_one_label(self):
         labels = [sentinel.label1]
         set_labels = self._create_patch('tacl.DataStore._set_labels')
         set_labels.return_value = {}
@@ -472,7 +472,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.intersection, catalogue,
                           output_fh)
 
-    def test_intersection_supplied_one_label (self):
+    def test_intersection_supplied_one_label(self):
         filenames = ['a.csv']
         labels = ['A']
         store = tacl.DataStore(':memory:')
@@ -480,7 +480,7 @@ class DataStoreTestCase (TaclTestCase):
         self.assertRaises(MalformedQueryError, store.intersection_supplied,
                           filenames, labels, output_fh)
 
-    def test_check_diff_result (self):
+    def test_check_diff_result(self):
         # Test the various possibilities that
         # DataStore._reduce_diff_results must handle.
         store = tacl.DataStore(':memory:')
@@ -515,7 +515,7 @@ class DataStoreTestCase (TaclTestCase):
         actual_row = store._check_diff_result(row, matches, tokenize, join)
         self.assertEqual(actual_row['count'], 0)
 
-    def test_reduce_diff_results_composed (self):
+    def test_reduce_diff_results_composed(self):
         # Consider the diff between a text "abcdefg" and
         # "abcABCDEFdGHIefg". Only fully composed n-grams (those made
         # up of two (n-1)-grams that are in the results) should be
@@ -608,7 +608,7 @@ class DataStoreTestCase (TaclTestCase):
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
 
-    def test_reduce_diff_no_overlap (self):
+    def test_reduce_diff_no_overlap(self):
         # An n-gram that does not overlap at all with any (n-1)-gram
         # should be kept:
         #   abdef vs abcbde
@@ -644,7 +644,7 @@ class DataStoreTestCase (TaclTestCase):
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
 
-    def test_reduce_diff_size (self):
+    def test_reduce_diff_size(self):
         # Consider a diff where the smallest gram for a witness is
         # larger than the smallest gram across all witnesses:
         #   abdef vs abcbdef
@@ -676,13 +676,13 @@ class DataStoreTestCase (TaclTestCase):
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
         self.assertEqual(set(actual_rows), expected_rows)
 
-    def _reduce_diff (self, store, input_data, tokenizer):
+    def _reduce_diff(self, store, input_data, tokenizer):
         in_fh = self._create_csv(input_data)
         out_fh = io.StringIO(newline='')
         return self._get_rows_from_csv(store._reduce_diff_results(
             in_fh, tokenizer, out_fh))
 
-    def test_set_labels (self):
+    def test_set_labels(self):
         catalogue = collections.OrderedDict(
             [(sentinel.text1, sentinel.label1),
              (sentinel.text2, sentinel.label2),
@@ -713,7 +713,7 @@ class DataStoreTestCase (TaclTestCase):
             self.assertIn(connection_call, store._conn.mock_calls)
         self.assertEqual(actual_labels, expected_labels)
 
-    def test_sort_labels (self):
+    def test_sort_labels(self):
         store = tacl.DataStore(':memory:')
         label_data = {sentinel.label1: 2, sentinel.label2: 3,
                       sentinel.label3: 1}
@@ -721,7 +721,7 @@ class DataStoreTestCase (TaclTestCase):
         expected_labels = [sentinel.label2, sentinel.label1, sentinel.label3]
         self.assertEqual(actual_labels, expected_labels)
 
-    def test_update_text_record (self):
+    def test_update_text_record(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         text = MagicMock(spec_set=tacl.Text)
@@ -736,7 +736,7 @@ class DataStoreTestCase (TaclTestCase):
             [sentinel.checksum, len(tokens), sentinel.text_id])
         store._conn.commit.assert_called_once_with()
 
-    def test_validate_true (self):
+    def test_validate_true(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
         text = MagicMock(spec_set=tacl.Text)
         text.get_checksum.return_value = sentinel.checksum
@@ -765,7 +765,7 @@ class DataStoreTestCase (TaclTestCase):
                           call.execute().fetchone()])
         self.assertEqual(actual_result, True)
 
-    def test_validate_missing_record (self):
+    def test_validate_missing_record(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
         text = MagicMock(spec_set=tacl.Text)
         text.get_checksum.return_value = sentinel.checksum
@@ -784,7 +784,7 @@ class DataStoreTestCase (TaclTestCase):
                           call.execute().fetchone()])
         self.assertEqual(actual_result, False)
 
-    def test_validate_mismatched_checksums (self):
+    def test_validate_mismatched_checksums(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
         text = MagicMock(spec_set=tacl.Text)
         text.get_checksum.return_value = sentinel.checksum
