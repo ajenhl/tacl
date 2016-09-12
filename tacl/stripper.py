@@ -23,7 +23,6 @@ class Stripper:
         self._output_dir = os.path.abspath(output_dir)
         xslt_filename = resource_filename(__name__, 'assets/xslt/strip_tei.xsl')
         self.transform = etree.XSLT(etree.parse(xslt_filename))
-        self._texts = {}
 
     def get_witnesses(self, source_tree):
         """Returns a list of all witnesses of variant readings in
@@ -82,7 +81,7 @@ class Stripper:
         except etree.XMLSyntaxError:
             logging.warning('XML file "{}" is invalid'.format(filename))
             return
-        witnesses = self._texts.setdefault(stripped_file_path, {})
+        witnesses = {}
         for witness, witness_id in self.get_witnesses(tei_doc):
             witness_param = "'{}'".format(witness_id)
             text = str(self.transform(tei_doc, witness_id=witness_param))
