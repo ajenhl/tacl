@@ -8,7 +8,7 @@ from lxml import etree
 import pandas as pd
 
 from . import constants
-from .text import Text
+from .text import WitnessText
 
 
 class BaseHighlighter:
@@ -35,15 +35,15 @@ class BaseHighlighter:
         content = re.sub(r'&#160; ', '&#160;&#160;', content)
         return content
 
-    def _generate_base(self, text_name, siglum):
-        text = self._corpus.get_text(text_name, siglum)
-        content = text.get_content().strip()
+    def _generate_base(self, work, siglum):
+        witness = self._corpus.get_witness(work, siglum)
+        content = witness.get_content().strip()
         return self._prepare_text(content)
 
-    def _generate_html(self, text_name, siglum, text, **kwargs):
+    def _generate_html(self, work, siglum, text, **kwargs):
         loader = PackageLoader('tacl', 'assets/templates')
         env = Environment(loader=loader)
-        text_data = {'base_name': text_name, 'base_siglum': siglum,
+        text_data = {'base_name': work, 'base_siglum': siglum,
                      'text': text}
         text_data.update(kwargs)
         template = env.get_template(self._template)
@@ -55,7 +55,7 @@ class BaseHighlighter:
             [re.escape(token) for token in self._tokenizer.tokenize(ngram)])
         return r'(<span[^>]*>{}</span>)'.format(pattern)
 
-    def highlight(self, text_name, siglum, *args):
+    def highlight(self, work, siglum, *args):
         raise NotImplementedError
 
     def _prepare_text(self, text):
@@ -90,16 +90,16 @@ class NgramHighlighter (BaseHighlighter):
                 del span.attrib['class']
         return etree.tostring(root, encoding='unicode')[5:-6]
 
-    def highlight(self, text_name, siglum, ngrams, minus_ngrams):
-        """Returns the text of `siglum` witness to `text_name` as an HTML
+    def highlight(self, work, siglum, ngrams, minus_ngrams):
+        """Returns the text of `siglum` witness to `work` as an HTML
         document with its n-grams in `ngrams` highlighted.
 
         Any n-grams in `minus_ngrams` have any highlighting of them
         (or subsets of them) removed.
 
-        :param text_name: name of text to highlight
-        :type text_name: `str`
-        :param siglum: siglum of text to highlight
+        :param work: name of work to highlight
+        :type work: `str`
+        :param siglum: siglum of witness to highlight
         :type siglum: `str`
         :param ngrams: n-grams to highlight
         :type ngrams: `list` of `str`
@@ -108,11 +108,11 @@ class NgramHighlighter (BaseHighlighter):
         :rtype: `str`
 
         """
-        content = self._generate_base(text_name, siglum)
+        content = self._generate_base(work, siglum)
         content = self._highlight(content, ngrams, True)
         content = self._highlight(content, minus_ngrams, False)
         content = self._format_content(content)
-        return self._generate_html(text_name, siglum, content, ngrams=ngrams,
+        return self._generate_html(work, siglum, content, ngrams=ngrams,
                                    minus_ngrams=minus_ngrams)
 
     def _highlight(self, content, ngrams, highlight):
@@ -152,21 +152,21 @@ class ResultsHighlighter (BaseHighlighter):
 
     @staticmethod
     def _generate_text_list(matches):
-        texts = matches[[constants.NAME_FIELDNAME,
+        texts = matches[[constants.WORK_FIELDNAME,
                          constants.SIGLUM_FIELDNAME]].drop_duplicates()
         text_list = []
-        for index, (name, siglum) in texts.iterrows():
-            text_list.append(Text.assemble_filename(name, siglum))
+        for index, (work, siglum) in texts.iterrows():
+            text_list.append(WitnessText.assemble_filename(work, siglum))
         text_list.sort()
         return text_list
 
-    def highlight(self, text_name, siglum, matches_filename):
-        """Returns the text of `siglum` witness to `text_name` as an HTML
+    def highlight(self, work, siglum, matches_filename):
+        """Returns the text of `siglum` witness to `work` as an HTML
         document with its matches in `matches` highlighted.
 
-        :param text_name: name of text to highlight
+        :param work: name of work to highlight
         :type text_name: `str`
-        :param siglum: siglum of text to highlight
+        :param siglum: siglum of witness to highlight
         :type siglum: `str`
         :param matches_filename: file containing matches to highlight
         :type matches_filename: `str`
@@ -174,20 +174,19 @@ class ResultsHighlighter (BaseHighlighter):
 
         """
         matches = pd.read_csv(matches_filename)
-        matches = matches[(matches[constants.NAME_FIELDNAME] != text_name) |
+        matches = matches[(matches[constants.WORK_FIELDNAME] != work) |
                           (matches[constants.SIGLUM_FIELDNAME] != siglum)]
-        content = self._generate_base(text_name, siglum)
+        content = self._generate_base(work, siglum)
         content = self._highlight(content, matches)
         content = self._format_content(content)
         text_list = self._generate_text_list(matches)
-        return self._generate_html(text_name, siglum, content,
-                                   text_list=text_list)
+        return self._generate_html(work, siglum, content, text_list=text_list)
 
     def _highlight(self, content, matches):
         for row_index, row in matches.iterrows():
             ngram = row[constants.NGRAM_FIELDNAME]
-            self._match_source = Text.assemble_filename(
-                row[constants.NAME_FIELDNAME], row[constants.SIGLUM_FIELDNAME])
+            self._match_source = WitnessText.assemble_filename(
+                row[constants.WORK_FIELDNAME], row[constants.SIGLUM_FIELDNAME])
             pattern = self._get_regexp_pattern(ngram)
             content = re.sub(pattern, self._annotate_tokens, content)
         return content

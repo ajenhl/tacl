@@ -1,4 +1,4 @@
-ngram,size,text name,siglum,count,label
+ngram,size,work,siglum,count,label
 AB,2,t1,base,1,A
 BC,2,t1,base,1,A
 CD,2,t1,base,2,A

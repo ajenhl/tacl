@@ -48,7 +48,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         subprocess.call(self._ngrams_command_args)
         conn = sqlite3.connect(self._db_path)
         actual_rows = conn.execute(
-            'SELECT Text.name, Text.siglum, Text.checksum, Text.label, '
+            'SELECT Text.work, Text.siglum, Text.checksum, Text.label, '
             'TextNGram.ngram, TextNGram.size, TextNGram.count '
             'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
         expected_rows = [
@@ -161,7 +161,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'ell', 3, 1)]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = conn.execute(
-            'SELECT Text.name, Text.siglum, TextHasNGram.size '
+            'SELECT Text.work, Text.siglum, TextHasNGram.size '
             'FROM Text, TextHasNGram '
             'WHERE Text.id = TextHasNGram.text').fetchall()
         expected_rows = [
@@ -182,7 +182,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         subprocess.call(shlex.split(ngrams_command))
         conn = sqlite3.connect(self._db_path)
         actual_rows = conn.execute(
-            'SELECT Text.name, Text.siglum, Text.checksum, Text.label, '
+            'SELECT Text.work, Text.siglum, Text.checksum, Text.label, '
             'TextNGram.ngram, TextNGram.size, TextNGram.count '
             'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
         expected_rows = [

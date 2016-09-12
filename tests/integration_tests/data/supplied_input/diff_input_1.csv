@@ -1,4 +1,4 @@
-ngram,size,text name,siglum,count,label
+ngram,size,work,siglum,count,label
 一佛,2,T0004,元,3,B
 一佛,2,T0003,明,1,A
 一佛,2,T0003,base,2,A

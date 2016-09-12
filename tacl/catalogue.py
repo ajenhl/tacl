@@ -1,7 +1,7 @@
 import csv
 import os
 
-from .constants import CATALOGUE_TEXT_RELABELLED_ERROR
+from .constants import CATALOGUE_WORK_RELABELLED_ERROR
 from .exceptions import MalformedCatalogueError
 
 
@@ -9,11 +9,11 @@ class Catalogue (dict):
 
     def generate(self, path, label):
         """Creates default data from the corpus at `path`, marking all
-        texts with `label`.
+        works with `label`.
 
         :param path: path to a corpus directory
         :type path: `str`
-        :param label: label to categorise each text as
+        :param label: label to categorise each work as
         :type label: `str`
 
         """
@@ -36,17 +36,17 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        fieldnames = ['text', 'label']
+        fieldnames = ['work', 'label']
         with open(path, 'r', encoding='utf-8', newline='') as fh:
             reader = csv.DictReader(fh, delimiter=' ', fieldnames=fieldnames,
                                     skipinitialspace=True)
             for row in reader:
-                text, label = row['text'], row['label']
+                work, label = row['work'], row['label']
                 if label:
-                    if text in self:
+                    if work in self:
                         raise MalformedCatalogueError(
-                            CATALOGUE_TEXT_RELABELLED_ERROR.format(text))
-                    self[text] = label
+                            CATALOGUE_WORK_RELABELLED_ERROR.format(work))
+                    self[work] = label
 
     def save(self, path):
         """Saves this catalogue's data to `path`.

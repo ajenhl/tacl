@@ -1,11 +1,18 @@
-"""Module containing the Text class."""
+"""Module containing the Text and WitnessText classes."""
 
 import collections
 import hashlib
 import os.path
 
 
-class BaseText:
+class Text:
+
+    """Class for base text functionality (getting tokens, generating
+    n-grams).
+
+    Used for (snippets of) texts that are not witnesses.
+
+    """
 
     def __init__(self, content, tokenizer):
         self._content = content
@@ -82,7 +89,10 @@ class BaseText:
                 for i in range(count)]
 
 
-class Text (BaseText):
+class WitnessText (Text):
+
+    """Class for the text of a witness. A witness has a work name and a
+    siglum, and has a corresponding filename."""
 
     def __init__(self, name, siglum, content, tokenizer):
         super().__init__(content, tokenizer)

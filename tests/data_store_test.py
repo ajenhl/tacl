@@ -29,15 +29,15 @@ class DataStoreTestCase (TaclTestCase):
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
         initialise = self._create_patch('tacl.DataStore._initialise_database')
-        text1 = MagicMock(spec_set=tacl.Text)
-        text2 = MagicMock(spec_set=tacl.Text)
+        text1 = MagicMock(spec_set=tacl.WitnessText)
+        text2 = MagicMock(spec_set=tacl.WitnessText)
         corpus = MagicMock(spec_set=tacl.Corpus)
-        corpus.get_texts = MagicMock(name='get_texts')
-        corpus.get_texts.return_value = iter([text1, text2])
+        corpus.get_witnesses = MagicMock(name='get_witnesses')
+        corpus.get_witnesses.return_value = iter([text1, text2])
         store = tacl.DataStore(':memory:')
         store.add_ngrams(corpus, 2, 3)
         initialise.assert_called_once_with(store)
-        corpus.get_texts.assert_called_once_with()
+        corpus.get_witnesses.assert_called_once_with()
         self.assertEqual(add_text_ngrams.mock_calls,
                          [call(store, text1, 2, 3), call(store, text2, 2, 3)])
         add_indices.assert_called_once_with(store)
@@ -48,21 +48,21 @@ class DataStoreTestCase (TaclTestCase):
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
         initialise = self._create_patch('tacl.DataStore._initialise_database')
-        text1 = MagicMock(spec_set=tacl.Text)
+        text1 = MagicMock(spec_set=tacl.WitnessText)
         text1.get_names = MagicMock(name='get_names')
         text1.get_names.return_value = ['T1', 'base']
-        text2 = MagicMock(spec_set=tacl.Text)
+        text2 = MagicMock(spec_set=tacl.WitnessText)
         text2.get_names = MagicMock(name='get_names')
         text2.get_names.return_value = ['T2', 'base']
         corpus = MagicMock(spec_set=tacl.Corpus)
-        corpus.get_texts = MagicMock(name='get_texts')
-        corpus.get_texts.return_value = iter([text1, text2])
+        corpus.get_witnesses = MagicMock(name='get_witnesses')
+        corpus.get_witnesses.return_value = iter([text1, text2])
         store = tacl.DataStore(':memory:')
         catalogue = tacl.Catalogue()
         catalogue['T1'] = 'A'
         store.add_ngrams(corpus, 2, 3, catalogue)
         initialise.assert_called_once_with(store)
-        corpus.get_texts.assert_called_once_with()
+        corpus.get_witnesses.assert_called_once_with()
         text1.get_names.assert_called_once_with()
         text2.get_names.assert_called_once_with()
         add_text_ngrams.assert_called_once_with(store, text1, 2, 3)
@@ -103,7 +103,7 @@ class DataStoreTestCase (TaclTestCase):
         has_ngrams.return_value = True
         add_text_size_ngrams = self._create_patch(
             'tacl.DataStore._add_text_size_ngrams')
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_ngrams.return_value = [(2, sentinel.two_grams),
                                         (3, sentinel.three_grams)]
         store = tacl.DataStore(':memory:')
@@ -122,7 +122,7 @@ class DataStoreTestCase (TaclTestCase):
         has_ngrams.return_value = False
         add_text_size_ngrams = self._create_patch(
             'tacl.DataStore._add_text_size_ngrams')
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_ngrams.return_value = [(2, sentinel.two_grams),
                                         (3, sentinel.three_grams)]
         store = tacl.DataStore(':memory:')
@@ -139,7 +139,7 @@ class DataStoreTestCase (TaclTestCase):
     def test_add_text_record(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock()
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_filename.return_value = sentinel.filename
         text.get_names.return_value = (sentinel.name, sentinel.siglum)
@@ -342,7 +342,7 @@ class DataStoreTestCase (TaclTestCase):
         add_text.return_value = sentinel.new_text_id
         update_text = self._create_patch('tacl.DataStore._update_text_record')
         delete_ngrams = self._create_patch('tacl.DataStore._delete_text_ngrams')
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_filename.return_value = sentinel.filename
         text.get_names.return_value = (sentinel.name, sentinel.siglum)
@@ -453,7 +453,7 @@ class DataStoreTestCase (TaclTestCase):
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
         self.assertTrue(log_query_plan.called)
-        sql = 'SELECT TextNGram.ngram, TextNGram.size, Text.name AS "text name", Text.siglum, TextNGram.count, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = 'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, TextNGram.count, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, labels * 2)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,
@@ -724,7 +724,7 @@ class DataStoreTestCase (TaclTestCase):
     def test_update_text_record(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         tokens = [sentinel.token]
         text.get_tokens.return_value = tokens
@@ -738,10 +738,10 @@ class DataStoreTestCase (TaclTestCase):
 
     def test_validate_true(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_names.return_value = (sentinel.name, sentinel.siglum)
-        corpus.get_texts.return_value = (text,)
+        corpus.get_witnesses.return_value = (text,)
         catalogue = collections.OrderedDict(
             [(sentinel.text1, sentinel.label1),
              (sentinel.text2, sentinel.label2),
@@ -751,7 +751,7 @@ class DataStoreTestCase (TaclTestCase):
         cursor = store._conn.execute.return_value
         cursor.fetchone.return_value = {'checksum': sentinel.checksum}
         actual_result = store.validate(corpus, catalogue)
-        corpus.get_texts.assert_has_calls([
+        corpus.get_witnesses.assert_has_calls([
             call(sentinel.text1), call(sentinel.text2), call(sentinel.text3)])
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(tacl.constants.SELECT_TEXT_SQL,
@@ -767,17 +767,17 @@ class DataStoreTestCase (TaclTestCase):
 
     def test_validate_missing_record(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_names.return_value = (sentinel.name, sentinel.siglum)
-        corpus.get_texts.return_value = (text,)
+        corpus.get_witnesses.return_value = (text,)
         catalogue = {sentinel.text1: sentinel.label1}
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         cursor = store._conn.execute.return_value
         cursor.fetchone.return_value = None
         actual_result = store.validate(corpus, catalogue)
-        corpus.get_texts.assert_has_calls([call(sentinel.text1)])
+        corpus.get_witnesses.assert_has_calls([call(sentinel.text1)])
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(tacl.constants.SELECT_TEXT_SQL,
                                        [sentinel.name, sentinel.siglum]),
@@ -786,17 +786,17 @@ class DataStoreTestCase (TaclTestCase):
 
     def test_validate_mismatched_checksums(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
-        text = MagicMock(spec_set=tacl.Text)
+        text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_names.return_value = (sentinel.name, sentinel.siglum)
-        corpus.get_texts.return_value = (text,)
+        corpus.get_witnesses.return_value = (text,)
         catalogue = {sentinel.text1: sentinel.label1}
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         cursor = store._conn.execute.return_value
         cursor.fetchone.return_value = {'checksum': sentinel.checksum2}
         actual_result = store.validate(corpus, catalogue)
-        corpus.get_texts.assert_has_calls([call(sentinel.text1)])
+        corpus.get_witnesses.assert_has_calls([call(sentinel.text1)])
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(tacl.constants.SELECT_TEXT_SQL,
                                        [sentinel.name, sentinel.siglum]),

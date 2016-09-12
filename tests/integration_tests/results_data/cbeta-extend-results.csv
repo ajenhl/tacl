@@ -1,4 +1,4 @@
-ngram,size,text name,siglum,count,label
+ngram,size,work,siglum,count,label
 [色-巴+鹿],1,t1,base,1,A
 [色-巴+鹿]一,2,t1,base,1,A
 [色-巴+鹿]一時,3,t1,base,1,A

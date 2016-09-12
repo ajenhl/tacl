@@ -1,4 +1,4 @@
-ngram,size,text name,siglum,count,label
+ngram,size,work,siglum,count,label
 thos pa dus gcig na,5,t2,base,1,B
 phung po'i,2,t1,base,1,A
 rgyal po'i khab,3,t1,base,1,A

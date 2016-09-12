@@ -23,7 +23,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
     def test_add_ngrams(self):
         self._store._conn.row_factory = None
         actual_rows = self._store._conn.execute(
-            'SELECT Text.name, Text.siglum, Text.checksum, Text.label, '
+            'SELECT Text.work, Text.siglum, Text.checksum, Text.label, '
             'TextNGram.ngram, TextNGram.size, TextNGram.count '
             'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
         expected_rows = [
@@ -136,7 +136,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'ell', 3, 1)]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._store._conn.execute(
-            'SELECT Text.name, Text.siglum, TextHasNGram.size '
+            'SELECT Text.work, Text.siglum, TextHasNGram.size '
             'FROM Text, TextHasNGram '
             'WHERE Text.id = TextHasNGram.text').fetchall()
         expected_rows = [

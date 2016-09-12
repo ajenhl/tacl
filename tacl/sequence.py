@@ -80,9 +80,9 @@ class Sequencer:
         env = Environment(loader=loader)
         template = env.get_template('sequence.html')
         # Get a list of the files in the matches, grouped by label
-        # (ordered by number of texts).
+        # (ordered by number of works).
         labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[
-            constants.NAME_FIELDNAME].nunique().index)
+            constants.WORK_FIELDNAME].nunique().index)
         ngrams = self._matches[
             self._matches[constants.SIZE_FIELDNAME] >= minimum_size].sort(
                 constants.SIZE_FIELDNAME, ascending=False)[
@@ -97,18 +97,18 @@ class Sequencer:
         self._substitutes = {}
         self._char_code = 61440
         cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME]
-        primary_texts = self._matches[self._matches[
+        primary_works = self._matches[self._matches[
             constants.LABEL_FIELDNAME] == primary_label][
                 cols].drop_duplicates()
-        secondary_texts = self._matches[self._matches[
+        secondary_works = self._matches[self._matches[
             constants.LABEL_FIELDNAME] == secondary_label][
                 cols].drop_duplicates()
-        for index, (name1, siglum1) in primary_texts.iterrows():
-            text1 = self._get_text(name1, siglum1)
-            label1 = '{}_{}'.format(name1, siglum1)
-            for index, (name2, siglum2) in secondary_texts.iterrows():
-                text2 = self._get_text(name2, siglum2)
-                label2 = '{}_{}'.format(name2, siglum2)
+        for index, (work1, siglum1) in primary_works.iterrows():
+            text1 = self._get_text(work1, siglum1)
+            label1 = '{}_{}'.format(work1, siglum1)
+            for index, (work2, siglum2) in secondary_works.iterrows():
+                text2 = self._get_text(work2, siglum2)
+                label2 = '{}_{}'.format(work2, siglum2)
                 self._generate_sequences_for_texts(label1, text1, label2,
                                                    text2, ngrams, template)
 
@@ -149,13 +149,20 @@ class Sequencer:
                     sequences.append(sequence.render())
         return sequences
 
-    def _get_text(self, name, siglum):
-        """Returns the text identified by `name` and `siglum`, with all []
-        tokens replaced with a single character. Substitutions are
-        recorded in self._substitutes.
+    def _get_text(self, work, siglum):
+        """Returns the text content of the witness identified by `work` and
+        `siglum`, with all mult-character tokens replaced with a
+        single character. Substitutions are recorded in
+        self._substitutes.
+
+        :param work: name of work
+        :type work: `str`
+        :param siglum: siglum of witness
+        :type siglum: `str`
+        :rtype: `str`
 
         """
-        tokens = self._corpus.get_text(name, siglum).get_tokens()
+        tokens = self._corpus.get_witness(work, siglum).get_tokens()
         for i, token in enumerate(tokens):
             if len(token) > 1:
                 char = chr(self._char_code)

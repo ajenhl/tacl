@@ -14,8 +14,8 @@ class CorpusTestCase (TaclTestCase):
         self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                          tacl.constants.TOKENIZER_JOINER_CBETA)
 
-    def test_get_text(self):
-        Text = self._create_patch('tacl.corpus.Text')
+    def test_get_witness(self):
+        Text = self._create_patch('tacl.corpus.WitnessText')
         path = '/test'
         name = 'foo'
         siglum = 'base'
@@ -24,13 +24,13 @@ class CorpusTestCase (TaclTestCase):
         m = mock_open(read_data=content)
         with patch('builtins.open', m, create=True):
             corpus = tacl.Corpus(path, self._tokenizer)
-            actual_text = corpus.get_text(name, siglum)
+            actual_text = corpus.get_witness(name, siglum)
         m.assert_called_once_with(os.path.join(path, filename),
                                   encoding='utf-8')
         Text.assert_called_once_with(name, siglum, content, self._tokenizer)
-        assert isinstance(actual_text, tacl.Text)
+        assert isinstance(actual_text, tacl.WitnessText)
 
-    def test_get_texts(self):
+    def test_get_witnesses(self):
         path = '/test'
         name1 = 'T1'
         name2 = 'T2'
@@ -43,13 +43,13 @@ class CorpusTestCase (TaclTestCase):
             os.path.join(path, name2, siglum1 + '.txt')]
         isfile = self._create_patch('os.path.isfile')
         isfile.return_value = True
-        get_text = self._create_patch('tacl.Corpus.get_text')
-        get_text.return_value = MagicMock(spec_set=tacl.Text)
+        get_witness = self._create_patch('tacl.Corpus.get_witness')
+        get_witness.return_value = MagicMock(spec_set=tacl.WitnessText)
         corpus = tacl.Corpus(path, self._tokenizer)
-        for text in corpus.get_texts():
-            assert isinstance(text, tacl.Text)
+        for text in corpus.get_witnesses():
+            assert isinstance(text, tacl.WitnessText)
         glob.assert_called_once_with(os.path.join(path, '*/*.txt'))
-        self.assertEqual(get_text.mock_calls,
+        self.assertEqual(get_witness.mock_calls,
                          [call(corpus, name1, siglum1),
                           call(corpus, name1, siglum2),
                           call(corpus, name2, siglum1)])

@@ -5,7 +5,7 @@ import re
 import pandas as pd
 
 from . import constants
-from .text import BaseText
+from .text import Text
 
 
 class StatisticsReport:
@@ -37,19 +37,19 @@ class StatisticsReport:
 
         """
         matches = self._matches
-        witness_fields = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
+        witness_fields = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
                           constants.LABEL_FIELDNAME]
         witnesses = matches[witness_fields].drop_duplicates()
         rows = []
-        for index, (text_name, siglum, label) in witnesses.iterrows():
-            text = self._corpus.get_text(text_name, siglum)
+        for index, (work, siglum, label) in witnesses.iterrows():
+            witness = self._corpus.get_witness(work, siglum)
             witness_matches = matches[
-                (matches[constants.NAME_FIELDNAME] == text_name) &
+                (matches[constants.WORK_FIELDNAME] == work) &
                 (matches[constants.SIGLUM_FIELDNAME] == siglum)]
             total_count, matching_count = self._process_witness(
-                text, witness_matches)
+                witness, witness_matches)
             percentage = matching_count / total_count * 100
-            rows.append({constants.NAME_FIELDNAME: text_name,
+            rows.append({constants.WORK_FIELDNAME: work,
                          constants.SIGLUM_FIELDNAME: siglum,
                          constants.COUNT_TOKENS_FIELDNAME: matching_count,
                          constants.TOTAL_TOKENS_FIELDNAME: total_count,
@@ -89,11 +89,11 @@ class StatisticsReport:
                 merged_slices.append(slice_indices)
         return merged_slices
 
-    def _process_witness(self, text, matches):
-        """Return the counts of total tokens and matching tokens in `text`.
+    def _process_witness(self, witness, matches):
+        """Return the counts of total tokens and matching tokens in `witness`.
 
-        :param text: witness text
-        :type text: `tacl.Text`
+        :param witness: witness text
+        :type witness: `tacl.WitnessText`
         :param matches: n-gram matches
         :type matches: `pandas.DataFrame`
         :rtype: `tuple` of `int`
@@ -111,8 +111,8 @@ class StatisticsReport:
         # n-grams. Merge these slices together (without overlap) and
         # create a Text using that text, which can then be tokenised
         # and the tokens counted.
-        tokens = text.get_tokens()
-        full_text = text.get_token_content()
+        tokens = witness.get_tokens()
+        full_text = witness.get_token_content()
         fields = [constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME]
         match_slices = []
         for index, (ngram, size) in matches[fields].iterrows():
@@ -129,5 +129,5 @@ class StatisticsReport:
         merged_slices = self._merge_slices(match_slices)
         match_content = self._generate_text_from_slices(
             full_text, merged_slices)
-        match_text = BaseText(match_content, self._tokenizer)
+        match_text = Text(match_content, self._tokenizer)
         return len(tokens), len(match_text.get_tokens())

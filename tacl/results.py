@@ -6,7 +6,7 @@ import re
 import pandas as pd
 
 from . import constants
-from .text import BaseText
+from .text import Text
 
 
 class Results:
@@ -34,19 +34,19 @@ class Results:
 
     def add_label_count(self):
         """Adds to each result row a count of the number occurrences of that
-        n-gram across all texts within the label.
+        n-gram across all works within the label.
 
-        This count uses the highest witness count for each text.
+        This count uses the highest witness count for each work.
 
         """
         self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
 
         def add_label_count(df):
             # For each n-gram and label pair, we need the maximum count
-            # among all witnesses to each text, and then the sum of those
-            # across all texts.
-            text_maxima = df.groupby(constants.NAME_FIELDNAME).max()
-            df.loc[:, constants.LABEL_COUNT_FIELDNAME] = text_maxima[
+            # among all witnesses to each work, and then the sum of those
+            # across all works.
+            work_maxima = df.groupby(constants.WORK_FIELDNAME).max()
+            df.loc[:, constants.LABEL_COUNT_FIELDNAME] = work_maxima[
                 constants.COUNT_FIELDNAME].sum()
             return df
 
@@ -55,7 +55,7 @@ class Results:
                 add_label_count)
 
     def collapse_witnesses(self):
-        """Groups together witnesses for the same n-gram and text that has the
+        """Groups together witnesses for the same n-gram and work that has the
         same count, and outputs a single row for each group.
 
         This output replaces the siglum field with a sigla field that
@@ -65,15 +65,15 @@ class Results:
 
         """
         # This code makes the not unwarranted assumption that the same
-        # n-gram means the same size and that the same text means the
+        # n-gram means the same size and that the same work means the
         # same label.
         grouped = self._matches.groupby(
-            [constants.NAME_FIELDNAME, constants.NGRAM_FIELDNAME,
+            [constants.WORK_FIELDNAME, constants.NGRAM_FIELDNAME,
              constants.COUNT_FIELDNAME], sort=False)
 
         def merge_sigla(df):
-            # Take the first result row arbitrarily; only the siglum
-            # should differ between them.
+            # Take the first result row; only the siglum should differ
+            # between them, and there may only be one row.
             merged = df[0:1]
             sigla = []
             for siglum in list(df[constants.SIGLUM_FIELDNAME]):
@@ -105,7 +105,7 @@ class Results:
 
         This works with both diff and intersect results.
 
-        :param corpus: corpus of texts to which results belong
+        :param corpus: corpus of works to which results belong
         :type corpus: `Corpus`
 
         """
@@ -121,7 +121,7 @@ class Results:
         # Determine if we are dealing with diff or intersect
         # results. In the latter case, we need to perform a reciprocal
         # remove as the final stage (since extended n-grams may exist
-        # in texts from more than one label). This test will think
+        # in works from more than one label). This test will think
         # that intersect results that have had all but one label
         # removed are difference results, which will cause the results
         # to be potentially incorrect.
@@ -131,15 +131,15 @@ class Results:
         matches = self._matches[
             self._matches[constants.SIZE_FIELDNAME] == highest_n]
         extended_matches = pd.DataFrame()
-        cols = [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
+        cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
                 constants.LABEL_FIELDNAME]
-        for index, (text_name, siglum, label) in \
+        for index, (work, siglum, label) in \
                 matches[cols].drop_duplicates().iterrows():
             extended_ngrams = self._generate_extended_ngrams(
-                matches, text_name, siglum, label, corpus, highest_n)
+                matches, work, siglum, label, corpus, highest_n)
             extended_matches = pd.concat(
                 [extended_matches, self._generate_extended_matches(
-                    extended_ngrams, highest_n, text_name, siglum, label)])
+                    extended_ngrams, highest_n, work, siglum, label)])
             extended_ngrams = None
         extended_matches = extended_matches.reindex_axis(
             constants.QUERY_FIELDNAMES, axis=1)
@@ -147,7 +147,7 @@ class Results:
             extended_matches = self._reciprocal_remove(extended_matches)
         self._matches = self._matches.append(extended_matches)
 
-    def _generate_extended_matches(self, extended_ngrams, highest_n, name,
+    def _generate_extended_matches(self, extended_ngrams, highest_n, work,
                                    siglum, label):
         """Returns extended match data derived from `extended_ngrams`.
 
@@ -158,8 +158,8 @@ class Results:
         :type extended_ngrams: `list` of `str`
         :param highest_n: the highest degree of n-grams in the original results
         :type highest_n: `int`
-        :param name: name of the text bearing `extended_ngrams`
-        :type name: `str`
+        :param work: name of the work bearing `extended_ngrams`
+        :type work: `str`
         :param siglum: siglum of the text bearing `extended_ngrams`
         :type siglum: `str`
         :param label: label associated with the text
@@ -174,10 +174,10 @@ class Results:
         # the counts for such.
         rows_list = []
         for extended_ngram in extended_ngrams:
-            text = BaseText(extended_ngram, self._tokenizer)
+            text = Text(extended_ngram, self._tokenizer)
             for size, ngrams in text.get_ngrams(highest_n+1,
                                                 len(text.get_tokens())):
-                data = [{constants.NAME_FIELDNAME: name,
+                data = [{constants.WORK_FIELDNAME: work,
                          constants.SIGLUM_FIELDNAME: siglum,
                          constants.LABEL_FIELDNAME: label,
                          constants.SIZE_FIELDNAME: size,
@@ -193,7 +193,7 @@ class Results:
         # extended_matches may be an empty DataFrame, in which case
         # manipulating it on the basis of non-existing columns is not
         # going to go well.
-        groupby_fields = [constants.NGRAM_FIELDNAME, constants.NAME_FIELDNAME,
+        groupby_fields = [constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                           constants.SIGLUM_FIELDNAME, constants.SIZE_FIELDNAME,
                           constants.LABEL_FIELDNAME]
         if constants.NGRAM_FIELDNAME in extended_matches:
@@ -201,16 +201,16 @@ class Results:
                 groupby_fields).sum().reset_index()
         return extended_matches
 
-    def _generate_extended_ngrams(self, matches, name, siglum, label, corpus,
+    def _generate_extended_ngrams(self, matches, work, siglum, label, corpus,
                                   highest_n):
         """Returns the n-grams of the largest size that exist in `siglum`
-        witness to `name` text under `label`, generated from adding
+        witness to `work` under `label`, generated from adding
         together overlapping n-grams in `matches`.
 
         :param matches: n-gram matches
         :type matches: `pandas.DataFrame`
-        :param name: name of text whose results are being processed
-        :type name: `str`
+        :param work: name of work whose results are being processed
+        :type work: `str`
         :param siglum: siglum of witness whose results are being processed
         :type siglum: `str`
         :param label: label of witness whose results are being processed
@@ -227,10 +227,10 @@ class Results:
         # things, such as aliasing dotted calls here and below.
         t_join = self._tokenizer.joiner.join
         witness_matches = matches[
-            (matches[constants.NAME_FIELDNAME] == name) &
+            (matches[constants.WORK_FIELDNAME] == work) &
             (matches[constants.SIGLUM_FIELDNAME] == siglum) &
             (matches[constants.LABEL_FIELDNAME] == label)]
-        text = corpus.get_text(name, siglum).get_token_content()
+        text = corpus.get_witness(work, siglum).get_token_content()
         ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
                   list(witness_matches[constants.NGRAM_FIELDNAME])]
         # Go through the list of n-grams, and create a list of
@@ -306,7 +306,7 @@ class Results:
         :rtype: `list`
 
         """
-        text = BaseText(ngram, self._tokenizer)
+        text = Text(ngram, self._tokenizer)
         substrings = []
         for sub_size, ngrams in text.get_ngrams(1, size-1):
             for sub_ngram, count in ngrams.items():
@@ -342,11 +342,11 @@ class Results:
 
     def prune_by_ngram_count(self, minimum=None, maximum=None):
         """Removes results rows whose total n-gram count (across all
-        texts bearing this n-gram) is outside the range specified by
+        works bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
 
         For each text, the count used as part of the sum across all
-        texts is the maximum count across the witnesses for that text.
+        works is the maximum count across the witnesses for that work.
 
         :param minimum: minimum n-gram count
         :type minimum: `int`
@@ -357,11 +357,12 @@ class Results:
         self._logger.info('Pruning results by n-gram count')
 
         def calculate_total(group):
-            text_grouped = group.groupby(constants.NAME_FIELDNAME)
-            total_count = text_grouped[constants.COUNT_FIELDNAME].max().sum()
+            work_grouped = group.groupby(constants.WORK_FIELDNAME)
+            total_count = work_grouped[constants.COUNT_FIELDNAME].max().sum()
             group['total_count'] = pd.Series([total_count] * len(group.index),
                                              index=group.index)
             return group
+
         self._matches = self._matches.groupby(constants.NGRAM_FIELDNAME).apply(
             calculate_total)
         if minimum:
@@ -372,12 +373,12 @@ class Results:
                 self._matches['total_count'] <= maximum]
         del self._matches['total_count']
 
-    def prune_by_ngram_count_per_text(self, minimum=None, maximum=None):
-        """Removes results rows if the n-gram count for all texts bearing that
+    def prune_by_ngram_count_per_work(self, minimum=None, maximum=None):
+        """Removes results rows if the n-gram count for all works bearing that
         n-gram is outside the range specified by `minimum` and
         `maximum`.
 
-        That is, if a single witness of a single text has an n-gram
+        That is, if a single witness of a single work has an n-gram
         count that falls within the specified range, all result rows
         for that n-gram are kept.
 
@@ -387,7 +388,7 @@ class Results:
         :type maximum: `int`
 
         """
-        self._logger.info('Pruning results by n-gram count per text')
+        self._logger.info('Pruning results by n-gram count per work')
         if minimum and maximum:
             keep_ngrams = set(self._matches[
                 (self._matches[constants.COUNT_FIELDNAME] >= minimum) &
@@ -426,27 +427,27 @@ class Results:
             self._matches = self._matches[
                 self._matches[constants.SIZE_FIELDNAME] <= maximum]
 
-    def prune_by_text_count(self, minimum=None, maximum=None):
+    def prune_by_work_count(self, minimum=None, maximum=None):
         """Removes results rows for n-grams that are not attested in a
-        number of texts in the range specified by `minimum` and
+        number of works in the range specified by `minimum` and
         `maximum`.
 
-        Text here encompasses all witnesses, so that the same n-gram
-        appearing in multiple witnesses of the same text are counted
-        as a single text.
+        Work here encompasses all witnesses, so that the same n-gram
+        appearing in multiple witnesses of the same work are counted
+        as a single work.
 
-        :param minimum: minimum number of texts
+        :param minimum: minimum number of works
         :type minimum: `int`
-        :param maximum: maximum number of texts
+        :param maximum: maximum number of works
         :type maximum: `int`
 
         """
-        self._logger.info('Pruning results by text count')
+        self._logger.info('Pruning results by work count')
         count_fieldname = 'tmp_count'
         filtered = self._matches[self._matches[constants.COUNT_FIELDNAME] > 0]
         grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
-        counts = pd.DataFrame(grouped[constants.NAME_FIELDNAME].nunique())
-        counts.rename(columns={constants.NAME_FIELDNAME: count_fieldname},
+        counts = pd.DataFrame(grouped[constants.WORK_FIELDNAME].nunique())
+        counts.rename(columns={constants.WORK_FIELDNAME: count_fieldname},
                       inplace=True)
         if minimum:
             counts = counts[counts[count_fieldname] >= minimum]
@@ -481,33 +482,33 @@ class Results:
         labels = {}
         # Derive a convenient data structure from the rows.
         for row_index, row in self._matches.iterrows():
-            name = row[constants.NAME_FIELDNAME]
+            work = row[constants.WORK_FIELDNAME]
             siglum = row[constants.SIGLUM_FIELDNAME]
-            labels[name] = row[constants.LABEL_FIELDNAME]
-            text_data = data.setdefault((name, siglum), {})
-            text_data[row[constants.NGRAM_FIELDNAME]] = {
+            labels[work] = row[constants.LABEL_FIELDNAME]
+            witness_data = data.setdefault((work, siglum), {})
+            witness_data[row[constants.NGRAM_FIELDNAME]] = {
                 'count': int(row[constants.COUNT_FIELDNAME]),
                 'size': int(row[constants.SIZE_FIELDNAME])}
-        for text_data in data.values():
-            ngrams = list(text_data.keys())
-            ngrams.sort(key=lambda ngram: text_data[ngram]['size'],
+        for witness_data in data.values():
+            ngrams = list(witness_data.keys())
+            ngrams.sort(key=lambda ngram: witness_data[ngram]['size'],
                         reverse=True)
             for ngram in ngrams:
-                if text_data[ngram]['count'] > 0:
-                    self._reduce_by_ngram(text_data, ngram)
+                if witness_data[ngram]['count'] > 0:
+                    self._reduce_by_ngram(witness_data, ngram)
         # Recreate rows from the modified data structure.
         rows = []
-        for (name, siglum), text_data in data.items():
-            for ngram, ngram_data in text_data.items():
+        for (work, siglum), witness_data in data.items():
+            for ngram, ngram_data in witness_data.items():
                 count = ngram_data['count']
                 if count > 0:
                     rows.append(
                         {constants.NGRAM_FIELDNAME: ngram,
                          constants.SIZE_FIELDNAME: ngram_data['size'],
-                         constants.NAME_FIELDNAME: name,
+                         constants.WORK_FIELDNAME: work,
                          constants.SIGLUM_FIELDNAME: siglum,
                          constants.COUNT_FIELDNAME: count,
-                         constants.LABEL_FIELDNAME: labels[name]})
+                         constants.LABEL_FIELDNAME: labels[work]})
         if rows:
             self._matches = pd.DataFrame(
                 rows, columns=constants.QUERY_FIELDNAMES)
@@ -560,7 +561,7 @@ class Results:
         self._matches.sort_values(
             by=[constants.SIZE_FIELDNAME, constants.NGRAM_FIELDNAME,
                 constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME,
-                constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME],
+                constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME],
             ascending=[False, True, False, True, True, True], inplace=True)
 
     def zero_fill(self, corpus, catalogue):
@@ -577,22 +578,22 @@ class Results:
         zero_rows = []
         # Get all of the texts, and their witnesses, for each label.
         data = {}
-        for text, label in iter(catalogue.items()):
-            data.setdefault(label, {})[text] = []
-            for siglum in corpus.get_sigla(text):
-                data[label][text].append(siglum)
+        for work, label in iter(catalogue.items()):
+            data.setdefault(label, {})[work] = []
+            for siglum in corpus.get_sigla(work):
+                data[label][work].append(siglum)
         grouping_cols = [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME,
-                         constants.SIZE_FIELDNAME, constants.NAME_FIELDNAME]
+                         constants.SIZE_FIELDNAME, constants.WORK_FIELDNAME]
         grouped = self._matches.groupby(grouping_cols, sort=False)
-        for (label, ngram, size, text), group in grouped:
+        for (label, ngram, size, work), group in grouped:
             row_data = {
                 constants.NGRAM_FIELDNAME: ngram,
                 constants.LABEL_FIELDNAME: label,
                 constants.SIZE_FIELDNAME: size,
                 constants.COUNT_FIELDNAME: 0,
-                constants.NAME_FIELDNAME: text,
+                constants.WORK_FIELDNAME: work,
             }
-            for siglum in data[label][text]:
+            for siglum in data[label][work]:
                 if group[group[constants.SIGLUM_FIELDNAME] == siglum].empty:
                     row_data[constants.SIGLUM_FIELDNAME] = siglum
                     zero_rows.append(row_data)

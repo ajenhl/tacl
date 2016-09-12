@@ -35,14 +35,14 @@ class TEICorpus:
 
     """A TEICorpus represents a collection of TEI XML documents.
 
-    The CBETA texts are TEI XML that have certain quirks that make
+    The CBETA works are TEI XML that have certain quirks that make
     them difficult to use directly in TACL's stripping process. This
     class provides a tidy method to deal with these quirks; in
-    particular it consolidates multiple XML files for a single text
+    particular it consolidates multiple XML files for a single work
     into one XML file.
 
     This class must not be instantiated directly; rather a subclass
-    appropriate to the source texts should be used.
+    appropriate to the source should be used.
 
     """
 
@@ -56,7 +56,7 @@ class TEICorpus:
             self.xslt))
         self.transform = etree.XSLT(etree.parse(xslt_filename))
 
-    def _assemble_parts(self, text_name, paths):
+    def _assemble_parts(self, work, paths):
         parts = list(paths.keys())
         parts.sort()
         # If the whitespace between tags in the supplied document is
@@ -66,35 +66,35 @@ class TEICorpus:
         corpus_root = etree.XML(TEI_CORPUS_XML, parser)
         for index, part in enumerate(parts):
             # Convert each part into the standard format.
-            xml_part = self._tidy(text_name, paths[part])
+            xml_part = self._tidy(work, paths[part])
             # Add each part in turn to the skeleton TEICorpus document.
             corpus_root.append(xml_part)
         return corpus_root
 
     def _assemble_part_list(self):
-        # The CBETA texts are organised into directories, and each
-        # text may be in multiple numbered parts. Crucially, these
+        # The CBETA files are organised into directories, and each
+        # work may be in multiple numbered parts. Crucially, these
         # parts may be split over multiple directories. Since it is
         # too memory intensive to store all of the lxml
         # representations of the XML files at once, before joining the
         # parts together, assemble the filenames into groups and then
         # process them one by one.
-        texts = {}
+        works = {}
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
-                    text_name, part_label = self._extract_text_name(filename)
-                    if text_name is None:
+                    work, part_label = self._extract_work(filename)
+                    if work is None:
                         self._logger.warning('Skipping file "{}"'.format(
                             filename))
                     else:
-                        text_name = '{}.xml'.format(text_name)
-                        text_parts = texts.setdefault(text_name, {})
-                        text_parts[part_label] = os.path.join(
+                        work = '{}.xml'.format(work)
+                        work_parts = works.setdefault(work, {})
+                        work_parts[part_label] = os.path.join(
                             dirpath, filename)
-        return texts
+        return works
 
-    def _extract_text_name(self, filename):
+    def _extract_work(self, filename):
         raise NotImplementedError
 
     def get_witnesses(self, source_tree):
@@ -109,7 +109,7 @@ class TEICorpus:
         witnesses = set()
         # Only get witnesses from tei:rdg, not tei:lem also, because a
         # witness may only be the source for the base reading, in
-        # which case it is pointless to create a separate text for it
+        # which case it is pointless to create a separate witness for it
         # - everything will be encompassed in the artificial base
         # witness.
         bearers = source_tree.xpath('//tei:app/tei:rdg[@wit]',
@@ -142,9 +142,9 @@ class TEICorpus:
             self._update_refs(root, bearers, 'wit', full_siglum, xml_id)
         return root
 
-    def _output_text(self, text_name, root):
-        """Saves the TEI XML document `root` at the path `text_name`."""
-        output_filename = os.path.join(self._output_dir, text_name)
+    def _output_work(self, work, root):
+        """Saves the TEI XML document `root` at the path `work`."""
+        output_filename = os.path.join(self._output_dir, work)
         tree = etree.ElementTree(root)
         tree.write(output_filename, encoding='utf-8', pretty_print=True)
 
@@ -179,13 +179,13 @@ class TEICorpus:
                 self._logger.error(
                     'Could not create output directory: {}'.format(err))
                 raise
-        texts = self._assemble_part_list()
-        for text_name, paths in texts.items():
-            root = self._assemble_parts(text_name, paths)
+        works = self._assemble_part_list()
+        for work, paths in works.items():
+            root = self._assemble_parts(work, paths)
             root = self._populate_header(root)
             root = self._handle_resps(root)
             root = self._handle_witnesses(root)
-            self._output_text(text_name, root)
+            self._output_work(work, root)
 
     def _tidy(self, *args, **kwargs):
         raise NotImplementedError
@@ -216,8 +216,8 @@ class TEICorpusCBETA2011 (TEICorpus):
     """A TEICorpus subclass where the source files are formatted as per
     the CBETA 2011 DVD release (TEI P4)."""
 
-    text_name_pattern = re.compile(
-        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<text>[^_\.]+)_(?P<part>\d+)$')
+    work_pattern = re.compile(
+        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<work>[^_\.]+)_(?P<part>\d+)$')
     xslt = 'prepare_tei_cbeta_2011.xsl'
 
     @staticmethod
@@ -234,30 +234,30 @@ class TEICorpusCBETA2011 (TEICorpus):
             output_file.write(text)
             output_file.write(b'<!ENTITY DUMMY_ENTITY "" >')
 
-    def _extract_text_name(self, filename):
-        """Returns the name of the text in `filename`.
+    def _extract_work(self, filename):
+        """Returns the name of the work in `filename`.
 
-        Many texts are divided into multiple parts that need to be
+        Many works are divided into multiple parts that need to be
         joined together.
 
         """
         basename = os.path.splitext(os.path.basename(filename))[0]
-        match = self.text_name_pattern.search(basename)
+        match = self.work_pattern.search(basename)
         if match is None:
             self._logger.warning('Found an anomalous filename "{}"'.format(
                 filename))
             return None, None
-        text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
-        return text_name, int(match.group('part'))
+        work = '{}{}'.format(match.group('prefix'), match.group('work'))
+        return work, int(match.group('part'))
 
     def _handle_resps(self, root):
         # Resp information is not extracted for 2011 CBETA files.
         return root
 
-    def _tidy(self, text_name, file_path, tried=False):
+    def _tidy(self, work, file_path, tried=False):
         """Transforms the file at `file_path` into simpler XML and returns
         it."""
-        output_file = os.path.join(self._output_dir, text_name)
+        output_file = os.path.join(self._output_dir, work)
         self._logger.info('Tidying file {} into {}'.format(
             file_path, output_file))
         try:
@@ -271,7 +271,7 @@ class TEICorpusCBETA2011 (TEICorpus):
                 raise
             self._logger.warning('Retrying after modifying entity file')
             self._correct_entity_file(file_path)
-            xml = self._tidy(text_name, file_path, True)
+            xml = self._tidy(work, file_path, True)
         else:
             xml = self.transform(tei_doc).getroot()
         return xml
@@ -283,14 +283,14 @@ class TEICorpusCBETAGitHub (TEICorpus):
     the CBETA GitHub repository at
     https://github.com/cbeta-org/xml-p5.git (TEI P5)"""
 
-    text_name_pattern = re.compile(
-        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<text>[A-Z]?\d+)(?P<part>[A-Za-z]?)$')
+    work_pattern = re.compile(
+        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<work>[A-Z]?\d+)(?P<part>[A-Za-z]?)$')
     xslt = 'prepare_tei_cbeta_github.xsl'
 
-    def _extract_text_name(self, filename):
-        """Returns the name of the text in `filename`.
+    def _extract_work(self, filename):
+        """Returns the name of the work in `filename`.
 
-        Some texts are divided into multiple parts that need to be
+        Some works are divided into multiple parts that need to be
         joined together.
 
         :param filename: filename of TEI
@@ -299,13 +299,13 @@ class TEICorpusCBETAGitHub (TEICorpus):
 
         """
         basename = os.path.splitext(os.path.basename(filename))[0]
-        match = self.text_name_pattern.search(basename)
+        match = self.work_pattern.search(basename)
         if match is None:
             self._logger.warning('Found an anomalous filename "{}"'.format(
                 filename))
             return None, None
-        text_name = '{}{}'.format(match.group('prefix'), match.group('text'))
-        return text_name, match.group('part')
+        work = '{}{}'.format(match.group('prefix'), match.group('work'))
+        return work, match.group('part')
 
     def get_resps(self, source_tree):
         """Returns a sorted list of all resps in `source_tree`, and the
@@ -348,12 +348,12 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._update_refs(root, bearers, 'resp', resp_data, xml_id)
         return root
 
-    def _tidy(self, text_name, file_path):
+    def _tidy(self, work, file_path):
         """Transforms the file at `file_path` into simpler XML and returns
         that.
 
         """
-        output_file = os.path.join(self._output_dir, text_name)
+        output_file = os.path.join(self._output_dir, work)
         self._logger.info('Tidying file {} into {}'.format(
             file_path, output_file))
         try:

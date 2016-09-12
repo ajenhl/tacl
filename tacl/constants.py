@@ -45,7 +45,6 @@ COUNT_FIELDNAME = 'count'
 COUNT_TOKENS_FIELDNAME = 'matching tokens'
 LABEL_FIELDNAME = 'label'
 LABEL_COUNT_FIELDNAME = 'label count'
-NAME_FIELDNAME = 'text name'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
 NUMBER_FIELDNAME = 'number'
@@ -56,15 +55,16 @@ SIZE_FIELDNAME = 'size'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
 TOTAL_TOKENS_FIELDNAME = 'total tokens'
 UNIQUE_NGRAMS_FIELDNAME = 'unique ngrams'
+WORK_FIELDNAME = 'work'
 
-QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, NAME_FIELDNAME,
+QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, WORK_FIELDNAME,
                     SIGLUM_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME]
-COUNTS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
+COUNTS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
-SEARCH_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
+SEARCH_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
                      LABEL_FIELDNAME, NGRAMS_FIELDNAME, NUMBER_FIELDNAME]
-STATISTICS_FIELDNAMES = [NAME_FIELDNAME, SIGLUM_FIELDNAME,
+STATISTICS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME,
                          COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
                          PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
 
@@ -75,14 +75,14 @@ ENCODING_EPILOG = '''\
 
 ALIGN_DESCRIPTION = '''\
     Generates an HTML report giving tables showing aligned sequences
-    of text between each text within each label and all of the texts
-    in the other labels, within a set of results. This functionality
-    is only appropriate for intersect results.'''
+    of text between each witness within each label and all of the
+    witnesses in the other labels, within a set of results. This
+    functionality is only appropriate for intersect results.'''
 ALIGN_EPILOG = ENCODING_EPILOG + '''\
     \n\nThis function requires the Biopython suite of software to be
     installed. It is extremely slow and resource hungry when the
-    overlap between two texts is very great.'''
-ALIGN_HELP = 'Show aligned sets of matches between two texts side by side.'
+    overlap between two witnesses is very great.'''
+ALIGN_HELP = 'Show aligned sets of matches between two witnesses side by side.'
 ALIGN_MINIMUM_SIZE_HELP = 'Minimum size of n-gram to base sequences around.'
 ALIGN_OUTPUT_HELP = 'Directory to output alignment files to.'
 
@@ -94,11 +94,11 @@ CATALOGUE_EPILOG = '''\
     This command is just a convenience for generating a base catalogue
     file to then be customised manually.'''
 CATALOGUE_HELP = 'Generate a catalogue file.'
-CATALOGUE_LABEL_HELP = 'Label to use for all texts.'
+CATALOGUE_LABEL_HELP = 'Label to use for all works.'
 
-COUNTS_DESCRIPTION = 'List counts of n-grams in each labelled text.'
+COUNTS_DESCRIPTION = 'List counts of n-grams in each labelled witness.'
 COUNTS_EPILOG = ENCODING_EPILOG
-COUNTS_HELP = 'List counts of n-grams in each labelled text.'
+COUNTS_HELP = 'List counts of n-grams in each labelled witness.'
 
 DB_CORPUS_HELP = 'Path to corpus.'
 DB_DATABASE_HELP = 'Path to database file.'
@@ -110,7 +110,7 @@ DB_MEMORY_HELP = '''\
 DB_RAM_HELP = 'Number of gigabytes of RAM to use.'
 DB_TOKENIZER_HELP = '''\
     Type of tokenizer to use. The "cbeta" tokenizer is suitable for
-    the Chinese CBETA texts (tokens are single characters or
+    the Chinese CBETA corpus (tokens are single characters or
     workaround clusters within square brackets). The "pagel" tokenizer
     is for use with the transliterated Tibetan corpus (tokens are sets
     of word characters plus some punctuation used to transliterate
@@ -149,13 +149,12 @@ DIFF_EPILOG = '''\
 ''' + ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
-HIGHLIGHT_BASE_NAME_HELP = 'Name of text to display.'
-HIGHLIGHT_BASE_SIGLUM_HELP = 'Siglum of text to display.'
+HIGHLIGHT_BASE_NAME_HELP = 'Name of work to display.'
+HIGHLIGHT_BASE_SIGLUM_HELP = 'Siglum of witness to display.'
 HIGHLIGHT_DESCRIPTION = '''\
-    Output an HTML document showing a text with supplied n-grams visually
-    highlighted.'''
+    Output an HTML document showing a witness' text with supplied
+    n-grams visually highlighted.'''
 HIGHLIGHT_EPILOG = '''\
-
     There are two possible outputs available, depending on whether the
     -n or -r option is specified.
 
@@ -177,7 +176,7 @@ HIGHLIGHT_EPILOG = '''\
       tacl highlight -r intersect.csv corpus/stripped/ T0001 元 > heatmap.html
 
       tacl highlight -n author_markers.csv corpus/stripped/ T0001 元 > highlight.html'''
-HIGHLIGHT_HELP = 'Output a text with its matches visually highlighted.'
+HIGHLIGHT_HELP = 'Output a witness with its matches visually highlighted.'
 HIGHLIGHT_MINUS_NGRAMS_HELP = '''\
     Path to file containing n-grams (one per line) to remove
     highlighting from. This applies only when -n is used.'''
@@ -203,28 +202,28 @@ INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
 JITC_DESCRIPTION = '''\
     Generate a report showing the amount of overlap between a set of
-    texts, ignoring those parts that overlap with texts in a second
-    set of texts.'''
-JITC_LABEL_HELP = 'Label of texts to compare with each other'
+    works, ignoring those parts that overlap with works in a second
+    set of works.'''
+JITC_LABEL_HELP = 'Label of works to compare with each other'
 JITC_OUTPUT_HELP = 'Directory to output results into'
 
 NGRAMS_CATALOGUE_HELP = '''\
-    Path to a catalogue file used to restrict which texts in the
+    Path to a catalogue file used to restrict which works in the
     corpus are added'''
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
 NGRAMS_EPILOG = '''\
     This command can be safely interrupted and subsequently rerun;
-    texts that have already had their n-grams added will be skipped.
+    witnesses that have already had their n-grams added will be skipped.
 
-    If new texts need to be added after a database was generated, this
-    command can be run again. However, the speed at which n-grams from
-    these new texts are added will be much less than to a new
+    If new witnesses need to be added after a database was generated,
+    this command can be run again. However, the speed at which n-grams
+    from these new witnesses are added will be much less than to a new
     database, due to the existing indices.
 
-    If a text has changed since a database was generated, this command
-    will not update the database. In this case, generate a new
+    If a witness has changed since a database was generated, this
+    command will not update the database. In this case, generate a new
     database or manipulate the existing dataase directly to remove the
-    text and its associated n-grams.
+    witness and its associated n-grams.
 
     examples:
 
@@ -244,17 +243,16 @@ NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
 PREPARE_DESCRIPTION = '''\
     Convert CBETA TEI XML files (which may have multiple files per
-    text) into XML suitable for processing via the tacl strip
+    work) into XML suitable for processing via the tacl strip
     command.'''
 PREPARE_EPILOG = '''\
     The TEI source options are:
 
     * {}: the CBETA TEI files as found on their 2011 DVD release
 
-    * {}: the CBETA TEI files as distruted on their GitHub repository
+    * {}: the CBETA TEI files as distributed on their GitHub repository
       at https://github.com/cbeta-org/xml-p5.git'''.format(
           TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB)
-
 PREPARE_HELP = '''\
     Convert CBETA TEI XML files into an XML form suitable for
     stripping.'''
@@ -274,8 +272,8 @@ RESULTS_EXTEND_HELP = '''\
 RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --reduce, --reciprocal, --zero-fill,
-    --ngrams, --min/max-texts, --min/max-size, --min/max-count,
-    --min/max-count-text, --remove, --sort.
+    --ngrams, --min/max-works, --min/max-size, --min/max-count,
+    --min/max-count-work, --remove, --sort.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -291,12 +289,12 @@ RESULTS_EPILOG = '''\
     results.
 
     --min-count and --max-count set the range within which the total
-    count of each n-gram, across all texts, must fall. For each text,
+    count of each n-gram, across all works, must fall. For each work,
     its count is taken as the highest count among its witnesses.
 
-    --min-texts and --max-texts count texts rather than witnesses.
+    --min-works and --max-works count works rather than witnesses.
 
-    If both --min-count-text and --max-count-text are specified, only
+    If both --min-count-work and --max-count-work are specified, only
     those n-grams are kept that have at least one witness whose count
     falls within that range.
 
@@ -321,23 +319,23 @@ RESULTS_EPILOG = '''\
 ''' + ENCODING_EPILOG
 RESULTS_HELP = 'Modify a query results file.'
 RESULTS_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
-RESULTS_MINIMUM_COUNT_TEXT_HELP = '''\
-    Minimum count per n-gram per text to include; if a single witness
+RESULTS_MINIMUM_COUNT_WORK_HELP = '''\
+    Minimum count per n-gram per work to include; if a single witness
     meets this criterion for an n-gram, all instances of that n-gram
     are kept.'''
 RESULTS_MAXIMUM_COUNT_HELP = 'Maximum total count per n-gram to include.'
-RESULTS_MAXIMUM_COUNT_TEXT_HELP = '''\
-    Maximum count per n-gram per text to include; if a single witness
+RESULTS_MAXIMUM_COUNT_WORK_HELP = '''\
+    Maximum count per n-gram per work to include; if a single witness
     meets this criterion for an n-gram, all instances of that n-gram
     are kept.'''
 RESULTS_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
 RESULTS_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
-RESULTS_MINIMUM_TEXT_HELP = 'Minimum count of texts containing n-gram to include.'
-RESULTS_MAXIMUM_TEXT_HELP = 'Maximum count of texts containing n-gram to include.'
+RESULTS_MINIMUM_WORK_HELP = 'Minimum count of works containing n-gram to include.'
+RESULTS_MAXIMUM_WORK_HELP = 'Maximum count of works containing n-gram to include.'
 RESULTS_NGRAMS_HELP = 'Path to file containing n-grams (one per line) to exclude.'
 RESULTS_RECIPROCAL_HELP = '''\
-    Remove n-grams that are not attested by at least one text in each
-    labelled set of texts. This can be useful after reducing a set of
+    Remove n-grams that are not attested by at least one work in each
+    labelled set of works. This can be useful after reducing a set of
     intersection results.'''
 RESULTS_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 RESULTS_REMOVE_HELP = 'Remove labelled results.'
@@ -345,20 +343,20 @@ RESULTS_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 RESULTS_SORT_HELP = 'Sort the results.'
 RESULTS_ZERO_FILL_HELP = '''\
     Add rows with a count of 0 for each n-gram in each witness of a
-    text that has at least one witness bearing that n-gram. The
+    work that has at least one witness bearing that n-gram. The
     catalogue used to generate the results must also be specified with
     the -c option.'''
 
 SEARCH_DESCRIPTION = '''\
-    List texts containing at least one of the supplied n-grams, along
-    with a total count of how many occurrences of the n-grams are
-    present in each text, and the number of n-grams that match in each
-    text.
+    List witnesses containing at least one of the supplied n-grams,
+    along with a total count of how many occurrences of the n-grams
+    are present in each witness, and the number of n-grams that match
+    in each witness.
 
     Specifying a catalogue file will not restrict the search to only
-    those labelled texts, but rather adds the labels to any
-    appropriate texts in the results.'''
-SEARCH_HELP = 'List texts containing at least one of the supplied n-grams.'
+    those labelled works, but rather adds the labels to any
+    appropriate witnesses in the results.'''
+SEARCH_HELP = 'List witnesses containing at least one of the supplied n-grams.'
 SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''
@@ -373,12 +371,12 @@ STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 
 STRIP_DESCRIPTION = '''\
     Preprocess a corpus by stripping unwanted material from each
-    text.'''
+    file.'''
 STRIP_EPILOG = '''\
-    The CBETA texts are in TEI XML that needs to have the markup and
+    The CBETA files are in TEI XML that needs to have the markup and
     metadata removed. If the TEI specifies textual variants, plain
     text versions based on these are also created.'''
-STRIP_HELP = 'Generate texts for use with TACL from a corpus of TEI XML.'
+STRIP_HELP = 'Generate files for use with TACL from a corpus of TEI XML.'
 STRIP_INPUT_HELP = 'Directory containing files to strip.'
 STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'
 
@@ -406,35 +404,35 @@ TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 TACL_HELPER_DESCRIPTION = '''\
     Perform helpful but non-essential tacl-related functions.'''
 TACL_HELPER_AGAINST_DESCRIPTION = '''\
-    Generate a script to compare each text of a corpus against all the
-    texts in another corpus.'''
+    Generate a script to compare each work in a corpus against all the
+    works in another corpus.'''
 TACL_HELPER_AGAINST_HELP = '''\
-    Generate a script to compare each text of a corpus against all the
-    texts in another corpus.'''
+    Generate a script to compare each work in a corpus against all the
+    works in another corpus.'''
 TACL_HELPER_AGAINST_A_HELP = '''\
-    File containing text names to compare (one per line).'''
+    File containing corpus work names to compare (one per line).'''
 TACL_HELPER_AGAINST_B_HELP = '''\
-    File containing corpus text names to be compared against (one per
+    File containing corpus work names to be compared against (one per
     line).'''
 TACL_HELPER_COLLAPSE_DESCRIPTION = '''
     Collapse result rows for multiple witnesses having the same count
     for an n-gram. Instead of the "siglum" column, all of the
-    witnesses (per text) with the same n-gram count are listed, space
+    witnesses (per work) with the same n-gram count are listed, space
     separated, in the "sigla" column.'''
 TACL_HELPER_COLLAPSE_HELP = 'Collapse result rows for multiple witnesses having the same count for an n-gram'
 TACL_HELPER_IN_DESCRIPTION = '''\
-    Generate a script to compare each text of a corpus with all the
-    other texts of that corpus.'''
+    Generate a script to compare each work in a corpus with all the
+    other works in that corpus.'''
 TACL_HELPER_IN_HELP = '''\
-    Generate a script to compare each text of a corpus with all the
-    other texts of that corpus.'''
+    Generate a script to compare each work in a corpus with all the
+    other works in that corpus.'''
 TACL_HELPER_IN_TEXTS_HELP = '''\
-    File containing text names to examine (one per line).'''
+    File containing work names to examine (one per line).'''
 TACL_HELPER_LABEL_COUNT_DESCRIPTION = '''\
     Output the supplied results with an additional column, "label
     count", giving the total count for each n-gram within the
-    label. The maximum count across all of a text's witnesses is used
-    in the sum.'''
+    label. For each work, the maximum count across all of that work's
+    witnesses is used in the sum.'''
 TACL_HELPER_LABEL_COUNT_HELP = '''\
     Add a "label count" column to results giving the count per
     label.'''
@@ -448,7 +446,7 @@ VERBOSE_HELP = '''\
 
 
 # Error messages.
-CATALOGUE_TEXT_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
 INSUFFICIENT_LABELS_QUERY_ERROR = 'Not running query with less than two defined labels'
 LABEL_NOT_IN_CATALOGUE_ERROR = 'Supplied label is not present in the supplied catalogue'
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
@@ -466,12 +464,12 @@ CREATE_INDEX_TEXTNGRAM_SQL = 'CREATE INDEX IF NOT EXISTS ' \
     'TextNGramIndexTextNGram ON TextNGram (text, ngram)'
 CREATE_TABLE_TEXT_SQL = 'CREATE TABLE IF NOT EXISTS Text (' \
     'id INTEGER PRIMARY KEY ASC, ' \
-    'name TEXT NOT NULL, ' \
+    'work TEXT NOT NULL, ' \
     'siglum TEXT NOT NULL, ' \
     'checksum TEXT NOT NULL, ' \
     'token_count INTEGER NOT NULL, ' \
     'label TEXT NOT NULL, ' \
-    'UNIQUE (name, siglum))'
+    'UNIQUE (work, siglum))'
 CREATE_TABLE_TEXTNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextNGram (' \
     'text INTEGER NOT NULL REFERENCES Text (id), ' \
     'ngram TEXT NOT NULL, ' \
@@ -486,7 +484,7 @@ CREATE_TEMPORARY_NGRAMS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (' \
 CREATE_TEMPORARY_RESULTS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputResults (' \
     'ngram TEXT NOT NULL, ' \
     'size INTEGER NOT NULL, ' \
-    'name TEXT NOT NULL, ' \
+    'work TEXT NOT NULL, ' \
     'siglum TEXT NOT NULL, ' \
     'count INTEGER NOT NULL, ' \
     'label TEXT NOT NULL)'
@@ -500,11 +498,11 @@ INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
 INSERT_TEXT_HAS_NGRAM_SQL = 'INSERT INTO TextHasNGram (text, size, count) ' \
     'VALUES (?, ?, ?)'
 INSERT_TEXT_SQL = 'INSERT INTO Text ' \
-    '(name, siglum, checksum, token_count, label) ' \
+    '(work, siglum, checksum, token_count, label) ' \
     'VALUES (?, ?, ?, ?, ?)'
 INSERT_TEMPORARY_NGRAM_SQL = 'INSERT INTO temp.InputNGram (ngram) VALUES (?)'
 INSERT_TEMPORARY_RESULTS_SQL = 'INSERT INTO temp.InputResults ' \
-    '(ngram, size, name, siglum, count, label) ' \
+    '(ngram, size, work, siglum, count, label) ' \
     'VALUES (?, ?, ?, ?, ?, ?)'
 PRAGMA_CACHE_SIZE_SQL = 'PRAGMA cache_size={}'
 PRAGMA_COUNT_CHANGES_SQL = 'PRAGMA count_changes=OFF'
@@ -512,15 +510,15 @@ PRAGMA_FOREIGN_KEYS_SQL = 'PRAGMA foreign_keys=ON'
 PRAGMA_LOCKING_MODE_SQL = 'PRAGMA locking_mode=EXCLUSIVE'
 PRAGMA_SYNCHRONOUS_SQL = 'PRAGMA synchronous=OFF'
 PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
-SELECT_COUNTS_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
+SELECT_COUNTS_SQL = 'SELECT Text.work, Text.siglum, ' \
     'TextHasNGram.size, TextHasNGram.count AS "unique ngrams", ' \
     'Text.token_count + 1 - TextHasNGram.size AS "total ngrams", ' \
     'Text.token_count AS "total tokens", Text.label ' \
     'FROM Text, TextHasNGram ' \
     'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
-    'ORDER BY Text.name, TextHasNGram.size'
+    'ORDER BY Text.work, TextHasNGram.size'
 SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
+    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
@@ -530,23 +528,22 @@ SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
 SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
+    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN (' \
     'SELECT TextNGram.ngram FROM Text, TextNGram ' \
     'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
     'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
-SELECT_DIFF_SUPPLIED_SQL = '''SELECT ngram, size, name AS "text name",
-siglum, count, label
-FROM temp.InputResults
-WHERE ngram IN (
-SELECT ngram FROM temp.InputResults
-GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)'''
+SELECT_DIFF_SUPPLIED_SQL = 'SELECT ngram, size, work, siglum, count, label ' \
+    'FROM temp.InputResults ' \
+    'WHERE ngram IN (' \
+    'SELECT ngram FROM temp.InputResults ' \
+    'GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)'
 SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
     'WHERE text = ? AND size = ?'
 SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.name AS "text name", Text.siglum, TextNGram.count, Text.label ' \
+    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
     'AND TextNGram.ngram IN ({})'
@@ -554,13 +551,14 @@ SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
 SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
     'FROM Text, TextNGram ' \
     'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = '''SELECT ngram, size, name AS "text name",
-siglum, count, label
-FROM temp.InputResults
-WHERE ngram IN (
-SELECT ngram FROM temp.InputResults
-GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)'''
-SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
+SELECT_INTERSECT_SUPPLIED_SQL = \
+    'SELECT ngram, size, work, siglum, count, ' \
+    'label ' \
+    'FROM temp.InputResults ' \
+    'WHERE ngram IN (' \
+    'SELECT ngram FROM temp.InputResults ' \
+    'GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)'
+SELECT_SEARCH_SQL = 'SELECT Text.work, Text.siglum, ' \
     'SUM(TextNGram.count) AS count, ' \
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, " \
     'count(TextNGram.ngram) AS number ' \
@@ -569,9 +567,9 @@ SELECT_SEARCH_SQL = 'SELECT Text.name AS "text name", Text.siglum, ' \
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
     'GROUP BY TextNGram.text'
 SELECT_TEXT_TOKEN_COUNT_SQL = 'SELECT Text.token_count ' \
-    'FROM Text WHERE Text.name = ?'
-SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE name = ? AND siglum = ?'
-UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE name = ?'
+    'FROM Text WHERE Text.work = ?'
+SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE work = ? AND siglum = ?'
+UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE work = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'
 UPDATE_TEXT_SQL = 'UPDATE Text SET checksum = ?, token_count = ? WHERE id = ?'
 VACUUM_SQL = 'VACUUM'

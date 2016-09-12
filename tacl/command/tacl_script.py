@@ -133,8 +133,8 @@ def generate_diff_subparser(subparsers):
 
 
 def generate_highlight_subparser(subparsers):
-    """Adds a sub-command parser to `subparsers` to highlight a text with
-    its matches in a result."""
+    """Adds a sub-command parser to `subparsers` to highlight a witness'
+    text with its matches in a result."""
     parser = subparsers.add_parser(
         'highlight', description=constants.HIGHLIGHT_DESCRIPTION,
         epilog=constants.HIGHLIGHT_EPILOG, formatter_class=ParagraphFormatter,
@@ -240,11 +240,11 @@ def generate_results_subparser(subparsers):
     parser.add_argument('--max-count', dest='max_count',
                         help=constants.RESULTS_MAXIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
-    parser.add_argument('--min-count-text', dest='min_count_text',
-                        help=constants.RESULTS_MINIMUM_COUNT_TEXT_HELP,
+    parser.add_argument('--min-count-work', dest='min_count_work',
+                        help=constants.RESULTS_MINIMUM_COUNT_WORK_HELP,
                         metavar='COUNT', type=int)
-    parser.add_argument('--max-count-text', dest='max_count_text',
-                        help=constants.RESULTS_MAXIMUM_COUNT_TEXT_HELP,
+    parser.add_argument('--max-count-work', dest='max_count_work',
+                        help=constants.RESULTS_MAXIMUM_COUNT_WORK_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--min-size', dest='min_size',
                         help=constants.RESULTS_MINIMUM_SIZE_HELP, metavar='SIZE',
@@ -252,11 +252,11 @@ def generate_results_subparser(subparsers):
     parser.add_argument('--max-size', dest='max_size',
                         help=constants.RESULTS_MAXIMUM_SIZE_HELP, metavar='SIZE',
                         type=int)
-    parser.add_argument('--min-texts', dest='min_texts',
-                        help=constants.RESULTS_MINIMUM_TEXT_HELP,
+    parser.add_argument('--min-works', dest='min_works',
+                        help=constants.RESULTS_MINIMUM_WORK_HELP,
                         metavar='COUNT', type=int)
-    parser.add_argument('--max-texts', dest='max_texts',
-                        help=constants.RESULTS_MAXIMUM_TEXT_HELP,
+    parser.add_argument('--max-works', dest='max_works',
+                        help=constants.RESULTS_MAXIMUM_WORK_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--ngrams', dest='ngrams',
                         help=constants.RESULTS_NGRAMS_HELP, metavar='NGRAMS')
@@ -313,13 +313,13 @@ def generate_statistics_subparser(subparsers):
 
 
 def generate_strip_subparser(subparsers):
-    """Adds a sub-command parser to `subparsers` to process original
-    texts for use with the tacl ngrams command."""
+    """Adds a sub-command parser to `subparsers` to process prepared files
+    for use with the tacl ngrams command."""
     parser = subparsers.add_parser(
         'strip', description=constants.STRIP_DESCRIPTION,
         epilog=constants.STRIP_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.STRIP_HELP)
-    parser.set_defaults(func=strip_texts)
+    parser.set_defaults(func=strip_files)
     utils.add_common_arguments(parser)
     parser.add_argument('input', help=constants.STRIP_INPUT_HELP,
                         metavar='INPUT')
@@ -406,10 +406,10 @@ def ngram_intersection(args, parser):
 
 
 def prepare_xml(args, parser):
-    """Prepares XML texts for stripping.
+    """Prepares XML files for stripping.
 
     This process creates a single, normalised TEI XML file for each
-    text.
+    work.
 
     """
     if args.source == constants.TEI_SOURCE_CBETA_2011:
@@ -448,15 +448,15 @@ def results(args, parser):
         with open(args.ngrams, encoding='utf-8') as fh:
             ngrams = fh.read().split()
         results.prune_by_ngram(ngrams)
-    if args.min_texts or args.max_texts:
-        results.prune_by_text_count(args.min_texts, args.max_texts)
+    if args.min_works or args.max_works:
+        results.prune_by_work_count(args.min_works, args.max_works)
     if args.min_size or args.max_size:
         results.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
         results.prune_by_ngram_count(args.min_count, args.max_count)
-    if args.min_count_text or args.max_count_text:
-        results.prune_by_ngram_count_per_text(args.min_count_text,
-                                              args.max_count_text)
+    if args.min_count_work or args.max_count_work:
+        results.prune_by_ngram_count_per_work(args.min_count_work,
+                                              args.max_count_work)
     if args.remove:
         results.remove_label(args.remove)
     if args.sort:
@@ -476,8 +476,8 @@ def search_texts(args, parser):
     store.search(catalogue, ngrams, sys.stdout)
 
 
-def strip_texts(args, parser):
-    """Processes prepared XML texts for use with the tacl ngrams
+def strip_files(args, parser):
+    """Processes prepared XML files for use with the tacl ngrams
     command."""
     stripper = tacl.Stripper(args.input, args.output)
     stripper.strip_files()

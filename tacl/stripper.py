@@ -42,17 +42,17 @@ class Stripper:
                               witness_element.get(constants.XML + 'id')))
         return witnesses
 
-    def _output_file(self, text_name, witnesses):
-        text_dir = os.path.join(self._output_dir, text_name)
+    def _output_file(self, work, witnesses):
+        work_dir = os.path.join(self._output_dir, work)
         try:
-            os.makedirs(text_dir)
+            os.makedirs(work_dir)
         except OSError as err:
             logging.error('Could not create output directory: {}'.format(
                 err))
             raise
         for witness in witnesses.keys():
             witness_file_path = os.path.join(
-                text_dir, '{}.txt'.format(witness))
+                work_dir, '{}.txt'.format(witness))
             with open(witness_file_path, 'wb') as output_file:
                 output_file.write(witnesses[witness].encode('utf-8'))
 
@@ -67,14 +67,14 @@ class Stripper:
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
                 if os.path.splitext(filename)[1] == '.xml':
-                    text_name, witnesses = self.strip_file(
+                    work, witnesses = self.strip_file(
                         os.path.join(dirpath, filename))
-                    self._output_file(text_name, witnesses)
+                    self._output_file(work, witnesses)
 
     def strip_file(self, filename):
         file_path = os.path.join(self._input_dir, filename)
-        text_name = os.path.splitext(os.path.basename(filename))[0]
-        stripped_file_path = os.path.join(self._output_dir, text_name)
+        work = os.path.splitext(os.path.basename(filename))[0]
+        stripped_file_path = os.path.join(self._output_dir, work)
         self._logger.info('Stripping file {} into {}'.format(
                 file_path, stripped_file_path))
         try:
@@ -82,9 +82,9 @@ class Stripper:
         except etree.XMLSyntaxError:
             logging.warning('XML file "{}" is invalid'.format(filename))
             return
-        text_witnesses = self._texts.setdefault(stripped_file_path, {})
+        witnesses = self._texts.setdefault(stripped_file_path, {})
         for witness, witness_id in self.get_witnesses(tei_doc):
             witness_param = "'{}'".format(witness_id)
             text = str(self.transform(tei_doc, witness_id=witness_param))
-            text_witnesses[witness] = text
-        return text_name, text_witnesses
+            witnesses[witness] = text
+        return work, witnesses

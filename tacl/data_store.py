@@ -50,7 +50,7 @@ class DataStore:
     def add_ngrams(self, corpus, minimum, maximum, catalogue=None):
         """Adds n-gram data from `corpus` to the data store.
 
-        :param corpus: corpus of texts
+        :param corpus: corpus of works
         :type corpus: `Corpus`
         :param minimum: minimum n-gram size
         :type minimum: `int`
@@ -61,10 +61,10 @@ class DataStore:
 
         """
         self._initialise_database()
-        for text in corpus.get_texts():
-            if catalogue and not catalogue.get(text.get_names()[0]):
+        for witness in corpus.get_witnesses():
+            if catalogue and not catalogue.get(witness.get_names()[0]):
                 continue
-            self._add_text_ngrams(text, minimum, maximum)
+            self._add_text_ngrams(witness, minimum, maximum)
         self._add_indices()
         self._analyse()
 
@@ -109,41 +109,41 @@ class DataStore:
         self._conn.execute(constants.CREATE_INDEX_INPUT_RESULTS_SQL)
         self._logger.info('Index added')
 
-    def _add_text_ngrams(self, text, minimum, maximum):
-        """Adds n-gram data from `text` to the data store.
+    def _add_text_ngrams(self, witness, minimum, maximum):
+        """Adds n-gram data from `witness` to the data store.
 
-        :param text: text to get n-grams from
-        :type text: `Text`
+        :param witness: witness to get n-grams from
+        :type witness: `WitnessText`
         :param minimum: minimum n-gram size
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
 
         """
-        text_id = self._get_text_id(text)
+        text_id = self._get_text_id(witness)
         self._logger.info('Adding n-grams ({} <= n <= {}) for {}'.format(
-            minimum, maximum, text.get_filename()))
+            minimum, maximum, witness.get_filename()))
         skip_sizes = []
         for size in range(minimum, maximum + 1):
             if self._has_ngrams(text_id, size):
                 self._logger.info('{}-grams are already in the database'.format(
                     size))
                 skip_sizes.append(size)
-        for size, ngrams in text.get_ngrams(minimum, maximum, skip_sizes):
+        for size, ngrams in witness.get_ngrams(minimum, maximum, skip_sizes):
             self._add_text_size_ngrams(text_id, size, ngrams)
 
-    def _add_text_record(self, text):
-        """Adds a Text record for `text`.
+    def _add_text_record(self, witness):
+        """Adds a Text record for `witness`.
 
-        :param text: text to add a record for
-        :type text: `Text`
+        :param witness: witness to add a record for
+        :type text: `WitnessText`
 
         """
-        filename = text.get_filename()
-        name, siglum = text.get_names()
+        filename = witness.get_filename()
+        name, siglum = witness.get_names()
         self._logger.info('Adding record for text {}'.format(filename))
-        checksum = text.get_checksum()
-        token_count = len(text.get_tokens())
+        checksum = witness.get_checksum()
+        token_count = len(witness.get_tokens())
         cursor = self._conn.execute(constants.INSERT_TEXT_SQL,
                                     [name, siglum, checksum, token_count, ''])
         self._conn.commit()
@@ -231,7 +231,7 @@ class DataStore:
 
     def counts(self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving
-        n-gram counts of the texts in `catalogue`.
+        n-gram counts of the witnesses of the works in `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
@@ -319,7 +319,8 @@ class DataStore:
 
     def diff(self, catalogue, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
-        that are unique to each labelled set of texts in `catalogue`.
+        that are unique to the witnesses of each labelled set of works
+        in `catalogue`.
 
         Note that this is not the same as the symmetric difference of
         these sets, except in the case where there are only two
@@ -349,8 +350,8 @@ class DataStore:
 
     def diff_asymmetric(self, catalogue, prime_label, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the
-        difference in n-grams between the labelled sets of texts in
-        `catalogue`, limited to those texts labelled with
+        difference in n-grams between the witnesses of labelled sets
+        of works in `catalogue`, limited to those works labelled with
         `prime_label`.
 
         :param catalogue: catalogue matching filenames to labels
@@ -383,8 +384,8 @@ class DataStore:
 
     def diff_supplied(self, results_filenames, labels, tokenizer, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
-        that are unique to each set of texts in `results_sets`, using
-        the labels in `labels`.
+        that are unique to the witnesses in each set of works in
+        `results_sets`, using the labels in `labels`.
 
         Note that this is not the same as the symmetric difference of
         these sets, except in the case where there are only two
@@ -440,8 +441,8 @@ class DataStore:
         """
         return ('?,' * len(items)).strip(',')
 
-    def _get_text_id(self, text):
-        """Returns the database ID of the Text record for `text`.
+    def _get_text_id(self, witness):
+        """Returns the database ID of the Text record for `witness`.
 
         This may require creating such a record.
 
@@ -449,23 +450,23 @@ class DataStore:
         checksum, the record's checksum is updated and all associated
         TextNGram and TextHasNGram records are deleted.
 
-        :param text: text to add a record for
-        :type text: `.Text`
+        :param witness: witness to add a record for
+        :type witness: `WitnessText`
         :rtype: `int`
 
         """
-        name, siglum = text.get_names()
+        name, siglum = witness.get_names()
         text_record = self._conn.execute(constants.SELECT_TEXT_SQL,
                                          [name, siglum]).fetchone()
         if text_record is None:
-            text_id = self._add_text_record(text)
+            text_id = self._add_text_record(witness)
         else:
             text_id = text_record['id']
-            if text_record['checksum'] != text.get_checksum():
-                filename = text.get_filename()
+            if text_record['checksum'] != witness.get_checksum():
+                filename = witness.get_filename()
                 self._logger.info('Text {} has changed since it was added to '
                                   'the database'.format(filename))
-                self._update_text_record(text, text_id)
+                self._update_text_record(witness, text_id)
                 self._logger.info('Deleting potentially out-of-date n-grams')
                 self._delete_text_ngrams(text_id)
         return text_id
@@ -502,8 +503,8 @@ class DataStore:
 
     def intersection(self, catalogue, output_fh):
         """Returns `output_fh` populated with CSV results giving the
-        intersection in n-grams of the labelled sets of texts in
-        `catalogue`.
+        intersection in n-grams of the witnesses of labelled sets of
+        works in `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
@@ -528,8 +529,8 @@ class DataStore:
 
     def intersection_supplied(self, results_filenames, labels, output_fh):
         """Returns `output_fh` populated with CSV results giving the n-grams
-        that are common to every set of texts in `results_sets`, using
-        the labels in `labels`.
+        that are common to witnesses in every set of works in
+        `results_sets`, using the labels in `labels`.
 
         :param results_filenames: list of results to be diffed
         :type results_filenames: `list` of `str`
@@ -595,15 +596,15 @@ class DataStore:
         # is no possible results pollution between them.
         grouped = pd.read_csv(matches_path, encoding='utf-8',
                               na_filter=False).groupby(
-            [constants.NAME_FIELDNAME, constants.SIGLUM_FIELDNAME,
+            [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
              constants.SIZE_FIELDNAME])
-        for (text, siglum, size), group in grouped:
-            if (text, siglum) != previous_witness:
+        for (work, siglum, size), group in grouped:
+            if (work, siglum) != previous_witness:
                 previous_matches = group
-                previous_witness = (text, siglum)
+                previous_witness = (work, siglum)
             else:
                 self._logger.debug('Reducing down {} {}-grams for {} {}'.format(
-                    len(group.index), size, text, siglum))
+                    len(group.index), size, work, siglum))
                 if previous_matches.empty:
                     reduced_count = 0
                 else:
@@ -653,8 +654,8 @@ class DataStore:
 
     def _set_labels(self, catalogue):
         """Returns a dictionary of the unique labels in `catalogue` and the
-        number of their associated texts, and sets the record of each
-        Text to the corresponding label.
+        count of all tokens associated with each, and sets the record
+        of each Text to its corresponding label.
 
         Texts that do not have a label specified are set to the empty
         string.
@@ -669,10 +670,10 @@ class DataStore:
         """
         self._conn.execute(constants.UPDATE_LABELS_SQL, [''])
         labels = {}
-        for name, label in catalogue.items():
-            self._conn.execute(constants.UPDATE_LABEL_SQL, [label, name])
+        for work, label in catalogue.items():
+            self._conn.execute(constants.UPDATE_LABEL_SQL, [label, work])
             cursor = self._conn.execute(constants.SELECT_TEXT_TOKEN_COUNT_SQL,
-                                        [name])
+                                        [work])
             token_count = cursor.fetchone()['token_count']
             labels[label] = labels.get(label, 0) + token_count
         self._conn.commit()
@@ -693,18 +694,18 @@ class DataStore:
         labels.sort(key=label_data.get, reverse=True)
         return labels
 
-    def _update_text_record(self, text, text_id):
-        """Updates the record with `text_id` with `text`\'s checksum and
+    def _update_text_record(self, witness, text_id):
+        """Updates the record with `text_id` with `witness`\'s checksum and
         token count.
 
-        :param text: text to update from
-        :type text: `Text`
+        :param withness: witness to update from
+        :type witness: `WitnessText`
         :param text_id: database ID of Text record
         :type text_id: `int`
 
         """
-        checksum = text.get_checksum()
-        token_count = len(text.get_tokens())
+        checksum = witness.get_checksum()
+        token_count = len(witness.get_tokens())
         self._conn.execute(constants.UPDATE_TEXT_SQL,
                            [checksum, token_count, text_id])
         self._conn.commit()
@@ -713,7 +714,7 @@ class DataStore:
         """Returns True if all of the files labelled in `catalogue`
         are up-to-date in the database.
 
-        :param corpus: corpus of texts
+        :param corpus: corpus of works
         :type corpus: `Corpus`
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
@@ -723,12 +724,12 @@ class DataStore:
         is_valid = True
         for name in catalogue:
             count = 0
-            # It is unfortunate that this creates Text objects for
-            # each text, since that involves reading the file.
-            for text in corpus.get_texts(name):
+            # It is unfortunate that this creates WitnessText objects
+            # for each work, since that involves reading the file.
+            for witness in corpus.get_witnesses(name):
                 count += 1
-                name, siglum = text.get_names()
-                filename = text.get_filename()
+                name, siglum = witness.get_names()
+                filename = witness.get_filename()
                 row = self._conn.execute(constants.SELECT_TEXT_SQL,
                                          [name, siglum]).fetchone()
                 if row is None:
@@ -736,13 +737,13 @@ class DataStore:
                     self._logger.warning(
                         'No record (or n-grams) exists for {} in '
                         'the database'.format(filename))
-                elif row['checksum'] != text.get_checksum():
+                elif row['checksum'] != witness.get_checksum():
                     is_valid = False
                     self._logger.warning(
                         '{} has changed since its n-grams were '
                         'added to the database'.format(filename))
             if count == 0:
-                self._logger.error('Catalogue references text {} that does not '
-                                   'exist in the corpus'.format(name))
+                self._logger.error('Catalogue references work {} that does '
+                                   'not exist in the corpus'.format(name))
                 raise FileNotFoundError
         return is_valid
