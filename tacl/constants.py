@@ -389,9 +389,13 @@ SUPPLIED_EPILOG = '''\
     files. The first label is assigned to all results in the first
     results file, the second label to all results in the second
     results file, etc. The labels specified in the results files are
-    replaced with the supplied labels in the output.'''
-SUPPLIED_DIFF_EPILOG = SUPPLIED_EPILOG.format('sdiff')
-SUPPLIED_INTERSECT_EPILOG = SUPPLIED_EPILOG.format('sintersect')
+    replaced with the supplied labels in the output.
+
+    examples:
+
+        tacl {cmd} -d cbeta2-10.db -l A B -s results1.csv results2.csv > output.csv'''
+SUPPLIED_DIFF_EPILOG = SUPPLIED_EPILOG.format(cmd='sdiff')
+SUPPLIED_INTERSECT_EPILOG = SUPPLIED_EPILOG.format(cmd='sintersect')
 SUPPLIED_INTERSECT_DESCRIPTION = '''\
     List n-grams common to all sets of results (as defined by the
     specified results files).'''
