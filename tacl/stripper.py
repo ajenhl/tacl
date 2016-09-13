@@ -24,7 +24,8 @@ class Stripper:
         self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
-        xslt_filename = resource_filename(__name__, 'assets/xslt/strip_tei.xsl')
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/strip_tei.xsl')
         self.transform = etree.XSLT(etree.parse(xslt_filename))
 
     def get_witnesses(self, source_tree):
@@ -37,8 +38,9 @@ class Stripper:
 
         """
         witnesses = [(constants.BASE_WITNESS, constants.BASE_WITNESS_ID)]
-        witness_elements = source_tree.xpath('/tei:teiCorpus/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:listWit/tei:witness',
-                                             namespaces=constants.NAMESPACES)
+        witness_elements = source_tree.xpath(
+            '/tei:teiCorpus/tei:teiHeader/tei:fileDesc/tei:sourceDesc/'
+            'tei:listWit/tei:witness', namespaces=constants.NAMESPACES)
         for witness_element in witness_elements:
             witnesses.append((witness_element.text,
                               witness_element.get(constants.XML + 'id')))

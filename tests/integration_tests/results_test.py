@@ -24,7 +24,8 @@ class ResultsIntegrationTestCase (TaclTestCase):
             os.path.join(self._stripped_dir, 'cbeta'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'cbeta-extend-results.csv')
         with open(expected_results, newline='') as fh:
@@ -37,7 +38,8 @@ class ResultsIntegrationTestCase (TaclTestCase):
             os.path.join(self._stripped_dir, 'pagel'),
             tacl.constants.TOKENIZER_CHOICE_PAGEL, results)
         data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'pagel-extend-results.csv')
         with open(expected_results, newline='') as fh:
@@ -53,7 +55,8 @@ class ResultsIntegrationTestCase (TaclTestCase):
             os.path.join(self._stripped_dir, 'multiply-labelled'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'multiply-labelled-extend-results.csv')
         with open(expected_results, newline='') as fh:
@@ -67,7 +70,8 @@ class ResultsIntegrationTestCase (TaclTestCase):
             os.path.join(self._stripped_dir, 'diff-extend'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
         data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(self._data_dir,
                                         'diff-extend-results.csv')
         with open(expected_results, newline='') as fh:
@@ -82,7 +86,8 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -c {} -z {} {}'.format(catalogue, corpus,
                                                        results)
         data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_results = os.path.join(data_dir, 'zero-fill-results.csv')
         with open(expected_results, newline='') as fh:
             expected_rows = self._get_rows_from_csv(fh)

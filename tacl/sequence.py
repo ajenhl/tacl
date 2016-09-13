@@ -113,7 +113,8 @@ class Sequencer:
                                                    text2, ngrams, template)
 
     def _generate_sequences_for_texts(self, l1, t1, l2, t2, ngrams, template):
-        self._r_substitutes = dict((v, k) for k, v in self._substitutes.items())
+        self._r_substitutes = dict((v, k) for k, v in
+                                   self._substitutes.items())
         sequences = []
         covered_spans = [[], []]
         for ngram in ngrams:
@@ -131,7 +132,8 @@ class Sequencer:
                 fh.write(html)
 
     def _generate_sequences_for_ngram(self, t1, t2, ngram, covered_spans):
-        self._logger.debug('Generating sequences for n-gram "{}"'.format(ngram))
+        self._logger.debug('Generating sequences for n-gram "{}"'.format(
+            ngram))
         pattern = re.compile(re.escape(ngram))
         context_length = len(ngram)
         t1_spans = [match.span() for match in pattern.finditer(t1)]

@@ -11,8 +11,9 @@ from .tacl_test_case import TaclTestCase
 class CorpusTestCase (TaclTestCase):
 
     def setUp(self):
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
 
     def test_get_witness(self):
         Text = self._create_patch('tacl.corpus.WitnessText')

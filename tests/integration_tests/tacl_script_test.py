@@ -241,7 +241,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         counts_command = 'tacl counts {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
         data = subprocess.check_output(shlex.split(counts_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('T1', 'base', '1', '5', '10', '10', 'A'),
             ('T1', 'base', '2', '7', '9', '10', 'A'),
@@ -268,7 +269,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         diff_command = 'tacl diff {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
         data = subprocess.check_output(shlex.split(diff_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('s', '1', 'T2', 'base', '2', 'B'),
             ('s', '1', 'T2', 'a', '2', 'B'),
@@ -290,7 +292,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         diff_command = 'tacl diff -a {} {} {} {}'.format(
             'A', self._db_path, self._corpus_dir, self._catalogue_path)
         data = subprocess.check_output(shlex.split(diff_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('l', '1', 'T5', 'base', '2', 'A'),
             ('nw', '2', 'T1', 'base', '1', 'A'),
@@ -311,7 +314,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         diff_command = 'tacl sdiff -d {} -l A B C -s {} {} {}'.format(
             self._db_path, results1, results2, results3)
         data = subprocess.check_output(shlex.split(diff_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('過失', '2', 'T0005', 'base', '5', 'A'),
             ('過失', '2', 'T0003', '大', '2', 'A'),
@@ -332,7 +336,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         intersect_command = 'tacl intersect {} {} {}'.format(
             self._db_path, self._corpus_dir, self._catalogue_path)
         data = subprocess.check_output(shlex.split(intersect_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('t', '1', 'T1', 'base', '2', 'A'),
             ('t', '1', 'T1', 'a', '2', 'A'),
@@ -356,10 +361,12 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         results1 = os.path.join(supplied_dir, 'intersect_input_1.csv')
         results2 = os.path.join(supplied_dir, 'intersect_input_2.csv')
         results3 = os.path.join(supplied_dir, 'intersect_input_3.csv')
-        intersect_command = 'tacl sintersect -d {} -l A B C -s {} {} {}'.format(
-            self._db_path, results1, results2, results3)
+        intersect_command = (
+            'tacl sintersect -d {} -l A B C -s {} {} {}'.format(
+                self._db_path, results1, results2, results3))
         data = subprocess.check_output(shlex.split(intersect_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         expected_rows = [
             ('龍皆起前', '4', 'T0033', '元', '1', 'A'),
             ('龍皆起前', '4', 'T0034', '明', '2', 'A'),
@@ -376,7 +383,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         search_command = 'tacl search {} {} {}'.format(
             self._db_path, self._corpus_dir, self._ngrams_path)
         data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         # The SQLite3 documentation says that the order of
         # concatenated tokens (as seen in the fourth element in each
         # row) is arbitrary, which means this test may sometimes fail
@@ -395,7 +403,8 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         search_command = 'tacl search -c {} {} {} {}'.format(
             catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
         data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
         # The SQLite3 documentation says that the order of
         # concatenated tokens (as seen in the fourth element in each
         # row) is arbitrary, which means this test may sometimes fail

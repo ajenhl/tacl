@@ -10,7 +10,8 @@ from pkg_resources import resource_filename
 from . import constants
 
 
-TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0"
+           xmlns:cb="http://www.cbeta.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
@@ -159,14 +160,14 @@ class TEICorpus:
         # in which case do nothing.
         try:
             title_stmt[0].text = root.xpath(
-                'tei:TEI[1]/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title',
-                namespaces=constants.NAMESPACES)[0].text
+                'tei:TEI[1]/tei:teiHeader/tei:fileDesc/tei:titleStmt/'
+                'tei:title', namespaces=constants.NAMESPACES)[0].text
         except IndexError:
             pass
         try:
             title_stmt[1].text = root.xpath(
-                'tei:TEI[1]/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author',
-                namespaces=constants.NAMESPACES)[0].text
+                'tei:TEI[1]/tei:teiHeader/tei:fileDesc/tei:titleStmt/'
+                'tei:author', namespaces=constants.NAMESPACES)[0].text
         except IndexError:
             pass
         return root

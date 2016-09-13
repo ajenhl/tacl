@@ -126,8 +126,8 @@ class DataStore:
         skip_sizes = []
         for size in range(minimum, maximum + 1):
             if self._has_ngrams(text_id, size):
-                self._logger.info('{}-grams are already in the database'.format(
-                    size))
+                self._logger.info(
+                    '{}-grams are already in the database'.format(size))
                 skip_sizes.append(size)
         for size, ngrams in witness.get_ngrams(minimum, maximum, skip_sizes):
             self._add_text_size_ngrams(text_id, size, ngrams)
@@ -200,7 +200,8 @@ class DataStore:
 
         :param row: result row of the n-gram to check
         :type row: pandas.Series
-        :param matches: (n-1)-grams and their associated counts to check against
+        :param matches: (n-1)-grams and their associated counts to check
+                        against
         :type matches: `dict`
         :param tokenize: function to tokenize a string
         :type tokenize: `function`
@@ -313,8 +314,8 @@ class DataStore:
         try:
             os.remove(temp_path)
         except OSError as e:
-            self._logger.error(
-                'Failed to remove temporary file containing unreduced results: {}'.format(e))
+            self._logger.error('Failed to remove temporary file containing '
+                               'unreduced results: {}'.format(e))
         return output_fh
 
     def diff(self, catalogue, tokenizer, output_fh):
@@ -337,7 +338,8 @@ class DataStore:
         """
         labels = self._sort_labels(self._set_labels(catalogue))
         if len(labels) < 2:
-            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
+            raise MalformedQueryError(
+                constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_SQL.format(label_placeholders,
                                                  label_placeholders)
@@ -367,7 +369,8 @@ class DataStore:
         """
         labels = list(self._set_labels(catalogue))
         if len(labels) < 2:
-            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
+            raise MalformedQueryError(
+                constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         try:
             labels.remove(prime_label)
         except ValueError:
@@ -515,7 +518,8 @@ class DataStore:
         """
         labels = self._sort_labels(self._set_labels(catalogue))
         if len(labels) < 2:
-            raise MalformedQueryError(constants.INSUFFICIENT_LABELS_QUERY_ERROR)
+            raise MalformedQueryError(
+                constants.INSUFFICIENT_LABELS_QUERY_ERROR)
         label_placeholders = self._get_placeholders(labels)
         subquery = self._get_intersection_subquery(labels)
         query = constants.SELECT_INTERSECT_SQL.format(label_placeholders,
@@ -603,8 +607,9 @@ class DataStore:
                 previous_matches = group
                 previous_witness = (work, siglum)
             else:
-                self._logger.debug('Reducing down {} {}-grams for {} {}'.format(
-                    len(group.index), size, work, siglum))
+                self._logger.debug(
+                    'Reducing down {} {}-grams for {} {}'.format(
+                        len(group.index), size, work, siglum))
                 if previous_matches.empty:
                     reduced_count = 0
                 else:

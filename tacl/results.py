@@ -326,8 +326,9 @@ class Results:
         sample = results.iloc[0]
         ngram = sample[constants.NGRAM_FIELDNAME]
         label = sample[constants.LABEL_FIELDNAME]
-        return not(results[(results[constants.NGRAM_FIELDNAME] == ngram) &
-                           (results[constants.LABEL_FIELDNAME] != label)].empty)
+        return not(results[
+            (results[constants.NGRAM_FIELDNAME] == ngram) &
+            (results[constants.LABEL_FIELDNAME] != label)].empty)
 
     def prune_by_ngram(self, ngrams):
         """Removes results rows whose n-gram is in `ngrams`.

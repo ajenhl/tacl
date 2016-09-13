@@ -38,8 +38,9 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             expected_path = os.path.join(self._expected_output_dir, filename)
-            self.assertTrue(os.path.exists(actual_path),
-                            'Expected file {} to exist, but it does not'.format(
+            self.assertTrue(
+                os.path.exists(actual_path),
+                'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
                 actual_content = fh.readlines()
@@ -61,7 +62,8 @@ class TEICorpusCBETA2011IntegrationTestCase (TEICorpusIntegrationTestCase):
         super().setUp()
 
     def test_tidy(self):
-        corpus = tacl.TEICorpusCBETA2011(self._xml_dir, self._actual_output_dir)
+        corpus = tacl.TEICorpusCBETA2011(self._xml_dir,
+                                         self._actual_output_dir)
         corpus.tidy()
         expected_files = ['T0001.xml', 'T0002.xml', 'T0003.xml']
         self.check_tidy_results(expected_files)

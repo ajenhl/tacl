@@ -7,8 +7,9 @@ import tacl
 class TextIntegrationTestCase (unittest.TestCase):
 
     def setUp(self):
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
 
     def test_get_checksum(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'

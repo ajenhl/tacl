@@ -247,11 +247,11 @@ def generate_results_subparser(subparsers):
                         help=constants.RESULTS_MAXIMUM_COUNT_WORK_HELP,
                         metavar='COUNT', type=int)
     parser.add_argument('--min-size', dest='min_size',
-                        help=constants.RESULTS_MINIMUM_SIZE_HELP, metavar='SIZE',
-                        type=int)
+                        help=constants.RESULTS_MINIMUM_SIZE_HELP,
+                        metavar='SIZE', type=int)
     parser.add_argument('--max-size', dest='max_size',
-                        help=constants.RESULTS_MAXIMUM_SIZE_HELP, metavar='SIZE',
-                        type=int)
+                        help=constants.RESULTS_MAXIMUM_SIZE_HELP,
+                        metavar='SIZE', type=int)
     parser.add_argument('--min-works', dest='min_works',
                         help=constants.RESULTS_MINIMUM_WORK_HELP,
                         metavar='COUNT', type=int)
@@ -270,7 +270,8 @@ def generate_results_subparser(subparsers):
                         help=constants.RESULTS_SORT_HELP)
     utils.add_tokenizer_argument(parser)
     parser.add_argument('-z', '--zero-fill', dest='zero_fill',
-                        help=constants.RESULTS_ZERO_FILL_HELP, metavar='CORPUS')
+                        help=constants.RESULTS_ZERO_FILL_HELP,
+                        metavar='CORPUS')
     parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
 
@@ -391,7 +392,8 @@ def ngram_diff(args, parser):
     tokenizer = utils.get_tokenizer(args)
     store.validate(corpus, catalogue)
     if args.asymmetric:
-        store.diff_asymmetric(catalogue, args.asymmetric, tokenizer, sys.stdout)
+        store.diff_asymmetric(catalogue, args.asymmetric, tokenizer,
+                              sys.stdout)
     else:
         store.diff(catalogue, tokenizer, sys.stdout)
 
@@ -439,8 +441,8 @@ def results(args, parser):
         results.reciprocal_remove()
     if args.zero_fill:
         if not args.catalogue:
-            parser.error(
-                'The zero-fill option requires that the -c option also be supplied.')
+            parser.error('The zero-fill option requires that the -c option '
+                         'also be supplied.')
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
         catalogue = utils.get_catalogue(args.catalogue)
         results.zero_fill(corpus, catalogue)

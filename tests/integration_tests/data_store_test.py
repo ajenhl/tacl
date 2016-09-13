@@ -10,8 +10,9 @@ from ..tacl_test_case import TaclTestCase
 class DataStoreIntegrationTestCase (TaclTestCase):
 
     def setUp(self):
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data')
         self._corpus = tacl.Corpus(os.path.join(self._data_dir, 'stripped'),
                                    self._tokenizer)
@@ -133,7 +134,8 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'el', 2, 1),
             ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'll', 2, 1),
             ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'wel', 3, 1),
-            ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'ell', 3, 1)]
+            ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'ell', 3, 1)
+        ]
         self.assertEqual(set(actual_rows), set(expected_rows))
         actual_rows = self._store._conn.execute(
             'SELECT Text.work, Text.siglum, TextHasNGram.size '

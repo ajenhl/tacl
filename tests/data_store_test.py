@@ -153,7 +153,8 @@ class DataStoreTestCase (TaclTestCase):
         text.get_tokens.assert_called_once_with()
         store._conn.execute.assert_called_once_with(
             tacl.constants.INSERT_TEXT_SQL,
-            [sentinel.name, sentinel.siglum, sentinel.checksum, len(tokens), ''])
+            [sentinel.name, sentinel.siglum, sentinel.checksum,
+             len(tokens), ''])
         store._conn.commit.assert_called_once_with()
         self.assertEqual(actual_text_id, sentinel.text_id)
 
@@ -246,8 +247,9 @@ class DataStoreTestCase (TaclTestCase):
         sql = tacl.constants.SELECT_DIFF_SQL.format(sentinel.placeholders,
                                                     sentinel.placeholders)
         self.assertEqual(store._conn.mock_calls,
-                         [call.execute(sql, [sentinel.label, sentinel.label2,
-                                             sentinel.label, sentinel.label2])])
+                         [call.execute(sql,
+                                       [sentinel.label, sentinel.label2,
+                                        sentinel.label, sentinel.label2])])
         self.assertTrue(_diff.called)
         self.assertEqual(input_fh, output_fh)
 
@@ -341,7 +343,8 @@ class DataStoreTestCase (TaclTestCase):
         add_text = self._create_patch('tacl.DataStore._add_text_record')
         add_text.return_value = sentinel.new_text_id
         update_text = self._create_patch('tacl.DataStore._update_text_record')
-        delete_ngrams = self._create_patch('tacl.DataStore._delete_text_ngrams')
+        delete_ngrams = self._create_patch(
+            'tacl.DataStore._delete_text_ngrams')
         text = MagicMock(spec_set=tacl.WitnessText)
         text.get_checksum.return_value = sentinel.checksum
         text.get_filename.return_value = sentinel.filename
@@ -453,7 +456,17 @@ class DataStoreTestCase (TaclTestCase):
         set_labels.assert_called_once_with(store, catalogue)
         get_placeholders.assert_called_once_with(labels)
         self.assertTrue(log_query_plan.called)
-        sql = 'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, TextNGram.count, Text.label FROM Text, TextNGram WHERE Text.label IN (sentinel.placeholders) AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text AND TextNGram.ngram IN (SELECT TextNGram.ngram FROM Text, TextNGram WHERE Text.label = ? AND Text.id = TextNGram.text))'
+        sql = (
+            'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, '
+            'TextNGram.count, Text.label FROM Text, TextNGram '
+            'WHERE Text.label IN (sentinel.placeholders) '
+            'AND Text.id = TextNGram.text '
+            'AND TextNGram.ngram IN '
+            '(SELECT TextNGram.ngram FROM Text, TextNGram '
+            'WHERE Text.label = ? AND Text.id = TextNGram.text '
+            'AND TextNGram.ngram IN (SELECT TextNGram.ngram '
+            'FROM Text, TextNGram WHERE Text.label = ? '
+            'AND Text.id = TextNGram.text))')
         self.assertEqual(store._conn.mock_calls,
                          [call.execute(sql, labels * 2)])
         csv.assert_called_once_with(cursor, tacl.constants.QUERY_FIELDNAMES,

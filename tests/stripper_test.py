@@ -15,10 +15,10 @@ class StripTestCase (unittest.TestCase):
     def test_foreign(self):
         """Tests that foreign elements with @place="foot" are stripped."""
         foreign_data = (
-            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" resp="Taisho" lang="san">Saalva</foreign>',
-             'Saalva'),
-            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" resp="Taisho" lang="san" place="foot">Saalva</foreign>',
-             ''),
+            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" '
+             'resp="Taisho" lang="san">Saalva</foreign>', 'Saalva'),
+            ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" '
+             'resp="Taisho" lang="san" place="foot">Saalva</foreign>', ''),
             )
         for input_xml, expected_output in foreign_data:
             actual_output = str(self.stripper.transform(etree.XML(input_xml)))
@@ -73,7 +73,11 @@ class StripTestCase (unittest.TestCase):
     def test_tt(self):
         """Tests that tt is stripped down to the content of
         t[@lang='chi']."""
-        input_xml = '''<tt xmlns="http://www.cbeta.org/ns/1.0" n="0001011" type="app"><t resp="Taisho" xml:lang="zh">長阿含經</t><t resp="Taisho" xml:lang="sa" place="foot">Dīrgha-āgama</t><t resp="Taisho" xml:lang="pi" place="foot">Dīgha-nikāya</t></tt>'''
+        input_xml = (
+            '<tt xmlns="http://www.cbeta.org/ns/1.0" n="0001011" type="app">'
+            '<t resp="Taisho" xml:lang="zh">長阿含經</t><t resp="Taisho" '
+            'xml:lang="sa" place="foot">Dīrgha-āgama</t><t resp="Taisho" '
+            'xml:lang="pi" place="foot">Dīgha-nikāya</t></tt>')
         expected_output = '長阿含經'
         actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)
@@ -81,8 +85,7 @@ class StripTestCase (unittest.TestCase):
     def test_variants(self):
         """Tests that lem/rdg is stripped when it doesn't match the supplied
         witness name."""
-        input_xml = '''
-<body xmlns="http://www.tei-c.org/ns/1.0">
+        input_xml = '''<body xmlns="http://www.tei-c.org/ns/1.0">
   <p><app n="0083004"><lem>釋。秦言能在直樹林。故名釋。釋。秦言亦言直</lem><rdg resp="Taisho" wit="#wit1 #wit2">在直樹林故名釋懿</rdg><rdg resp="Taisho" wit="#wit3">佛法</rdg></app></p>
 </body>'''
         # With the base witness name provided (ie, use the lem).

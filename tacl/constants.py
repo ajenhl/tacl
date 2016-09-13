@@ -330,9 +330,12 @@ RESULTS_MAXIMUM_COUNT_WORK_HELP = '''\
     are kept.'''
 RESULTS_MINIMUM_SIZE_HELP = 'Minimum size of n-grams to include.'
 RESULTS_MAXIMUM_SIZE_HELP = 'Maximum size of n-grams to include.'
-RESULTS_MINIMUM_WORK_HELP = 'Minimum count of works containing n-gram to include.'
-RESULTS_MAXIMUM_WORK_HELP = 'Maximum count of works containing n-gram to include.'
-RESULTS_NGRAMS_HELP = 'Path to file containing n-grams (one per line) to exclude.'
+RESULTS_MINIMUM_WORK_HELP = (
+    'Minimum count of works containing n-gram to include.')
+RESULTS_MAXIMUM_WORK_HELP = (
+    'Maximum count of works containing n-gram to include.')
+RESULTS_NGRAMS_HELP = (
+    'Path to file containing n-grams (one per line) to exclude.')
 RESULTS_RECIPROCAL_HELP = '''\
     Remove n-grams that are not attested by at least one work in each
     labelled set of works. This can be useful after reducing a set of
@@ -399,7 +402,8 @@ SUPPLIED_INTERSECT_DESCRIPTION = '''\
     List n-grams common to all sets of results (as defined by the
     specified results files).'''
 SUPPLIED_INTERSECT_HELP = 'List n-grams common to all results files.'
-SUPPLIED_LABELS_HELP = 'Labels to be assigned in order to the supplied results.'
+SUPPLIED_LABELS_HELP = (
+    'Labels to be assigned in order to the supplied results.')
 SUPPLIED_RESULTS_HELP = 'Paths to results files to be used in the query.'
 
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
@@ -422,7 +426,8 @@ TACL_HELPER_COLLAPSE_DESCRIPTION = '''
     for an n-gram. Instead of the "siglum" column, all of the
     witnesses (per work) with the same n-gram count are listed, space
     separated, in the "sigla" column.'''
-TACL_HELPER_COLLAPSE_HELP = 'Collapse result rows for multiple witnesses having the same count for an n-gram'
+TACL_HELPER_COLLAPSE_HELP = (
+    'Collapse result rows for witnesses having the same count for an n-gram')
 TACL_HELPER_IN_DESCRIPTION = '''\
     Generate a script to compare each work in a corpus with all the
     other works in that corpus.'''
@@ -450,127 +455,144 @@ VERBOSE_HELP = '''\
 
 # Error messages.
 CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
-INSUFFICIENT_LABELS_QUERY_ERROR = 'Not running query with less than two defined labels'
-LABEL_NOT_IN_CATALOGUE_ERROR = 'Supplied label is not present in the supplied catalogue'
-SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = 'The number of labels supplied does not match the number of results files.'
+INSUFFICIENT_LABELS_QUERY_ERROR = (
+    'Not running query with less than two defined labels')
+LABEL_NOT_IN_CATALOGUE_ERROR = (
+    'Supplied label is not present in the supplied catalogue')
+SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = (
+    'The number of labels supplied does not match the number of results files.'
+)
 
 
 # SQL statements.
 ANALYSE_SQL = 'ANALYZE {}'
-CREATE_INDEX_INPUT_RESULTS_SQL = 'CREATE INDEX IF NOT EXISTS ' \
-        'temp.InputResultsLabel ON InputResults (ngram)'
-CREATE_INDEX_TEXT_SQL = 'CREATE INDEX IF NOT EXISTS TextIndexLabel ' \
-    'ON Text (label)'
-CREATE_INDEX_TEXTHASNGRAM_SQL = 'CREATE UNIQUE INDEX IF NOT EXISTS ' \
-    'TextHasNGramIndex ON TextHasNGram (text, size)'
-CREATE_INDEX_TEXTNGRAM_SQL = 'CREATE INDEX IF NOT EXISTS ' \
-    'TextNGramIndexTextNGram ON TextNGram (text, ngram)'
-CREATE_TABLE_TEXT_SQL = 'CREATE TABLE IF NOT EXISTS Text (' \
-    'id INTEGER PRIMARY KEY ASC, ' \
-    'work TEXT NOT NULL, ' \
-    'siglum TEXT NOT NULL, ' \
-    'checksum TEXT NOT NULL, ' \
-    'token_count INTEGER NOT NULL, ' \
-    'label TEXT NOT NULL, ' \
-    'UNIQUE (work, siglum))'
-CREATE_TABLE_TEXTNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextNGram (' \
-    'text INTEGER NOT NULL REFERENCES Text (id), ' \
-    'ngram TEXT NOT NULL, ' \
-    'size INTEGER NOT NULL, ' \
-    'count INTEGER NOT NULL)'
-CREATE_TABLE_TEXTHASNGRAM_SQL = 'CREATE TABLE IF NOT EXISTS TextHasNGram (' \
-    'text INTEGER NOT NULL REFERENCES Text (id), ' \
-    'size INTEGER NOT NULL, ' \
-    'count INTEGER NOT NULL)'
-CREATE_TEMPORARY_NGRAMS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputNGram (' \
-    'ngram TEXT)'
-CREATE_TEMPORARY_RESULTS_TABLE_SQL = 'CREATE TEMPORARY TABLE InputResults (' \
-    'ngram TEXT NOT NULL, ' \
-    'size INTEGER NOT NULL, ' \
-    'work TEXT NOT NULL, ' \
-    'siglum TEXT NOT NULL, ' \
-    'count INTEGER NOT NULL, ' \
-    'label TEXT NOT NULL)'
+CREATE_INDEX_INPUT_RESULTS_SQL = (
+    'CREATE INDEX IF NOT EXISTS temp.InputResultsLabel '
+    'ON InputResults (ngram)')
+CREATE_INDEX_TEXT_SQL = (
+    'CREATE INDEX IF NOT EXISTS TextIndexLabel ON Text (label)')
+CREATE_INDEX_TEXTHASNGRAM_SQL = (
+    'CREATE UNIQUE INDEX IF NOT EXISTS TextHasNGramIndex '
+    'ON TextHasNGram (text, size)')
+CREATE_INDEX_TEXTNGRAM_SQL = (
+    'CREATE INDEX IF NOT EXISTS TextNGramIndexTextNGram '
+    'ON TextNGram (text, ngram)')
+CREATE_TABLE_TEXT_SQL = (
+    'CREATE TABLE IF NOT EXISTS Text ('
+    'id INTEGER PRIMARY KEY ASC, '
+    'work TEXT NOT NULL, '
+    'siglum TEXT NOT NULL, '
+    'checksum TEXT NOT NULL, '
+    'token_count INTEGER NOT NULL, '
+    'label TEXT NOT NULL, '
+    'UNIQUE (work, siglum))')
+CREATE_TABLE_TEXTNGRAM_SQL = (
+    'CREATE TABLE IF NOT EXISTS TextNGram ('
+    'text INTEGER NOT NULL REFERENCES Text (id), '
+    'ngram TEXT NOT NULL, '
+    'size INTEGER NOT NULL, '
+    'count INTEGER NOT NULL)')
+CREATE_TABLE_TEXTHASNGRAM_SQL = (
+    'CREATE TABLE IF NOT EXISTS TextHasNGram ('
+    'text INTEGER NOT NULL REFERENCES Text (id), '
+    'size INTEGER NOT NULL, '
+    'count INTEGER NOT NULL)')
+CREATE_TEMPORARY_NGRAMS_TABLE_SQL = (
+    'CREATE TEMPORARY TABLE InputNGram (ngram TEXT)')
+CREATE_TEMPORARY_RESULTS_TABLE_SQL = (
+    'CREATE TEMPORARY TABLE InputResults ('
+    'ngram TEXT NOT NULL, '
+    'size INTEGER NOT NULL, '
+    'work TEXT NOT NULL, '
+    'siglum TEXT NOT NULL, '
+    'count INTEGER NOT NULL, '
+    'label TEXT NOT NULL)')
 DELETE_TEXT_HAS_NGRAMS_SQL = 'DELETE FROM TextHasNGram WHERE text = ?'
 DELETE_TEXT_NGRAMS_SQL = 'DELETE FROM TextNGram WHERE text = ?'
 DROP_TEMPORARY_NGRAMS_TABLE_SQL = 'DROP TABLE IF EXISTS InputNGram'
 DROP_TEMPORARY_RESULTS_TABLE_SQL = 'DROP TABLE IF EXISTS InputResults'
 DROP_TEXTNGRAM_INDEX_SQL = 'DROP INDEX IF EXISTS TextNGramIndexTextNGram'
-INSERT_NGRAM_SQL = 'INSERT INTO TextNGram (text, ngram, size, count) ' \
-    'VALUES (?, ?, ?, ?)'
-INSERT_TEXT_HAS_NGRAM_SQL = 'INSERT INTO TextHasNGram (text, size, count) ' \
-    'VALUES (?, ?, ?)'
-INSERT_TEXT_SQL = 'INSERT INTO Text ' \
-    '(work, siglum, checksum, token_count, label) ' \
-    'VALUES (?, ?, ?, ?, ?)'
+INSERT_NGRAM_SQL = (
+    'INSERT INTO TextNGram (text, ngram, size, count) VALUES (?, ?, ?, ?)')
+INSERT_TEXT_HAS_NGRAM_SQL = (
+    'INSERT INTO TextHasNGram (text, size, count) VALUES (?, ?, ?)')
+INSERT_TEXT_SQL = (
+    'INSERT INTO Text (work, siglum, checksum, token_count, label) '
+    'VALUES (?, ?, ?, ?, ?)')
 INSERT_TEMPORARY_NGRAM_SQL = 'INSERT INTO temp.InputNGram (ngram) VALUES (?)'
-INSERT_TEMPORARY_RESULTS_SQL = 'INSERT INTO temp.InputResults ' \
-    '(ngram, size, work, siglum, count, label) ' \
-    'VALUES (?, ?, ?, ?, ?, ?)'
+INSERT_TEMPORARY_RESULTS_SQL = (
+    'INSERT INTO temp.InputResults '
+    '(ngram, size, work, siglum, count, label) '
+    'VALUES (?, ?, ?, ?, ?, ?)')
 PRAGMA_CACHE_SIZE_SQL = 'PRAGMA cache_size={}'
 PRAGMA_COUNT_CHANGES_SQL = 'PRAGMA count_changes=OFF'
 PRAGMA_FOREIGN_KEYS_SQL = 'PRAGMA foreign_keys=ON'
 PRAGMA_LOCKING_MODE_SQL = 'PRAGMA locking_mode=EXCLUSIVE'
 PRAGMA_SYNCHRONOUS_SQL = 'PRAGMA synchronous=OFF'
 PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
-SELECT_COUNTS_SQL = 'SELECT Text.work, Text.siglum, ' \
-    'TextHasNGram.size, TextHasNGram.count AS "unique ngrams", ' \
-    'Text.token_count + 1 - TextHasNGram.size AS "total ngrams", ' \
-    'Text.token_count AS "total tokens", Text.label ' \
-    'FROM Text, TextHasNGram ' \
-    'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) ' \
-    'ORDER BY Text.work, TextHasNGram.size'
-SELECT_DIFF_ASYMMETRIC_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label = ? AND Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN (' \
-    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label = ? ' \
-    'EXCEPT ' \
-    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label IN ({}))'
-SELECT_DIFF_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN (' \
-    'SELECT TextNGram.ngram FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text AND Text.label IN ({}) ' \
-    'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)'
-SELECT_DIFF_SUPPLIED_SQL = 'SELECT ngram, size, work, siglum, count, label ' \
-    'FROM temp.InputResults ' \
-    'WHERE ngram IN (' \
-    'SELECT ngram FROM temp.InputResults ' \
-    'GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)'
-SELECT_HAS_NGRAMS_SQL = 'SELECT text FROM TextHasNGram ' \
-    'WHERE text = ? AND size = ?'
-SELECT_INTERSECT_SQL = 'SELECT TextNGram.ngram, TextNGram.size, ' \
-    'Text.work, Text.siglum, TextNGram.count, Text.label ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN ({})'
+SELECT_COUNTS_SQL = (
+    'SELECT Text.work, Text.siglum, '
+    'TextHasNGram.size, TextHasNGram.count AS "unique ngrams", '
+    'Text.token_count + 1 - TextHasNGram.size AS "total ngrams", '
+    'Text.token_count AS "total tokens", Text.label '
+    'FROM Text, TextHasNGram '
+    'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) '
+    'ORDER BY Text.work, TextHasNGram.size')
+SELECT_DIFF_ASYMMETRIC_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, '
+    'Text.work, Text.siglum, TextNGram.count, Text.label '
+    'FROM Text, TextNGram '
+    'WHERE Text.label = ? AND Text.id = TextNGram.text '
+    'AND TextNGram.ngram IN ('
+    'SELECT TextNGram.ngram FROM Text, TextNGram '
+    'WHERE Text.id = TextNGram.text AND Text.label = ? '
+    'EXCEPT '
+    'SELECT TextNGram.ngram FROM Text, TextNGram '
+    'WHERE Text.id = TextNGram.text AND Text.label IN ({}))')
+SELECT_DIFF_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, '
+    'TextNGram.count, Text.label '
+    'FROM Text, TextNGram '
+    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text '
+    'AND TextNGram.ngram IN ('
+    'SELECT TextNGram.ngram FROM Text, TextNGram '
+    'WHERE Text.id = TextNGram.text AND Text.label IN ({}) '
+    'GROUP BY TextNGram.ngram HAVING COUNT(DISTINCT Text.label) = 1)')
+SELECT_DIFF_SUPPLIED_SQL = (
+    'SELECT ngram, size, work, siglum, count, label '
+    'FROM temp.InputResults '
+    'WHERE ngram IN ('
+    'SELECT ngram FROM temp.InputResults '
+    'GROUP BY ngram HAVING COUNT(DISTINCT label) = 1)')
+SELECT_HAS_NGRAMS_SQL = (
+    'SELECT text FROM TextHasNGram WHERE text = ? AND size = ?')
+SELECT_INTERSECT_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, '
+    'Text.work, Text.siglum, TextNGram.count, Text.label '
+    'FROM Text, TextNGram '
+    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text '
+    'AND TextNGram.ngram IN ({})')
 SELECT_INTERSECT_SUB_EXTRA_SQL = ' AND TextNGram.ngram IN ({})'
-SELECT_INTERSECT_SUB_SQL = 'SELECT TextNGram.ngram ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.label = ? AND Text.id = TextNGram.text'
-SELECT_INTERSECT_SUPPLIED_SQL = \
-    'SELECT ngram, size, work, siglum, count, ' \
-    'label ' \
-    'FROM temp.InputResults ' \
-    'WHERE ngram IN (' \
-    'SELECT ngram FROM temp.InputResults ' \
-    'GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)'
-SELECT_SEARCH_SQL = 'SELECT Text.work, Text.siglum, ' \
-    'SUM(TextNGram.count) AS count, ' \
-    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, " \
-    'count(TextNGram.ngram) AS number ' \
-    'FROM Text, TextNGram ' \
-    'WHERE Text.id = TextNGram.text ' \
-    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) ' \
-    'GROUP BY TextNGram.text'
-SELECT_TEXT_TOKEN_COUNT_SQL = 'SELECT Text.token_count ' \
-    'FROM Text WHERE Text.work = ?'
+SELECT_INTERSECT_SUB_SQL = (
+    'SELECT TextNGram.ngram '
+    'FROM Text, TextNGram '
+    'WHERE Text.label = ? AND Text.id = TextNGram.text')
+SELECT_INTERSECT_SUPPLIED_SQL = (
+    'SELECT ngram, size, work, siglum, count, label '
+    'FROM temp.InputResults '
+    'WHERE ngram IN ('
+    'SELECT ngram FROM temp.InputResults '
+    'GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)')
+SELECT_SEARCH_SQL = (
+    'SELECT Text.work, Text.siglum, SUM(TextNGram.count) AS count, '
+    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, "
+    'count(TextNGram.ngram) AS number '
+    'FROM Text, TextNGram '
+    'WHERE Text.id = TextNGram.text '
+    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) '
+    'GROUP BY TextNGram.text')
+SELECT_TEXT_TOKEN_COUNT_SQL = (
+    'SELECT Text.token_count FROM Text WHERE Text.work = ?')
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE work = ? AND siglum = ?'
 UPDATE_LABEL_SQL = 'UPDATE Text SET label = ? WHERE work = ?'
 UPDATE_LABELS_SQL = 'UPDATE Text SET label = ?'

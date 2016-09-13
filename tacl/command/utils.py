@@ -58,12 +58,14 @@ def add_supplied_query_arguments(parser):
     `parser`."""
     parser.add_argument('-l', '--labels', help=constants.SUPPLIED_LABELS_HELP,
                         nargs='+', required=True)
-    parser.add_argument('-s', '--supplied', help=constants.SUPPLIED_RESULTS_HELP,
+    parser.add_argument('-s', '--supplied',
+                        help=constants.SUPPLIED_RESULTS_HELP,
                         metavar='RESULTS', nargs='+', required=True)
 
 
 def add_tokenizer_argument(parser):
-    parser.add_argument('-t', '--tokenizer', choices=constants.TOKENIZER_CHOICES,
+    parser.add_argument('-t', '--tokenizer',
+                        choices=constants.TOKENIZER_CHOICES,
                         default=constants.TOKENIZER_CHOICE_CBETA,
                         help=constants.DB_TOKENIZER_HELP)
 

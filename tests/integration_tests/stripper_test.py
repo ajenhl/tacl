@@ -35,8 +35,9 @@ class StripperIntegrationTestCase (unittest.TestCase):
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             expected_path = os.path.join(self._expected_output_dir, filename)
-            self.assertTrue(os.path.exists(actual_path),
-                            'Expected file {} to exist, but it does not'.format(
+            self.assertTrue(
+                os.path.exists(actual_path),
+                'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
                 actual_content = fh.readlines()

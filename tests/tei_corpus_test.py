@@ -15,15 +15,19 @@ class TEICorpusCBETA2011TestCase (unittest.TestCase):
     def test_gaiji(self):
         """Tests that the correct gaiji alternative is used."""
         gaiji_data = (
-            ('''<p><gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/></p>''', 'Ā'),
-            ('''<p><gaiji uniflag='0' cb='CB00006' des='[(王*巨)/木]' uni='249B2' nor='璩' mojikyo='M021123' mofont='Mojikyo M104' mochar='6E82'/></p>''', '[(王*巨)/木]'),
-            ('''<p><gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/></p>''', 'ka'),
-            ('''<p><gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/></p>''', 'yā'),
+            ("<p><gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/></p>",
+             'Ā'),
+            ("<p><gaiji uniflag='0' cb='CB00006' des='[(王*巨)/木]' uni='249B2' nor='璩' mojikyo='M021123' mofont='Mojikyo M104' mochar='6E82'/></p>",
+             '[(王*巨)/木]'),
+            ("<p><gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/></p>",
+             'ka'),
+            ("<p><gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/></p>",
+             'yā'),
             )
         for input_xml, expected_output in gaiji_data:
             output_tree = self.corpus.transform(etree.XML(input_xml))
-            actual_output = etree.tostring(output_tree.getroot(), method='text',
-                                           encoding='unicode')
+            actual_output = etree.tostring(output_tree.getroot(),
+                                           method='text', encoding='unicode')
             self.assertEqual(expected_output, actual_output)
 
     def test_get_witnesses(self):
@@ -83,7 +87,9 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
     def test_glyph(self):
         """Tests that the correct alternative for characters not in Unicode is
         used."""
-        base_xml = '''<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+        base_xml = '''\
+        <TEI xmlns="http://www.tei-c.org/ns/1.0"
+             xmlns:cb="http://www.cbeta.org/ns/1.0">
         <charDecl><char xml:id="CB00178">
         <charName>CBETA CHARACTER CB00178</charName>
         {}
@@ -93,16 +99,20 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         <p><g ref="#CB00178">㮈</g></p>
         </TEI>'''
         data = [
-            ('<charProp><localName>composition</localName><value>[木*奈]</value></charProp>', '[木*奈]'),
-            ('<charProp><localName>Romanized form in CBETA transcription</localName><value>o.m</value></charProp><charProp><localName>Character in the Siddham font</localName><value>湡</value></charProp><charProp><localName>Romanized form in Unicode transcription</localName><value>oṃ</value></charProp>', 'oṃ'),
-            ('<charProp><localName>composition</localName><value>[木*奈]</value></charProp><charProp><localName>Romanized form in CBETA transcription</localName><value>o.m</value></charProp><charProp><localName>Character in the Siddham font</localName><value>湡</value></charProp><charProp><localName>Romanized form in Unicode transcription</localName><value>oṃ</value></charProp>', '[木*奈]'),
-            ('<charProp><localName>Character in the Siddham font</localName><value>揨</value></charProp>', '揨'),
+            ('<charProp><localName>composition</localName><value>[木*奈]</value></charProp>',
+             '[木*奈]'),
+            ('<charProp><localName>Romanized form in CBETA transcription</localName><value>o.m</value></charProp><charProp><localName>Character in the Siddham font</localName><value>湡</value></charProp><charProp><localName>Romanized form in Unicode transcription</localName><value>oṃ</value></charProp>',
+             'oṃ'),
+            ('<charProp><localName>composition</localName><value>[木*奈]</value></charProp><charProp><localName>Romanized form in CBETA transcription</localName><value>o.m</value></charProp><charProp><localName>Character in the Siddham font</localName><value>湡</value></charProp><charProp><localName>Romanized form in Unicode transcription</localName><value>oṃ</value></charProp>',
+             '[木*奈]'),
+            ('<charProp><localName>Character in the Siddham font</localName><value>揨</value></charProp>',
+             '揨'),
         ]
         for char_detail, expected_output in data:
             output_tree = self.corpus.transform(etree.XML(base_xml.format(
                 char_detail)))
-            actual_output = etree.tostring(output_tree.getroot(), method='text',
-                                           encoding='unicode')
+            actual_output = etree.tostring(output_tree.getroot(),
+                                           method='text', encoding='unicode')
             self.assertEqual(expected_output, actual_output)
 
 

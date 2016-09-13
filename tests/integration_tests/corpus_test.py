@@ -9,8 +9,9 @@ class CorpusIntegrationTestCase (unittest.TestCase):
     def setUp(self):
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data',
                                       'stripped')
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
 
     def test_get_sigla(self):
         corpus = tacl.Corpus(self._data_dir, self._tokenizer)

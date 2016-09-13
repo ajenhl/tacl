@@ -11,8 +11,9 @@ from .tacl_test_case import TaclTestCase
 class TextTestCase (TaclTestCase):
 
     def setUp(self):
-        self._tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
-                                         tacl.constants.TOKENIZER_JOINER_CBETA)
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
 
     def test_assemble_filename(self):
         actual_filename = tacl.WitnessText.assemble_filename('T1', 'base')
