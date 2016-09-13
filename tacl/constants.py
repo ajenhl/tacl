@@ -371,11 +371,10 @@ STATISTICS_RESULTS_HELP = 'Path to CSV results.'
 
 STRIP_DESCRIPTION = '''\
     Preprocess a corpus by stripping unwanted material from each
-    file.'''
+    file, creating a plain text file for each attested witness.'''
 STRIP_EPILOG = '''\
-    The CBETA files are in TEI XML that needs to have the markup and
-    metadata removed. If the TEI specifies textual variants, plain
-    text versions based on these are also created.'''
+    This command operates on files in an augmented TEI XML format that
+    is quite close to that used in the CBETA GitHub files.'''
 STRIP_HELP = 'Generate files for use with TACL from a corpus of TEI XML.'
 STRIP_INPUT_HELP = 'Directory containing files to strip.'
 STRIP_OUTPUT_HELP = 'Directory to output stripped files to.'

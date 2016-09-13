@@ -11,11 +11,14 @@ from . import constants
 
 class Stripper:
 
-    """Class used for preprocessing a corpus of texts by stripping out
-    all material that is not the textual material proper.
+    """Class used for preprocessing a corpus of texts by stripping out all
+    material that is not the textual material proper, and generating
+    plain text witness files for each witness attested.
 
     The intention is to keep the stripped text as close in formatting
-    to the original as possible, including whitespace."""
+    to the original as possible, including whitespace.
+
+    """
 
     def __init__(self, input_dir, output_dir):
         self._logger = logging.getLogger(__name__)
