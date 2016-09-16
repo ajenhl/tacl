@@ -64,6 +64,15 @@ class Results:
         methods on results that have had their witnesses collapsed.
 
         """
+        # In order to allow for additional columns to be present in
+        # the input data (such as label count), copy the siglum
+        # information into a new final column, then put the sigla
+        # information into the siglum field and finally rename it.
+        #
+        # This means that in merge_sigla below, the column names are
+        # reversed from what would be expected.
+        self._matches.loc[:, constants.SIGLA_FIELDNAME] = \
+            self._matches[constants.SIGLUM_FIELDNAME]
         # This code makes the not unwarranted assumption that the same
         # n-gram means the same size and that the same work means the
         # same label.
@@ -76,16 +85,19 @@ class Results:
             # between them, and there may only be one row.
             merged = df[0:1]
             sigla = []
-            for siglum in list(df[constants.SIGLUM_FIELDNAME]):
+            for siglum in list(df[constants.SIGLA_FIELDNAME]):
                 if ' ' in siglum:
                     siglum = '"{}"'.format(siglum)
                 sigla.append(siglum)
-            sigla.sort()
-            merged[constants.SIGLA_FIELDNAME] = ' '.join(sigla)
+            sigla.sort(key=lambda x: x.strip('"'))
+            merged[constants.SIGLUM_FIELDNAME] = ' '.join(sigla)
             return merged
 
         self._matches = grouped.apply(merge_sigla)
-        del self._matches[constants.SIGLUM_FIELDNAME]
+        del self._matches[constants.SIGLA_FIELDNAME]
+        self._matches.rename(columns={constants.SIGLUM_FIELDNAME:
+                                      constants.SIGLA_FIELDNAME},
+                             inplace=True)
 
     def csv(self, fh):
         """Writes the report data to `fh` in CSV format and returns it.

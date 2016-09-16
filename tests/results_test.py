@@ -37,7 +37,7 @@ class ResultsTestCase (TaclTestCase):
         ]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
-        self.assertTrue(actual_rows, expected_rows)
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_collapse_witnesses(self):
         input_data = (
@@ -63,7 +63,7 @@ class ResultsTestCase (TaclTestCase):
         ]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
-        self.assertTrue(actual_rows, expected_rows)
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
