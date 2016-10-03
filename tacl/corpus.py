@@ -32,7 +32,7 @@ class Corpus:
         return [os.path.splitext(os.path.basename(path))[0]
                 for path in glob.glob(os.path.join(self._path, work, '*.txt'))]
 
-    def get_witness(self, work, siglum):
+    def get_witness(self, work, siglum, text_class=WitnessText):
         """Returns a `WitnessText` representing the file associated with
         `work` and `siglum`.
 
@@ -52,7 +52,7 @@ class Corpus:
         with open(os.path.join(self._path, filename), encoding='utf-8') \
                 as fh:
             content = fh.read()
-        return WitnessText(work, siglum, content, self._tokenizer)
+        return text_class(work, siglum, content, self._tokenizer)
 
     def get_witnesses(self, name='*'):
         """Returns a generator supplying `WitnessText` objects for each file

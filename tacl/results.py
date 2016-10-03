@@ -1,12 +1,18 @@
 """Module containing the Results class."""
 
+import csv
 import logging
+import os
 import re
+import tempfile
 
 import pandas as pd
 
 from . import constants
-from .text import Text
+from .text import Text, FilteredWitnessText
+
+
+DELETE_FIELDNAME = 'delete'
 
 
 class Results:
@@ -39,20 +45,125 @@ class Results:
         This count uses the highest witness count for each work.
 
         """
+        self._logger.info('Adding label count')
         self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
 
         def add_label_count(df):
             # For each n-gram and label pair, we need the maximum count
             # among all witnesses to each work, and then the sum of those
             # across all works.
-            work_maxima = df.groupby(constants.WORK_FIELDNAME).max()
+            work_maxima = df.groupby(constants.WORK_FIELDNAME,
+                                     sort=False).max()
             df.loc[:, constants.LABEL_COUNT_FIELDNAME] = work_maxima[
                 constants.COUNT_FIELDNAME].sum()
             return df
 
         self._matches = self._matches.groupby(
-            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME]).apply(
-                add_label_count)
+            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
+            sort=False).apply(add_label_count)
+        self._logger.info('Finished adding label count')
+
+    def _annotate_bifurcated_extend_data(self, row, smaller, larger, tokenize,
+                                         join):
+        """Returns `row` annotated with whether it should be deleted or not.
+
+        An n-gram is marked for deletion if:
+
+        * its label count is 1 and its constituent (n-1)-grams also
+          have a label count of 1; or
+
+        * there is a containing (n+1)-gram that has the same label
+          count.
+
+        :param row: row of witness n-grams to annotate
+        :type row: `pandas.Series`
+        :param smaller: rows of (n-1)-grams for this witness
+        :type smaller: `pandas.DataFrame`
+        :param larger: rows of (n+1)-grams for this witness
+        :type larger: `pandas.DataFrame`
+        :param tokenize: function to tokenize an n-gram
+        :param join: function to join tokens
+        :rtype: `pandas.Series`
+
+        """
+        lcf = constants.LABEL_COUNT_FIELDNAME
+        nf = constants.NGRAM_FIELDNAME
+        # Escape the n-gram because str.contains interprets the supplied
+        # string as a regular expression.
+        ngram = row[constants.NGRAM_FIELDNAME]
+        escaped_ngram = re.escape(ngram)
+        label_count = row[constants.LABEL_COUNT_FIELDNAME]
+        if label_count == 1 and not smaller.empty:
+            # Keep a result with a label count of 1 if its
+            # constituents do not also have a count of 1.
+            ngram_tokens = tokenize(ngram)
+            sub_ngram1 = join(ngram_tokens[:-1])
+            sub_ngram2 = join(ngram_tokens[1:])
+            pattern = FilteredWitnessText.get_filter_ngrams_pattern(
+                [sub_ngram1, sub_ngram2])
+            if smaller[smaller[constants.NGRAM_FIELDNAME].str.match(
+                    pattern, as_indexer=True)][
+                        constants.LABEL_COUNT_FIELDNAME].max() == 1:
+                row[DELETE_FIELDNAME] = True
+        elif not larger.empty and larger[larger[nf].str.contains(
+                escaped_ngram)][lcf].max() == label_count:
+            # Remove a result if the label count of a containing
+            # n-gram is equal to its label count.
+            row[DELETE_FIELDNAME] = True
+        return row
+
+    def bifurcated_extend(self, corpus, max_size):
+        """Replaces the results with those n-grams that contain any of the
+        original n-grams, and that represent points at which an n-gram
+        is a constituent of multiple larger n-grams with a lower label
+        count.
+
+        :param corpus: corpus of works to which results belong
+        :type corpus: `Corpus`
+        :param max_size: maximum size of n-gram results to include
+        :type max_size: `int`
+
+        """
+        temp_fd, temp_path = tempfile.mkstemp(text=True)
+        try:
+            self._prepare_bifurcated_extend_data(corpus, max_size, temp_path,
+                                                 temp_fd)
+        finally:
+            try:
+                os.remove(temp_path)
+            except OSError as e:
+                msg = ('Failed to remove temporary file containing unreduced '
+                       'results: {}')
+                self._logger.error(msg.format(e))
+        self._bifurcated_extend()
+
+    def _bifurcated_extend(self):
+        self._matches.loc[:, DELETE_FIELDNAME] = False
+        tokenize = self._tokenizer.tokenize
+        join = self._tokenizer.joiner.join
+        new_results = []
+        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                      constants.SIZE_FIELDNAME]
+        grouped = self._matches.groupby(group_cols, sort=False)
+        for (work, siglum, size), group in grouped:
+            try:
+                smaller_grams = grouped.get_group((work, siglum, size-1))
+            except KeyError:
+                smaller_grams = pd.DataFrame()
+            try:
+                larger_grams = grouped.get_group((work, siglum, size+1))
+            except KeyError:
+                larger_grams = pd.DataFrame()
+            group = group.apply(self._annotate_bifurcated_extend_data, axis=1,
+                                args=(smaller_grams, larger_grams, tokenize,
+                                      join))
+            new_results.append(group[~group['delete']])
+        all_cols = constants.QUERY_FIELDNAMES + \
+            [constants.LABEL_COUNT_FIELDNAME, DELETE_FIELDNAME]
+        self._matches = pd.concat(new_results, ignore_index=True).reindex(
+            columns=all_cols)
+        self._matches
+        del self._matches[DELETE_FIELDNAME]
 
     def collapse_witnesses(self):
         """Groups together witnesses for the same n-gram and work that has the
@@ -210,7 +321,7 @@ class Results:
                           constants.LABEL_FIELDNAME]
         if constants.NGRAM_FIELDNAME in extended_matches:
             extended_matches = extended_matches.groupby(
-                groupby_fields).sum().reset_index()
+                groupby_fields, sort=False).sum().reset_index()
         return extended_matches
 
     def _generate_extended_ngrams(self, matches, work, siglum, label, corpus,
@@ -308,6 +419,29 @@ class Results:
                            '{} distinct n-grams exist'.format(len(ngrams)))
         return ngrams
 
+    def _generate_filter_ngrams(self, data, min_size):
+        """Returns the n-grams in `data` that do not contain any other n-gram
+        in `data`.
+
+        :param data: n-gram results data
+        :type data: `pandas.DataFrame`
+        :param min_size: minimum n-gram size in `data`
+        :type min_size: `int`
+        :rtype: `list` of `str`
+
+        """
+        max_size = data[constants.SIZE_FIELDNAME].max()
+        kept_ngrams = list(data[data[constants.SIZE_FIELDNAME] == min_size][
+            constants.NGRAM_FIELDNAME])
+        for size in range(min_size+1, max_size+1):
+            pattern = FilteredWitnessText.get_filter_ngrams_pattern(
+                kept_ngrams)
+            potential_ngrams = list(data[data[constants.SIZE_FIELDNAME] ==
+                                         size][constants.NGRAM_FIELDNAME])
+            kept_ngrams.extend([ngram for ngram in potential_ngrams if
+                                pattern.search(ngram) is None])
+        return kept_ngrams
+
     def _generate_substrings(self, ngram, size):
         """Returns a list of all substrings of `ngram`.
 
@@ -342,6 +476,42 @@ class Results:
             (results[constants.NGRAM_FIELDNAME] == ngram) &
             (results[constants.LABEL_FIELDNAME] != label)].empty)
 
+    def _prepare_bifurcated_extend_data(self, corpus, max_size, temp_path,
+                                        temp_fd):
+        # It might be wondered why this whole derivation of n-grams
+        # anew from the source text is required, when an extended set
+        # of results could just be passed through to the final
+        # filtering process.
+        #
+        # The answer is that, for diff results, the filtering done by
+        # diff-reduce can remove many n-grams that are picked up in
+        # this process, and which may well prove important in the
+        # context of a bifurcated extend.
+        self._matches.sort_values(by=[constants.SIZE_FIELDNAME],
+                                  ascending=True, inplace=True)
+        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                      constants.LABEL_FIELDNAME]
+        # Output a CSV file containing the possible n-grams to include
+        # in the final output.
+        self._logger.debug('Writing filtered n-grams to temporary CSV file '
+                           'at {}'.format(temp_path))
+        with open(temp_fd, 'w', encoding='utf-8', newline='') as fh:
+            writer = csv.writer(fh)
+            writer.writerow(constants.QUERY_FIELDNAMES)
+            for (text, siglum, label), group in self._matches.groupby(
+                    group_cols, sort=False):
+                min_size = group[constants.SIZE_FIELDNAME].min()
+                filter_ngrams = self._generate_filter_ngrams(group, min_size)
+                witness = corpus.get_witness(text, siglum, FilteredWitnessText)
+                for size, ngrams in witness.get_ngrams(min_size, max_size,
+                                                       filter_ngrams):
+                    rows = [[ngram, size, text, siglum, count, label] for
+                            ngram, count in ngrams.items()]
+                    writer.writerows(rows)
+        self._matches = pd.read_csv(temp_path, encoding='utf-8',
+                                    na_filter=False)
+        self.add_label_count()
+
     def prune_by_ngram(self, ngrams):
         """Removes results rows whose n-gram is in `ngrams`.
 
@@ -370,14 +540,14 @@ class Results:
         self._logger.info('Pruning results by n-gram count')
 
         def calculate_total(group):
-            work_grouped = group.groupby(constants.WORK_FIELDNAME)
+            work_grouped = group.groupby(constants.WORK_FIELDNAME, sort=False)
             total_count = work_grouped[constants.COUNT_FIELDNAME].max().sum()
             group['total_count'] = pd.Series([total_count] * len(group.index),
                                              index=group.index)
             return group
 
-        self._matches = self._matches.groupby(constants.NGRAM_FIELDNAME).apply(
-            calculate_total)
+        self._matches = self._matches.groupby(
+            constants.NGRAM_FIELDNAME, sort=False).apply(calculate_total)
         if minimum:
             self._matches = self._matches[
                 self._matches['total_count'] >= minimum]
@@ -458,7 +628,7 @@ class Results:
         self._logger.info('Pruning results by work count')
         count_fieldname = 'tmp_count'
         filtered = self._matches[self._matches[constants.COUNT_FIELDNAME] > 0]
-        grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
+        grouped = filtered.groupby(constants.NGRAM_FIELDNAME, sort=False)
         counts = pd.DataFrame(grouped[constants.WORK_FIELDNAME].nunique())
         counts.rename(columns={constants.WORK_FIELDNAME: count_fieldname},
                       inplace=True)
@@ -481,7 +651,7 @@ class Results:
     def _reciprocal_remove(self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
         filtered = matches[matches[constants.COUNT_FIELDNAME] > 0]
-        grouped = filtered.groupby(constants.NGRAM_FIELDNAME)
+        grouped = filtered.groupby(constants.NGRAM_FIELDNAME, sort=False)
         return grouped.filter(
             lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 

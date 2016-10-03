@@ -408,8 +408,14 @@ SUPPLIED_RESULTS_HELP = 'Paths to results files to be used in the query.'
 
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 
-TACL_HELPER_DESCRIPTION = '''\
-    Perform helpful but non-essential tacl-related functions.'''
+TACL_HELPER_BIFURCATED_EXTEND_DESCRIPTION = '''\
+    Generates results with those n-grams, derived from the original
+    n-grams, that have a label count higher than their containing
+    (n+1)-grams, or that have a label count of one and the constituent
+    (n-1)-grams have a higher label count.'''
+TACL_HELPER_BIFURCATED_EXTEND_HELP = (
+    'Extend difference results to bifurcation points')
+TACL_HELPER_BIFURCATED_EXTEND_SIZE_HELP = 'Maximum size of n-gram to extend to'
 TACL_HELPER_AGAINST_DESCRIPTION = '''\
     Generate a script to compare each work in a corpus against all the
     works in another corpus.'''
@@ -428,6 +434,8 @@ TACL_HELPER_COLLAPSE_DESCRIPTION = '''
     separated, in the "sigla" column.'''
 TACL_HELPER_COLLAPSE_HELP = (
     'Collapse result rows for witnesses having the same count for an n-gram')
+TACL_HELPER_DESCRIPTION = '''\
+    Perform helpful but non-essential tacl-related functions.'''
 TACL_HELPER_IN_DESCRIPTION = '''\
     Generate a script to compare each work in a corpus with all the
     other works in that corpus.'''

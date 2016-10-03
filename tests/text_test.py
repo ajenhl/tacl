@@ -99,5 +99,29 @@ class WitnessTextTestCase (TaclTestCase):
         self.assertEqual(actual_names, expected_names)
 
 
+class FilteredWitnessTextTestCase (TaclTestCase):
+
+    def setUp(self):
+        self._tokenizer = tacl.Tokenizer(
+            tacl.constants.TOKENIZER_PATTERN_CBETA,
+            tacl.constants.TOKENIZER_JOINER_CBETA)
+
+    def test_get_ngrams(self):
+        content = '阿闍世[(禾*尤)\n/上/日]首 佛足敬 強闍世耶又'
+        minimum = 2
+        maximum = 3
+        filter_ngrams = ['闍世', '[(禾*尤)/上/日]首佛', '佛足敬強']
+        text = tacl.FilteredWitnessText('test', 'base', content,
+                                        self._tokenizer)
+        actual_ngrams = list(text.get_ngrams(minimum, maximum, filter_ngrams))
+        expected_ngrams = [
+            (2, collections.Counter(['闍世', '闍世'])),
+            (3, collections.Counter(
+                ['阿闍世', '闍世[(禾*尤)/上/日]', '[(禾*尤)/上/日]首佛',
+                 '強闍世', '闍世耶']))
+        ]
+        self.assertEqual(actual_ngrams, expected_ngrams)
+
+
 if __name__ == '__main__':
     unittest.main()

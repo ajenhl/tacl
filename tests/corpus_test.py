@@ -16,20 +16,33 @@ class CorpusTestCase (TaclTestCase):
             tacl.constants.TOKENIZER_JOINER_CBETA)
 
     def test_get_witness(self):
-        Text = self._create_patch('tacl.corpus.WitnessText')
         path = '/test'
-        name = 'foo'
+        work = 'foo'
         siglum = 'base'
         content = 'test content'
-        filename = os.path.join(name, siglum + '.txt')
+        filename = os.path.join(work, siglum + '.txt')
         m = mock_open(read_data=content)
         with patch('builtins.open', m, create=True):
             corpus = tacl.Corpus(path, self._tokenizer)
-            actual_text = corpus.get_witness(name, siglum)
+            actual_text = corpus.get_witness(work, siglum)
         m.assert_called_once_with(os.path.join(path, filename),
                                   encoding='utf-8')
-        Text.assert_called_once_with(name, siglum, content, self._tokenizer)
         assert isinstance(actual_text, tacl.WitnessText)
+
+    def test_get_witness_specific_class(self):
+        path = '/test'
+        work = 'foo'
+        siglum = 'base'
+        content = 'test content'
+        filename = os.path.join(work, siglum + '.txt')
+        m = mock_open(read_data=content)
+        with patch('builtins.open', m, create=True):
+            corpus = tacl.Corpus(path, self._tokenizer)
+            actual_text = corpus.get_witness(work, siglum,
+                                             tacl.FilteredWitnessText)
+        m.assert_called_once_with(os.path.join(path, filename),
+                                  encoding='utf-8')
+        assert isinstance(actual_text, tacl.FilteredWitnessText)
 
     def test_get_witnesses(self):
         path = '/test'

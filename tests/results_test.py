@@ -39,6 +39,57 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_bifurcated_extend(self):
+        self.maxDiff = None
+        # This is a test of Results._bifurcated_extend, which does not
+        # require any information other than the results themselves.
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A', '7'],
+            ['AB', '2', 'a', 'wit1', '5', 'A', '7'],
+            ['AB', '2', 'b', 'base', '2', 'A', '7'],
+            ['AB', '2', 'c', 'base', '4', 'B', '4'],
+            ['ZAB', '3', 'a', 'base', '2', 'A', '3'],
+            ['ZAB', '3', 'a', 'wit1', '2', 'A', '3'],
+            ['ZAB', '3', 'b', 'base', '1', 'A', '3'],
+            ['ABC', '3', 'a', 'base', '4', 'A', '5'],
+            ['ABC', '3', 'a', 'wit1', '4', 'A', '5'],
+            ['ABC', '3', 'b', 'base', '1', 'A', '5'],
+            ['ABC', '3', 'c', 'base', '4', 'B', '4'],
+            ['ZAB', '3', 'c', 'base', '2', 'B', '2'],
+            ['XAB', '3', 'c', 'base', '2', 'B', '2'],
+            ['ZABC', '4', 'a', 'base', '2', 'A', '2'],
+            ['ZABC', '4', 'a', 'wit1', '2', 'A', '2'],
+            ['ZABCD', '5', 'a', 'base', '1', 'A', '1'],
+            ['ZABCD', '5', 'a', 'wit1', '1', 'A', '1'],
+            ['ZABCDE', '6', 'a', 'base', '1', 'A', '1'],
+        )
+        fieldnames = tacl.constants.QUERY_FIELDNAMES + \
+            [tacl.constants.LABEL_COUNT_FIELDNAME]
+        fh = self._create_csv(input_data, fieldnames=fieldnames)
+        results = tacl.Results(fh, self._tokenizer)
+        results._bifurcated_extend()
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '4', 'A', '7'),
+            ('AB', '2', 'a', 'wit1', '5', 'A', '7'),
+            ('AB', '2', 'b', 'base', '2', 'A', '7'),
+            ('ZAB', '3', 'a', 'base', '2', 'A', '3'),
+            ('ABC', '3', 'a', 'base', '4', 'A', '5'),
+            ('ZAB', '3', 'a', 'wit1', '2', 'A', '3'),
+            ('ABC', '3', 'a', 'wit1', '4', 'A', '5'),
+            ('ZAB', '3', 'b', 'base', '1', 'A', '3'),
+            ('ABC', '3', 'b', 'base', '1', 'A', '5'),
+            ('ABC', '3', 'c', 'base', '4', 'B', '4'),
+            ('ZAB', '3', 'c', 'base', '2', 'B', '2'),
+            ('XAB', '3', 'c', 'base', '2', 'B', '2'),
+            ('ZABC', '4', 'a', 'base', '2', 'A', '2'),
+            ('ZABC', '4', 'a', 'wit1', '2', 'A', '2'),
+            ('ZABCD', '5', 'a', 'base', '1', 'A', '1'),
+            ('ZABCD', '5', 'a', 'wit1', '1', 'A', '1'),
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_collapse_witnesses(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],

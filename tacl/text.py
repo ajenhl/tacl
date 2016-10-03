@@ -3,6 +3,7 @@
 import collections
 import hashlib
 import os.path
+import re
 
 
 class Text:
@@ -127,3 +128,51 @@ class WitnessText (Text):
 
         """
         return self._name, self._siglum
+
+
+class FilteredWitnessText (WitnessText):
+
+    """Class for the text of a witness that supplies only those n-grams
+    that contain a supplied list of n-grams."""
+
+    @staticmethod
+    def get_filter_ngrams_pattern(filter_ngrams):
+        """Returns a compiled regular expression matching on any of the
+        n-grams in `filter_ngrams`.
+
+        :param filter_ngrams: n-grams to use in regular expression
+        :type filter_ngrams: `list` of `str`
+        :rtype: `_sre.SRE_Pattern`
+
+        """
+        return re.compile('|'.join([re.escape(ngram) for ngram in
+                                    filter_ngrams]))
+
+    def get_ngrams(self, minimum, maximum, filter_ngrams):
+        """Returns a generator supplying the n-grams (`minimum` <= n
+        <= `maximum`) for this text.
+
+        Each iteration of the generator supplies a tuple consisting of
+        the size of the n-grams and a `collections.Counter` of the
+        n-grams.
+
+        :param minimum: minimum n-gram size
+        :type minimum: `int`
+        :param maximum: maximum n-gram size
+        :type maximum: `int`
+        :param filter_ngrams: n-grams that must be contained by the generated
+                              n-grams
+        :type filter_ngrams: `list`
+        :rtype: `generator`
+
+        """
+        tokens = self.get_tokens()
+        filter_pattern = self.get_filter_ngrams_pattern(filter_ngrams)
+        for size in range(minimum, maximum + 1):
+            ngrams = collections.Counter(
+                self._ngrams(tokens, size, filter_pattern))
+            yield (size, ngrams)
+
+    def _ngrams(self, sequence, degree, filter_ngrams):
+        return [ngram for ngram in super()._ngrams(sequence, degree)
+                if filter_ngrams.search(ngram)]
