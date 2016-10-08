@@ -24,8 +24,8 @@ class StatisticsReport:
         :rtype: file object
 
         """
-        self._stats.to_csv(fh, columns=constants.STATISTICS_FIELDNAMES,
-                           encoding='utf-8', index=False)
+        self._stats.to_csv(fh, encoding='utf-8', float_format='%d',
+                           index=False)
         return fh
 
     def generate_statistics(self):
@@ -55,7 +55,8 @@ class StatisticsReport:
                          constants.TOTAL_TOKENS_FIELDNAME: total_count,
                          constants.PERCENTAGE_FIELDNAME: percentage,
                          constants.LABEL_FIELDNAME: label})
-        self._stats = pd.DataFrame(rows)
+        self._stats = pd.DataFrame(
+            rows, columns=constants.STATISTICS_FIELDNAMES)
 
     def _generate_text_from_slices(self, full_text, slices):
         """Return a single string consisting of the parts specified in
