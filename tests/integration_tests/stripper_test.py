@@ -19,7 +19,7 @@ class StripperIntegrationTestCase (unittest.TestCase):
             self._data_dir, 'expected_stripped_output')
         if os.path.exists(self._actual_output_dir):
             raise Exception('{} exists; aborting test that would create '
-                            'this directory'.format(self._expected_output_dir))
+                            'this directory'.format(self._actual_output_dir))
 
     def tearDown(self):
         if os.path.exists(self._actual_output_dir):
