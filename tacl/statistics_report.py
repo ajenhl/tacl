@@ -24,8 +24,7 @@ class StatisticsReport:
         :rtype: file object
 
         """
-        self._stats.to_csv(fh, encoding='utf-8', float_format='%d',
-                           index=False)
+        self._stats.to_csv(fh, encoding='utf-8', index=False)
         return fh
 
     def generate_statistics(self):
