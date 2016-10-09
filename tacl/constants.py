@@ -260,6 +260,8 @@ PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 PREPARE_SOURCE_HELP = 'Source of TEI files'
 
+REPORT_OUTPUT_HELP = 'Directory to output report to'
+
 RESULTS_CATALOGUE_HELP = '''\
     Path to the catalogue file used to generate the results'''
 RESULTS_DESCRIPTION = '''\

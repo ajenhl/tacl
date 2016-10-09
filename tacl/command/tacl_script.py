@@ -3,6 +3,7 @@ texts."""
 
 import argparse
 import io
+import os
 import sys
 
 import colorlog
@@ -153,6 +154,8 @@ def generate_highlight_subparser(subparsers):
                         metavar='BASE_NAME')
     parser.add_argument('base_siglum', metavar='BASE_SIGLUM',
                         help=constants.HIGHLIGHT_BASE_SIGLUM_HELP)
+    parser.add_argument('output', metavar='OUTPUT',
+                        help=constants.REPORT_OUTPUT_HELP)
 
 
 def generate_intersect_subparser(subparsers):
@@ -360,19 +363,23 @@ def highlight_text(args, parser):
     """Outputs the result of highlighting a text."""
     tokenizer = utils.get_tokenizer(args)
     corpus = utils.get_corpus(args)
+    output_dir = os.path.abspath(args.output)
+    if os.path.exists(output_dir):
+        parser.exit(status=3, message='Output directory already exists, '
+                    'aborting.\n')
+    os.makedirs(output_dir, exist_ok=True)
     if args.ngrams:
-        highlighter = tacl.NgramHighlighter(corpus, tokenizer)
+        report = tacl.NgramHighlightReport(corpus, tokenizer)
         ngrams = utils.get_ngrams(args.ngrams)
         minus_ngrams = []
         if args.minus_ngrams:
             minus_ngrams = utils.get_ngrams(args.minus_ngrams)
-        text = highlighter.highlight(args.base_name, args.base_siglum,
-                                     ngrams, minus_ngrams)
+        report.generate(args.output, args.base_name, args.base_siglum, ngrams,
+                        minus_ngrams)
     else:
-        highlighter = tacl.ResultsHighlighter(corpus, tokenizer)
-        text = highlighter.highlight(args.base_name, args.base_siglum,
-                                     args.results)
-    print(text)
+        report = tacl.ResultsHighlightReport(corpus, tokenizer)
+        report.generate(args.output, args.base_name, args.base_siglum,
+                        args.results)
 
 
 def ngram_counts(args, parser):

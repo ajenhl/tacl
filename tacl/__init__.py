@@ -2,7 +2,7 @@ from . import constants
 from .catalogue import Catalogue
 from .corpus import Corpus
 from .data_store import DataStore
-from .highlighter import NgramHighlighter, ResultsHighlighter
+from .highlighter import NgramHighlightReport, ResultsHighlightReport
 from .jitc import JITCProcessor
 from .results import Results
 from .sequence import Sequencer

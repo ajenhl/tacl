@@ -3,18 +3,17 @@
 import logging
 import re
 
-from jinja2 import Environment, PackageLoader
 from lxml import etree
 import pandas as pd
 
 from . import constants
+from .report import Report
 from .text import WitnessText
 
 
-class BaseHighlighter:
+class HighlightReport(Report):
 
     _base_token_markup = r'<span>\1</span>'
-    _template = 'highlight.html'
 
     def __init__(self, corpus, tokenizer):
         self._logger = logging.getLogger(__name__)
@@ -40,22 +39,13 @@ class BaseHighlighter:
         content = witness.get_content().strip()
         return self._prepare_text(content)
 
-    def _generate_html(self, work, siglum, text, **kwargs):
-        loader = PackageLoader('tacl', 'assets/templates')
-        env = Environment(loader=loader)
-        text_data = {'base_name': work, 'base_siglum': siglum,
-                     'text': text}
-        text_data.update(kwargs)
-        template = env.get_template(self._template)
-        return template.render(text_data)
-
     def _get_regexp_pattern(self, ngram):
         inter_token_pattern = r'</span>\W*<span[^>]*>'
         pattern = inter_token_pattern.join(
             [re.escape(token) for token in self._tokenizer.tokenize(ngram)])
         return r'(<span[^>]*>{}</span>)'.format(pattern)
 
-    def highlight(self, work, siglum, *args):
+    def generate(self, output_dir, work, siglum, *args):
         raise NotImplementedError
 
     def _prepare_text(self, text):
@@ -74,11 +64,20 @@ class BaseHighlighter:
         pattern = r'({})'.format(self._tokenizer.pattern)
         return re.sub(pattern, self._base_token_markup, text)
 
+    def _write(self, work, siglum, text, report_dir, copy_assets=False,
+               **kwargs):
+        context = {'base_name': work, 'base_siglum': siglum, 'text': text}
+        context.update(kwargs)
+        assets_dir = None
+        if copy_assets:
+            assets_dir = report_dir
+        super()._write(context, report_dir, 'report.html', assets_dir)
 
-class NgramHighlighter (BaseHighlighter):
+
+class NgramHighlightReport (HighlightReport):
 
     _base_token_markup = r'<span>\1</span>'
-    _template = 'ngram_highlight.html'
+    _report_name = 'ngram_highlight'
 
     def _annotate_tokens(self, match_obj):
         match = match_obj.group(0)
@@ -90,13 +89,15 @@ class NgramHighlighter (BaseHighlighter):
                 del span.attrib['class']
         return etree.tostring(root, encoding='unicode')[5:-6]
 
-    def highlight(self, work, siglum, ngrams, minus_ngrams):
-        """Returns the text of `siglum` witness to `work` as an HTML
-        document with its n-grams in `ngrams` highlighted.
+    def generate(self, output_dir, work, siglum, ngrams, minus_ngrams):
+        """Generates an HTML report showing the text of `siglum` witness to
+        `work` with its n-grams in `ngrams` highlighted.
 
         Any n-grams in `minus_ngrams` have any highlighting of them
         (or subsets of them) removed.
 
+        :param output_dir: directory to write report to
+        :type output_dir: `str`
         :param work: name of work to highlight
         :type work: `str`
         :param siglum: siglum of witness to highlight
@@ -112,8 +113,8 @@ class NgramHighlighter (BaseHighlighter):
         content = self._highlight(content, ngrams, True)
         content = self._highlight(content, minus_ngrams, False)
         content = self._format_content(content)
-        return self._generate_html(work, siglum, content, ngrams=ngrams,
-                                   minus_ngrams=minus_ngrams)
+        self._write(work, siglum, content, output_dir, ngrams=ngrams,
+                    minus_ngrams=minus_ngrams)
 
     def _highlight(self, content, ngrams, highlight):
         """Returns `content` with its n-grams from `ngrams` highlighted (if
@@ -135,10 +136,10 @@ class NgramHighlighter (BaseHighlighter):
         return content
 
 
-class ResultsHighlighter (BaseHighlighter):
+class ResultsHighlightReport (HighlightReport):
 
     _base_token_markup = r'<span data-count="0" data-texts=" ">\1</span>'
-    _template = 'results_highlight.html'
+    _report_name = 'results_highlight'
 
     def _annotate_tokens(self, match_obj):
         match = match_obj.group(0)
@@ -160,10 +161,12 @@ class ResultsHighlighter (BaseHighlighter):
         text_list.sort()
         return text_list
 
-    def highlight(self, work, siglum, matches_filename):
+    def generate(self, output_dir, work, siglum, matches_filename):
         """Returns the text of `siglum` witness to `work` as an HTML
         document with its matches in `matches` highlighted.
 
+        :param output_dir: directory to write report to
+        :type output_dir: `str`
         :param work: name of work to highlight
         :type text_name: `str`
         :param siglum: siglum of witness to highlight
@@ -180,7 +183,8 @@ class ResultsHighlighter (BaseHighlighter):
         content = self._highlight(content, matches)
         content = self._format_content(content)
         text_list = self._generate_text_list(matches)
-        return self._generate_html(work, siglum, content, text_list=text_list)
+        self._write(work, siglum, content, output_dir, True,
+                    text_list=text_list)
 
     def _highlight(self, content, matches):
         for row_index, row in matches.iterrows():
