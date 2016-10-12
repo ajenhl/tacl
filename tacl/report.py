@@ -7,7 +7,20 @@ from pkg_resources import resource_filename, resource_listdir
 
 class Report:
 
-    """Base class for HTML reports."""
+    """Base class for HTML reports.
+
+    Subclasses should implement the `generate` method, used to
+    generate and output the report into the supplied directory. The
+    calling code is responsible for ensuring that the directory exists
+    and is writable.
+
+    The intention is that the same Report object can be used to
+    produce multiple reports in a given context, such as a single
+    corpus. The contextual data should be supplied to the `__init__`
+    method, and the data for a single specific report passed to the
+    `generate` method.
+
+    """
 
     _report_name = ''
 

@@ -4,9 +4,17 @@
     <meta charset="UTF-8" />
     <title>JitC Report</title>
     <link rel="stylesheet" href="report_assets{{ sep }}report.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
     <script src="http://d3js.org/d3.v2.min.js?2.8.1"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-</head>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+      $( function() {
+        $(".tabs").tabs();
+      } );
+    </script>
+  </head>
   <body>
     <h1>Jewel in the Clouds Report</h1>
 
@@ -29,7 +37,7 @@
       <dt>unique</dt>
       <dd>Text that is unique to the work, occuring neither in the
       other work, nor in any of the works in the second set of
-      works.</dt>
+      works.</dd>
     </dl>
 
     <h2>Works analysed for overlap</h2>
@@ -65,11 +73,22 @@
     <div id="work-{{ index }}" type="text">
       <h2>{{ work }}</h2>
 
-      {{ tables[index] }}
-
-      <div id="breakdown_{{ index }}"></div>
-
-      <div id="related_{{ index }}"></div>
+      <div class="tabs">
+        <ul>
+          <li><a href="#tabs-{{ index }}-1">Breakdown chart</a></li>
+          <li><a href="#tabs-{{ index }}-2">Related chart</a></li>
+          <li><a href="#tabs-{{ index }}-3">Data</a></li>
+        </ul>
+        <div id="tabs-{{ index }}-1">
+          <div id="breakdown_{{ index }}"></div>
+        </div>
+        <div id="tabs-{{ index }}-2">
+          <div id="related_{{ index }}"></div>
+        </div>
+        <div id="tabs-{{ index }}-3">
+          {{ tables[index] }}
+        </div>
+      </div>
     </div>
     {% endfor %}
 
@@ -79,17 +98,17 @@
     <script src="report_assets{{ sep }}chord.js"></script>
     <script src="report_assets{{ sep }}stacked_bar.js"></script>
     <script src="report_assets{{ sep }}grouped_bar.js"></script>
-    {% for index, text in texts %}
+    {% for index, work in works %}
     <script>
       var breakdown_chart_{{ index }} = stackedBarChart();
-      d3.csv("report_data{{ sep }}breakdown_{{ text }}.csv", function(data) {
+      d3.csv("report_data{{ sep }}breakdown_{{ work }}.csv", function(data) {
         d3.select("#breakdown_{{ index }}").datum(data).call(
           breakdown_chart_{{ index }});
       });
     </script>
     <script>
       var related_chart_{{ index }} = groupedBarChart();
-      d3.csv("report_data{{ sep }}related_{{ text }}.csv", function(data) {
+      d3.csv("report_data{{ sep }}related_{{ work }}.csv", function(data) {
         d3.select("#related_{{ index }}").datum(data).call(
           related_chart_{{ index }});
       });

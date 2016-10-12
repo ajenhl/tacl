@@ -34,7 +34,7 @@ function stackedBarChart() {
     function chart(selection) {
         selection.each(function(data) {
             color.domain(d3.keys(data[0]).filter(function(key) {
-                return key !== "related_text";
+                return key !== "related_work";
             }));
 
             data.forEach(function(d) {
@@ -44,7 +44,7 @@ function stackedBarChart() {
                 });
             });
 
-            x.domain(data.map(function(d) { return d.related_text; }));
+            x.domain(data.map(function(d) { return d.related_work; }));
             y.domain([0, 100]);
 
             var svg = d3.select(this).append("svg")
@@ -76,15 +76,15 @@ function stackedBarChart() {
                 .style("text-anchor", "end")
                 .text("Percentage of text");
 
-            var related_text = svg.selectAll(".related_text")
+            var related_work = svg.selectAll(".related_work")
                 .data(data)
                 .enter().append("g")
                 .attr("class", "g")
                 .attr("transform", function(d) {
-                    return "translate(" + x(d.related_text) + ",0)";
+                    return "translate(" + x(d.related_work) + ",0)";
                 });
 
-            related_text.selectAll("rect")
+            related_work.selectAll("rect")
                 .data(function(d) { return d.groups; })
                 .enter().append("rect")
                 .attr("width", x.rangeBand())

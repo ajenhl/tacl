@@ -15,9 +15,9 @@ var table_svg = d3.select("#matrix").append("svg")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function handleTableData (texts) {
+function handleTableData (works) {
     var matrix = [],
-        nodes = texts.nodes,
+        nodes = works.nodes,
         n = nodes.length;
 
     // Compute index per node.
@@ -27,9 +27,9 @@ function handleTableData (texts) {
         matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
     });
 
-    // Convert links to matrix; sum percentages for each text (to get a
-    // measure of how much it overlaps with all the other texts).
-    texts.links.forEach(function(link) {
+    // Convert links to matrix; sum percentages for each work (to get a
+    // measure of how much it overlaps with all the other works).
+    works.links.forEach(function(link) {
         matrix[link.source][link.target].z += link.value;
         matrix[link.target][link.source].z += link.value;
         matrix[link.source][link.source].z = 0;
@@ -40,14 +40,14 @@ function handleTableData (texts) {
 
     // Precompute the orders.
     var orders = {
-        name: d3.range(n).sort(function(a, b) {
-            return d3.ascending(nodes[a].name, nodes[b].name); }),
+        work: d3.range(n).sort(function(a, b) {
+            return d3.ascending(nodes[a].work, nodes[b].work); }),
         count: d3.range(n).sort(function(a, b) {
             return nodes[b].count - nodes[a].count; })
     };
 
     // The default sort order.
-    x.domain(orders.name);
+    x.domain(orders.work);
 
     table_svg.append("rect")
         .attr("class", "background")
@@ -70,7 +70,7 @@ function handleTableData (texts) {
         .attr("y", x.rangeBand() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "end")
-        .text(function(d, i) { return nodes[i].name; });
+        .text(function(d, i) { return nodes[i].work; });
 
     var column = table_svg.selectAll(".column")
             .data(matrix)
@@ -87,7 +87,7 @@ function handleTableData (texts) {
         .attr("y", x.rangeBand() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "start")
-        .text(function(d, i) { return nodes[i].name; });
+        .text(function(d, i) { return nodes[i].work; });
 
     function row(row) {
         var cell = d3.select(this).selectAll(".cell")
@@ -136,7 +136,7 @@ function handleTableData (texts) {
     }
 
     var timeout = setTimeout(function() {
-        order("name");
+        order("work");
         d3.select("#order").property("selectedIndex", 0).node().focus();
     }, 5000);
 }

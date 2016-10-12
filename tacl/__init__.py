@@ -3,7 +3,7 @@ from .catalogue import Catalogue
 from .corpus import Corpus
 from .data_store import DataStore
 from .highlighter import NgramHighlightReport, ResultsHighlightReport
-from .jitc import JITCProcessor
+from .jitc import JitCReport
 from .results import Results
 from .sequence import Sequencer
 from .statistics_report import StatisticsReport

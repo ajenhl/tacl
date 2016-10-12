@@ -205,7 +205,6 @@ JITC_DESCRIPTION = '''\
     works, ignoring those parts that overlap with works in a second
     set of works.'''
 JITC_LABEL_HELP = 'Label of works to compare with each other'
-JITC_OUTPUT_HELP = 'Directory to output results into'
 
 NGRAMS_CATALOGUE_HELP = '''\
     Path to a catalogue file used to restrict which works in the

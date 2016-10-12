@@ -19,7 +19,7 @@ function groupedBarChart() {
     function chart(selection) {
         selection.each(function(data) {
             var groupNames = d3.keys(data[0]).filter(function(key) {
-                return key !== "related_text";
+                return key !== "related_work";
             });
 
             data.forEach(function(d) {
@@ -28,7 +28,7 @@ function groupedBarChart() {
                 });
             });
 
-            x0.domain(data.map(function(d) { return d.related_text; }));
+            x0.domain(data.map(function(d) { return d.related_work; }));
             x1.domain(groupNames).rangeRoundBands([0, x0.rangeBand()]);
             y.domain([0, 100]);
 
@@ -59,15 +59,15 @@ function groupedBarChart() {
                 .style("text-anchor", "end")
                 .text("Percentage of text");
 
-            var related_text = svg.selectAll(".related_text")
+            var related_work = svg.selectAll(".related_work")
                 .data(data)
                 .enter().append("g")
                 .attr("class", "g")
                 .attr("transform", function(d) {
-                    return "translate(" + x0(d.related_text) + ",0)";
+                    return "translate(" + x0(d.related_work) + ",0)";
                 });
 
-            related_text.selectAll("rect")
+            related_work.selectAll("rect")
                 .data(function(d) { return d.groups; })
                 .enter().append("rect")
                 .attr("width", x1.rangeBand())

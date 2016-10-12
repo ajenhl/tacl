@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Distribution of n-grams in {{ text }}</title>
+    <style>
+      svg { width: 100px; }
+      svg:hover { width: 1000px; }
+      .bar rect {
+        fill: steelblue;
+        shape-rendering: crispEdges;
+      }
+      .bar text {
+        fill: #FFF;
+      }
+      .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+    </style>
+    <script src="http://d3js.org/d3.v2.min.js?2.8.1"></script>
+  </head>
+  <body>
+    <h1>Distribution of n-grams in {{ text }}</h1>
+
+    <p>Mouse-over the individual graphs to expand them.</p>
+
+    <!--<div id="cluster">
+      <h2>Clustering of n-grams</h2>
+
+      <p>The size of the dot is proportional to the number of
+      occurrences of the n-gram in the witness. The distance between
+      two dots is roughly inversely proportional to how closely the
+      two n-grams occur together.</p>
+
+      <p>Mouseover a dot to see the n-gram it represents and the
+      number of times it appears.</p>
+
+      {% for siglum in cluster %}
+      <div id="cluster-{{ siglum }}"></div>
+      {% endfor %}
+    </div>-->
+
+    <div id="all-ngrams">
+      <h2>Distribution of all n-grams combined</h2>
+
+      {% for siglum in combined %}
+      <div id="combined-{{ siglum }}"></div>
+      {% endfor %}
+    </div>
+
+    {% for ngram, sigla in ngrams.items() %}
+    <div id="ngram-{{ loop.index }}">
+      <h2>{{ ngram }}</h2>
+      {% set outer_loop = loop %}
+      {% for siglum in sigla %}
+      <div id="ngram-{{ outer_loop.index }}-{{ siglum }}"></div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <script src="force_directed.js"></script>
+    <script src="histogram.js"></script>
+    {% for siglum, data in cluster.items() %}
+    <script>
+      var forceData = {{ data }};
+      d3.select("#cluster-{{ siglum }}").datum(forceData)
+        .call(forceDirectedChart());
+    </script>
+    {% endfor %}
+    {% for siglum, data in combined.items() %}
+    <script>
+      chart = histogramChart();
+      d3.select("#combined-{{ siglum }}").datum({{ data }}).call(chart);
+      chart.title("Distribution of all n-grams in {{ siglum }}");
+    </script>
+    {% endfor %}
+    {% for ngram, sigla in ngrams.items() %}
+    {% set outer_loop = loop %}
+    {% for siglum, ngram_data in sigla.items() %}
+    <script>
+      chart = histogramChart();
+      d3.select("#ngram-{{ outer_loop.index }}-{{ siglum }}")
+        .datum({{ ngram_data }}).call(chart);
+      chart.title("Distribution of {{ ngram }} in {{ siglum }}");
+    </script>
+    {% endfor %}
+    {% endfor %}
+  </body>
+</html>

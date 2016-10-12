@@ -32,9 +32,8 @@ def main():
         logger.warning('Output directory already exists; any results therein '
                        'will be reused rather than regenerated.')
     os.makedirs(output_dir, exist_ok=True)
-    processor = tacl.JITCProcessor(store, corpus, catalogue, args.label,
-                                   tokenizer, output_dir)
-    processor.process()
+    report = tacl.JitCReport(store, corpus, tokenizer)
+    report.generate(output_dir, catalogue, args.label)
 
 
 def check_catalogue(catalogue, label):
@@ -56,6 +55,6 @@ def generate_parser():
     utils.add_query_arguments(parser)
     parser.add_argument('label', help=constants.JITC_LABEL_HELP,
                         metavar='LABEL')
-    parser.add_argument('output', help=constants.JITC_OUTPUT_HELP,
+    parser.add_argument('output', help=constants.REPORT_OUTPUT_HELP,
                         metavar='OUTPUT')
     return parser

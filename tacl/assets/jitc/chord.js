@@ -31,7 +31,7 @@ chord_svg.append("circle")
     .attr("r", outerRadius);
 
 function handleChordData (chordData) {
-    var texts = chordData.texts;
+    var works = chordData.works;
     // Compute the chord layout.
     layout.matrix(chordData.matrix);
 
@@ -44,14 +44,14 @@ function handleChordData (chordData) {
 
     // Add a mouseover title.
     group.append("title").text(function(d, i) {
-        return texts[i].name + ": sum of shared text percentages: " + formatPercent(d.value);
+        return works[i].work + ": sum of shared text percentages: " + formatPercent(d.value);
     });
 
     // Add the group arc.
     var groupPath = group.append("path")
             .attr("id", function(d, i) { return "group" + i; })
             .attr("d", arc)
-            .style("fill", function(d, i) { return texts[i].colour; });
+            .style("fill", function(d, i) { return works[i].colour; });
 
     // Add a text label.
     var groupText = group.append("text")
@@ -60,7 +60,7 @@ function handleChordData (chordData) {
 
     groupText.append("textPath")
         .attr("xlink:href", function(d, i) { return "#group" + i; })
-        .text(function(d, i) { return texts[i].name; });
+        .text(function(d, i) { return works[i].name; });
 
     // Remove the labels that don't fit. :(
     groupText.filter(function(d, i) {
@@ -72,16 +72,16 @@ function handleChordData (chordData) {
             .data(layout.chords)
             .enter().append("path")
             .attr("class", "chord")
-            .style("fill", function(d) { return texts[d.source.index].colour; })
+            .style("fill", function(d) { return works[d.source.index].colour; })
             .attr("d", path);
 
     // Add an elaborate mouseover title for each chord.
     chord.append("title").text(function(d) {
-        return "Percentage of " + texts[d.source.index].name
-            + " shared with " + texts[d.target.index].name
+        return "Percentage of " + works[d.source.index].work
+            + " shared with " + works[d.target.index].work
             + ": " + formatPercent(d.source.value)
-            + "\nPercentage of " + texts[d.target.index].name
-            + " shared with " + texts[d.source.index].name
+            + "\nPercentage of " + works[d.target.index].work
+            + " shared with " + works[d.source.index].work
             + ": " + formatPercent(d.target.value);
     });
 
