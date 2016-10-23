@@ -34,8 +34,8 @@ def align_results(args, parser):
         results = open(args.results, 'r', encoding='utf-8', newline='')
     tokenizer = utils.get_tokenizer(args)
     corpus = tacl.Corpus(args.corpus, tokenizer)
-    s = tacl.Sequencer(corpus, tokenizer, results, args.output)
-    s.generate_sequences(args.minimum)
+    report = tacl.SequenceReport(corpus, tokenizer, results)
+    report.generate(args.output, args.minimum)
 
 
 def generate_parser():

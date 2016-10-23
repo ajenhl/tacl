@@ -5,7 +5,7 @@ from .data_store import DataStore
 from .highlighter import NgramHighlightReport, ResultsHighlightReport
 from .jitc import JitCReport
 from .results import Results
-from .sequence import Sequencer
+from .sequence import SequenceReport
 from .statistics_report import StatisticsReport
 from .stripper import Stripper
 from .tei_corpus import TEICorpusCBETA2011, TEICorpusCBETAGitHub
