@@ -261,6 +261,13 @@ PREPARE_SOURCE_HELP = 'Source of TEI files'
 
 REPORT_OUTPUT_HELP = 'Directory to output report to'
 
+RESULTS_BIFURCATED_EXTEND_HELP = '''\
+    Extend results to bifurcation points. Generates results containing
+    those n-grams, derived from the original n-grams, that have a
+    label count higher than their containing (n+1)-grams, or that have
+    a label count of one and the constituent (n-1)-grams have a higher
+    label count.'''
+RESULTS_BIFURCATED_EXTEND_MAX_HELP = 'Maximum size of n-gram to extend to'
 RESULTS_CATALOGUE_HELP = '''\
     Path to the catalogue file used to generate the results'''
 RESULTS_DESCRIPTION = '''\
@@ -272,9 +279,10 @@ RESULTS_EXTEND_HELP = '''\
     database. This has no effect if the results contain only 1-grams.'''
 RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --extend, --reduce, --reciprocal, --zero-fill,
-    --ngrams, --min/max-works, --min/max-size, --min/max-count,
-    --min/max-count-work, --remove, --sort.
+    following order: --extend, --bifurcated-extend, --reduce,
+    --reciprocal, --zero-fill, --ngrams, --min/max-works,
+    --min/max-size, --min/max-count, --min/max-count-work, --remove,
+    --sort.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -409,14 +417,6 @@ SUPPLIED_RESULTS_HELP = 'Paths to results files to be used in the query.'
 
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 
-TACL_HELPER_BIFURCATED_EXTEND_DESCRIPTION = '''\
-    Generates results with those n-grams, derived from the original
-    n-grams, that have a label count higher than their containing
-    (n+1)-grams, or that have a label count of one and the constituent
-    (n-1)-grams have a higher label count.'''
-TACL_HELPER_BIFURCATED_EXTEND_HELP = (
-    'Extend difference results to bifurcation points')
-TACL_HELPER_BIFURCATED_EXTEND_SIZE_HELP = 'Maximum size of n-gram to extend to'
 TACL_HELPER_AGAINST_DESCRIPTION = '''\
     Generate a script to compare each work in a corpus against all the
     works in another corpus.'''

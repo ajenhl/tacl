@@ -232,6 +232,13 @@ def generate_results_subparser(subparsers):
         help=constants.RESULTS_HELP)
     utils.add_common_arguments(parser)
     parser.set_defaults(func=results)
+    be_group = parser.add_argument_group('bifurcated extend')
+    be_group.add_argument('-b', '--bifurcated-extend',
+                          dest='bifurcated_extend', metavar='CORPUS',
+                          help=constants.RESULTS_BIFURCATED_EXTEND_HELP)
+    be_group.add_argument('--max-be-count', dest='bifurcated_extend_size',
+                          help=constants.RESULTS_BIFURCATED_EXTEND_MAX_HELP,
+                          metavar='COUNT', type=int)
     parser.add_argument('-c', '--catalogue', dest='catalogue',
                         help=constants.RESULTS_CATALOGUE_HELP,
                         metavar='CATALOGUE')
@@ -442,6 +449,12 @@ def results(args, parser):
     if args.extend:
         corpus = tacl.Corpus(args.extend, tokenizer)
         results.extend(corpus)
+    if args.bifurcated_extend:
+        if not args.bifurcated_extend_size:
+            parser.error('The bifurcated extend option requires that the '
+                         '--max-be-count option also be supplied')
+        corpus = tacl.Corpus(args.bifurcated_extend, tokenizer)
+        results.bifurcated_extend(corpus, args.bifurcated_extend_size)
     if args.reduce:
         results.reduce()
     if args.reciprocal:

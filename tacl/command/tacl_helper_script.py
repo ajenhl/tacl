@@ -23,12 +23,6 @@ def main():
         parser.print_help()
 
 
-def bifurcated_extend(args):
-    results = tacl.Results(args.results, utils.get_tokenizer(args))
-    results.bifurcated_extend(utils.get_corpus(args), args.size)
-    results.csv(sys.stdout)
-
-
 def collapse_witnesses(args):
     results = tacl.Results(args.results, utils.get_tokenizer(args))
     results.collapse_witnesses()
@@ -52,28 +46,12 @@ def generate_parser():
         description=constants.TACL_HELPER_DESCRIPTION,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
-    generate_bifurcated_extend_results_subparser(subparsers)
     generate_collapse_witness_results_subparser(subparsers)
     generate_label_count_subparser(subparsers)
     generate_work_against_corpus_subparser(subparsers)
     generate_work_in_corpus_subparser(subparsers)
     generate_validate_catalogue_subparser(subparsers)
     return parser
-
-
-def generate_bifurcated_extend_results_subparser(subparsers):
-    parser = subparsers.add_parser(
-        'bifurcated-extend',
-        description=constants.TACL_HELPER_BIFURCATED_EXTEND_DESCRIPTION,
-        help=constants.TACL_HELPER_BIFURCATED_EXTEND_HELP)
-    parser.set_defaults(func=bifurcated_extend)
-    utils.add_common_arguments(parser)
-    utils.add_corpus_arguments(parser)
-    parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
-                        metavar='RESULTS')
-    parser.add_argument(
-        'size', help=constants.TACL_HELPER_BIFURCATED_EXTEND_SIZE_HELP,
-        metavar='SIZE', type=int)
 
 
 def generate_collapse_witness_results_subparser(subparsers):
