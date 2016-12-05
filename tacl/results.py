@@ -162,7 +162,6 @@ class Results:
             [constants.LABEL_COUNT_FIELDNAME, DELETE_FIELDNAME]
         self._matches = pd.concat(new_results, ignore_index=True).reindex(
             columns=all_cols)
-        self._matches
         del self._matches[DELETE_FIELDNAME]
 
     def collapse_witnesses(self):
