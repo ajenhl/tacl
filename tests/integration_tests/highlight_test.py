@@ -39,7 +39,7 @@ class NgramHighlightIntegrationTestCase (BaseHighlightIntegrationTestCase):
     def test_highlight(self):
         ngrams = os.path.join(self._data_dir, 'ngrams.txt')
         minus_ngrams = os.path.join(self._data_dir, 'minus_ngrams.txt')
-        command = 'tacl highlight -t {} -m {} -n {} {} {} {} {}'.format(
+        command = 'tacl highlight -t {} -m {} -n {} -l L {} {} {} {}'.format(
             self._tokenizer, minus_ngrams, ngrams, self._corpus, 't1', 'base',
             self._actual_output_dir)
         subprocess.call(shlex.split(command))

@@ -7,6 +7,7 @@ from lxml import etree
 import pandas as pd
 
 from . import constants
+from .colour import generate_colours
 from .report import Report
 from .text import WitnessText
 
@@ -77,6 +78,7 @@ class HighlightReport(Report):
 class NgramHighlightReport (HighlightReport):
 
     _base_token_markup = r'<span>\1</span>'
+    _ngrams_count = 1
     _report_name = 'ngram_highlight'
 
     def _annotate_tokens(self, match_obj):
@@ -84,12 +86,12 @@ class NgramHighlightReport (HighlightReport):
         root = etree.fromstring('<div>{}</div>'.format(match))
         for span in root.xpath('//span'):
             if self._add_highlight:
-                span.set('class', 'highlight')
+                span.set('class', 'highlight{}'.format(self._ngrams_count))
             elif span.get('class'):
                 del span.attrib['class']
         return etree.tostring(root, encoding='unicode')[5:-6]
 
-    def generate(self, output_dir, work, siglum, ngrams, minus_ngrams):
+    def generate(self, output_dir, work, siglum, ngrams, labels, minus_ngrams):
         """Generates an HTML report showing the text of `siglum` witness to
         `work` with its n-grams in `ngrams` highlighted.
 
@@ -102,19 +104,25 @@ class NgramHighlightReport (HighlightReport):
         :type work: `str`
         :param siglum: siglum of witness to highlight
         :type siglum: `str`
-        :param ngrams: n-grams to highlight
-        :type ngrams: `list` of `str`
+        :param ngrams: groups of n-grams to highlight
+        :type ngrams: `list` of `list` of `str`
+        :param labels: labels for the groups of n-grams
+        :type labels: `list` of `str`
         :param minus_ngrams: n-grams to remove highlighting from
         :type minus_ngrams: `list` of `str`
         :rtype: `str`
 
         """
         content = self._generate_base(work, siglum)
-        content = self._highlight(content, ngrams, True)
+        colours = generate_colours(len(ngrams))
+        for ngrams_group in ngrams:
+            content = self._highlight(content, ngrams_group, True)
+        self._ngrams_count = 1
         content = self._highlight(content, minus_ngrams, False)
         content = self._format_content(content)
-        self._write(work, siglum, content, output_dir, ngrams=ngrams,
-                    minus_ngrams=minus_ngrams)
+        ngram_data = zip(labels, ngrams)
+        self._write(work, siglum, content, output_dir, ngram_data=ngram_data,
+                    minus_ngrams=minus_ngrams, colours=colours)
 
     def _highlight(self, content, ngrams, highlight):
         """Returns `content` with its n-grams from `ngrams` highlighted (if
@@ -133,6 +141,7 @@ class NgramHighlightReport (HighlightReport):
         for ngram in ngrams:
             pattern = self._get_regexp_pattern(ngram)
             content = re.sub(pattern, self._annotate_tokens, content)
+        self._ngrams_count += 1
         return content
 
 

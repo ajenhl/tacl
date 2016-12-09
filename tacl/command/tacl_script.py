@@ -145,10 +145,12 @@ def generate_highlight_subparser(subparsers):
     parser.add_argument('-m', '--minus-ngrams', metavar='NGRAMS',
                         help=constants.HIGHLIGHT_MINUS_NGRAMS_HELP)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-n', '--ngrams', metavar='NGRAMS',
+    group.add_argument('-n', '--ngrams', action='append', metavar='NGRAMS',
                        help=constants.HIGHLIGHT_NGRAMS_HELP)
     group.add_argument('-r', '--results', metavar='RESULTS',
                        help=constants.HIGHLIGHT_RESULTS_HELP)
+    parser.add_argument('-l', '--label', action='append', metavar='LABEL',
+                        help=constants.HIGHLIGHT_LABEL_HELP)
     utils.add_corpus_arguments(parser)
     parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
                         metavar='BASE_NAME')
@@ -376,13 +378,18 @@ def highlight_text(args, parser):
                     'aborting.\n')
     os.makedirs(output_dir, exist_ok=True)
     if args.ngrams:
+        if args.label is None or len(args.label) != len(args.ngrams):
+            parser.error('There must be as many labels as there are files '
+                         'of n-grams')
         report = tacl.NgramHighlightReport(corpus, tokenizer)
-        ngrams = utils.get_ngrams(args.ngrams)
+        ngrams = []
+        for ngram_file in args.ngrams:
+            ngrams.append(utils.get_ngrams(ngram_file))
         minus_ngrams = []
         if args.minus_ngrams:
             minus_ngrams = utils.get_ngrams(args.minus_ngrams)
         report.generate(args.output, args.base_name, args.base_siglum, ngrams,
-                        minus_ngrams)
+                        args.label, minus_ngrams)
     else:
         report = tacl.ResultsHighlightReport(corpus, tokenizer)
         report.generate(args.output, args.base_name, args.base_siglum,

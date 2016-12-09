@@ -6,7 +6,9 @@
     <style>
       body { margin-left: 4em; color: black; background-color: white; }
       ul { list-style-type: none; }
-      .highlight { color: red; }
+      {% for colour in colours %}
+      .highlight{{ loop.index }} { color: {{ colour }}; }
+      {% endfor %}
     </style>
   </head>
   <body>
@@ -22,11 +24,15 @@
 
     <h2 id="highlighted">Highlighted n-grams</h2>
 
-    <ul>
+    {% for label, ngrams in ngram_data %}
+    <h3>{{ label }}</h3>
+
+    <ul class="highlight{{ loop.index }}">
       {% for ngram in ngrams %}
       <li>{{ ngram }}</li>
       {% endfor %}
     </ul>
+    {% endfor %}
 
     <h2 id="unhighlighted">Unhighlighted n-grams</h2>
 

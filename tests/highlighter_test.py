@@ -23,26 +23,26 @@ class NgramHighlightReportTestCase (TaclTestCase):
         report = tacl.NgramHighlightReport(None, self._tokenizer)
         actual_text = report._highlight(input_text, ngrams, True)
         expected_text = (
-            '<span>火</span><span class="highlight">無</span>'
-            '<span class="highlight">[火*因]</span>。'
-            '<span class="highlight">是</span><span>故</span><span>顯</span>'
+            '<span>火</span><span class="highlight1">無</span>'
+            '<span class="highlight1">[火*因]</span>。'
+            '<span class="highlight1">是</span><span>故</span><span>顯</span>'
             '<span>物</span>')
         self.assertEqual(actual_text, expected_text)
 
     def test_highlight_minus(self):
         input_text = (
-            '<span class="highlight">火</span><span class="highlight">無</span>'
-            '<span class="highlight">[火*因]</span>。<span class="highlight">'
-            '是</span><span>故</span><span class="highlight">火</span>'
-            '<span>顯</span><span>物</span><span class="highlight">火</span>')
+            '<span class="highlight2">火</span><span class="highlight">無</span>'
+            '<span class="highlight1">[火*因]</span>。<span class="highlight1">'
+            '是</span><span>故</span><span class="highlight2">火</span>'
+            '<span>顯</span><span>物</span><span class="highlight2">火</span>')
         minus_ngrams = ['火顯']
         report = tacl.NgramHighlightReport(None, self._tokenizer)
         actual_text = report._highlight(input_text, minus_ngrams, False)
         expected_text = (
-            '<span class="highlight">火</span><span class="highlight">無</span>'
-            '<span class="highlight">[火*因]</span>。<span class="highlight">'
+            '<span class="highlight2">火</span><span class="highlight">無</span>'
+            '<span class="highlight1">[火*因]</span>。<span class="highlight1">'
             '是</span><span>故</span><span>火</span><span>顯</span><span>物'
-            '</span><span class="highlight">火</span>')
+            '</span><span class="highlight2">火</span>')
         self.assertEqual(actual_text, expected_text)
 
     def test_prepare_text_cbeta(self):
