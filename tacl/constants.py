@@ -150,22 +150,26 @@ DIFF_EPILOG = '''\
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
 HIGHLIGHT_BASE_NAME_HELP = 'Name of work to display.'
-HIGHLIGHT_BASE_SIGLUM_HELP = 'Siglum of witness to display.'
 HIGHLIGHT_DESCRIPTION = '''\
-    Output an HTML document showing a witness' text with supplied
-    n-grams visually highlighted.'''
+    Output an HTML report for each witness to a work, showing the text
+    of that witness with supplied n-grams visually highlighted.'''
 HIGHLIGHT_EPILOG = '''\
     There are two possible outputs available, depending on whether the
     -n or -r option is specified.
 
     If n-grams are supplied via the -n/--ngrams option, the resulting
-    HTML shows the specified witness text with those n-grams
-    highlighted. Any n-grams that are specified via the
+    HTML reports show the specified work's witness texts with those
+    n-grams highlighted. Any n-grams that are specified via the
     -m/--minus-ngrams option will have had its constituent tokens
-    unhighlighted.
+    unhighlighted. The -n/--ngrams option may be specified multiple
+    times; each file's n-grams will be highlighted in a distinct
+    colour. The -l/--labels option can be used with -n/--ngrams in
+    order to provide labels for groups of n-grams. There must be as
+    many instances of -l/--labels as there are of -n/--ngrams. The
+    order of the labels matches the order of the n-grams files.
 
     If results are supplied via the -r/--results option, the resulting
-    HTML contains an interactive heatmap of the results, allowing the
+    HTML reports contain an interactive heatmap of the results, allowing the
     user to select which witness' matches should be highlighted in the
     text. Multiple selections are possible, and the colour of the
     highlight of a token reflects how many witnesses have matches
@@ -173,15 +177,23 @@ HIGHLIGHT_EPILOG = '''\
 
     examples:
 
-      tacl highlight -r intersect.csv corpus/stripped/ T0001 元 > heatmap.html
+      tacl highlight -r intersect.csv corpus/stripped/ T0001 report_dir
 
-      tacl highlight -n author_markers.csv corpus/stripped/ T0001 元 > highlight.html'''
+      tacl highlight -n author_markers.csv corpus/stripped/ T0001 report_dir
+
+      tacl highlight -n Dhr_markers.csv -n ZQ_markers.csv corpus/stripped/ -l Dharmaraksa -l "Zhi Qian" T0474 report_dir'''
 HIGHLIGHT_HELP = 'Output a witness with its matches visually highlighted.'
+HIGHLIGHT_LABEL_HELP = '''\
+    Label used to identify the n-grams from a file specified by
+    -n/--ngrams. This option may be specified multiple times, and
+    provided as many times as the -n/--ngrams option.'''
 HIGHLIGHT_MINUS_NGRAMS_HELP = '''\
     Path to file containing n-grams (one per line) to remove
     highlighting from. This applies only when -n is used.'''
 HIGHLIGHT_NGRAMS_HELP = '''\
-    Path to file containing n-grams (one per line) to highlight.'''
+    Path to file containing n-grams (one per line) to highlight. This
+    option may be specified multiple times; the n-grams in each file
+    will be displayed in a distinct colour.'''
 HIGHLIGHT_RESULTS_HELP = 'Path to CSV results; creates heatmap highlighting'
 
 

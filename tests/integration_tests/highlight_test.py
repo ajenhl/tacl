@@ -39,11 +39,11 @@ class NgramHighlightIntegrationTestCase (BaseHighlightIntegrationTestCase):
     def test_highlight(self):
         ngrams = os.path.join(self._data_dir, 'ngrams.txt')
         minus_ngrams = os.path.join(self._data_dir, 'minus_ngrams.txt')
-        command = 'tacl highlight -t {} -m {} -n {} -l L {} {} {} {}'.format(
-            self._tokenizer, minus_ngrams, ngrams, self._corpus, 't1', 'base',
+        command = 'tacl highlight -t {} -m {} -n {} -l L {} {} {}'.format(
+            self._tokenizer, minus_ngrams, ngrams, self._corpus, 't1',
             self._actual_output_dir)
         subprocess.call(shlex.split(command))
-        with open(os.path.join(self._actual_output_dir, 'report.html')) as fh:
+        with open(os.path.join(self._actual_output_dir, 't1-base.html')) as fh:
             actual_output = fh.read()
         with open(os.path.join(self._data_dir, 'highlight.html')) as fh:
             expected_output = fh.read()
@@ -55,11 +55,11 @@ class ResultsHighlightIntegrationTestCase (BaseHighlightIntegrationTestCase):
 
     def test_highlight(self):
         results = os.path.join(self._data_dir, 'results.csv')
-        command = 'tacl highlight -t {} -r {} {} {} {} {}'.format(
-            self._tokenizer, results, self._corpus, 't1', 'base',
+        command = 'tacl highlight -t {} -r {} {} {} {}'.format(
+            self._tokenizer, results, self._corpus, 't1',
             self._actual_output_dir)
         subprocess.call(shlex.split(command))
-        with open(os.path.join(self._actual_output_dir, 'report.html')) as fh:
+        with open(os.path.join(self._actual_output_dir, 't1-base.html')) as fh:
             actual_output = fh.read()
         with open(os.path.join(self._data_dir, 'heatmap.html')) as fh:
             expected_output = fh.read()

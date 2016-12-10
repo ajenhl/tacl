@@ -51,26 +51,34 @@ class Report:
         env = Environment(loader=loader)
         return env.get_template('{}.html'.format(self._report_name))
 
-    def _write(self, context, report_dir, report_file, assets_dir=None):
+    def _write(self, context, report_dir, report_name, assets_dir=None,
+               template=None):
         """Writes the data in `context` in the report's template to
         `report_file` in `report_dir`.
 
         If `assets_dir` is supplied, copies all assets for this report
         to the specified directory.
 
+        If `template` is supplied, uses that template instead of
+        automatically finding it. This is useful if a single report
+        generates multiple files using the same template.
+
         :param context: context data to render within the template
         :type context: `dict`
         :param report_dir: directory to write the report to
         :type report_dir: `str`
-        :param report_file: file to write the report to
-        :type report_file: `str`
-        :assets_dir: optional directory to output report assets to
+        :param report_name: name of file to write the report to
+        :type report_name: `str`
+        :param assets_dir: optional directory to output report assets to
         :type assets_dir: `str`
+        :param template: template to render and output
+        :type template: `jinja2.Template`
 
         """
-        template = self._get_template()
+        if template is None:
+            template = self._get_template()
         report = template.render(context)
-        with open(os.path.join(report_dir, report_file), 'w') as fh:
+        with open(os.path.join(report_dir, report_name), 'w') as fh:
             fh.write(report)
         if assets_dir:
             self._copy_static_assets(assets_dir)

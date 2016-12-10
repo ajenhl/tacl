@@ -154,8 +154,6 @@ def generate_highlight_subparser(subparsers):
     utils.add_corpus_arguments(parser)
     parser.add_argument('base_name', help=constants.HIGHLIGHT_BASE_NAME_HELP,
                         metavar='BASE_NAME')
-    parser.add_argument('base_siglum', metavar='BASE_SIGLUM',
-                        help=constants.HIGHLIGHT_BASE_SIGLUM_HELP)
     parser.add_argument('output', metavar='OUTPUT',
                         help=constants.REPORT_OUTPUT_HELP)
 
@@ -388,12 +386,11 @@ def highlight_text(args, parser):
         minus_ngrams = []
         if args.minus_ngrams:
             minus_ngrams = utils.get_ngrams(args.minus_ngrams)
-        report.generate(args.output, args.base_name, args.base_siglum, ngrams,
-                        args.label, minus_ngrams)
+        report.generate(args.output, args.base_name, ngrams, args.label,
+                        minus_ngrams)
     else:
         report = tacl.ResultsHighlightReport(corpus, tokenizer)
-        report.generate(args.output, args.base_name, args.base_siglum,
-                        args.results)
+        report.generate(args.output, args.base_name, args.results)
 
 
 def ngram_counts(args, parser):
