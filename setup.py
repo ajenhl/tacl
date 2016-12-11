@@ -16,9 +16,9 @@ setup(name='tacl',
       packages=['tacl', 'tacl.command'],
       entry_points={
           'console_scripts': [
-              'jitc=tacl.command.jitc_script:main',
               'tacl=tacl.command.tacl_script:main',
               'tacl-helper=tacl.command.tacl_helper_script:main',
+              'tacl-jitc=tacl.command.jitc_script:main',
           ],
       },
       package_data={
