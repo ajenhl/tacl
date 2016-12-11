@@ -5,7 +5,8 @@ tacl-helper script
    :maxdepth: 1
 
    tacl-helper-collapse-witnesses
-   tacl-helper-text-against-corpus
-   tacl-helper-text-in-corpus
+   tacl-helper-validate-catalogue
+   tacl-helper-work-against-corpus
+   tacl-helper-work-in-corpus
 
 .. program-output:: tacl-helper -h
