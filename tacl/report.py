@@ -48,7 +48,7 @@ class Report:
 
         """
         loader = PackageLoader('tacl', 'assets/templates')
-        env = Environment(loader=loader)
+        env = Environment(extensions=['jinja2.ext.with_'], loader=loader)
         return env.get_template('{}.html'.format(self._report_name))
 
     def _write(self, context, report_dir, report_name, assets_dir=None,

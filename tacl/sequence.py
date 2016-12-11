@@ -15,9 +15,10 @@ class Sequence:
 
     """Class to format supplied sequences using simple HTML span markup."""
 
-    def __init__(self, alignment, substitutes):
+    def __init__(self, alignment, substitutes, start_index):
         self._alignment = alignment
         self._substitutes = substitutes
+        self._start_index = start_index
 
     def _format_alignment(self, a1, a2):
         """Returns `a1` marked up with HTML spans around characters that are
@@ -45,6 +46,10 @@ class Sequence:
         f1 = self._format_alignment(self._alignment[0], self._alignment[1])
         f2 = self._format_alignment(self._alignment[1], self._alignment[0])
         return f1, f2
+
+    @property
+    def start_index(self):
+        return self._start_index
 
 
 class SequenceReport (Report):
@@ -134,7 +139,7 @@ class SequenceReport (Report):
             old_length = length
         covered_spans[0].append(span1)
         covered_spans[1].append(span2)
-        return Sequence(alignment, self._reverse_substitutes)
+        return Sequence(alignment, self._reverse_substitutes, t1_span[0])
 
     def _generate_sequences(self, primary_label, secondary_label, ngrams):
         """Generates aligned sequences between each witness labelled
@@ -202,7 +207,7 @@ class SequenceReport (Report):
                 sequence = self._generate_sequence(
                     t1, t1_span, t2, t2_span, context_length, covered_spans)
                 if sequence:
-                    sequences.append(sequence.render())
+                    sequences.append(sequence)
         return sequences
 
     def _generate_sequences_for_texts(self, l1, t1, l2, t2, ngrams):
@@ -235,6 +240,7 @@ class SequenceReport (Report):
             sequences.extend(self._generate_sequences_for_ngram(
                 t1, t2, ngram, covered_spans))
         if sequences:
+            sequences.sort(key=lambda x: x.start_index)
             context = {'l1': l1, 'l2': l2, 'sequences': sequences}
             report_name = '{}-{}.html'.format(l1, l2)
             os.makedirs(self._output_dir, exist_ok=True)
