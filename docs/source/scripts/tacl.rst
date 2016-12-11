@@ -14,7 +14,7 @@ Subcommands:
    tacl-intersect
    tacl-ngrams
    tacl-prepare
-   tacl-report
+   tacl-results
    tacl-sdiff
    tacl-search
    tacl-sintersect
