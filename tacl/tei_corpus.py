@@ -104,7 +104,7 @@ class TEICorpus:
 
         :param source_tree: XML tree of source document
         :type source_tree: `etree._ElementTree`
-        :rtype: `tuple` of `list`s
+        :rtype: `tuple` of `list`\s
 
         """
         witnesses = set()

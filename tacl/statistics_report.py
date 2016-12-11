@@ -64,7 +64,7 @@ class StatisticsReport:
         :param full_text: the text to be sliced
         :type full_text: `str`
         :param slices: list of slice indices to apply to `full_text`
-        :type slices: `list` of `list`s
+        :type slices: `list` of `list`\s
         :rtype: `str`
 
         """

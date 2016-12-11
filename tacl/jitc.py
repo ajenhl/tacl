@@ -39,15 +39,19 @@ class JitCReport(Report):
     following actions:
 
     1. For each work Y in Maybe:
+
       1. Run an intersection between Y and No.
       2. For each work M in Maybe (excluding Y):
+
         1. Run an intersect between Y and M.
         2. Run a supplied diff between results from [1.2.1] and
            results from [1.1].
         3. Get number of tokens in M.
+
       3. Rank and list works in Maybe in descending order of the
          ratio, from [1.2.2], of matching tokens (n-gram size x count)
          to total tokens [1.2.3].
+
     2. Concatenate all results from [1.2.2] and present them in an
        HTML report.
 

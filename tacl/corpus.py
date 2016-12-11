@@ -58,7 +58,7 @@ class Corpus:
         """Returns a generator supplying `WitnessText` objects for each file
         in the corpus.
 
-        :rtype: `generator`
+        :rtype: `generator` of `WitnessText`
 
         """
         for filepath in glob.glob(os.path.join(self._path, name, '*.txt')):
