@@ -15,6 +15,8 @@
   <body>
     <h1 lang="en">Alignment between {{ l1 }} and {{ l2 }}</h1>
 
+    <p>Aligned sequences are presented in the text order of {{ l1 }}.</p>
+
     <table>
       <thead>
         <tr>
@@ -24,10 +26,12 @@
       </thead>
       <tbody>
         {% for sequence in sequences %}
+        {% with rendered = sequence.render() %}
         <tr>
-          <td>{{ sequence.0 }}</td>
-          <td>{{ sequence.1 }}</td>
+          <td>{{ rendered.0 }}</td>
+          <td>{{ rendered.1 }}</td>
         </tr>
+        {% endwith %}
         {% endfor %}
       </tbody>
     </table>
