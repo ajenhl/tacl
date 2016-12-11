@@ -467,8 +467,11 @@ TACL_HELPER_LABEL_COUNT_HELP = '''\
     label.'''
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
-TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = ''
-TACL_HELPER_VALIDATE_CATALOGUE_HELP = ''
+TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = '''\
+    Report any errors in the specified catalogue file. Errors that can
+    be detected are referencse to works that do not exist in the
+    specified corpus and the same work being listed more than once.'''
+TACL_HELPER_VALIDATE_CATALOGUE_HELP = 'Report errors in a catalogue file.'
 
 VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''
