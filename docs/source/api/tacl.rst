@@ -19,6 +19,14 @@ tacl.catalogue module
     :undoc-members:
     :show-inheritance:
 
+tacl.colour module
+------------------
+
+.. automodule:: tacl.colour
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tacl.constants module
 ---------------------
 
@@ -59,8 +67,24 @@ tacl.highlighter module
     :undoc-members:
     :show-inheritance:
 
-tacl.results module
+tacl.jitc module
+----------------
+
+.. automodule:: tacl.jitc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tacl.report module
 ------------------
+
+.. automodule:: tacl.report
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tacl.results module
+-------------------
 
 .. automodule:: tacl.results
     :members:
