@@ -78,7 +78,8 @@ class Report:
         if template is None:
             template = self._get_template()
         report = template.render(context)
-        with open(os.path.join(report_dir, report_name), 'w') as fh:
+        output_file = os.path.join(report_dir, report_name)
+        with open(output_file, 'w', encoding='utf-8') as fh:
             fh.write(report)
         if assets_dir:
             self._copy_static_assets(assets_dir)
