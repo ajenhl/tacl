@@ -39,6 +39,32 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_add_label_work_count(self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'a', 'wit1', '2', 'A'],
+            ['AB', '2', 'b', 'base', '1', 'A'],
+            ['AB', '2', 'c', 'base', '2', 'B'],
+            ['BC', '2', 'a', 'base', '0', 'A'],
+            ['BC', '2', 'a', 'wit1', '0', 'A'],
+            ['CD', '2', 'a', 'base', '1', 'A']
+        )
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.add_label_work_count()
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '4', 'A', '2'),
+            ('AB', '2', 'a', 'wit1', '2', 'A', '2'),
+            ('AB', '2', 'b', 'base', '1', 'A', '2'),
+            ('AB', '2', 'c', 'base', '2', 'B', '1'),
+            ('BC', '2', 'a', 'base', '0', 'A', '0'),
+            ('BC', '2', 'a', 'wit1', '0', 'A', '0'),
+            ('CD', '2', 'a', 'base', '1', 'A', '1')
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_bifurcated_extend(self):
         self.maxDiff = None
         # This is a test of Results._bifurcated_extend, which does not

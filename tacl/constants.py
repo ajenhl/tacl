@@ -45,6 +45,7 @@ COUNT_FIELDNAME = 'count'
 COUNT_TOKENS_FIELDNAME = 'matching tokens'
 LABEL_FIELDNAME = 'label'
 LABEL_COUNT_FIELDNAME = 'label count'
+LABEL_WORK_COUNT_FIELDNAME = 'label work count'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
 NUMBER_FIELDNAME = 'number'
@@ -442,9 +443,9 @@ TACL_HELPER_AGAINST_B_HELP = '''\
     line).'''
 TACL_HELPER_COLLAPSE_DESCRIPTION = '''
     Collapse result rows for multiple witnesses having the same count
-    for an n-gram. Instead of the "siglum" column, all of the
+    for an n-gram. Instead of the "{}" column, all of the
     witnesses (per work) with the same n-gram count are listed, space
-    separated, in the "sigla" column.'''
+    separated, in the "{}" column.'''.format(SIGLUM_FIELDNAME, SIGLA_FIELDNAME)
 TACL_HELPER_COLLAPSE_HELP = (
     'Collapse result rows for witnesses having the same count for an n-gram')
 TACL_HELPER_DESCRIPTION = '''\
@@ -458,13 +459,22 @@ TACL_HELPER_IN_HELP = '''\
 TACL_HELPER_IN_TEXTS_HELP = '''\
     File containing work names to examine (one per line).'''
 TACL_HELPER_LABEL_COUNT_DESCRIPTION = '''\
-    Output the supplied results with an additional column, "label
-    count", giving the total count for each n-gram within the
-    label. For each work, the maximum count across all of that work's
-    witnesses is used in the sum.'''
+    Output the supplied results with an additional column, "{}",
+    giving the total count for each n-gram within the label. For each
+    work, the maximum count across all of that work's witnesses is
+    used in the sum.'''.format(LABEL_COUNT_FIELDNAME)
 TACL_HELPER_LABEL_COUNT_HELP = '''\
-    Add a "label count" column to results giving the count per
-    label.'''
+    Add a "{}" column to results giving the count per
+    label.'''.format(LABEL_COUNT_FIELDNAME)
+TACL_HELPER_LABEL_WORK_COUNT_DESCRIPTION = '''\
+    Output the supplied results with an additional column, "{}",
+    giving the total count of works that contain the n-gram within the
+    label. For each work, any number of positive counts across all of
+    that work's witnesses is counted as one in the sum.'''.format(
+        LABEL_WORK_COUNT_FIELDNAME)
+TACL_HELPER_LABEL_WORK_COUNT_HELP = '''\
+    Add a "{}" column to results giving the count of works per
+    label.'''.format(LABEL_WORK_COUNT_FIELDNAME)
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
 TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = '''\
@@ -556,12 +566,14 @@ PRAGMA_SYNCHRONOUS_SQL = 'PRAGMA synchronous=OFF'
 PRAGMA_TEMP_STORE_SQL = 'PRAGMA temp_store=MEMORY'
 SELECT_COUNTS_SQL = (
     'SELECT Text.work, Text.siglum, '
-    'TextHasNGram.size, TextHasNGram.count AS "unique ngrams", '
-    'Text.token_count + 1 - TextHasNGram.size AS "total ngrams", '
-    'Text.token_count AS "total tokens", Text.label '
+    'TextHasNGram.size, TextHasNGram.count AS "%s", '
+    'Text.token_count + 1 - TextHasNGram.size AS "%s", '
+    'Text.token_count AS "%s", Text.label '
     'FROM Text, TextHasNGram '
     'WHERE Text.id = TextHasNGram.text AND Text.label IN ({}) '
-    'ORDER BY Text.work, TextHasNGram.size')
+    'ORDER BY Text.work, TextHasNGram.size' % (
+        UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
+        TOTAL_TOKENS_FIELDNAME))
 SELECT_DIFF_ASYMMETRIC_SQL = (
     'SELECT TextNGram.ngram, TextNGram.size, '
     'Text.work, Text.siglum, TextNGram.count, Text.label '

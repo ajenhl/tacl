@@ -39,8 +39,8 @@ class Results:
         self._tokenizer = tokenizer
 
     def add_label_count(self):
-        """Adds to each result row a count of the number occurrences of that
-        n-gram across all works within the label.
+        """Adds to each result row a count of the number of occurrences of
+        that n-gram across all works within the label.
 
         This count uses the highest witness count for each work.
 
@@ -63,8 +63,36 @@ class Results:
             sort=False).apply(add_label_count)
         self._logger.info('Finished adding label count')
 
+    def add_label_work_count(self):
+        """Adds to each result row a count of the number of works within the
+        label contain that n-gram.
+
+        This counts works that have at least one witness carrying the
+        n-gram.
+
+        This correctly handles cases where an n-gram has only zero
+        counts for a given work (possible with zero-fill followed by
+        filtering by maximum count).
+
+        """
+        self._logger.info('Adding label work count')
+        self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
+
+        def add_label_text_count(df):
+            work_maxima = df.groupby(constants.WORK_FIELDNAME,
+                                     sort=False).any()
+            df.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = work_maxima[
+                constants.COUNT_FIELDNAME].sum()
+            return df
+
+        self._matches = self._matches.groupby(
+            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
+            sort=False).apply(add_label_text_count)
+        self._logger.info('Finished adding label work count')
+
     def _annotate_bifurcated_extend_data(self, row, smaller, larger, tokenize,
                                          join):
+
         """Returns `row` annotated with whether it should be deleted or not.
 
         An n-gram is marked for deletion if:

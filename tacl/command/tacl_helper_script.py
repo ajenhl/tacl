@@ -48,6 +48,7 @@ def generate_parser():
     subparsers = parser.add_subparsers(title='subcommands')
     generate_collapse_witness_results_subparser(subparsers)
     generate_label_count_subparser(subparsers)
+    generate_label_work_count_subparser(subparsers)
     generate_work_against_corpus_subparser(subparsers)
     generate_work_in_corpus_subparser(subparsers)
     generate_validate_catalogue_subparser(subparsers)
@@ -72,6 +73,18 @@ def generate_label_count_subparser(subparsers):
         description=constants.TACL_HELPER_LABEL_COUNT_DESCRIPTION,
         help=constants.TACL_HELPER_LABEL_COUNT_HELP)
     parser.set_defaults(func=label_count)
+    utils.add_common_arguments(parser)
+    utils.add_tokenizer_argument(parser)
+    parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
+                        metavar='RESULTS')
+
+
+def generate_label_work_count_subparser(subparsers):
+    parser = subparsers.add_parser(
+        'label-work-count',
+        description=constants.TACL_HELPER_LABEL_WORK_COUNT_DESCRIPTION,
+        help=constants.TACL_HELPER_LABEL_WORK_COUNT_HELP)
+    parser.set_defaults(func=label_work_count)
     utils.add_common_arguments(parser)
     utils.add_tokenizer_argument(parser)
     parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
@@ -127,6 +140,12 @@ def generate_validate_catalogue_subparser(subparsers):
 def label_count(args):
     results = tacl.Results(args.results, utils.get_tokenizer(args))
     results.add_label_count()
+    results.csv(sys.stdout)
+
+
+def label_work_count(args):
+    results = tacl.Results(args.results, utils.get_tokenizer(args))
+    results.add_label_work_count()
     results.csv(sys.stdout)
 
 
