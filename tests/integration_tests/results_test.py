@@ -93,6 +93,24 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_zero_fill_min_count(self):
+        # Zero fill followed by pruning by minimum count should not
+        # raise a "cannot reindex from a duplicate axis" ValueError.
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        corpus = os.path.join(data_dir, 'stripped')
+        catalogue = os.path.join(data_dir, 'catalogue.txt')
+        results = os.path.join(data_dir, 'non-zero-fill-results.csv')
+        command = 'tacl results -c {} --max-count 2 -z {} {}'.format(
+            catalogue, corpus, results)
+        data = subprocess.check_output(shlex.split(command))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
+        expected_results = os.path.join(
+            data_dir, 'zero-fill-max-count-results.csv')
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
 
 if __name__ == '__main__':
     unittest.main()

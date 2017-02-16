@@ -785,6 +785,7 @@ class Results:
         :type catalogue: `Catalogue`
 
         """
+        self._logger.info('Zero-filling results')
         zero_rows = []
         # Get all of the texts, and their witnesses, for each label.
         data = {}
@@ -808,4 +809,4 @@ class Results:
                     row_data[constants.SIGLUM_FIELDNAME] = siglum
                     zero_rows.append(row_data)
         zero_df = pd.DataFrame(zero_rows, columns=constants.QUERY_FIELDNAMES)
-        self._matches = pd.concat([self._matches, zero_df])
+        self._matches = pd.concat([self._matches, zero_df], ignore_index=True)
