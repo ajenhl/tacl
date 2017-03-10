@@ -208,7 +208,7 @@ def work_in_corpus(args):
 
 def validate_catalogue(args):
     try:
-        catalogue = utils.get_catalogue(args.catalogue)
+        catalogue = utils.get_catalogue(args)
     except tacl.exceptions.MalformedCatalogueError as e:
         print('Error: {}'.format(e))
         print('Other errors may be present; re-run this validation after '

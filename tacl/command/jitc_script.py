@@ -23,7 +23,7 @@ def main():
         utils.configure_logging(args.verbose, logger)
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    catalogue = utils.get_catalogue(args.catalogue)
+    catalogue = utils.get_catalogue(args)
     tokenizer = utils.get_tokenizer(args)
     check_catalogue(catalogue, args.label)
     store.validate(corpus, catalogue)

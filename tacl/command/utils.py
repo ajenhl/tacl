@@ -87,17 +87,17 @@ def configure_logging(verbose, logger):
     logger.addHandler(ch)
 
 
+def get_catalogue(args):
+    """Returns a `tacl.Catalogue`."""
+    catalogue = tacl.Catalogue()
+    catalogue.load(args.catalogue)
+    return catalogue
+
+
 def get_corpus(args):
     """Returns a `tacl.Corpus`."""
     tokenizer = get_tokenizer(args)
     return tacl.Corpus(args.corpus, tokenizer)
-
-
-def get_catalogue(path):
-    """Returns a `tacl.Catalogue`."""
-    catalogue = tacl.Catalogue()
-    catalogue.load(path)
-    return catalogue
 
 
 def get_data_store(args):

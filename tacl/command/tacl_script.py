@@ -177,7 +177,7 @@ def generate_ngrams(args, parser):
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
     if args.catalogue:
-        catalogue = utils.get_catalogue(args.catalogue)
+        catalogue = utils.get_catalogue(args)
     else:
         catalogue = None
     store.add_ngrams(corpus, args.min_size, args.max_size, catalogue)
@@ -397,7 +397,7 @@ def ngram_counts(args, parser):
     """Outputs the results of performing a counts query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    catalogue = utils.get_catalogue(args.catalogue)
+    catalogue = utils.get_catalogue(args)
     store.validate(corpus, catalogue)
     store.counts(catalogue, sys.stdout)
 
@@ -406,7 +406,7 @@ def ngram_diff(args, parser):
     """Outputs the results of performing a diff query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    catalogue = utils.get_catalogue(args.catalogue)
+    catalogue = utils.get_catalogue(args)
     tokenizer = utils.get_tokenizer(args)
     store.validate(corpus, catalogue)
     if args.asymmetric:
@@ -420,7 +420,7 @@ def ngram_intersection(args, parser):
     """Outputs the results of performing an intersection query."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    catalogue = utils.get_catalogue(args.catalogue)
+    catalogue = utils.get_catalogue(args)
     store.validate(corpus, catalogue)
     store.intersection(catalogue, sys.stdout)
 
@@ -468,7 +468,7 @@ def results(args, parser):
             parser.error('The zero-fill option requires that the -c option '
                          'also be supplied.')
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
-        catalogue = utils.get_catalogue(args.catalogue)
+        catalogue = utils.get_catalogue(args)
         results.zero_fill(corpus, catalogue)
     if args.ngrams:
         with open(args.ngrams, encoding='utf-8') as fh:
