@@ -756,7 +756,8 @@ class Results:
 
         """
         self._logger.info('Removing label "{}"'.format(label))
-        count = self._matches[constants.LABEL_FIELDNAME].value_counts()[label]
+        count = self._matches[constants.LABEL_FIELDNAME].value_counts().get(
+            label, 0)
         self._matches = self._matches[
             self._matches[constants.LABEL_FIELDNAME] != label]
         self._logger.info('Removed {} labelled results'.format(count))

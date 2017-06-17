@@ -581,6 +581,7 @@ class ResultsTestCase (TaclTestCase):
         return self._get_rows_from_csv(results.csv(io.StringIO(newline='')))
 
     def test_remove_label(self):
+        """Test removing labelled results."""
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
             ['AB', '2', 'a', 'wit', '3', 'A'],
@@ -599,6 +600,23 @@ class ResultsTestCase (TaclTestCase):
             ('ABC', '3', 'a', 'base', '2', 'A'),
             ('AB', '2', 'b', 'base', '2', 'AB'),
             ('ABC', '3', 'b', 'base', '2', 'AB')]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
+    def test_remove_missing_label(self):
+        """Test removing a label that doesn't exist in the results."""
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'a', 'wit', '3', 'A'],
+            ['ABC', '3', 'a', 'base', '2', 'A'])
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.remove_label('C')
+        expected_rows = [
+            ('AB', '2', 'a', 'base', '4', 'A'),
+            ('AB', '2', 'a', 'wit', '3', 'A'),
+            ('ABC', '3', 'a', 'base', '2', 'A')]
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
