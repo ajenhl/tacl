@@ -13,7 +13,7 @@ TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
 # n-grams) by an empty string.
 TOKENIZER_PATTERN_CBETA = r'\[[^]]*\]|\w'
 TOKENIZER_JOINER_CBETA = ''
-# For the Pagel (Tibetan) tokenizer, a token is a continuous set of
+# For the Pagel (Tibetan) tokenizer, a token is a continuous sequence of
 # word (plus some punctuation) characters. Tokens are grouped together
 # (when constituted into n-grams) by a space.
 TOKENIZER_PATTERN_PAGEL = r"[\w'\-+?~]+"
@@ -281,8 +281,6 @@ RESULTS_BIFURCATED_EXTEND_HELP = '''\
     a label count of one and the constituent (n-1)-grams have a higher
     label count.'''
 RESULTS_BIFURCATED_EXTEND_MAX_HELP = 'Maximum size of n-gram to extend to'
-RESULTS_CATALOGUE_HELP = '''\
-    Path to the catalogue file used to generate the results'''
 RESULTS_DESCRIPTION = '''\
     Modify a query results file by adding, removing or otherwise
     manipulating result rows. Outputs the new set of results.'''
@@ -333,7 +331,7 @@ RESULTS_EPILOG = '''\
         tacl results -e corpus/cbeta/ --min-count 9 output.csv > mod-output.csv
 
       Zero-fill CBETA results.
-        tacl results -c dhr-vs-rest.txt -z corpus/cbeta/ output.csv > mod-output.csv
+        tacl results -z corpus/cbeta/ output.csv > mod-output.csv
 
       Reduce Pagel results.
         tacl results --reduce -t pagel output.csv > mod-output.csv
@@ -368,9 +366,7 @@ RESULTS_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 RESULTS_SORT_HELP = 'Sort the results.'
 RESULTS_ZERO_FILL_HELP = '''\
     Add rows with a count of 0 for each n-gram in each witness of a
-    work that has at least one witness bearing that n-gram. The
-    catalogue used to generate the results must also be specified with
-    the -c option.'''
+    work that has at least one witness bearing that n-gram.'''
 
 SEARCH_DESCRIPTION = '''\
     List witnesses containing at least one of the supplied n-grams,

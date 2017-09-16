@@ -663,8 +663,7 @@ class ResultsTestCase (TaclTestCase):
         corpus = tacl.Corpus(stripped_dir, tokenizer)
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, tokenizer)
-        catalogue = {'T1': 'A', 'T2': 'B', 'T3': 'C', 'T5': 'A'}
-        results.zero_fill(corpus, catalogue)
+        results.zero_fill(corpus)
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         expected_rows = [

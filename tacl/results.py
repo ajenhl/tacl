@@ -775,25 +775,18 @@ class Results:
                 constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME],
             ascending=[False, True, False, True, True, True], inplace=True)
 
-    def zero_fill(self, corpus, catalogue):
+    def zero_fill(self, corpus):
         """Adds rows to the results to ensure that, for every n-gram that is
         attested in at least one witness, every witness for that text
         has a row, with added rows having a count of zero.
 
         :param corpus: corpus containing the texts appearing in the results
         :type corpus: `Corpus`
-        :param catalogue: catalogue used in the generation of the results
-        :type catalogue: `Catalogue`
 
         """
         self._logger.info('Zero-filling results')
         zero_rows = []
-        # Get all of the texts, and their witnesses, for each label.
-        data = {}
-        for work, label in iter(catalogue.items()):
-            data.setdefault(label, {})[work] = []
-            for siglum in corpus.get_sigla(work):
-                data[label][work].append(siglum)
+        work_sigla = {}
         grouping_cols = [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME,
                          constants.SIZE_FIELDNAME, constants.WORK_FIELDNAME]
         grouped = self._matches.groupby(grouping_cols, sort=False)
@@ -805,7 +798,9 @@ class Results:
                 constants.COUNT_FIELDNAME: 0,
                 constants.WORK_FIELDNAME: work,
             }
-            for siglum in data[label][work]:
+            if work not in work_sigla:
+                work_sigla[work] = corpus.get_sigla(work)
+            for siglum in work_sigla[work]:
                 if group[group[constants.SIGLUM_FIELDNAME] == siglum].empty:
                     row_data[constants.SIGLUM_FIELDNAME] = siglum
                     zero_rows.append(row_data)

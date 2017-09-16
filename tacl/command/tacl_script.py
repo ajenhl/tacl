@@ -239,9 +239,6 @@ def generate_results_subparser(subparsers):
     be_group.add_argument('--max-be-count', dest='bifurcated_extend_size',
                           help=constants.RESULTS_BIFURCATED_EXTEND_MAX_HELP,
                           metavar='COUNT', type=int)
-    parser.add_argument('-c', '--catalogue', dest='catalogue',
-                        help=constants.RESULTS_CATALOGUE_HELP,
-                        metavar='CATALOGUE')
     parser.add_argument('-e', '--extend', dest='extend',
                         help=constants.RESULTS_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--min-count', dest='min_count',
@@ -464,12 +461,8 @@ def results(args, parser):
     if args.reciprocal:
         results.reciprocal_remove()
     if args.zero_fill:
-        if not args.catalogue:
-            parser.error('The zero-fill option requires that the -c option '
-                         'also be supplied.')
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
-        catalogue = utils.get_catalogue(args)
-        results.zero_fill(corpus, catalogue)
+        results.zero_fill(corpus)
     if args.ngrams:
         with open(args.ngrams, encoding='utf-8') as fh:
             ngrams = fh.read().split()
