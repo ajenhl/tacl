@@ -219,6 +219,16 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_prune_by_ngram_count_empty_results(self):
+        input_data = ()
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_ngram_count(minimum=3)
+        expected_rows = []
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_prune_by_ngram_count_per_work(self):
         input_data = (
             ['AB', '2', 'a', 'base', '7', 'A'],

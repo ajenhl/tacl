@@ -573,6 +573,12 @@ class Results:
                                              index=group.index)
             return group
 
+        # self._matches may be empty, in which case not only is there
+        # no point trying to do the pruning, but it will raise an
+        # exception due to referencing the column 'total_count' which
+        # won't have been added. Therefore just return immediately.
+        if self._matches.empty:
+            return
         self._matches = self._matches.groupby(
             constants.NGRAM_FIELDNAME, sort=False).apply(calculate_total)
         if minimum:
