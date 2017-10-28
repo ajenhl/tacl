@@ -243,7 +243,7 @@ NGRAMS_EPILOG = '''\
         tacl ngrams cbeta2-10.db corpus/cbeta/ 2 10
 
       Create a database of 1 to 7-grams from a Pagel corpus.
-        tacl ngrams pagel1-7.db corpus/pagel/ 1 7
+        tacl ngrams -t pagel pagel1-7.db corpus/pagel/ 1 7
 
       Create a database of 1 to 7-grams from a subset of the CBETA corpus.
         tacl ngrams -c dhr-texts.txt cbeta-dhr1-7.db corpus/cbeta/ 1 7
