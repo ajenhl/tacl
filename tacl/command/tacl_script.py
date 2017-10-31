@@ -295,6 +295,10 @@ def generate_search_subparser(subparsers):
     utils.add_corpus_arguments(parser)
     parser.add_argument('-c', '--catalogue', metavar='CATALOGUE',
                         help=constants.CATALOGUE_CATALOGUE_HELP)
+    parser.add_argument('-d', '--delete-unlabelled', action='store_true',
+                        help=constants.SEARCH_DELETE_HELP)
+    parser.add_argument('mode', choices=constants.SEARCH_MODE_CHOICES,
+                        help=constants.SEARCH_MODE_HELP, metavar='MODE')
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
                         metavar='NGRAMS')
 
@@ -492,7 +496,12 @@ def search_texts(args, parser):
         catalogue.load(args.catalogue)
     store.validate(corpus, catalogue)
     ngrams = utils.get_ngrams(args.ngrams)
-    store.search(catalogue, ngrams, sys.stdout)
+    if args.mode == 'ngram':
+        store.search_ngram(catalogue, ngrams, args.delete_unlabelled,
+                           sys.stdout)
+    elif args.mode == 'witness':
+        store.search_witness(catalogue, ngrams, args.delete_unlabelled,
+                             sys.stdout)
 
 
 def strip_files(args, parser):

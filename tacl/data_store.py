@@ -634,14 +634,16 @@ class DataStore:
                                index=False)
         return output_fh
 
-    def search(self, catalogue, ngrams, output_fh):
-        """Returns `output_fh` populated with CSV results for each witness
-        that contains at least one of the n-grams in `ngrams`.
+    def search_ngram(self, catalogue, ngrams, labelled_only, output_fh):
+        """Returns `output_fh` populated with CSV results for each n-gram and
+        label pair for which a labelled witness contains the n-gram.
 
-        :param catalogue:
+        :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
         :param ngrams: n-grams to search for
         :type ngrams: `list`
+        :param labelled_only: whether to only return labelled results
+        :type labelled_only: `bool`
         :param output_fh: object to write results to
         :type output_fh: file-like object
         :rtype: file-like object
@@ -649,13 +651,47 @@ class DataStore:
         """
         self._set_labels(catalogue)
         self._add_temporary_ngrams(ngrams)
-        query = constants.SELECT_SEARCH_SQL
-        self._logger.info('Running search query')
+        query = constants.SELECT_SEARCH_NGRAM_SQL
+        extra_query = ''
+        if labelled_only:
+            extra_query = constants.SELECT_SEARCH_LABELLED_ONLY_SQL
+        query = query.format(extra_query)
+        self._logger.info('Running search ngram query')
         self._logger.debug('Query: {}\nN-grams: {}'.format(
             query, ', '.join(ngrams)))
         self._log_query_plan(query, [])
         cursor = self._conn.execute(query)
-        return self._csv(cursor, constants.SEARCH_FIELDNAMES, output_fh)
+        return self._csv(cursor, constants.SEARCH_NGRAM_FIELDNAMES, output_fh)
+
+    def search_witness(self, catalogue, ngrams, labelled_only, output_fh):
+
+        """Returns `output_fh` populated with CSV results for each witness
+        that contains at least one of the n-grams in `ngrams`.
+
+        :param catalogue: catalogue matching filenames to labels
+        :type catalogue: `Catalogue`
+        :param ngrams: n-grams to search for
+        :type ngrams: `list`
+        :param labelled_only: whether to only return labelled results
+        :type labelled_only: `bool`
+        :param output_fh: object to write results to
+        :type output_fh: file-like object
+        :rtype: file-like object
+
+        """
+        self._set_labels(catalogue)
+        self._add_temporary_ngrams(ngrams)
+        extra_query = ''
+        if labelled_only:
+            extra_query = constants.SELECT_SEARCH_LABELLED_ONLY_SQL
+        query = constants.SELECT_SEARCH_WITNESS_SQL.format(extra_query)
+        self._logger.info('Running search witness query')
+        self._logger.debug('Query: {}\nN-grams: {}'.format(
+            query, ', '.join(ngrams)))
+        self._log_query_plan(query, [])
+        cursor = self._conn.execute(query)
+        return self._csv(cursor, constants.SEARCH_WITNESS_FIELDNAMES,
+                         output_fh)
 
     def _set_labels(self, catalogue):
         """Returns a dictionary of the unique labels in `catalogue` and the

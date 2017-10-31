@@ -56,6 +56,7 @@ SIZE_FIELDNAME = 'size'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
 TOTAL_TOKENS_FIELDNAME = 'total tokens'
 UNIQUE_NGRAMS_FIELDNAME = 'unique ngrams'
+WITNESSES_FIELDNAME = 'witnesses'
 WORK_FIELDNAME = 'work'
 
 QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, WORK_FIELDNAME,
@@ -63,8 +64,11 @@ QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, WORK_FIELDNAME,
 COUNTS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
-SEARCH_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
-                     LABEL_FIELDNAME, NGRAMS_FIELDNAME, NUMBER_FIELDNAME]
+SEARCH_NGRAM_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, LABEL_FIELDNAME,
+                           WITNESSES_FIELDNAME]
+SEARCH_WITNESS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
+                             LABEL_FIELDNAME, NGRAMS_FIELDNAME,
+                             NUMBER_FIELDNAME]
 STATISTICS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME,
                          COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
                          PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
@@ -369,15 +373,26 @@ RESULTS_ZERO_FILL_HELP = '''\
     work that has at least one witness bearing that n-gram.'''
 
 SEARCH_DESCRIPTION = '''\
-    List witnesses containing at least one of the supplied n-grams,
-    along with a total count of how many occurrences of the n-grams
-    are present in each witness, and the number of n-grams that match
-    in each witness.
+    Output results of searching the database for the supplied n-grams.
+
+    This command has two output modes: 'ngram' and 'witness':
+
+        'ngram' mode outputs results grouped by n-gram, with one
+        result row per combination of n-gram and catalogue label, and
+        each witness and its count given.
+
+        'witness' mode outputs results grouped by witness, with each
+        row specifying the matching n-grams that occur within it, the
+        total count of instances of those n-grams, and the number of
+        matching n-grams.
 
     Specifying a catalogue file will not restrict the search to only
     those labelled works, but rather adds the labels to any
     appropriate witnesses in the results.'''
 SEARCH_HELP = 'List witnesses containing at least one of the supplied n-grams.'
+SEARCH_DELETE_HELP = 'Do not include results for unlabelled witnesses.'
+SEARCH_MODE_CHOICES = ['ngram', 'witness']
+SEARCH_MODE_HELP = 'The mode or organising principle of the search results.'
 SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''
@@ -615,12 +630,21 @@ SELECT_INTERSECT_SUPPLIED_SQL = (
     'WHERE ngram IN ('
     'SELECT ngram FROM temp.InputResults '
     'GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)')
-SELECT_SEARCH_SQL = (
+SELECT_SEARCH_LABELLED_ONLY_SQL = "AND Text.label != '' "
+SELECT_SEARCH_NGRAM_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, Text.label, '
+    "group_concat(printf('%s-%s(%d)', Text.work, Text.siglum, "
+    "TextNGram.count), ', ') "
+    'FROM Text, TextNGram '
+    'WHERE Text.id = TextNGram.text {}'
+    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) '
+    'GROUP BY TextNGram.ngram, Text.label')
+SELECT_SEARCH_WITNESS_SQL = (
     'SELECT Text.work, Text.siglum, SUM(TextNGram.count) AS count, '
     "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, "
     'count(TextNGram.ngram) AS number '
     'FROM Text, TextNGram '
-    'WHERE Text.id = TextNGram.text '
+    'WHERE Text.id = TextNGram.text {}'
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) '
     'GROUP BY TextNGram.text')
 SELECT_TEXT_TOKEN_COUNT_SQL = (
