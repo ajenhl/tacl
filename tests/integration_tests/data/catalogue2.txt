@@ -1,6 +1,6 @@
-T1 A
 T2 B
 T3 C
+T1 A
 T4
 T5 A
 T6 

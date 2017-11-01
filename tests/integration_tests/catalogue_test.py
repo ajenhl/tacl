@@ -21,6 +21,12 @@ class CatalogueIntegrationTest (unittest.TestCase):
         path = os.path.join(self._data_dir, 'catalogue_relabel.txt')
         self.assertRaises(MalformedCatalogueError, catalogue.load, path)
 
+    def test_ordered_labels_load(self):
+        catalogue = tacl.Catalogue()
+        catalogue.load(os.path.join(self._data_dir, 'catalogue2.txt'))
+        expected_labels = ['B', 'C', 'A']
+        self.assertEqual(catalogue.ordered_labels, expected_labels)
+
 
 if __name__ == '__main__':
     unittest.main()

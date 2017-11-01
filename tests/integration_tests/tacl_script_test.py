@@ -390,11 +390,11 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # row) is arbitrary, which means this test may sometimes fail
         # in its current form.
         expected_rows = [
+            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
             ('he', '2', '', 'T4-base(1), T1-base(1), T1-a(1), T2-base(2), '
              'T2-a(2)'),
-            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
         ]
-        self.assertEqual(set(actual_rows), set(expected_rows))
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_search_ngram_with_catalogue(self):
         subprocess.call(self._ngrams_command_args)
@@ -409,12 +409,12 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         # row) is arbitrary, which means this test may sometimes fail
         # in its current form.
         expected_rows = [
+            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
             ('he', '2', 'A', 'T1-base(1), T1-a(1)'),
             ('he', '2', 'B', 'T4-base(1)'),
             ('he', '2', '', 'T2-base(2), T2-a(2)'),
-            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
         ]
-        self.assertEqual(set(actual_rows), set(expected_rows))
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_search_ngram_no_label_removed(self):
         subprocess.call(self._ngrams_command_args)

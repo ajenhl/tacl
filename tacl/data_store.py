@@ -280,6 +280,22 @@ class DataStore:
         self._logger.info('Finished outputting results')
         return output_fh
 
+    def _csv_temp(self, cursor, fieldnames):
+        """Writes the rows of `cursor` in CSV format to a temporary file and
+        returns the path to that file.
+
+        :param cursor: database cursor containing data to be output
+        :type cursor: `sqlite3.Cursor`
+        :param fieldnames: row headings
+        :type fieldnames: `list`
+        :rtype: `str`
+
+        """
+        temp_fd, temp_path = tempfile.mkstemp(text=True)
+        with open(temp_fd, 'w', encoding='utf-8', newline='') as results_fh:
+            self._csv(cursor, fieldnames, results_fh)
+        return temp_path
+
     def _delete_text_ngrams(self, text_id):
         """Deletes all n-grams associated with `text_id` from the data
         store.
@@ -307,9 +323,7 @@ class DataStore:
         :rtype: file-like object
 
         """
-        temp_fd, temp_path = tempfile.mkstemp(text=True)
-        with open(temp_fd, 'w', encoding='utf-8', newline='') as results_fh:
-            self._csv(cursor, constants.QUERY_FIELDNAMES, results_fh)
+        temp_path = self._csv_temp(cursor, constants.QUERY_FIELDNAMES)
         output_fh = self._reduce_diff_results(temp_path, tokenizer, output_fh)
         try:
             os.remove(temp_path)
@@ -661,10 +675,29 @@ class DataStore:
             query, ', '.join(ngrams)))
         self._log_query_plan(query, [])
         cursor = self._conn.execute(query)
-        return self._csv(cursor, constants.SEARCH_NGRAM_FIELDNAMES, output_fh)
+        # Sort the results by the n-gram and the order the labels
+        # occur in the catalogue.
+        temp_path = self._csv_temp(cursor, constants.SEARCH_NGRAM_FIELDNAMES)
+        results = pd.read_csv(temp_path, encoding='utf-8', na_filter=False)
+        # Add in a temporary column giving the label's order of
+        # occurrence in the catalogue, to be sorted on.
+        label_order_col = 'label_order'
+
+        def add_label_order(row, labels):
+            row[label_order_col] = labels.index(row[constants.LABEL_FIELDNAME])
+            return row
+
+        ordered_labels = catalogue.ordered_labels + ['']
+        results = results.apply(add_label_order, axis=1,
+                                args=(ordered_labels,))
+        results.sort_values(by=[constants.NGRAM_FIELDNAME, label_order_col],
+                            ascending=True, inplace=True)
+        del results[label_order_col]
+        results.to_csv(output_fh, encoding='utf-8', float_format='%d',
+                       index=False)
+        return output_fh
 
     def search_witness(self, catalogue, ngrams, labelled_only, output_fh):
-
         """Returns `output_fh` populated with CSV results for each witness
         that contains at least one of the n-grams in `ngrams`.
 

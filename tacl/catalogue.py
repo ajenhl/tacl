@@ -7,6 +7,10 @@ from .exceptions import MalformedCatalogueError
 
 class Catalogue (dict):
 
+    def __init__(self, *args, **kwargs):
+        self._ordered_labels = []
+        super().__init__(*args, **kwargs)
+
     def generate(self, path, label):
         """Creates default data from the corpus at `path`, marking all
         works with `label`.
@@ -19,6 +23,19 @@ class Catalogue (dict):
         """
         for filename in os.listdir(path):
             self[filename] = label
+
+    @property
+    def ordered_labels(self):
+        """Returns the labels in their order of first occurrence from loading.
+
+        If the catalogue was populated in whole or part through means
+        other than the load method, the string sorted labels are
+        returned instead.
+
+        :rtype: `list`
+
+        """
+        return self._ordered_labels or self.labels
 
     @property
     def labels(self):
@@ -43,6 +60,8 @@ class Catalogue (dict):
             for row in reader:
                 work, label = row['work'], row['label']
                 if label:
+                    if label not in self._ordered_labels:
+                        self._ordered_labels.append(label)
                     if work in self:
                         raise MalformedCatalogueError(
                             CATALOGUE_WORK_RELABELLED_ERROR.format(work))

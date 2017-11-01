@@ -379,7 +379,9 @@ SEARCH_DESCRIPTION = '''\
 
         'ngram' mode outputs results grouped by n-gram, with one
         result row per combination of n-gram and catalogue label, and
-        each witness and its count given.
+        each witness and its count given. Within each n-gram group,
+        result rows are sorted by order of the first appearance of the
+        label in the catalogue file.
 
         'witness' mode outputs results grouped by witness, with each
         row specifying the matching n-grams that occur within it, the
