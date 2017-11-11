@@ -142,6 +142,51 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_group_by_ngram(self):
+        input_results = (
+            ['AB', '2', 'T1', 'wit1', '4', 'A'],
+            ['AB', '2', 'T1', 'wit2', '3', 'A'],
+            ['AB', '2', 'T2', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit2', '0', 'A'],
+            ['AB', '2', 'T3', 'wit1', '2', 'B'],
+            ['AB', '2', 'T4', 'wit1', '1', 'B'],
+        )
+        fh = self._create_csv(input_results)
+        results = tacl.Results(fh, self._tokenizer)
+        results.group_by_ngram(['B', 'A'])
+        expected_rows = [
+            ('AB', '2', 'B', 'T3(2), T4(1)'),
+            ('AB', '2', 'A', 'T1(3-4), T2(2)'),
+            ('ABC', '3', 'A', 'T1(0-2)'),
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
+    def test_group_by_witness(self):
+        input_results = (
+            ['AB', '2', 'T1', 'wit1', '4', 'A'],
+            ['AB', '2', 'T1', 'wit2', '3', 'A'],
+            ['AB', '2', 'T2', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit2', '0', 'A'],
+            ['AB', '2', 'T3', 'wit1', '2', 'B'],
+            ['BC', '2', 'T1', 'wit1', '3', 'A'],
+        )
+        fh = self._create_csv(input_results)
+        results = tacl.Results(fh, self._tokenizer)
+        results.group_by_witness()
+        expected_rows = [
+            ('T1', 'wit1', 'A', 'AB, ABC, BC', '3', '9'),
+            ('T1', 'wit2', 'A', 'AB', '1', '3'),
+            ('T2', 'wit1', 'A', 'AB', '1', '2'),
+            ('T3', 'wit1', 'B', 'AB', '1', '2'),
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
         # and intersect results.

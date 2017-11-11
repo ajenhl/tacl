@@ -648,54 +648,29 @@ class DataStore:
                                index=False)
         return output_fh
 
-    def search_ngram(self, catalogue, ngrams, labelled_only, output_fh):
-        """Returns `output_fh` populated with CSV results for each n-gram and
-        label pair for which a labelled witness contains the n-gram.
+    def search(self, catalogue, ngrams, output_fh):
+        """Returns `output_fh` populated with CSV results for each n-gram in
+        `ngrams` that occurs within labelled witnesses in `catalogue`.
 
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
         :param ngrams: n-grams to search for
         :type ngrams: `list`
-        :param labelled_only: whether to only return labelled results
-        :type labelled_only: `bool`
         :param output_fh: object to write results to
         :type output_fh: file-like object
         :rtype: file-like object
 
         """
-        self._set_labels(catalogue)
         self._add_temporary_ngrams(ngrams)
-        query = constants.SELECT_SEARCH_NGRAM_SQL
-        extra_query = ''
-        if labelled_only:
-            extra_query = constants.SELECT_SEARCH_LABELLED_ONLY_SQL
-        query = query.format(extra_query)
-        self._logger.info('Running search ngram query')
+        labels = list(self._set_labels(catalogue))
+        label_placeholders = self._get_placeholders(labels)
+        query = constants.SELECT_SEARCH_SQL.format(label_placeholders)
+        self._logger.info('Running search query')
         self._logger.debug('Query: {}\nN-grams: {}'.format(
             query, ', '.join(ngrams)))
-        self._log_query_plan(query, [])
-        cursor = self._conn.execute(query)
-        # Sort the results by the n-gram and the order the labels
-        # occur in the catalogue.
-        temp_path = self._csv_temp(cursor, constants.SEARCH_NGRAM_FIELDNAMES)
-        results = pd.read_csv(temp_path, encoding='utf-8', na_filter=False)
-        # Add in a temporary column giving the label's order of
-        # occurrence in the catalogue, to be sorted on.
-        label_order_col = 'label_order'
-
-        def add_label_order(row, labels):
-            row[label_order_col] = labels.index(row[constants.LABEL_FIELDNAME])
-            return row
-
-        ordered_labels = catalogue.ordered_labels + ['']
-        results = results.apply(add_label_order, axis=1,
-                                args=(ordered_labels,))
-        results.sort_values(by=[constants.NGRAM_FIELDNAME, label_order_col],
-                            ascending=True, inplace=True)
-        del results[label_order_col]
-        results.to_csv(output_fh, encoding='utf-8', float_format='%d',
-                       index=False)
-        return output_fh
+        self._log_query_plan(query, labels)
+        cursor = self._conn.execute(query, labels)
+        return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
     def search_witness(self, catalogue, ngrams, labelled_only, output_fh):
         """Returns `output_fh` populated with CSV results for each witness

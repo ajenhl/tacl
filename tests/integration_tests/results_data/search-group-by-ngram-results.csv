@@ -1,0 +1,5 @@
+ngram,size,work,siglum,count,label
+AB,2,B,"T3(2), T4(1)"
+AB,2,A,"T1(3-4), T2(2)"
+ABC,3,A,T1(0-2)
+BC,2,A,T1(3)

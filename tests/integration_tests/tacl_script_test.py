@@ -378,117 +378,25 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('[月*劦]生', '2', 'T0053', '大', '2', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_search_ngram(self):
+    def test_search(self):
         subprocess.call(self._ngrams_command_args)
-        search_command = 'tacl search {} {} ngram {}'.format(
-            self._db_path, self._corpus_dir, self._ngrams_path)
+        search_command = 'tacl search {} {} {} {}'.format(
+            self._db_path, self._corpus_dir, self._catalogue_path,
+            self._ngrams_path)
         data = subprocess.check_output(shlex.split(search_command))
         actual_rows = self._get_rows_from_csv(
             io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
         expected_rows = [
-            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
-            ('he', '2', '', 'T4-base(1), T1-base(1), T1-a(1), T2-base(2), '
-             'T2-a(2)'),
+            ('ll', '2', 'T5', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'a', '1', 'A'),
+            ('th', '2', 'T2', 'base', '1', 'B'),
+            ('th', '2', 'T2', 'a', '1', 'B'),
+            ('th', '2', 'T3', 'base', '1', 'C'),
+            ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
+            ('we', '2', 'T5', 'base', '1', 'A'),
         ]
-        self.assertEqual(actual_rows, expected_rows)
-
-    def test_search_ngram_with_catalogue(self):
-        subprocess.call(self._ngrams_command_args)
-        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
-        search_command = 'tacl search -c {} {} {} ngram {}'.format(
-            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
-        data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
-        expected_rows = [
-            ('ese', '3', '', 'T2-base(2), T2-a(1)'),
-            ('he', '2', 'A', 'T1-base(1), T1-a(1)'),
-            ('he', '2', 'B', 'T4-base(1)'),
-            ('he', '2', '', 'T2-base(2), T2-a(2)'),
-        ]
-        self.assertEqual(actual_rows, expected_rows)
-
-    def test_search_ngram_no_label_removed(self):
-        subprocess.call(self._ngrams_command_args)
-        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
-        search_command = 'tacl search -c {} -d {} {} ngram {}'.format(
-            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
-        data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
-        expected_rows = [
-            ('he', '2', 'A', 'T1-base(1), T1-a(1)'),
-            ('he', '2', 'B', 'T4-base(1)'),
-        ]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_search_witness(self):
-        subprocess.call(self._ngrams_command_args)
-        search_command = 'tacl search {} {} witness {}'.format(
-            self._db_path, self._corpus_dir, self._ngrams_path)
-        data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
-        expected_rows = [
-            ('T1', 'base', '1', '', 'he', '1'),
-            ('T1', 'a', '1', '', 'he', '1'),
-            ('T2', 'base', '4', '', 'ese, he', '2'),
-            ('T2', 'a', '3', '', 'ese, he', '2'),
-            ('T4', 'base', '1', '', 'he', '1')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_search_witness_with_catalogue(self):
-        subprocess.call(self._ngrams_command_args)
-        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
-        search_command = 'tacl search -c {} {} {} witness {}'.format(
-            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
-        data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
-        expected_rows = [
-            ('T1', 'base', '1', 'A', 'he', '1'),
-            ('T1', 'a', '1', 'A', 'he', '1'),
-            ('T2', 'base', '4', '', 'ese, he', '2'),
-            ('T2', 'a', '3', '', 'ese, he', '2'),
-            ('T4', 'base', '1', 'B', 'he', '1')]
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_search_witness_no_label_removed(self):
-        subprocess.call(self._ngrams_command_args)
-        catalogue_path = os.path.join(self._data_dir, 'search_catalogue.txt')
-        search_command = 'tacl search -c {} -d {} {} witness {}'.format(
-            catalogue_path, self._db_path, self._corpus_dir, self._ngrams_path)
-        data = subprocess.check_output(shlex.split(search_command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
-        # The SQLite3 documentation says that the order of
-        # concatenated tokens (as seen in the fourth element in each
-        # row) is arbitrary, which means this test may sometimes fail
-        # in its current form.
-        expected_rows = [
-            ('T1', 'base', '1', 'A', 'he', '1'),
-            ('T1', 'a', '1', 'A', 'he', '1'),
-            ('T4', 'base', '1', 'B', 'he', '1')]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 

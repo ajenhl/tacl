@@ -486,6 +486,79 @@ class Results:
                 substrings.extend([sub_ngram] * count)
         return substrings
 
+    def group_by_ngram(self, labels):
+        """Groups result rows by n-gram and label, providing a single summary
+        field giving the range of occurrences across each work's
+        witnesses. Results are sorted by n-gram then by label (in the
+        order given in `labels`).
+
+        :param labels: labels to order on
+        :type labels: `list` of `str`
+
+        """
+        label_order_col = 'label order'
+
+        def work_summary(group):
+            match = group.iloc[0]
+            work = match[constants.WORK_FIELDNAME]
+            minimum = group[constants.COUNT_FIELDNAME].min()
+            maximum = group[constants.COUNT_FIELDNAME].max()
+            if minimum == maximum:
+                work_count = '{}({})'.format(work, minimum)
+            else:
+                work_count = '{}({}-{})'.format(work, minimum, maximum)
+            match['work count'] = work_count
+            return match
+
+        def ngram_label_summary(group):
+            match = group.iloc[0]
+            summary = group.groupby(constants.WORK_FIELDNAME).apply(
+                work_summary)
+            work_counts = ', '.join(list(summary['work count']))
+            match[constants.WORK_COUNTS_FIELDNAME] = work_counts
+            return match
+
+        def add_label_order(row, labels):
+            row[label_order_col] = labels.index(row[constants.LABEL_FIELDNAME])
+            return row
+
+        group_cols = [constants.NGRAM_FIELDNAME, constants.LABEL_FIELDNAME]
+        matches = self._matches.groupby(group_cols, sort=False).apply(
+            ngram_label_summary)
+        del matches[constants.WORK_FIELDNAME]
+        del matches[constants.SIGLUM_FIELDNAME]
+        del matches[constants.COUNT_FIELDNAME]
+        matches = matches.apply(add_label_order, axis=1, args=(labels,))
+        matches.sort_values(by=[constants.NGRAM_FIELDNAME, label_order_col],
+                            ascending=True, inplace=True)
+        del matches[label_order_col]
+        self._matches = matches
+
+    def group_by_witness(self):
+        """Groups results by witness, providing a single summary field giving
+        the n-grams found in it, a count of their number, and the count of
+        their combined occurrences."""
+        def witness_summary(group):
+            matches = group.sort_values(by=[constants.NGRAM_FIELDNAME],
+                                        ascending=[True])
+            match = matches.iloc[0]
+            ngrams = ', '.join(list(matches[constants.NGRAM_FIELDNAME]))
+            match[constants.NGRAMS_FIELDNAME] = ngrams
+            match[constants.NUMBER_FIELDNAME] = len(matches)
+            match[constants.TOTAL_COUNT_FIELDNAME] = matches[
+                constants.COUNT_FIELDNAME].sum()
+            return match
+
+        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME]
+        # Remove zero-count results.
+        self._matches = self._matches[
+            self._matches[constants.COUNT_FIELDNAME] != 0]
+        self._matches = self._matches.groupby(group_cols, sort=False).apply(
+            witness_summary)
+        del self._matches[constants.NGRAM_FIELDNAME]
+        del self._matches[constants.SIZE_FIELDNAME]
+        del self._matches[constants.COUNT_FIELDNAME]
+
     @staticmethod
     def _is_intersect_results(results):
         """Returns False if `results` has an n-gram that exists in only one

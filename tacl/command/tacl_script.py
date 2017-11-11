@@ -281,6 +281,14 @@ def generate_results_subparser(subparsers):
                         metavar='CORPUS')
     parser.add_argument('results', help=constants.RESULTS_RESULTS_HELP,
                         metavar='RESULTS')
+    unsafe_group = parser.add_argument_group(
+        constants.RESULTS_UNSAFE_GROUP_TITLE,
+        constants.RESULTS_UNSAFE_GROUP_DESCRIPTION)
+    unsafe_group.add_argument('--group-by-ngram', dest='group_by_ngram',
+                              help=constants.RESULTS_GROUP_BY_NGRAM_HELP,
+                              metavar='CATALOGUE')
+    unsafe_group.add_argument('--group-by-witness', action='store_true',
+                              help=constants.RESULTS_GROUP_BY_WITNESS_HELP)
 
 
 def generate_search_subparser(subparsers):
@@ -293,12 +301,7 @@ def generate_search_subparser(subparsers):
     utils.add_common_arguments(parser)
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
-    parser.add_argument('-c', '--catalogue', metavar='CATALOGUE',
-                        help=constants.CATALOGUE_CATALOGUE_HELP)
-    parser.add_argument('-d', '--delete-unlabelled', action='store_true',
-                        help=constants.SEARCH_DELETE_HELP)
-    parser.add_argument('mode', choices=constants.SEARCH_MODE_CHOICES,
-                        help=constants.SEARCH_MODE_HELP, metavar='MODE')
+    utils.add_query_arguments(parser)
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
                         metavar='NGRAMS')
 
@@ -484,6 +487,13 @@ def results(args, parser):
         results.remove_label(args.remove)
     if args.sort:
         results.sort()
+    # Run format-changing operations last.
+    if args.group_by_ngram:
+        catalogue = tacl.Catalogue()
+        catalogue.load(args.group_by_ngram)
+        results.group_by_ngram(catalogue.ordered_labels)
+    if args.group_by_witness:
+        results.group_by_witness()
     results.csv(sys.stdout)
 
 
@@ -491,17 +501,10 @@ def search_texts(args, parser):
     """Searches texts for presence of n-grams."""
     store = utils.get_data_store(args)
     corpus = utils.get_corpus(args)
-    catalogue = tacl.Catalogue()
-    if args.catalogue:
-        catalogue.load(args.catalogue)
+    catalogue = utils.get_catalogue(args)
     store.validate(corpus, catalogue)
     ngrams = utils.get_ngrams(args.ngrams)
-    if args.mode == 'ngram':
-        store.search_ngram(catalogue, ngrams, args.delete_unlabelled,
-                           sys.stdout)
-    elif args.mode == 'witness':
-        store.search_witness(catalogue, ngrams, args.delete_unlabelled,
-                             sys.stdout)
+    store.search(catalogue, ngrams, sys.stdout)
 
 
 def strip_files(args, parser):

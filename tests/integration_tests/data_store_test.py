@@ -303,6 +303,23 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             MalformedQueryError, self._store.intersection_supplied,
             results, labels, io.StringIO(newline=''))
 
+    def test_search(self):
+        ngrams = ['the', 'seh', 'we']
+        actual_rows = self._get_rows_from_csv(
+            self._store.search(self._catalogue, ngrams,
+                               io.StringIO(newline='')))
+        expected_rows = [
+            ('the', '3', 'T1', 'base', '1', 'A'),
+            ('the', '3', 'T1', 'a', '1', 'A'),
+            ('the', '3', 'T2', 'base', '1', 'B'),
+            ('the', '3', 'T2', 'a', '1', 'B'),
+            ('seh', '3', 'T2', 'base', '1', 'B'),
+            ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
+            ('we', '2', 'T5', 'base', '1', 'A'),
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_validate_missing_text(self):
         self._catalogue['missing'] = 'A'
         with self.assertRaises(FileNotFoundError):

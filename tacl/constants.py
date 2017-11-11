@@ -48,27 +48,24 @@ LABEL_COUNT_FIELDNAME = 'label count'
 LABEL_WORK_COUNT_FIELDNAME = 'label work count'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
-NUMBER_FIELDNAME = 'number'
+NUMBER_FIELDNAME = 'number of n-grams'
 PERCENTAGE_FIELDNAME = 'percentage'
 SIGLA_FIELDNAME = 'sigla'
 SIGLUM_FIELDNAME = 'siglum'
 SIZE_FIELDNAME = 'size'
+TOTAL_COUNT_FIELDNAME = 'total count'
 TOTAL_NGRAMS_FIELDNAME = 'total ngrams'
 TOTAL_TOKENS_FIELDNAME = 'total tokens'
 UNIQUE_NGRAMS_FIELDNAME = 'unique ngrams'
 WITNESSES_FIELDNAME = 'witnesses'
 WORK_FIELDNAME = 'work'
+WORK_COUNTS_FIELDNAME = 'work counts'
 
 QUERY_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, WORK_FIELDNAME,
                     SIGLUM_FIELDNAME, COUNT_FIELDNAME, LABEL_FIELDNAME]
 COUNTS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, SIZE_FIELDNAME,
                      UNIQUE_NGRAMS_FIELDNAME, TOTAL_NGRAMS_FIELDNAME,
                      TOTAL_TOKENS_FIELDNAME, LABEL_FIELDNAME]
-SEARCH_NGRAM_FIELDNAMES = [NGRAM_FIELDNAME, SIZE_FIELDNAME, LABEL_FIELDNAME,
-                           WITNESSES_FIELDNAME]
-SEARCH_WITNESS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME, COUNT_FIELDNAME,
-                             LABEL_FIELDNAME, NGRAMS_FIELDNAME,
-                             NUMBER_FIELDNAME]
 STATISTICS_FIELDNAMES = [WORK_FIELDNAME, SIGLUM_FIELDNAME,
                          COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
                          PERCENTAGE_FIELDNAME, LABEL_FIELDNAME]
@@ -297,7 +294,8 @@ RESULTS_EPILOG = '''\
     following order: --extend, --bifurcated-extend, --reduce,
     --reciprocal, --zero-fill, --ngrams, --min/max-works,
     --min/max-size, --min/max-count, --min/max-count-work, --remove,
-    --sort.
+    --sort. All of the options that modify the format are performed at
+    the end, and only one should be specified.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -322,7 +320,8 @@ RESULTS_EPILOG = '''\
     those n-grams are kept that have at least one witness whose count
     falls within that range.
 
-    Since this command always outputs a valid results file, its output
+    Since this command outputs a valid results file (except when using
+    one of those options listed as changing the format), its output
     can be used as input for a subsequent tacl results command. To
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
@@ -341,6 +340,14 @@ RESULTS_EPILOG = '''\
         tacl results --reduce -t pagel output.csv > mod-output.csv
 
 ''' + ENCODING_EPILOG
+RESULTS_GROUP_BY_NGRAM_HELP = '''\
+    Group results by n-gram, providing summary information of the
+    works each n-gram appears in. Results are sorted by n-gram and
+    then order of occurrence of the label in the supplied
+    catalogue.'''
+RESULTS_GROUP_BY_WITNESS_HELP = '''\
+    Group results by witness, providing summary information of which
+    n-grams appear in each witness.'''
 RESULTS_HELP = 'Modify a query results file.'
 RESULTS_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
 RESULTS_MINIMUM_COUNT_WORK_HELP = '''\
@@ -368,29 +375,17 @@ RESULTS_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
 RESULTS_REMOVE_HELP = 'Remove labelled results.'
 RESULTS_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 RESULTS_SORT_HELP = 'Sort the results.'
+RESULTS_UNSAFE_GROUP_TITLE = 'format changing arguments'
+RESULTS_UNSAFE_GROUP_DESCRIPTION = '''\
+    These arguments change the format of the results, making them
+    potentially unsafe to use other operations on.'''
 RESULTS_ZERO_FILL_HELP = '''\
     Add rows with a count of 0 for each n-gram in each witness of a
     work that has at least one witness bearing that n-gram.'''
 
 SEARCH_DESCRIPTION = '''\
-    Output results of searching the database for the supplied n-grams.
-
-    This command has two output modes: 'ngram' and 'witness':
-
-        'ngram' mode outputs results grouped by n-gram, with one
-        result row per combination of n-gram and catalogue label, and
-        each witness and its count given. Within each n-gram group,
-        result rows are sorted by order of the first appearance of the
-        label in the catalogue file.
-
-        'witness' mode outputs results grouped by witness, with each
-        row specifying the matching n-grams that occur within it, the
-        total count of instances of those n-grams, and the number of
-        matching n-grams.
-
-    Specifying a catalogue file will not restrict the search to only
-    those labelled works, but rather adds the labels to any
-    appropriate witnesses in the results.'''
+    Output results of searching the database for the supplied n-grams
+    that occur within labelled witnesses.'''
 SEARCH_HELP = 'List witnesses containing at least one of the supplied n-grams.'
 SEARCH_DELETE_HELP = 'Do not include results for unlabelled witnesses.'
 SEARCH_MODE_CHOICES = ['ngram', 'witness']
@@ -632,23 +627,12 @@ SELECT_INTERSECT_SUPPLIED_SQL = (
     'WHERE ngram IN ('
     'SELECT ngram FROM temp.InputResults '
     'GROUP BY ngram HAVING COUNT(DISTINCT label) = ?)')
-SELECT_SEARCH_LABELLED_ONLY_SQL = "AND Text.label != '' "
-SELECT_SEARCH_NGRAM_SQL = (
-    'SELECT TextNGram.ngram, TextNGram.size, Text.label, '
-    "group_concat(printf('%s-%s(%d)', Text.work, Text.siglum, "
-    "TextNGram.count), ', ') "
+SELECT_SEARCH_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, '
+    'TextNGram.count, Text.label '
     'FROM Text, TextNGram '
-    'WHERE Text.id = TextNGram.text {}'
-    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) '
-    'GROUP BY TextNGram.ngram, Text.label')
-SELECT_SEARCH_WITNESS_SQL = (
-    'SELECT Text.work, Text.siglum, SUM(TextNGram.count) AS count, '
-    "Text.label, group_concat(TextNGram.ngram, ', ') AS ngrams, "
-    'count(TextNGram.ngram) AS number '
-    'FROM Text, TextNGram '
-    'WHERE Text.id = TextNGram.text {}'
-    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram) '
-    'GROUP BY TextNGram.text')
+    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text '
+    'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram)')
 SELECT_TEXT_TOKEN_COUNT_SQL = (
     'SELECT Text.token_count FROM Text WHERE Text.work = ?')
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE work = ? AND siglum = ?'

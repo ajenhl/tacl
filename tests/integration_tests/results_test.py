@@ -78,6 +78,33 @@ class ResultsIntegrationTestCase (TaclTestCase):
             expected_rows = self._get_rows_from_csv(fh)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_group_by_ngram(self):
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        catalogue = os.path.join(data_dir, 'catalogue3.txt')
+        results = os.path.join(self._data_dir, 'search-results.csv')
+        command = 'tacl results --group-by-ngram {} {}'.format(
+            catalogue, results)
+        data = subprocess.check_output(shlex.split(command))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
+        expected_results = os.path.join(self._data_dir,
+                                        'search-group-by-ngram-results.csv')
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
+        self.assertEqual(actual_rows, expected_rows)
+
+    def test_group_by_witness(self):
+        results = os.path.join(self._data_dir, 'search-results.csv')
+        command = 'tacl results --group-by-witness {}'.format(results)
+        data = subprocess.check_output(shlex.split(command))
+        actual_rows = self._get_rows_from_csv(
+            io.StringIO(data.decode('utf-8')))
+        expected_results = os.path.join(self._data_dir,
+                                        'search-group-by-witness-results.csv')
+        with open(expected_results, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_zero_fill(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         corpus = os.path.join(data_dir, 'stripped')
