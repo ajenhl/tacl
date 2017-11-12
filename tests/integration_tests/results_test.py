@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import io
 import os
-import shlex
-import subprocess
 import unittest
 
 
@@ -23,13 +20,10 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'cbeta'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'cbeta-extend-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_extend_pagel(self):
@@ -37,13 +31,10 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'pagel'),
             tacl.constants.TOKENIZER_CHOICE_PAGEL, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'pagel-extend-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_extend_multiply_labelled(self):
@@ -54,13 +45,10 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'multiply-labelled'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'multiply-labelled-extend-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_extend_diff(self):
@@ -69,13 +57,10 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -e {} -t {} {}'.format(
             os.path.join(self._stripped_dir, 'diff-extend'),
             tacl.constants.TOKENIZER_CHOICE_CBETA, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'diff-extend-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_group_by_ngram(self):
@@ -84,25 +69,19 @@ class ResultsIntegrationTestCase (TaclTestCase):
         results = os.path.join(self._data_dir, 'search-results.csv')
         command = 'tacl results --group-by-ngram {} {}'.format(
             catalogue, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'search-group-by-ngram-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(actual_rows, expected_rows)
 
     def test_group_by_witness(self):
         results = os.path.join(self._data_dir, 'search-results.csv')
         command = 'tacl results --group-by-witness {}'.format(results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'search-group-by-witness-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_zero_fill(self):
@@ -110,12 +89,9 @@ class ResultsIntegrationTestCase (TaclTestCase):
         corpus = os.path.join(data_dir, 'stripped')
         results = os.path.join(data_dir, 'non-zero-fill-results.csv')
         command = 'tacl results -z {} {}'.format(corpus, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(data_dir, 'zero-fill-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_zero_fill_min_count(self):
@@ -126,13 +102,10 @@ class ResultsIntegrationTestCase (TaclTestCase):
         results = os.path.join(data_dir, 'non-zero-fill-results.csv')
         command = 'tacl results --max-count 2 -z {} {}'.format(
             corpus, results)
-        data = subprocess.check_output(shlex.split(command))
-        actual_rows = self._get_rows_from_csv(
-            io.StringIO(data.decode('utf-8')))
+        actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(
             data_dir, 'zero-fill-max-count-results.csv')
-        with open(expected_results, newline='') as fh:
-            expected_rows = self._get_rows_from_csv(fh)
+        expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
 

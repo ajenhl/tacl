@@ -1,5 +1,7 @@
 import csv
 import io
+import shlex
+import subprocess
 import unittest
 import unittest.mock
 
@@ -23,6 +25,10 @@ class TaclTestCase (unittest.TestCase):
         self.addCleanup(patcher.stop)
         return thing
 
+    def _get_rows_from_command(self, command):
+        data = subprocess.check_output(shlex.split(command))
+        return self._get_rows_from_csv(io.StringIO(data.decode('utf-8')))
+
     def _get_rows_from_csv(self, fh):
         rows = []
         fh.seek(0)
@@ -30,3 +36,8 @@ class TaclTestCase (unittest.TestCase):
         for row in reader:
             rows.append(tuple(row))
         return rows[1:]
+
+    def _get_rows_from_file(self, path):
+        with open(path, newline='') as fh:
+            expected_rows = self._get_rows_from_csv(fh)
+        return expected_rows
