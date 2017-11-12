@@ -197,7 +197,7 @@ class Results:
         same count, and outputs a single row for each group.
 
         This output replaces the siglum field with a sigla field that
-        provides a space-separated list of the witness sigla. Due to
+        provides a comma separated list of the witness sigla. Due to
         this, it is not necessarily possible to run other Results
         methods on results that have had their witnesses collapsed.
 
@@ -222,13 +222,9 @@ class Results:
             # Take the first result row; only the siglum should differ
             # between them, and there may only be one row.
             merged = df[0:1]
-            sigla = []
-            for siglum in list(df[constants.SIGLA_FIELDNAME]):
-                if ' ' in siglum:
-                    siglum = '"{}"'.format(siglum)
-                sigla.append(siglum)
-            sigla.sort(key=lambda x: x.strip('"'))
-            merged[constants.SIGLUM_FIELDNAME] = ' '.join(sigla)
+            sigla = list(df[constants.SIGLA_FIELDNAME])
+            sigla.sort()
+            merged[constants.SIGLUM_FIELDNAME] = ', '.join(sigla)
             return merged
 
         self._matches = grouped.apply(merge_sigla)

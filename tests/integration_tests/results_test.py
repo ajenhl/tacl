@@ -15,6 +15,35 @@ class ResultsIntegrationTestCase (TaclTestCase):
         self._data_dir = os.path.join(base_dir, 'results_data')
         self._stripped_dir = os.path.join(self._data_dir, 'stripped')
 
+    def test_add_label_count(self):
+        results = os.path.join(self._data_dir, 'non-label-count-results.csv')
+        command = 'tacl results --add-label-count {}'.format(results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir,
+                                        'label-count-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_add_label_work_count(self):
+        results = os.path.join(self._data_dir,
+                               'non-label-work-count-results.csv')
+        command = 'tacl results --add-label-work-count {}'.format(results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir,
+                                        'label-work-count-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_collapse_witnesses(self):
+        results = os.path.join(self._data_dir,
+                               'non-collapse-witnesses-results.csv')
+        command = 'tacl results --collapse-witnesses {}'.format(results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir,
+                                        'collapse-witnesses-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_extend_cbeta(self):
         results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
         command = 'tacl results -e {} -t {} {}'.format(

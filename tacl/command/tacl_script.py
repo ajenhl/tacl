@@ -284,6 +284,12 @@ def generate_results_subparser(subparsers):
     unsafe_group = parser.add_argument_group(
         constants.RESULTS_UNSAFE_GROUP_TITLE,
         constants.RESULTS_UNSAFE_GROUP_DESCRIPTION)
+    unsafe_group.add_argument('--add-label-count', action='store_true',
+                              help=constants.RESULTS_ADD_LABEL_COUNT_HELP)
+    unsafe_group.add_argument('--add-label-work-count', action='store_true',
+                              help=constants.RESULTS_ADD_LABEL_WORK_COUNT_HELP)
+    unsafe_group.add_argument('--collapse-witnesses', action='store_true',
+                              help=constants.RESULTS_COLLAPSE_WITNESSES_HELP)
     unsafe_group.add_argument('--group-by-ngram', dest='group_by_ngram',
                               help=constants.RESULTS_GROUP_BY_NGRAM_HELP,
                               metavar='CATALOGUE')
@@ -488,12 +494,18 @@ def results(args, parser):
     if args.sort:
         results.sort()
     # Run format-changing operations last.
+    if args.add_label_count:
+        results.add_label_count()
+    if args.add_label_work_count:
+        results.add_label_work_count()
     if args.group_by_ngram:
         catalogue = tacl.Catalogue()
         catalogue.load(args.group_by_ngram)
         results.group_by_ngram(catalogue.ordered_labels)
     if args.group_by_witness:
         results.group_by_witness()
+    if args.collapse_witnesses:
+        results.collapse_witnesses()
     results.csv(sys.stdout)
 
 

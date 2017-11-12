@@ -23,12 +23,6 @@ def main():
         parser.print_help()
 
 
-def collapse_witnesses(args):
-    results = tacl.Results(args.results, utils.get_tokenizer(args))
-    results.collapse_witnesses()
-    results.csv(sys.stdout)
-
-
 def _copy_options(args):
     """Returns a string form of the options in `args`."""
     options = []
@@ -46,37 +40,11 @@ def generate_parser():
         description=constants.TACL_HELPER_DESCRIPTION,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title='subcommands')
-    generate_collapse_witness_results_subparser(subparsers)
-    generate_label_count_subparser(subparsers)
     generate_label_work_count_subparser(subparsers)
     generate_work_against_corpus_subparser(subparsers)
     generate_work_in_corpus_subparser(subparsers)
     generate_validate_catalogue_subparser(subparsers)
     return parser
-
-
-def generate_collapse_witness_results_subparser(subparsers):
-    parser = subparsers.add_parser(
-        'collapse-witnesses',
-        description=constants.TACL_HELPER_COLLAPSE_DESCRIPTION,
-        help=constants.TACL_HELPER_COLLAPSE_HELP)
-    parser.set_defaults(func=collapse_witnesses)
-    utils.add_common_arguments(parser)
-    utils.add_tokenizer_argument(parser)
-    parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
-                        metavar='RESULTS')
-
-
-def generate_label_count_subparser(subparsers):
-    parser = subparsers.add_parser(
-        'label-count',
-        description=constants.TACL_HELPER_LABEL_COUNT_DESCRIPTION,
-        help=constants.TACL_HELPER_LABEL_COUNT_HELP)
-    parser.set_defaults(func=label_count)
-    utils.add_common_arguments(parser)
-    utils.add_tokenizer_argument(parser)
-    parser.add_argument('results', help=constants.TACL_HELPER_RESULTS_HELP,
-                        metavar='RESULTS')
 
 
 def generate_label_work_count_subparser(subparsers):
@@ -135,12 +103,6 @@ def generate_validate_catalogue_subparser(subparsers):
     utils.add_common_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
-
-
-def label_count(args):
-    results = tacl.Results(args.results, utils.get_tokenizer(args))
-    results.add_label_count()
-    results.csv(sys.stdout)
 
 
 def label_work_count(args):

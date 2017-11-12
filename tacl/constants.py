@@ -275,6 +275,17 @@ PREPARE_SOURCE_HELP = 'Source of TEI files'
 
 REPORT_OUTPUT_HELP = 'Directory to output report to'
 
+RESULTS_ADD_LABEL_COUNT_HELP = '''\
+    Output the supplied results with an additional column, "{}",
+    giving the total count for each n-gram within the label. For each
+    work, the maximum count across all of that work's witnesses is
+    used in the sum.'''.format(LABEL_COUNT_FIELDNAME)
+RESULTS_ADD_LABEL_WORK_COUNT_HELP = '''\
+    Output the supplied results with an additional column, "{}",
+    giving the total count of works that contain the n-gram within the
+    label. For each work, any number of positive counts across all of
+    that work's witnesses is counted as one in the sum.'''.format(
+        LABEL_WORK_COUNT_FIELDNAME)
 RESULTS_BIFURCATED_EXTEND_HELP = '''\
     Extend results to bifurcation points. Generates results containing
     those n-grams, derived from the original n-grams, that have a
@@ -282,6 +293,11 @@ RESULTS_BIFURCATED_EXTEND_HELP = '''\
     a label count of one and the constituent (n-1)-grams have a higher
     label count.'''
 RESULTS_BIFURCATED_EXTEND_MAX_HELP = 'Maximum size of n-gram to extend to'
+RESULTS_COLLAPSE_WITNESSES_HELP = '''\
+    Collapse result rows for multiple witnesses having the same count
+    for an n-gram. Instead of the "{}" column, all of the witnesses
+    (per work) with the same n-gram count are listed, comma separated,
+    in the "{}" column.'''.format(SIGLUM_FIELDNAME, SIGLA_FIELDNAME)
 RESULTS_DESCRIPTION = '''\
     Modify a query results file by adding, removing or otherwise
     manipulating result rows. Outputs the new set of results.'''
@@ -449,13 +465,6 @@ TACL_HELPER_AGAINST_A_HELP = '''\
 TACL_HELPER_AGAINST_B_HELP = '''\
     File containing corpus work names to be compared against (one per
     line).'''
-TACL_HELPER_COLLAPSE_DESCRIPTION = '''
-    Collapse result rows for multiple witnesses having the same count
-    for an n-gram. Instead of the "{}" column, all of the
-    witnesses (per work) with the same n-gram count are listed, space
-    separated, in the "{}" column.'''.format(SIGLUM_FIELDNAME, SIGLA_FIELDNAME)
-TACL_HELPER_COLLAPSE_HELP = (
-    'Collapse result rows for witnesses having the same count for an n-gram')
 TACL_HELPER_DESCRIPTION = '''\
     Perform helpful but non-essential tacl-related functions.'''
 TACL_HELPER_IN_DESCRIPTION = '''\
@@ -466,23 +475,6 @@ TACL_HELPER_IN_HELP = '''\
     other works in that corpus.'''
 TACL_HELPER_IN_TEXTS_HELP = '''\
     File containing work names to examine (one per line).'''
-TACL_HELPER_LABEL_COUNT_DESCRIPTION = '''\
-    Output the supplied results with an additional column, "{}",
-    giving the total count for each n-gram within the label. For each
-    work, the maximum count across all of that work's witnesses is
-    used in the sum.'''.format(LABEL_COUNT_FIELDNAME)
-TACL_HELPER_LABEL_COUNT_HELP = '''\
-    Add a "{}" column to results giving the count per
-    label.'''.format(LABEL_COUNT_FIELDNAME)
-TACL_HELPER_LABEL_WORK_COUNT_DESCRIPTION = '''\
-    Output the supplied results with an additional column, "{}",
-    giving the total count of works that contain the n-gram within the
-    label. For each work, any number of positive counts across all of
-    that work's witnesses is counted as one in the sum.'''.format(
-        LABEL_WORK_COUNT_FIELDNAME)
-TACL_HELPER_LABEL_WORK_COUNT_HELP = '''\
-    Add a "{}" column to results giving the count of works per
-    label.'''.format(LABEL_WORK_COUNT_FIELDNAME)
 TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
 TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
 TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = '''\

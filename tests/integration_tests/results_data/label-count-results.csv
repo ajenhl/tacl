@@ -1,0 +1,11 @@
+ngram,size,work,siglum,count,label,label count
+AB,2,T1,wit1,3,A,6
+AB,2,T1,wit2,3,A,6
+AB,2,T1,wit3,2,A,6
+AB,2,T1,wit4,2,A,6
+AB,2,T1,wit5,1,A,6
+AB,2,T2,wit1,3,A,6
+AB,2,T2,wit2,2,A,6
+AB,2,T3,wit1,2,B,2
+BC,2,T1,wit1,3,A,3
+BC,2,T2,wit2,2,B,2
