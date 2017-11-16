@@ -10,6 +10,7 @@ import colorlog
 
 import tacl
 from tacl import constants
+from tacl.exceptions import TACLError
 from tacl.command.formatters import ParagraphFormatter
 import tacl.command.utils as utils
 
@@ -21,7 +22,10 @@ def main():
     if hasattr(args, 'verbose'):
         utils.configure_logging(args.verbose, logger)
     if hasattr(args, 'func'):
-        args.func(args, parser)
+        try:
+            args.func(args, parser)
+        except TACLError as err:
+            print(err)
     else:
         parser.print_help()
 
