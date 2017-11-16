@@ -9,6 +9,7 @@ import pandas as pd
 
 from . import constants
 from .report import Report
+from .text import Text
 
 
 class Sequence:
@@ -26,7 +27,7 @@ class Sequence:
 
         :param a1: text sequence from one witness
         :type a1: `str`
-        :param a2: text seequence from another witness
+        :param a2: text sequence from another witness
         :type a2: `str`
         :rtype: `str`
 
@@ -61,6 +62,8 @@ class SequenceReport (Report):
         self._corpus = corpus
         self._tokenizer = tokenizer
         self._matches = pd.read_csv(results, encoding='utf-8', na_filter=False)
+        self._substitutes = {}
+        self._char_code = 61440
 
     def generate(self, output_dir, minimum_size):
         """Generates sequence reports and writes them to the output directory.
@@ -76,11 +79,15 @@ class SequenceReport (Report):
         # (ordered by number of works).
         labels = list(self._matches.groupby([constants.LABEL_FIELDNAME])[
             constants.WORK_FIELDNAME].nunique().index)
-        ngrams = self._matches[
+        original_ngrams = self._matches[
             self._matches[
                 constants.SIZE_FIELDNAME] >= minimum_size].sort_values(
                 by=constants.SIZE_FIELDNAME, ascending=False)[
                     constants.NGRAM_FIELDNAME].unique()
+        ngrams = []
+        for original_ngram in original_ngrams:
+            ngrams.append(self._get_text(Text(original_ngram,
+                                              self._tokenizer)))
         # Generate sequences for each witness in every combination of
         # (different) labels.
         for index, primary_label in enumerate(labels):
@@ -156,8 +163,6 @@ class SequenceReport (Report):
         :type ngrams: `list` of `str`
 
         """
-        self._substitutes = {}
-        self._char_code = 61440
         cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME]
         primary_works = self._matches[self._matches[
             constants.LABEL_FIELDNAME] == primary_label][
@@ -166,10 +171,11 @@ class SequenceReport (Report):
             constants.LABEL_FIELDNAME] == secondary_label][
                 cols].drop_duplicates()
         for index, (work1, siglum1) in primary_works.iterrows():
-            text1 = self._get_text(work1, siglum1)
+            text1 = self._get_text(self._corpus.get_witness(work1, siglum1))
             label1 = '{}_{}'.format(work1, siglum1)
             for index, (work2, siglum2) in secondary_works.iterrows():
-                text2 = self._get_text(work2, siglum2)
+                text2 = self._get_text(self._corpus.get_witness(
+                    work2, siglum2))
                 label2 = '{}_{}'.format(work2, siglum2)
                 self._generate_sequences_for_texts(label1, text1, label2,
                                                    text2, ngrams)
@@ -198,6 +204,7 @@ class SequenceReport (Report):
         t1_spans = [match.span() for match in pattern.finditer(t1)]
         t2_spans = [match.span() for match in pattern.finditer(t2)]
         sequences = []
+        self._logger.debug(t1)
         for t1_span in t1_spans:
             for t2_span in t2_spans:
                 if self._is_inside(t1_span, t2_span, covered_spans):
@@ -246,19 +253,17 @@ class SequenceReport (Report):
             os.makedirs(self._output_dir, exist_ok=True)
             self._write(context, self._output_dir, report_name)
 
-    def _get_text(self, work, siglum):
-        """Returns the text content of the witness identified by `work` and
-        `siglum`, with all multi-character tokens replaced with a
-        single character. Substitutions are recorded in self._substitutes.
+    def _get_text(self, text):
+        """Returns the text content of `text`, with all multi-character tokens
+        replaced with a single character. Substitutions are recorded
+        in self._substitutes.
 
-        :param work: name of work
-        :type work: `str`
-        :param siglum: siglum of witness
-        :type siglum: `str`
+        :param text: text to get content from
+        :type text: `Text`
         :rtype: `str`
 
         """
-        tokens = self._corpus.get_witness(work, siglum).get_tokens()
+        tokens = text.get_tokens()
         for i, token in enumerate(tokens):
             if len(token) > 1:
                 char = chr(self._char_code)
