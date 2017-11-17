@@ -25,7 +25,7 @@ def main():
         try:
             args.func(args, parser)
         except TACLError as err:
-            print(err)
+            parser.error(err)
     else:
         parser.print_help()
 
