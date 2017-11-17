@@ -5,14 +5,21 @@ TEI_SOURCE_CBETA_GITHUB = 'cbeta-github'
 TEI_SOURCE_CHOICES = [TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB]
 
 TOKENIZER_CHOICE_CBETA = 'cbeta'
+TOKENIZER_CHOICE_LATIN = 'latin'
 TOKENIZER_CHOICE_PAGEL = 'pagel'
-TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_PAGEL]
+TOKENIZER_CHOICES = [TOKENIZER_CHOICE_CBETA, TOKENIZER_CHOICE_LATIN,
+                     TOKENIZER_CHOICE_PAGEL]
 # For the CBETA (Chinese) tokenizer, a token is either a workaround
 # (anything in square brackets, as a whole), or a single word
 # character. Tokens are grouped together (when constituted into
 # n-grams) by an empty string.
 TOKENIZER_PATTERN_CBETA = r'\[[^]]*\]|\w'
 TOKENIZER_JOINER_CBETA = ''
+# For the Latin tokenizer, a token is a continuous sequence of word
+# characters. Tokens are grouped together (when constituted into
+# n-grams) by a space.
+TOKENIZER_PATTERN_LATIN = r'\w+'
+TOKENIZER_JOINER_LATIN = ' '
 # For the Pagel (Tibetan) tokenizer, a token is a continuous sequence of
 # word (plus some punctuation) characters. Tokens are grouped together
 # (when constituted into n-grams) by a space.
@@ -20,6 +27,7 @@ TOKENIZER_PATTERN_PAGEL = r"[\w'\-+?~]+"
 TOKENIZER_JOINER_PAGEL = ' '
 TOKENIZERS = {
     TOKENIZER_CHOICE_CBETA: [TOKENIZER_PATTERN_CBETA, TOKENIZER_JOINER_CBETA],
+    TOKENIZER_CHOICE_LATIN: [TOKENIZER_PATTERN_LATIN, TOKENIZER_JOINER_LATIN],
     TOKENIZER_CHOICE_PAGEL: [TOKENIZER_PATTERN_PAGEL, TOKENIZER_JOINER_PAGEL],
 }
 
