@@ -10,6 +10,7 @@ Subcommands:
    tacl-catalogue
    tacl-counts
    tacl-diff
+   tacl-excise
    tacl-highlight
    tacl-intersect
    tacl-ngrams
