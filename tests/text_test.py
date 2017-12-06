@@ -14,6 +14,15 @@ class TextTestCase (TaclTestCase):
             tacl.constants.TOKENIZER_PATTERN_CBETA,
             tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_excise(self):
+        content = 'abcd efgh. ije'
+        excised_ngrams = ['b', 'de', 'je', 'hij']
+        replacement = 'F'
+        text = tacl.Text(content, self._tokenizer)
+        actual_content = text.excise(excised_ngrams, replacement)
+        expected_content = 'aFcFfgFe'
+        self.assertEqual(actual_content, expected_content)
+
     def test_get_ngrams(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.WitnessText('test', 'base', content, self._tokenizer)

@@ -42,6 +42,35 @@ def align_results(args, parser):
     report.generate(args.output, args.minimum)
 
 
+def excise(args, parser):
+    logger = colorlog.getLogger('tacl')
+    tokenizer = utils.get_tokenizer(args)
+    corpus = tacl.Corpus(args.corpus, tokenizer)
+    with open(args.ngrams) as fh:
+        ngrams = [line.strip() for line in fh.readlines()]
+    # It is no issue if the output directory already exists; it is a
+    # reasonable use case to create an excised corpus from multiple
+    # excise operations.
+    try:
+        os.mkdir(args.output)
+    except FileExistsError:
+        pass
+    for work in args.works:
+        # It is worth warning about writing in existing work
+        # directories, however, since that might be unintended. Do not
+        # prevent this, however, since it is a reasonable use case.
+        try:
+            os.mkdir(os.path.join(args.output, work))
+        except FileExistsError:
+            logger.warn(constants.EXCISE_OVERWRITE_WORK_WARNING.format(
+                work))
+        for witness in corpus.get_witnesses(work):
+            path = os.path.join(args.output, witness.get_filename())
+            content = witness.excise(ngrams, args.replacement)
+            with open(path, 'w') as fh:
+                fh.write(content)
+
+
 def generate_parser():
     """Returns a parser configured with sub-commands and arguments."""
     parser = argparse.ArgumentParser(
@@ -52,6 +81,7 @@ def generate_parser():
     generate_catalogue_subparser(subparsers)
     generate_counts_subparser(subparsers)
     generate_diff_subparser(subparsers)
+    generate_excise_subparser(subparsers)
     generate_highlight_subparser(subparsers)
     generate_intersect_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
@@ -135,6 +165,25 @@ def generate_diff_subparser(subparsers):
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
+
+
+def generate_excise_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to excise n-grams from
+    witnesses."""
+    parser = subparsers.add_parser(
+        'excise', description=constants.EXCISE_DESCRIPTION,
+        help=constants.EXCISE_HELP)
+    parser.set_defaults(func=excise)
+    utils.add_common_arguments(parser)
+    parser.add_argument('ngrams', metavar='NGRAMS',
+                        help=constants.EXCISE_NGRAMS_HELP)
+    parser.add_argument('replacement', metavar='REPLACEMENT',
+                        help=constants.EXCISE_REPLACEMENT_HELP)
+    parser.add_argument('output', metavar='OUTPUT',
+                        help=constants.EXCISE_OUTPUT_HELP)
+    utils.add_corpus_arguments(parser)
+    parser.add_argument('works', metavar='WORK',
+                        help=constants.EXCISE_WORKS_HELP, nargs='+')
 
 
 def generate_highlight_subparser(subparsers):

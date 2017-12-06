@@ -159,6 +159,20 @@ DIFF_EPILOG = '''\
 ''' + ENCODING_EPILOG
 DIFF_HELP = 'List n-grams unique to each sub-corpus.'
 
+EXCISE_DESCRIPTION = '''
+    Output witness files for each specified work with all of the
+    specified n-grams replaced with the supplied replacement text. The
+    replacement is done for each n-gram in turn, in descending order
+    of n-gram length.'''
+EXCISE_HELP = "Remove specified n-grams from specified works' witnesses."
+EXCISE_NGRAMS_HELP = '''
+    Path to file containing n-grams (one per line) to be replaced.'''
+EXCISE_OUTPUT_HELP = 'Path to directory to output transformed files to.'
+EXCISE_REPLACEMENT_HELP = '''
+    Text to replace n-grams with. This should be one or more valid
+    tokens.'''
+EXCISE_WORKS_HELP = 'Work whose witnesses will be transformed.'
+
 HIGHLIGHT_BASE_NAME_HELP = 'Name of work to display.'
 HIGHLIGHT_DESCRIPTION = '''\
     Output an HTML report for each witness to a work, showing the text
@@ -497,6 +511,8 @@ VERBOSE_HELP = '''\
 
 # Error messages.
 CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
+                                 'existing files may be overwritten.')
 INSUFFICIENT_LABELS_QUERY_ERROR = (
     'Not running query with less than two defined labels')
 LABEL_NOT_IN_CATALOGUE_ERROR = (

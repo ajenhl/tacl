@@ -19,6 +19,26 @@ class Text:
         self._content = content
         self._tokenizer = tokenizer
 
+    def excise(self, ngrams, replacement):
+        """Returns the token content of this text with every occurrence of
+        each n-gram in `ngrams` replaced with `replacement`.
+
+        The replacing is performed on each n-gram by descending order
+        of length.
+
+        :param ngrams: n-grams to be replaced
+        :type ngrams: `list` of `str`
+        :param replacement: replacement string
+        :type replacement: `str`
+        :rtype: `str`
+
+        """
+        content = self.get_token_content()
+        ngrams.sort(key=len, reverse=True)
+        for ngram in ngrams:
+            content = content.replace(ngram, replacement)
+        return content
+
     def get_content(self):
         """Returns the content of this text.
 

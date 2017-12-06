@@ -4,6 +4,7 @@ import os
 import shlex
 import sqlite3
 import subprocess
+import tempfile
 import unittest
 
 from ..tacl_test_case import TaclTestCase
@@ -321,6 +322,42 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ('人子', '2', 'T0004', '元', '1', 'C'),
             ('人子', '2', 'T0007', 'base', '1', 'C')]
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_excise(self):
+        excise_dir = os.path.join(self._data_dir, 'excise')
+        ngrams_list = os.path.join(excise_dir, 'ngrams.txt')
+        replacement = 'F'
+        corpus_dir = os.path.join(excise_dir, 'corpus')
+        work1 = 'A'
+        work2 = 'B'
+        expected_output_dir = os.path.join(excise_dir, 'output')
+        expected_files = ['A/wit1.txt', 'A/wit2.txt', 'B/wit1.txt']
+        with tempfile.TemporaryDirectory() as actual_output_dir:
+            command = 'tacl excise {} {} {} {} {} {}'.format(
+                ngrams_list, replacement, actual_output_dir, corpus_dir, work1,
+                work2)
+            subprocess.call(shlex.split(command))
+            for filename in expected_files:
+                actual_path = os.path.join(actual_output_dir, filename)
+                expected_path = os.path.join(expected_output_dir, filename)
+                self.assertTrue(
+                    os.path.exists(actual_path),
+                    'Expected output file {} to exist, but it does not'.format(
+                        filename))
+                with open(actual_path) as fh:
+                    actual_content = fh.read().strip()
+                with open(expected_path) as fh:
+                    expected_content = fh.read().strip()
+                self.assertEqual(actual_content, expected_content)
+            # Check that no extra files are created.
+            actual_files = set()
+            expected_files.extend([work1, work2])
+            for entry in os.scandir(actual_output_dir):
+                actual_files.add(entry.name)
+                if entry.is_dir():
+                    for filename in os.listdir(entry.path):
+                        actual_files.add(os.path.join(entry.name, filename))
+            self.assertEqual(actual_files, set(expected_files))
 
     def test_intersection(self):
         subprocess.call(self._ngrams_command_args)
