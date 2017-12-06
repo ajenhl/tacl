@@ -142,6 +142,29 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_excise(self):
+        input_results = (
+            ['AB', '2', 'T1', 'wit1', '4', 'A'],
+            ['AC', '2', 'T1', 'wit1', '3', 'A'],
+            ['ABde', '3', 'T1', 'wit1', '1', 'A'],
+            ['dDe', '3', 'T1', 'wit1', '2', 'A'],
+            ['Dde', '3', 'T1', 'wit1', '1', 'A'],
+            ['ABdeD', '4', 'T1', 'wit1', '1', 'A'],
+            ['deAB', '3', 'T2', 'wit1', '2', 'B'],
+            ['deAB', '3', 'T2', 'wit2', '2', 'B'],
+        )
+        fh = self._create_csv(input_results)
+        results = tacl.Results(fh, self._tokenizer)
+        results.excise('de')
+        expected_rows = [
+            ('AB', '2', 'T1', 'wit1', '4', 'A'),
+            ('AC', '2', 'T1', 'wit1', '3', 'A'),
+            ('dDe', '3', 'T1', 'wit1', '2', 'A'),
+        ]
+        actual_rows = self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_group_by_ngram(self):
         input_results = (
             ['AB', '2', 'T1', 'wit1', '4', 'A'],

@@ -44,6 +44,14 @@ class ResultsIntegrationTestCase (TaclTestCase):
         expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_excise(self):
+        results = os.path.join(self._data_dir, 'non-excise-results.csv')
+        command = 'tacl results --excise {} {}'.format('de', results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir, 'excise-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_extend_cbeta(self):
         results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
         command = 'tacl results -e {} -t {} {}'.format(

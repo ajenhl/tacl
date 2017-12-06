@@ -1,0 +1,6 @@
+ngram,size,work,siglum,count,label
+AB,2,T1,wit1,3,A
+ABd,3,T1,wit1,2,A
+AB,2,T3,wit1,4,B
+BC,2,T3,wit2,3,A
+BC,2,T3,wit2,2,B

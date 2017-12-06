@@ -323,6 +323,9 @@ RESULTS_COLLAPSE_WITNESSES_HELP = '''\
 RESULTS_DESCRIPTION = '''\
     Modify a query results file by adding, removing or otherwise
     manipulating result rows. Outputs the new set of results.'''
+RESULTS_EXCISE_HELP = '''\
+    Remove all results whose n-gram contains the supplied n-gram
+    within it.'''
 RESULTS_EXTEND_HELP = '''\
     Extend the results to list the highest size grams that also count
     as matches, going beyond the maximum size recorded in the
@@ -330,7 +333,7 @@ RESULTS_EXTEND_HELP = '''\
 RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
     following order: --extend, --bifurcated-extend, --reduce,
-    --reciprocal, --zero-fill, --ngrams, --min/max-works,
+    --reciprocal, --excise, --zero-fill, --ngrams, --min/max-works,
     --min/max-size, --min/max-count, --min/max-count-work, --remove,
     --sort. All of the options that modify the format are performed at
     the end, and only one should be specified.

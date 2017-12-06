@@ -116,10 +116,7 @@ class Results:
         """
         lcf = constants.LABEL_COUNT_FIELDNAME
         nf = constants.NGRAM_FIELDNAME
-        # Escape the n-gram because str.contains interprets the supplied
-        # string as a regular expression.
         ngram = row[constants.NGRAM_FIELDNAME]
-        escaped_ngram = re.escape(ngram)
         label_count = row[constants.LABEL_COUNT_FIELDNAME]
         if label_count == 1 and not smaller.empty:
             # Keep a result with a label count of 1 if its
@@ -134,7 +131,7 @@ class Results:
                         constants.LABEL_COUNT_FIELDNAME].max() == 1:
                 row[DELETE_FIELDNAME] = True
         elif not larger.empty and larger[larger[nf].str.contains(
-                escaped_ngram)][lcf].max() == label_count:
+                ngram, regex=False)][lcf].max() == label_count:
             # Remove a result if the label count of a containing
             # n-gram is equal to its label count.
             row[DELETE_FIELDNAME] = True
@@ -244,6 +241,24 @@ class Results:
         self._matches.to_csv(fh, encoding='utf-8', float_format='%d',
                              index=False)
         return fh
+
+    def excise(self, ngram):
+        """Removes all rows whose n-gram contains `ngram`.
+
+        This operation uses simple string containment matching. For
+        tokens that consist of multiple characters, this means that
+        `ngram` may be part of one or two tokens; eg, "he m" would
+        match on "she may".
+
+        :param ngram: n-gram to remove containing n-gram rows by
+        :type ngram: `str`
+
+        """
+        self._logger.info('Excising results containing "{}"'.format(ngram))
+        if not ngram:
+            return
+        self._matches = self._matches[~self._matches[
+            constants.NGRAM_FIELDNAME].str.contains(ngram, regex=False)]
 
     def extend(self, corpus):
         """Adds rows for all longer forms of n-grams in the results that are

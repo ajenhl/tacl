@@ -294,6 +294,8 @@ def generate_results_subparser(subparsers):
                           metavar='COUNT', type=int)
     parser.add_argument('-e', '--extend', dest='extend',
                         help=constants.RESULTS_EXTEND_HELP, metavar='CORPUS')
+    parser.add_argument('--excise', help=constants.RESULTS_EXCISE_HELP,
+                        metavar='NGRAM', type=str)
     parser.add_argument('--min-count', dest='min_count',
                         help=constants.RESULTS_MINIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
@@ -526,6 +528,8 @@ def results(args, parser):
         results.reduce()
     if args.reciprocal:
         results.reciprocal_remove()
+    if args.excise:
+        results.excise(args.excise)
     if args.zero_fill:
         corpus = tacl.Corpus(args.zero_fill, tokenizer)
         results.zero_fill(corpus)
