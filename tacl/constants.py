@@ -218,7 +218,7 @@ HIGHLIGHT_NGRAMS_HELP = '''\
     Path to file containing n-grams (one per line) to highlight. This
     option may be specified multiple times; the n-grams in each file
     will be displayed in a distinct colour.'''
-HIGHLIGHT_RESULTS_HELP = 'Path to CSV results; creates heatmap highlighting'
+HIGHLIGHT_RESULTS_HELP = 'Path to CSV results; creates heatmap highlighting.'
 
 
 INTERSECT_DESCRIPTION = '''\
@@ -244,7 +244,7 @@ JITC_LABEL_HELP = 'Label of works to compare with each other'
 
 NGRAMS_CATALOGUE_HELP = '''\
     Path to a catalogue file used to restrict which works in the
-    corpus are added'''
+    corpus are added.'''
 NGRAMS_DESCRIPTION = 'Generate n-grams from a corpus.'
 NGRAMS_EPILOG = '''\
     This command can be safely interrupted and subsequently rerun;
@@ -283,10 +283,10 @@ PREPARE_DESCRIPTION = '''\
 PREPARE_EPILOG = '''\
     The TEI source options are:
 
-    * {}: the CBETA TEI files as found on their 2011 DVD release
+    * {}: The CBETA TEI files as found on their 2011 DVD release.
 
-    * {}: the CBETA TEI files as distributed on their GitHub repository
-      at https://github.com/cbeta-org/xml-p5.git'''.format(
+    * {}: The CBETA TEI files as distributed on their GitHub repository
+      at https://github.com/cbeta-org/xml-p5.git.'''.format(
           TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB)
 PREPARE_HELP = '''\
     Convert CBETA TEI XML files into an XML form suitable for
