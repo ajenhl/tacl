@@ -14,7 +14,6 @@ Contents:
    installation
    guide
    scripts/tacl
-   scripts/tacl-helper
    scripts/tacl-jitc
    API <api/tacl>
 
@@ -111,9 +110,8 @@ analysis of the corpus, as listed with example commands:
 
        tacl highlight path/stripped/dir intersect-results.csv text-name witness-siglum
 
-Another script, :doc:`tacl-helper </scripts/tacl-helper>`, can be used
-to create sets of catalogue files and prepare batches of commands for
-particular sets of queries.
+Other tacl commands can be found using the command `tacl -h` or
+reading the documentation for the :doc:`tacl </scripts/tacl>` script.
 
 
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/

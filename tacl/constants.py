@@ -479,35 +479,6 @@ SUPPLIED_RESULTS_HELP = 'Paths to results files to be used in the query.'
 
 TACL_DESCRIPTION = 'Analyse the text of corpora in various simple ways.'
 
-TACL_HELPER_AGAINST_DESCRIPTION = '''\
-    Generate a script to compare each work in a corpus against all the
-    works in another corpus.'''
-TACL_HELPER_AGAINST_HELP = '''\
-    Generate a script to compare each work in a corpus against all the
-    works in another corpus.'''
-TACL_HELPER_AGAINST_A_HELP = '''\
-    File containing corpus work names to compare (one per line).'''
-TACL_HELPER_AGAINST_B_HELP = '''\
-    File containing corpus work names to be compared against (one per
-    line).'''
-TACL_HELPER_DESCRIPTION = '''\
-    Perform helpful but non-essential tacl-related functions.'''
-TACL_HELPER_IN_DESCRIPTION = '''\
-    Generate a script to compare each work in a corpus with all the
-    other works in that corpus.'''
-TACL_HELPER_IN_HELP = '''\
-    Generate a script to compare each work in a corpus with all the
-    other works in that corpus.'''
-TACL_HELPER_IN_TEXTS_HELP = '''\
-    File containing work names to examine (one per line).'''
-TACL_HELPER_OUTPUT = 'Output directory for script and catalogue files.'
-TACL_HELPER_RESULTS_HELP = 'Path to CSV results'
-TACL_HELPER_VALIDATE_CATALOGUE_DESCRIPTION = '''\
-    Report any errors in the specified catalogue file. Errors that can
-    be detected are referencse to works that do not exist in the
-    specified corpus and the same work being listed more than once.'''
-TACL_HELPER_VALIDATE_CATALOGUE_HELP = 'Report errors in a catalogue file.'
-
 VERBOSE_HELP = '''\
     Display debug information; multiple -v options increase the verbosity.'''
 
