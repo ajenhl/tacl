@@ -92,7 +92,6 @@ class Results:
 
     def _annotate_bifurcated_extend_data(self, row, smaller, larger, tokenize,
                                          join):
-
         """Returns `row` annotated with whether it should be deleted or not.
 
         An n-gram is marked for deletion if:

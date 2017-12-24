@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import unittest
-
 import tacl
 from .tacl_test_case import TaclTestCase
 

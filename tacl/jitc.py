@@ -308,7 +308,6 @@ class JitCReport(Report):
 
     def _process_maybe_work(self, yes_work, maybe_work, work_dir,
                             yn_results_path, stats):
-
         """Returns statistics of how `yes_work` compares with `maybe_work`.
 
         :param yes_work: name of work for which stats are collected
