@@ -125,9 +125,8 @@ class Results:
             sub_ngram2 = join(ngram_tokens[1:])
             pattern = FilteredWitnessText.get_filter_ngrams_pattern(
                 [sub_ngram1, sub_ngram2])
-            if smaller[smaller[constants.NGRAM_FIELDNAME].str.match(
-                    pattern, as_indexer=True)][
-                        constants.LABEL_COUNT_FIELDNAME].max() == 1:
+            if smaller[smaller[constants.NGRAM_FIELDNAME].str.match(pattern)][
+                    constants.LABEL_COUNT_FIELDNAME].max() == 1:
                 row[DELETE_FIELDNAME] = True
         elif not larger.empty and larger[larger[nf].str.contains(
                 ngram, regex=False)][lcf].max() == label_count:
@@ -301,8 +300,8 @@ class Results:
                 [extended_matches, self._generate_extended_matches(
                     extended_ngrams, highest_n, work, siglum, label)])
             extended_ngrams = None
-        extended_matches = extended_matches.reindex_axis(
-            constants.QUERY_FIELDNAMES, axis=1)
+        extended_matches = extended_matches.reindex(
+            columns=constants.QUERY_FIELDNAMES)
         if is_intersect:
             extended_matches = self._reciprocal_remove(extended_matches)
         self._matches = self._matches.append(extended_matches)
