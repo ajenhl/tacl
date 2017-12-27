@@ -37,13 +37,15 @@ class Stripper:
         :rtype: `list` of `tuple`
 
         """
-        witnesses = [(constants.BASE_WITNESS, constants.BASE_WITNESS_ID)]
+        witnesses = []
         witness_elements = source_tree.xpath(
-            '/tei:teiCorpus/tei:teiHeader/tei:fileDesc/tei:sourceDesc/'
+            '/tei:*/tei:teiHeader/tei:fileDesc/tei:sourceDesc/'
             'tei:listWit/tei:witness', namespaces=constants.NAMESPACES)
         for witness_element in witness_elements:
             witnesses.append((witness_element.text,
                               witness_element.get(constants.XML + 'id')))
+        if not witnesses:
+            witnesses = [(constants.BASE_WITNESS, constants.BASE_WITNESS_ID)]
         return witnesses
 
     def _output_file(self, work, witnesses):

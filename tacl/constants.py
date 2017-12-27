@@ -1,8 +1,7 @@
 """Module containing constants."""
 
-TEI_SOURCE_CBETA_2011 = 'cbeta-2011'
 TEI_SOURCE_CBETA_GITHUB = 'cbeta-github'
-TEI_SOURCE_CHOICES = [TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB]
+TEI_SOURCE_CHOICES = [TEI_SOURCE_CBETA_GITHUB]
 
 TOKENIZER_CHOICE_CBETA = 'cbeta'
 TOKENIZER_CHOICE_LATIN = 'latin'
@@ -283,11 +282,9 @@ PREPARE_DESCRIPTION = '''\
 PREPARE_EPILOG = '''\
     The TEI source options are:
 
-    * {}: The CBETA TEI files as found on their 2011 DVD release.
-
     * {}: The CBETA TEI files as distributed on their GitHub repository
       at https://github.com/cbeta-org/xml-p5.git.'''.format(
-          TEI_SOURCE_CBETA_2011, TEI_SOURCE_CBETA_GITHUB)
+          TEI_SOURCE_CBETA_GITHUB)
 PREPARE_HELP = '''\
     Convert CBETA TEI XML files into an XML form suitable for
     stripping.'''

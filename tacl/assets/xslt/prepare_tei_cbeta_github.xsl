@@ -52,16 +52,11 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Remove the witness from the lemma, since it isn't used and will
-       cause confusion since the witness xml:ids will likely change,
-       leaving this potentially wrong as well as unused. -->
-  <xsl:template match="tei:lem/@wit" />
-
   <xsl:template match="tei:listWit" />
 
   <xsl:template match="tei:note/@target" />
 
-  <xsl:template match="tei:rdg/@wit">
+  <xsl:template match="tei:*/@wit">
     <xsl:attribute name="wit">
       <xsl:for-each select="id(translate(., '#', ''))">
         <xsl:value-of select="." />

@@ -24,10 +24,62 @@ class StripTestCase (unittest.TestCase):
             actual_output = str(self.stripper.transform(etree.XML(input_xml)))
             self.assertEqual(expected_output, actual_output)
 
+    def test_get_witnesses(self):
+        input_xml = '''
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taisho Tripitaka, Electronic version, No. 0001 長阿含經</title>
+        <author>後秦 佛陀耶舍共竺佛念譯</author>
+      </titleStmt>
+      <sourceDesc>
+        <listWit>
+          <witness xml:id="wit1">CBETA</witness>
+          <witness xml:id="wit2">宋</witness>
+          <witness xml:id="wit3">明</witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI>
+    <teiHeader>
+    </teiHeader>
+    <text>
+    </text>
+  </TEI>
+</teiCorpus>'''
+        actual_witnesses = self.stripper.get_witnesses(etree.XML(input_xml))
+        expected_witnesses = [('CBETA', 'wit1'), ('宋', 'wit2'), ('明', 'wit3')]
+        self.assertEqual(actual_witnesses, expected_witnesses)
+
+    def test_get_witnesses_no_witnesses(self):
+        input_xml = '''
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taisho Tripitaka, Electronic version, No. 0001 長阿含經</title>
+        <author>後秦 佛陀耶舍共竺佛念譯</author>
+      </titleStmt>
+    </fileDesc>
+  </teiHeader>
+  <TEI>
+    <teiHeader>
+    </teiHeader>
+    <text>
+    </text>
+  </TEI>
+</teiCorpus>'''
+        actual_witnesses = self.stripper.get_witnesses(etree.XML(input_xml))
+        expected_witnesses = [(tacl.constants.BASE_WITNESS,
+                               tacl.constants.BASE_WITNESS_ID)]
+        self.assertEqual(actual_witnesses, expected_witnesses)
+
     def test_no_header(self):
         """Tests that the TEI header is stripped."""
         input_xml = '''
-<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
@@ -50,9 +102,19 @@ class StripTestCase (unittest.TestCase):
       </langUsage>
     </profileDesc>
   </teiHeader>
-  <text>
-  </text>
-</TEI>'''
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Taisho Tripitaka, Electronic version, No. 0001 長阿含經</title>
+          <author>後秦 佛陀耶舍共竺佛念譯</author>
+        </titleStmt>
+      </fileDesc>
+    </teiHeader>
+    <text>
+    </text>
+  </TEI>
+</teiCorpus>'''
         expected_output = ''
         actual_output = str(self.stripper.transform(etree.XML(input_xml)))
         self.assertEqual(expected_output, actual_output)

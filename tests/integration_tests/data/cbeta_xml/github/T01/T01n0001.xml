@@ -113,7 +113,7 @@
       <cb:div type="apparatus">
         <head>校勘記</head>
         <p>
-          <app from="#beg0001002" to="#end0001002"><lem wit="#wit1">長安</lem><rdg resp="#resp1" wit="#wit2"><space quantity="0"/></rdg></app>
+          <app from="#beg0001002" to="#end0001002"><lem wit="#wit1 #wit6">長安</lem><rdg resp="#resp1" wit="#wit2"><space quantity="0"/></rdg></app>
           <app from="#beg0001003" to="#end0001003"><lem wit="#wit1">述</lem><rdg resp="#resp1" wit="#wit2"><space quantity="0"/></rdg></app>
           <app from="#beg0001004" to="#end0001004"><lem wit="#wit1">辨</lem><rdg
           resp="#resp1" wit="#wit2">辯</rdg></app>

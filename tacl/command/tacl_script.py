@@ -497,9 +497,7 @@ def prepare_xml(args, parser):
     work.
 
     """
-    if args.source == constants.TEI_SOURCE_CBETA_2011:
-        corpus_class = tacl.TEICorpusCBETA2011
-    elif args.source == constants.TEI_SOURCE_CBETA_GITHUB:
+    if args.source == constants.TEI_SOURCE_CBETA_GITHUB:
         corpus_class = tacl.TEICorpusCBETAGitHub
     else:
         raise Exception('Unsupported TEI source option provided')

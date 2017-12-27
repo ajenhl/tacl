@@ -43,9 +43,9 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
                 'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
-                actual_content = fh.readlines()
+                actual_content = fh.read()
             with open(expected_path) as fh:
-                expected_content = fh.readlines()
+                expected_content = fh.read()
             self.assertEqual(
                 actual_content, expected_content,
                 'Expected transformed contents of {} to match {}'.format(
@@ -53,20 +53,6 @@ class TEICorpusIntegrationTestCase (unittest.TestCase):
         # Check that no extra files are created.
         self.assertEqual(set(os.listdir(self._actual_output_dir)),
                          set(expected_files))
-
-
-class TEICorpusCBETA2011IntegrationTestCase (TEICorpusIntegrationTestCase):
-
-    def setUp(self):
-        self._corpus_name = '2011'
-        super().setUp()
-
-    def test_tidy(self):
-        corpus = tacl.TEICorpusCBETA2011(self._xml_dir,
-                                         self._actual_output_dir)
-        corpus.tidy()
-        expected_files = ['T0001.xml', 'T0002.xml', 'T0003.xml']
-        self.check_tidy_results(expected_files)
 
 
 class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):

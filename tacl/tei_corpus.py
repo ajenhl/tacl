@@ -99,7 +99,7 @@ class TEICorpus:
         raise NotImplementedError
 
     def get_witnesses(self, source_tree):
-        """Returns a sorted list of all witnesses of variant readings in
+        """Returns a sorted list of all witnesses of readings in
         `source_tree`, and the elements that bear @wit attributes.
 
         :param source_tree: XML tree of source document
@@ -108,12 +108,7 @@ class TEICorpus:
 
         """
         witnesses = set()
-        # Only get witnesses from tei:rdg, not tei:lem also, because a
-        # witness may only be the source for the base reading, in
-        # which case it is pointless to create a separate witness for it
-        # - everything will be encompassed in the artificial base
-        # witness.
-        bearers = source_tree.xpath('//tei:app/tei:rdg[@wit]',
+        bearers = source_tree.xpath('//tei:app/tei:*[@wit]',
                                     namespaces=constants.NAMESPACES)
         for bearer in bearers:
             for witness in witnesses_splitter.split(bearer.get('wit')):
@@ -210,72 +205,6 @@ class TEICorpus:
             attribute_text = bearer.get(attribute).replace(ref_text, ref)
             refs = ' '.join(sorted(attribute_text.strip().split()))
             bearer.set(attribute, refs)
-
-
-class TEICorpusCBETA2011 (TEICorpus):
-
-    """A TEICorpus subclass where the source files are formatted as per
-    the CBETA 2011 DVD release (TEI P4)."""
-
-    work_pattern = re.compile(
-        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<work>[^_\.]+)_(?P<part>\d+)$')
-    xslt = 'prepare_tei_cbeta_2011.xsl'
-
-    @staticmethod
-    def _correct_entity_file(file_path):
-        """Adds an unused entity declaration to the entity file for
-        `file_path`, in the hopes that this will make it not cause a
-        validation failure."""
-        path, basename = os.path.split(file_path)
-        entity_file = '{}.ent'.format(os.path.join(
-                path, basename.split('_')[0]))
-        with open(entity_file, 'rb') as input_file:
-            text = input_file.read()
-        with open(entity_file, 'wb') as output_file:
-            output_file.write(text)
-            output_file.write(b'<!ENTITY DUMMY_ENTITY "" >')
-
-    def _extract_work(self, filename):
-        """Returns the name of the work in `filename`.
-
-        Many works are divided into multiple parts that need to be
-        joined together.
-
-        """
-        basename = os.path.splitext(os.path.basename(filename))[0]
-        match = self.work_pattern.search(basename)
-        if match is None:
-            self._logger.warning('Found an anomalous filename "{}"'.format(
-                filename))
-            return None, None
-        work = '{}{}'.format(match.group('prefix'), match.group('work'))
-        return work, int(match.group('part'))
-
-    def _handle_resps(self, root):
-        # Resp information is not extracted for 2011 CBETA files.
-        return root
-
-    def _tidy(self, work, file_path, tried=False):
-        """Transforms the file at `file_path` into simpler XML and returns
-        it."""
-        output_file = os.path.join(self._output_dir, work)
-        self._logger.info('Tidying file {} into {}'.format(
-            file_path, output_file))
-        try:
-            tei_doc = etree.parse(file_path)
-        except etree.XMLSyntaxError as err:
-            self._logger.warning('XML file "{}" is invalid'.format(file_path))
-            if tried:
-                self._logger.error(
-                    'XML file "{}" is irretrievably invalid: {}'.format(
-                        file_path, err))
-                raise
-            self._logger.warning('Retrying after modifying entity file')
-            self._correct_entity_file(file_path)
-            xml = self._tidy(work, file_path, True)
-        else:
-            xml = self.transform(tei_doc).getroot()
-        return xml
 
 
 class TEICorpusCBETAGitHub (TEICorpus):

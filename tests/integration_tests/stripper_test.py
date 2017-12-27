@@ -25,13 +25,12 @@ class StripperIntegrationTestCase (unittest.TestCase):
         if os.path.exists(self._actual_output_dir):
             shutil.rmtree(self._actual_output_dir)
 
-    def test_2011_strip_files(self):
-        xml_dir = os.path.join(self._xml_dir, '2011')
+    def test_github_strip_files(self):
+        xml_dir = os.path.join(self._xml_dir, 'github')
         stripper = tacl.Stripper(xml_dir, self._actual_output_dir)
         stripper.strip_files()
-        expected_files = ['T0001/base.txt', 'T0001/大.txt', 'T0001/宋.txt',
-                          'T0002/base.txt', 'T0003/base.txt', 'T0003/元.txt',
-                          'T0003/明.txt', 'T0003/宋.txt']
+        expected_files = ['T0001/CBETA.txt', 'T0001/元.txt', 'T0001/大.txt',
+                          'T0001/宋.txt', 'T0001/明.txt', 'T0002/base.txt']
         for filename in expected_files:
             actual_path = os.path.join(self._actual_output_dir, filename)
             expected_path = os.path.join(self._expected_output_dir, filename)
@@ -40,9 +39,9 @@ class StripperIntegrationTestCase (unittest.TestCase):
                 'Expected file {} to exist, but it does not'.format(
                     actual_path))
             with open(actual_path, 'r') as fh:
-                actual_content = fh.readlines()
+                actual_content = fh.read()
             with open(expected_path) as fh:
-                expected_content = fh.readlines()
+                expected_content = fh.read()
             self.maxDiff = None
             self.assertEqual(
                 actual_content, expected_content,
@@ -50,7 +49,7 @@ class StripperIntegrationTestCase (unittest.TestCase):
                     actual_path, expected_path))
         # Check that no extra files are created.
         files = set()
-        for directory in ['T0001', 'T0002', 'T0003']:
+        for directory in ['T0001', 'T0002']:
             output_dir = os.path.join(self._actual_output_dir, directory)
             for filename in os.listdir(output_dir):
                 files.add(os.path.join(directory, filename))

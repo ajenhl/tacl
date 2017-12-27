@@ -7,45 +7,6 @@ from lxml import etree
 import tacl
 
 
-class TEICorpusCBETA2011TestCase (unittest.TestCase):
-
-    def setUp(self):
-        self.corpus = tacl.TEICorpusCBETA2011('/', '/')
-
-    def test_gaiji(self):
-        """Tests that the correct gaiji alternative is used."""
-        gaiji_data = (
-            ("<p><gaiji uniflag='1' cb='Amacron' nor='AA' uni='0100'/></p>",
-             'Ā'),
-            ("<p><gaiji uniflag='0' cb='CB00006' des='[(王*巨)/木]' uni='249B2' nor='璩' mojikyo='M021123' mofont='Mojikyo M104' mochar='6E82'/></p>",
-             '[(王*巨)/木]'),
-            ("<p><gaiji uniflag='' cb='SD-A440' cbdia='ka' udia='ka' sdchar='一'/></p>",
-             'ka'),
-            ("<p><gaiji uniflag='' cb='RJ-CEBD' cbdia='yaa' udia='y&#x0101;' rjchar='彖'/></p>",
-             'yā'),
-            )
-        for input_xml, expected_output in gaiji_data:
-            output_tree = self.corpus.transform(etree.XML(input_xml))
-            actual_output = etree.tostring(output_tree.getroot(),
-                                           method='text', encoding='unicode')
-            self.assertEqual(expected_output, actual_output)
-
-    def test_get_witnesses(self):
-        """Tests that all of the witnesses of variant readings are extracted
-        from a text."""
-        input_xml = '''
-<div xmlns="http://www.tei-c.org/ns/1.0">
-  <app><lem wit="【宋】">念</lem><rdg wit="【大】">忘</rdg></app>
-  <app n="0001008"><lem wit="【大】">閹</lem><rdg resp="Taisho" wit="【宋】【元】">掩</rdg></app>
-  <app n="0001012"><lem wit="【大】">後秦弘始年</lem><rdg resp="Taisho" wit="【宋】【元】【明】">姚秦三藏法師</rdg></app>
-  <app><lem with="【三】">毗</lem><rdg wit="【大】">毘</rdg></app>
-</div>
-        '''
-        expected_witnesses = ['元', '大', '宋', '明']
-        actual_witnesses = self.corpus.get_witnesses(etree.XML(input_xml))[0]
-        self.assertEqual(expected_witnesses, actual_witnesses)
-
-
 class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
 
     def setUp(self):
@@ -56,13 +17,25 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         from a text."""
         input_xml = '''
 <div xmlns="http://www.tei-c.org/ns/1.0">
-  <app><lem wit="【宋】">念</lem><rdg wit="【大】">忘</rdg></app>
-  <app n="0001008"><lem wit="【大】">閹</lem><rdg resp="Taisho" wit="【宋】【元】">掩</rdg></app>
-  <app n="0001012"><lem wit="【大】">後秦弘始年</lem><rdg resp="Taisho" wit="【宋】【元】【明】">姚秦三藏法師</rdg></app>
-  <app><lem with="【三】">毗</lem><rdg wit="【大】">毘</rdg></app>
+  <app>
+    <lem wit="【宋】">念</lem>
+    <rdg wit="【大】">忘</rdg>
+  </app>
+  <app n="0001008">
+    <lem wit="【大】">閹</lem>
+    <rdg resp="Taisho" wit="【宋】【元】">掩</rdg>
+  </app>
+  <app n="0001012">
+    <lem wit="【大】">後秦弘始年</lem>
+    <rdg resp="Taisho" wit="【宋】【元】【明】">姚秦三藏法師</rdg>
+  </app>
+  <app>
+    <lem wit="【三】">毗</lem>
+    <rdg wit="【大】">毘</rdg>
+  </app>
 </div>
         '''
-        expected_witnesses = ['元', '大', '宋', '明']
+        expected_witnesses = ['三', '元', '大', '宋', '明']
         actual_witnesses = self.corpus.get_witnesses(etree.XML(input_xml))[0]
         self.assertEqual(expected_witnesses, actual_witnesses)
 
