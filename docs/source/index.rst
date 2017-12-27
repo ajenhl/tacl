@@ -31,6 +31,11 @@ into their consistuent `n-grams`_, and allow querying for the
 differences and intersections of these n-grams between arbitrary
 groupings of texts.
 
+The documentation here concentrates on the specifics of using
+TACL. Michael Radich has written a `user's guide`_ that focuses on
+"questions of Buddhological method bearing upon rigorous and effective
+application of the tool to research questions".
+
 
 Process
 -------
@@ -118,5 +123,6 @@ to install `tacl-catalogue-manager`_.
 
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/
 .. _n-grams: http://en.wikipedia.org/wiki/N-gram
+.. _user's guide: http://dazangthings.nz/documents/3/TACL_users_guide.pdf
 .. _GitHub repository: https://github.com/cbeta-org/xml-p5.git
 .. _tacl-catalogue-manager: https://github.com/ajenhl/tacl-catalogue-manager
