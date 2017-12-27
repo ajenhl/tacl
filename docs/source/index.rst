@@ -51,9 +51,8 @@ analysis of the corpus, as listed with example commands:
 
    Note that the output format is simply plain text. If you already
    have plain text files, then this step is not necessary. The
-   processing both the style of TEI XML used by the CBETA corpus as
-   per their `GitHub repository`_ (the default) and as per the 2011 CD
-   release.
+   processing currently expects the style of TEI XML used by the CBETA
+   corpus as per their `GitHub repository`_.
 
 2. Generate the n-grams that will be used in the analysis (:doc:`tacl
    ngrams </scripts/tacl-ngrams>`). This is typically the slowest part
