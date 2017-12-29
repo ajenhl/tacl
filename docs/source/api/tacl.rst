@@ -51,6 +51,14 @@ tacl.data_store module
     :undoc-members:
     :show-inheritance:
 
+tacl.decorators module
+----------------------
+
+.. automodule:: tacl.decorators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tacl.exceptions module
 ----------------------
 
