@@ -311,11 +311,11 @@ class Results:
                 [extended_matches, self._generate_extended_matches(
                     extended_ngrams, highest_n, work, siglum, label)])
             extended_ngrams = None
-        extended_matches = extended_matches.reindex(
-            columns=constants.QUERY_FIELDNAMES)
         if is_intersect:
             extended_matches = self._reciprocal_remove(extended_matches)
-        self._matches = self._matches.append(extended_matches)
+        self._matches = self._matches.append(
+            extended_matches, ignore_index=True).reindex(
+                columns=constants.QUERY_FIELDNAMES)
 
     def _generate_extended_matches(self, extended_ngrams, highest_n, work,
                                    siglum, label):

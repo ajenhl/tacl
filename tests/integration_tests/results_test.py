@@ -100,6 +100,21 @@ class ResultsIntegrationTestCase (TaclTestCase):
         expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_extend_duplicate_index(self):
+        # When adding rows to a DataFrame, it is possible to have
+        # duplicate index values, which then may cause problems
+        # (ValueError: cannot reindex from a duplicate axis) with
+        # subsequent operations.
+        results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
+        command = 'tacl results -e {} -t {} --min-count 2 {}'.format(
+            os.path.join(self._stripped_dir, 'cbeta'),
+            tacl.constants.TOKENIZER_CHOICE_CBETA, results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir,
+                                        'cbeta-extend-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_group_by_ngram(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         catalogue = os.path.join(data_dir, 'catalogue3.txt')
