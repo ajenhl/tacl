@@ -9,6 +9,7 @@ import tempfile
 import pandas as pd
 
 from . import constants
+from .decorators import requires_columns
 from .text import Text, FilteredWitnessText
 
 
@@ -38,6 +39,8 @@ class Results:
         self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
     def add_label_count(self):
         """Adds to each result row a count of the number of occurrences of
         that n-gram across all works within the label.
@@ -63,6 +66,8 @@ class Results:
             sort=False).apply(add_label_count)
         self._logger.info('Finished adding label count')
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def add_label_work_count(self):
         """Adds to each result row a count of the number of works within the
         label contain that n-gram.
@@ -135,6 +140,9 @@ class Results:
             row[DELETE_FIELDNAME] = True
         return row
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def bifurcated_extend(self, corpus, max_size):
         """Replaces the results with those n-grams that contain any of the
         original n-grams, and that represent points at which an n-gram
@@ -181,12 +189,14 @@ class Results:
                                 args=(smaller_grams, larger_grams, tokenize,
                                       join))
             new_results.append(group[~group['delete']])
-        all_cols = constants.QUERY_FIELDNAMES + \
+        all_cols = list(constants.QUERY_FIELDNAMES[:]) + \
             [constants.LABEL_COUNT_FIELDNAME, DELETE_FIELDNAME]
         self._matches = pd.concat(new_results, ignore_index=True).reindex(
             columns=all_cols)
         del self._matches[DELETE_FIELDNAME]
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.SIGLUM_FIELDNAME, constants.COUNT_FIELDNAME])
     def collapse_witnesses(self):
         """Groups together witnesses for the same n-gram and work that has the
         same count, and outputs a single row for each group.
@@ -240,6 +250,7 @@ class Results:
                              index=False)
         return fh
 
+    @requires_columns([constants.NGRAM_FIELDNAME])
     def excise(self, ngram):
         """Removes all rows whose n-gram contains `ngram`.
 
@@ -495,6 +506,9 @@ class Results:
                 substrings.extend([sub_ngram] * count)
         return substrings
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.SIGLUM_FIELDNAME, constants.COUNT_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def group_by_ngram(self, labels):
         """Groups result rows by n-gram and label, providing a single summary
         field giving the range of occurrences across each work's
@@ -543,6 +557,9 @@ class Results:
         del matches[label_order_col]
         self._matches = matches
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.COUNT_FIELDNAME])
     def group_by_witness(self):
         """Groups results by witness, providing a single summary field giving
         the n-grams found in it, a count of their number, and the count of
@@ -621,6 +638,7 @@ class Results:
                                     na_filter=False)
         self.add_label_count()
 
+    @requires_columns([constants.NGRAM_FIELDNAME])
     def prune_by_ngram(self, ngrams):
         """Removes results rows whose n-gram is in `ngrams`.
 
@@ -632,6 +650,8 @@ class Results:
         self._matches = self._matches[
             ~self._matches[constants.NGRAM_FIELDNAME].isin(ngrams)]
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.COUNT_FIELDNAME])
     def prune_by_ngram_count(self, minimum=None, maximum=None):
         """Removes results rows whose total n-gram count (across all
         works bearing this n-gram) is outside the range specified by
@@ -671,6 +691,7 @@ class Results:
                 self._matches['total_count'] <= maximum]
         del self._matches['total_count']
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME])
     def prune_by_ngram_count_per_work(self, minimum=None, maximum=None):
         """Removes results rows if the n-gram count for all works bearing that
         n-gram is outside the range specified by `minimum` and
@@ -707,6 +728,7 @@ class Results:
             self._matches = self._matches[self._matches[
                 constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
 
+    @requires_columns([constants.SIZE_FIELDNAME])
     def prune_by_ngram_size(self, minimum=None, maximum=None):
         """Removes results rows whose n-gram size is outside the
         range specified by `minimum` and `maximum`.
@@ -725,6 +747,8 @@ class Results:
             self._matches = self._matches[
                 self._matches[constants.SIZE_FIELDNAME] <= maximum]
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.COUNT_FIELDNAME])
     def prune_by_work_count(self, minimum=None, maximum=None):
         """Removes results rows for n-grams that are not attested in a
         number of works in the range specified by `minimum` and
@@ -756,6 +780,8 @@ class Results:
                                  right_index=True)
         del self._matches[count_fieldname]
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def reciprocal_remove(self):
         """Removes results rows for which the n-gram is not present in
         at least one text in each labelled set of texts."""
@@ -770,6 +796,9 @@ class Results:
         return grouped.filter(
             lambda x: x[constants.LABEL_FIELDNAME].nunique() == number_labels)
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
     def reduce(self):
         """Removes results rows whose n-grams are contained in larger
         n-grams."""
@@ -836,6 +865,7 @@ class Results:
             else:
                 substring_data['count'] -= count
 
+    @requires_columns([constants.LABEL_FIELDNAME])
     def remove_label(self, label):
         """Removes all results rows associated with `label`.
 
@@ -850,6 +880,9 @@ class Results:
             self._matches[constants.LABEL_FIELDNAME] != label]
         self._logger.info('Removed {} labelled results'.format(count))
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
     def sort(self):
         """Sorts all results rows.
 
@@ -863,6 +896,9 @@ class Results:
                 constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME],
             ascending=[False, True, False, True, True, True], inplace=True)
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def zero_fill(self, corpus):
         """Adds rows to the results to ensure that, for every n-gram that is
         attested in at least one witness, every witness for that text

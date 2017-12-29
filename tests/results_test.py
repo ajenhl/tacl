@@ -5,6 +5,7 @@ import os
 import unittest
 
 import tacl
+from tacl.exceptions import MalformedResultsError
 from .tacl_test_case import TaclTestCase
 
 
@@ -14,6 +15,44 @@ class ResultsTestCase (TaclTestCase):
         self._tokenizer = tacl.Tokenizer(
             tacl.constants.TOKENIZER_PATTERN_CBETA,
             tacl.constants.TOKENIZER_JOINER_CBETA)
+
+    def _test_required_columns(self, cols, cmd, *args, **kwargs):
+        """Tests that when `cmd` is run with `args` and `kwargs`, it raises a
+        `MalformedResultsError when each of `cols` is not present in
+        the results. Further tests that that exception is not raised
+        when other columns are not present."""
+        input_results = (
+            ['AB', '2', 'T1', 'wit1', '4', 'A'],
+            ['AB', '2', 'T1', 'wit2', '3', 'A'],
+            ['AB', '2', 'T2', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit1', '2', 'A'],
+            ['ABC', '3', 'T1', 'wit2', '0', 'A'],
+            ['AB', '2', 'T3', 'wit1', '2', 'B'],
+            ['BC', '2', 'T1', 'wit1', '3', 'A'],
+        )
+        for col in tacl.constants.QUERY_FIELDNAMES:
+            fs = list(tacl.constants.QUERY_FIELDNAMES[:])
+            index = fs.index(col)
+            fs[index] = 'dummy'
+            fh = self._create_csv(input_results, fieldnames=fs)
+            results = tacl.Results(fh, self._tokenizer)
+            if col in cols:
+                self.assertRaises(MalformedResultsError, getattr(results, cmd),
+                                  *args, **kwargs)
+            else:
+                try:
+                    getattr(results, cmd)(*args, **kwargs)
+                except MalformedResultsError:
+                    self.fail(
+                        'Results.{} improperly raises MalformedResultsError '
+                        'when column "{}" not present in results'.format(
+                            cmd, col))
+                except Exception:
+                    # Ignore any other exception; we are not
+                    # necessarily passing in everything required for
+                    # correct running of the code (such as real Corpus
+                    # objects).
+                    pass
 
     def test_add_label_count(self):
         input_data = (
@@ -38,6 +77,13 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_add_label_count_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'add_label_count')
 
     def test_add_label_work_count(self):
         input_data = (
@@ -65,6 +111,13 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_add_label_work_count_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.COUNT_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'add_label_work_count')
+
     def test_bifurcated_extend(self):
         self.maxDiff = None
         # This is a test of Results._bifurcated_extend, which does not
@@ -89,7 +142,7 @@ class ResultsTestCase (TaclTestCase):
             ['ZABCD', '5', 'a', 'wit1', '1', 'A', '1'],
             ['ZABCDE', '6', 'a', 'base', '1', 'A', '1'],
         )
-        fieldnames = tacl.constants.QUERY_FIELDNAMES + \
+        fieldnames = list(tacl.constants.QUERY_FIELDNAMES[:]) + \
             [tacl.constants.LABEL_COUNT_FIELDNAME]
         fh = self._create_csv(input_data, fieldnames=fieldnames)
         results = tacl.Results(fh, self._tokenizer)
@@ -115,6 +168,14 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_bifurcated_extend_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'bifurcated_extend', None, 2)
 
     def test_collapse_witnesses(self):
         input_data = (
@@ -142,6 +203,13 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_collapse_witnesses_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
+            tacl.constants.SIGLUM_FIELDNAME, tacl.constants.COUNT_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'collapse_witnesses')
+
     def test_excise(self):
         input_results = (
             ['AB', '2', 'T1', 'wit1', '4', 'A'],
@@ -165,6 +233,10 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_excise_malformed_results(self):
+        fieldnames = [tacl.constants.NGRAM_FIELDNAME]
+        self._test_required_columns(fieldnames, 'excise', 'A')
+
     def test_group_by_ngram(self):
         input_results = (
             ['AB', '2', 'T1', 'wit1', '4', 'A'],
@@ -186,6 +258,14 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_group_by_ngram_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
+            tacl.constants.SIGLUM_FIELDNAME, tacl.constants.COUNT_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'group_by_ngram', ['A', 'B'])
 
     def test_group_by_witness(self):
         input_results = (
@@ -209,6 +289,14 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_group_by_witness_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'group_by_witness')
 
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
@@ -249,6 +337,10 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_prune_by_ngram_malformed_results(self):
+        fieldnames = [tacl.constants.NGRAM_FIELDNAME]
+        self._test_required_columns(fieldnames, 'prune_by_ngram', ['A'])
 
     def test_prune_by_ngram_count(self):
         input_data = (
@@ -296,6 +388,12 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_prune_by_ngram_count_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME]
+        self._test_required_columns(fieldnames, 'prune_by_ngram_count', 1, 3)
 
     def test_prune_by_ngram_count_per_work(self):
         input_data = (
@@ -360,6 +458,13 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_prune_by_ngram_count_per_work_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.COUNT_FIELDNAME
+        ]
+        self._test_required_columns(
+            fieldnames, 'prune_by_ngram_count_per_work', 1, 3)
+
     def test_prune_by_ngram_size(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
@@ -401,6 +506,10 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_prune_by_ngram_size_malformed_results(self):
+        fieldnames = [tacl.constants.SIZE_FIELDNAME]
+        self._test_required_columns(fieldnames, 'prune_by_ngram_size', 1, 3)
 
     def test_prune_by_work_count(self):
         input_data = (
@@ -460,6 +569,13 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
+
+    def test_prune_by_work_count_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'prune_by_work_count', 1, 3)
 
     def test_reciprocal_remove(self):
         input_data = (
@@ -536,6 +652,13 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(results.csv(
                 io.StringIO(newline='')))
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_reciprocal_remove_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.COUNT_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'reciprocal_remove')
 
     def test_reduce_cbeta(self):
         tokenizer = self._tokenizer
@@ -652,6 +775,14 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_reduce_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'reduce')
+
     def _perform_reduce(self, input_data, tokenizer):
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, tokenizer)
@@ -699,6 +830,10 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_remove_label_malformed_results(self):
+        fieldnames = [tacl.constants.LABEL_FIELDNAME]
+        self._test_required_columns(fieldnames, 'remove_label', 'A')
+
     def test_sort(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
@@ -727,6 +862,14 @@ class ResultsTestCase (TaclTestCase):
             io.StringIO(newline='')))
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_sort_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'sort')
+
     def test_zero_fill(self):
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_CBETA,
                                    tacl.constants.TOKENIZER_JOINER_CBETA)
@@ -752,6 +895,14 @@ class ResultsTestCase (TaclTestCase):
             ('ABC', '3', 'T5', 'base', '1', 'A'),
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_zero_file_malformed_results(self):
+        fieldnames = [
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME
+        ]
+        self._test_required_columns(fieldnames, 'zero_fill', None)
 
 
 if __name__ == '__main__':

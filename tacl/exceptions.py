@@ -15,3 +15,8 @@ class MalformedCatalogueError (TACLError):
 class MalformedQueryError (TACLError):
 
     pass
+
+
+class MalformedResultsError (TACLError):
+
+    pass
