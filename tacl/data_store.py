@@ -175,7 +175,7 @@ class DataStore:
     def _analyse(self, table=''):
         """Analyses the database, or `table` if it is supplied.
 
-        :param table: optional name of table analyse
+        :param table: optional name of table to analyse
         :type table: `str`
 
         """
