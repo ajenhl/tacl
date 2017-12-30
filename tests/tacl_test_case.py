@@ -6,6 +6,7 @@ import unittest
 import unittest.mock
 
 import tacl
+from tacl.exceptions import MalformedResultsError
 
 
 class TaclTestCase (unittest.TestCase):
@@ -41,3 +42,48 @@ class TaclTestCase (unittest.TestCase):
         with open(path, newline='') as fh:
             expected_rows = self._get_rows_from_csv(fh)
         return expected_rows
+
+    def _get_rows_from_results(self, results):
+        return self._get_rows_from_csv(results.csv(
+            io.StringIO(newline='')))
+
+    def _test_required_columns(self, cols, cmd, *args, **kwargs):
+        """Tests that when `cmd` is run with `args` and `kwargs`, it raises a
+        `MalformedResultsError when each of `cols` is not present in
+        the results. Further tests that that exception is not raised
+        when other columns are not present.
+
+        This test is designed to test Results methods only.
+
+        """
+        input_results = (
+            ['AB', '2', 'T1', 'base', '4', 'A'],
+            ['AB', '2', 'T1', 'a', '3', 'A'],
+            ['AB', '2', 'T2', 'base', '2', 'A'],
+            ['ABC', '3', 'T1', 'base', '2', 'A'],
+            ['ABC', '3', 'T1', 'a', '0', 'A'],
+            ['AB', '2', 'T3', 'base', '2', 'B'],
+            ['BC', '2', 'T1', 'base', '3', 'A'],
+        )
+        for col in tacl.constants.QUERY_FIELDNAMES:
+            fs = list(tacl.constants.QUERY_FIELDNAMES[:])
+            index = fs.index(col)
+            fs[index] = 'dummy'
+            fh = self._create_csv(input_results, fieldnames=fs)
+            results = tacl.Results(fh, self._tokenizer)
+            if col in cols:
+                self.assertRaises(MalformedResultsError, getattr(results, cmd),
+                                  *args, **kwargs)
+            else:
+                try:
+                    getattr(results, cmd)(*args, **kwargs)
+                except MalformedResultsError:
+                    self.fail(
+                        'Results.{} improperly raises MalformedResultsError '
+                        'when column "{}" not present in results'.format(
+                            cmd, col))
+                except KeyError as e:
+                    if str(e).strip('"\'') == col:
+                        self.fail(
+                            'Results.{} requires column "{}" but does not '
+                            'specify this.'.format(cmd, col))

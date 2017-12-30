@@ -38,6 +38,8 @@ class Results:
         # actual row.
         self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
+        if self._matches.empty:
+            self._logger.info('Supplied results file is empty')
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                        constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
@@ -49,7 +51,10 @@ class Results:
 
         """
         self._logger.info('Adding label count')
-        self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
+        if self._matches.empty:
+            self._matches[constants.LABEL_COUNT_FIELDNAME] = 0
+        else:
+            self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
 
         def add_label_count(df):
             # For each n-gram and label pair, we need the maximum count
@@ -66,8 +71,8 @@ class Results:
             sort=False).apply(add_label_count)
         self._logger.info('Finished adding label count')
 
-    @requires_columns([constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME,
-                       constants.LABEL_FIELDNAME])
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
     def add_label_work_count(self):
         """Adds to each result row a count of the number of works within the
         label contain that n-gram.
@@ -81,7 +86,10 @@ class Results:
 
         """
         self._logger.info('Adding label work count')
-        self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
+        if self._matches.empty:
+            self._matches[constants.LABEL_WORK_COUNT_FIELDNAME] = 0
+        else:
+            self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
 
         def add_label_text_count(df):
             work_maxima = df.groupby(constants.WORK_FIELDNAME,
@@ -169,6 +177,8 @@ class Results:
         self._bifurcated_extend()
 
     def _bifurcated_extend(self):
+        if self._matches.empty:
+            return
         self._matches.loc[:, DELETE_FIELDNAME] = False
         tokenize = self._tokenizer.tokenize
         join = self._tokenizer.joiner.join
@@ -214,6 +224,11 @@ class Results:
         #
         # This means that in merge_sigla below, the column names are
         # reversed from what would be expected.
+        if self._matches.empty:
+            self._matches.rename(columns={constants.SIGLUM_FIELDNAME:
+                                          constants.SIGLA_FIELDNAME},
+                                 inplace=True)
+            return
         self._matches.loc[:, constants.SIGLA_FIELDNAME] = \
             self._matches[constants.SIGLUM_FIELDNAME]
         # This code makes the not unwarranted assumption that the same
@@ -269,6 +284,9 @@ class Results:
         self._matches = self._matches[~self._matches[
             constants.NGRAM_FIELDNAME].str.contains(ngram, regex=False)]
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
+                       constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
     def extend(self, corpus):
         """Adds rows for all longer forms of n-grams in the results that are
         present in the witnesses.
@@ -519,6 +537,8 @@ class Results:
         :type labels: `list` of `str`
 
         """
+        if self._matches.empty:
+            return
         label_order_col = 'label order'
 
         def work_summary(group):
@@ -564,6 +584,9 @@ class Results:
         """Groups results by witness, providing a single summary field giving
         the n-grams found in it, a count of their number, and the count of
         their combined occurrences."""
+        if self._matches.empty:
+            return
+
         def witness_summary(group):
             matches = group.sort_values(by=[constants.NGRAM_FIELDNAME],
                                         ascending=[True])
