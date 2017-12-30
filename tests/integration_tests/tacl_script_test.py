@@ -242,6 +242,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, self._corpus_dir, self._catalogue_path)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.COUNTS_FIELDNAMES,
             ('T1', 'base', '1', '5', '10', '10', 'A'),
             ('T1', 'base', '2', '7', '9', '10', 'A'),
             ('T1', 'base', '3', '8', '8', '10', 'A'),
@@ -268,6 +269,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, self._corpus_dir, self._catalogue_path)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('s', '1', 'T2', 'base', '2', 'B'),
             ('s', '1', 'T2', 'a', '2', 'B'),
             ('a', '1', 'T3', 'base', '1', 'C'),
@@ -289,6 +291,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             'A', self._db_path, self._corpus_dir, self._catalogue_path)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('l', '1', 'T5', 'base', '2', 'A'),
             ('nw', '2', 'T1', 'base', '1', 'A'),
             ('we', '2', 'T1', 'base', '2', 'A'),
@@ -309,6 +312,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, results1, results2, results3)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('過失', '2', 'T0005', 'base', '5', 'A'),
             ('過失', '2', 'T0003', '大', '2', 'A'),
             ('皆不', '2', 'T0004', 'base', '1', 'A'),
@@ -365,6 +369,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._db_path, self._corpus_dir, self._catalogue_path)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('t', '1', 'T1', 'base', '2', 'A'),
             ('t', '1', 'T1', 'a', '2', 'A'),
             ('t', '1', 'T2', 'base', '2', 'B'),
@@ -391,6 +396,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
                 self._db_path, results1, results2, results3)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('龍皆起前', '4', 'T0033', '元', '1', 'A'),
             ('龍皆起前', '4', 'T0034', '明', '2', 'A'),
             ('龍皆起前', '4', 'T0002', 'base', '3', 'B'),
@@ -408,6 +414,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             self._ngrams_path)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
+            constants.QUERY_FIELDNAMES,
             ('ll', '2', 'T5', 'base', '1', 'A'),
             ('th', '2', 'T1', 'base', '1', 'A'),
             ('th', '2', 'T1', 'a', '1', 'A'),

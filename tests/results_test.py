@@ -15,11 +15,11 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.TOKENIZER_PATTERN_CBETA,
             tacl.constants.TOKENIZER_JOINER_CBETA)
 
-    def _test_empty_results(self, cmd, *args, **kwargs):
+    def _test_empty_results(self, cmd, fieldnames, *args, **kwargs):
         fh = self._create_csv([])
         results = tacl.Results(fh, self._tokenizer)
         getattr(results, cmd)(*args, **kwargs)
-        expected_rows = []
+        expected_rows = [fieldnames]
         actual_rows = self._get_rows_from_results(results)
         self.assertEqual(actual_rows, expected_rows)
 
@@ -35,7 +35,10 @@ class ResultsTestCase (TaclTestCase):
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, self._tokenizer)
         results.add_label_count()
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES) +
+                           [tacl.constants.LABEL_COUNT_FIELDNAME])
         expected_rows = [
+            fieldnames,
             ('AB', '2', 'a', 'base', '4', 'A', '8'),
             ('AB', '2', 'a', 'wit1', '5', 'A', '8'),
             ('AB', '2', 'b', 'base', '3', 'A', '8'),
@@ -47,7 +50,9 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_add_label_count_empty_results(self):
-        self._test_empty_results('add_label_count')
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES) +
+                           [tacl.constants.LABEL_COUNT_FIELDNAME])
+        self._test_empty_results('add_label_count', fieldnames)
 
     def test_add_label_count_malformed_results(self):
         fieldnames = [
@@ -69,7 +74,10 @@ class ResultsTestCase (TaclTestCase):
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, self._tokenizer)
         results.add_label_work_count()
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES) +
+                           [tacl.constants.LABEL_WORK_COUNT_FIELDNAME])
         expected_rows = [
+            fieldnames,
             ('AB', '2', 'a', 'base', '4', 'A', '2'),
             ('AB', '2', 'a', 'wit1', '2', 'A', '2'),
             ('AB', '2', 'b', 'base', '1', 'A', '2'),
@@ -82,7 +90,9 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_add_label_work_count_empty_results(self):
-        self._test_empty_results('add_label_work_count')
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES) +
+                           [tacl.constants.LABEL_WORK_COUNT_FIELDNAME])
+        self._test_empty_results('add_label_work_count', fieldnames)
 
     def test_add_label_work_count_malformed_results(self):
         fieldnames = [
@@ -115,12 +125,13 @@ class ResultsTestCase (TaclTestCase):
             ['ZABCD', '5', 'a', 'wit1', '1', 'A', '1'],
             ['ZABCDE', '6', 'a', 'base', '1', 'A', '1'],
         )
-        fieldnames = list(tacl.constants.QUERY_FIELDNAMES[:]) + \
-            [tacl.constants.LABEL_COUNT_FIELDNAME]
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES[:]) +
+                           [tacl.constants.LABEL_COUNT_FIELDNAME])
         fh = self._create_csv(input_data, fieldnames=fieldnames)
         results = tacl.Results(fh, self._tokenizer)
         results._bifurcated_extend()
         expected_rows = [
+            fieldnames,
             ('AB', '2', 'a', 'base', '4', 'A', '7'),
             ('AB', '2', 'a', 'wit1', '5', 'A', '7'),
             ('AB', '2', 'b', 'base', '2', 'A', '7'),
@@ -155,7 +166,12 @@ class ResultsTestCase (TaclTestCase):
         fh = self._create_csv(input_data)
         results = tacl.Results(fh, self._tokenizer)
         results.collapse_witnesses()
+        fieldnames = (
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLA_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME)
         expected_rows = [
+            fieldnames,
             ('AB', '2', 'a', 'base, wit 1', '4', 'A'),
             ('AB', '2', 'a', 'wit 2', '3', 'A'),
             ('AB', '2', 'b', 'base', '4', 'A'),
@@ -167,7 +183,11 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_collapse_witnesses_empty_results(self):
-        self._test_empty_results('collapse_witnesses')
+        fieldnames = (
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLA_FIELDNAME,
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME)
+        self._test_empty_results('collapse_witnesses', fieldnames)
 
     def test_collapse_witnesses_malformed_results(self):
         fieldnames = [
@@ -191,6 +211,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.excise('de')
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'T1', 'wit1', '4', 'A'),
             ('AC', '2', 'T1', 'wit1', '3', 'A'),
             ('dDe', '3', 'T1', 'wit1', '2', 'A'),
@@ -199,7 +220,8 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_excise_empty_results(self):
-        self._test_empty_results('excise', 'de')
+        self._test_empty_results('excise', tacl.constants.QUERY_FIELDNAMES,
+                                 'de')
 
     def test_excise_malformed_results(self):
         fieldnames = [tacl.constants.NGRAM_FIELDNAME]
@@ -218,7 +240,12 @@ class ResultsTestCase (TaclTestCase):
         fh = self._create_csv(input_results)
         results = tacl.Results(fh, self._tokenizer)
         results.group_by_ngram(['B', 'A'])
+        fieldnames = (
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME,
+            tacl.constants.WORK_COUNTS_FIELDNAME)
         expected_rows = [
+            fieldnames,
             ('AB', '2', 'B', 'T3(2), T4(1)'),
             ('AB', '2', 'A', 'T1(3-4), T2(2)'),
             ('ABC', '3', 'A', 'T1(0-2)'),
@@ -227,7 +254,11 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_group_by_ngram_empty_results(self):
-        self._test_empty_results('group_by_ngram', ['B', 'A'])
+        fieldnames = (
+            tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME,
+            tacl.constants.WORK_COUNTS_FIELDNAME)
+        self._test_empty_results('group_by_ngram', fieldnames, ['B', 'A'])
 
     def test_group_by_ngram_malformed_results(self):
         fieldnames = [
@@ -250,7 +281,13 @@ class ResultsTestCase (TaclTestCase):
         fh = self._create_csv(input_results)
         results = tacl.Results(fh, self._tokenizer)
         results.group_by_witness()
+        fieldnames = (
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME, tacl.constants.NGRAMS_FIELDNAME,
+            tacl.constants.NUMBER_FIELDNAME,
+            tacl.constants.TOTAL_COUNT_FIELDNAME)
         expected_rows = [
+            fieldnames,
             ('T1', 'wit1', 'A', 'AB, ABC, BC', '3', '9'),
             ('T1', 'wit2', 'A', 'AB', '1', '3'),
             ('T2', 'wit1', 'A', 'AB', '1', '2'),
@@ -260,7 +297,12 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_group_by_witness_empty_results(self):
-        self._test_empty_results('group_by_witness')
+        fieldnames = (
+            tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
+            tacl.constants.LABEL_FIELDNAME, tacl.constants.NGRAMS_FIELDNAME,
+            tacl.constants.NUMBER_FIELDNAME,
+            tacl.constants.TOTAL_COUNT_FIELDNAME)
+        self._test_empty_results('group_by_witness', fieldnames)
 
     def test_group_by_witness_malformed_results(self):
         fieldnames = [
@@ -302,6 +344,7 @@ class ResultsTestCase (TaclTestCase):
         ngrams = ['AB', 'ABD']
         results.prune_by_ngram(ngrams)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABC', '3', 'a', 'base', '2', 'A'),
             ('ABCD', '4', 'a', 'base', '2', 'A'),
             ('ABC', '3', 'b', 'wit', '2', 'A')
@@ -310,7 +353,8 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_ngram_empty_results(self):
-        self._test_empty_results('prune_by_ngram', ['AB', 'ABD'])
+        self._test_empty_results(
+            'prune_by_ngram', tacl.constants.QUERY_FIELDNAMES, ['AB', 'ABD'])
 
     def test_prune_by_ngram_malformed_results(self):
         fieldnames = [tacl.constants.NGRAM_FIELDNAME]
@@ -326,6 +370,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count(minimum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '7', 'A'),
             ('BA', '2', 'a', 'wit', '1', 'A'),
             ('BA', '2', 'b', 'base', '3', 'B'),
@@ -336,22 +381,29 @@ class ResultsTestCase (TaclTestCase):
         fh.seek(0)
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count(maximum=4)
-        expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
-                         ('BA', '2', 'b', 'base', '3', 'B'),
-                         ('BA', '2', 'b', 'wit', '3', 'B')]
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('BA', '2', 'a', 'wit', '1', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '3', 'B')
+        ]
         actual_rows = self._get_rows_from_results(results)
         self.assertEqual(actual_rows, expected_rows)
         fh.seek(0)
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count(minimum=4, maximum=5)
-        expected_rows = [('BA', '2', 'a', 'wit', '1', 'A'),
-                         ('BA', '2', 'b', 'base', '3', 'B'),
-                         ('BA', '2', 'b', 'wit', '3', 'B')]
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('BA', '2', 'a', 'wit', '1', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '3', 'B')
+        ]
         actual_rows = self._get_rows_from_results(results)
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_ngram_count_empty_results(self):
-        self._test_empty_results('prune_by_ngram_count', minimum=3)
+        self._test_empty_results(
+            'prune_by_ngram_count', tacl.constants.QUERY_FIELDNAMES, minimum=3)
 
     def test_prune_by_ngram_count_malformed_results(self):
         fieldnames = [
@@ -372,6 +424,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count_per_work(minimum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '7', 'A'),
             ('AB', '2', 'a', 'wit', '1', 'A'),
             ('AB', '2', 'b', 'base', '1', 'B'),
@@ -386,6 +439,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count_per_work(minimum=4)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '7', 'A'),
             ('AB', '2', 'a', 'wit', '1', 'A'),
             ('AB', '2', 'b', 'base', '1', 'B')
@@ -396,6 +450,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count_per_work(maximum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '7', 'A'),
             ('AB', '2', 'a', 'wit', '1', 'A'),
             ('AB', '2', 'b', 'base', '1', 'B'),
@@ -410,6 +465,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_count_per_work(minimum=3, maximum=4)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('BA', '2', 'a', 'base', '2', 'A'),
             ('BA', '2', 'a', 'wit', '3', 'A'),
             ('BA', '2', 'b', 'base', '3', 'B'),
@@ -420,6 +476,7 @@ class ResultsTestCase (TaclTestCase):
 
     def test_prune_by_ngram_count_per_work_empty_results(self):
         self._test_empty_results('prune_by_ngram_count_per_work',
+                                 tacl.constants.QUERY_FIELDNAMES,
                                  minimum=3, maximum=4)
 
     def test_prune_by_ngram_count_per_work_malformed_results(self):
@@ -441,6 +498,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_size(minimum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABC', '3', 'a', 'base', '2', 'A'),
             ('ABD', '3', 'a', 'wit', '1', 'A'),
             ('ABCD', '4', 'a', 'base', '2', 'A'),
@@ -451,6 +509,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_size(maximum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '4', 'A'),
             ('ABC', '3', 'a', 'base', '2', 'A'),
             ('ABD', '3', 'a', 'wit', '1', 'A'),
@@ -462,6 +521,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_ngram_size(minimum=3, maximum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABC', '3', 'a', 'base', '2', 'A'),
             ('ABD', '3', 'a', 'wit', '1', 'A'),
             ('ABC', '3', 'b', 'wit', '2', 'A')]
@@ -469,7 +529,9 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_ngram_size_empty_results(self):
-        self._test_empty_results('prune_by_ngram_size', minimum=3, maximum=4)
+        self._test_empty_results(
+            'prune_by_ngram_size', tacl.constants.QUERY_FIELDNAMES, minimum=3,
+            maximum=4)
 
     def test_prune_by_ngram_size_malformed_results(self):
         fieldnames = [tacl.constants.SIZE_FIELDNAME]
@@ -493,6 +555,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_work_count(minimum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '4', 'A'),
             ('AB', '2', 'b', 'base', '7', 'A'),
             ('AB', '2', 'c', 'base', '1', 'B'),
@@ -506,6 +569,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_work_count(maximum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABC', '3', 'a', 'base', '3', 'A'),
             ('ABC', '3', 'b', 'base', '5', 'A'),
             ('ABC', '3', 'c', 'base', '1', 'B'),
@@ -521,6 +585,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.prune_by_work_count(minimum=2, maximum=3)
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABC', '3', 'a', 'base', '3', 'A'),
             ('ABC', '3', 'b', 'base', '5', 'A'),
             ('ABC', '3', 'c', 'base', '1', 'B'),
@@ -532,7 +597,9 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_work_count_empty_rows(self):
-        self._test_empty_results('prune_by_work_count', minimum=2, maximum=3)
+        self._test_empty_results(
+            'prune_by_work_count', tacl.constants.QUERY_FIELDNAMES, minimum=2,
+            maximum=3)
 
     def test_prune_by_work_count_malformed_results(self):
         fieldnames = [
@@ -555,6 +622,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.reciprocal_remove()
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABCDEF', '6', 'a', 'base', '7', 'A'),
             ('GHIJ', '4', 'a', 'base', '3', 'A'),
             ('ABCDEF', '6', 'b', 'base', '3', 'B'),
@@ -579,6 +647,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.reciprocal_remove()
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABCDEF', '6', 'a', 'base', '7', 'A'),
             ('GHIJ', '4', 'b', 'base', '3', 'A'),
             ('ABCDEF', '6', 'c', 'base', '3', 'B'),
@@ -606,6 +675,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.reciprocal_remove()
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABCDEF', '6', 'a', 'wit1', '7', 'A'),
             ('GHIJ', '4', 'b', 'base', '3', 'A'),
             ('ABCDEF', '6', 'c', 'base', '3', 'B'),
@@ -617,7 +687,8 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reciprocal_remove_empty_results(self):
-        self._test_empty_results('reciprocal_remove')
+        self._test_empty_results(
+            'reciprocal_remove', tacl.constants.QUERY_FIELDNAMES)
 
     def test_reciprocal_remove_malformed_results(self):
         fieldnames = [
@@ -637,15 +708,17 @@ class ResultsTestCase (TaclTestCase):
             ['ABC', '3', 'b', 'base', '2', 'A'],
             ['AB', '2', 'b', 'wit', '3', 'A'],
             ['ABC', '3', 'b', 'wit', '1', 'A'])
-        expected_rows = set(
-            (('AB', '2', 'a', 'base', '1', 'A'),
-             ('ABD', '3', 'a', 'base', '1', 'A'),
-             ('ABCD', '4', 'a', 'base', '2', 'A'),
-             ('ABC', '3', 'b', 'base', '2', 'A'),
-             ('AB', '2', 'b', 'wit', '2', 'A'),
-             ('ABC', '3', 'b', 'wit', '1', 'A')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('AB', '2', 'a', 'base', '1', 'A'),
+            ('ABD', '3', 'a', 'base', '1', 'A'),
+            ('ABCD', '4', 'a', 'base', '2', 'A'),
+            ('ABC', '3', 'b', 'base', '2', 'A'),
+            ('AB', '2', 'b', 'wit', '2', 'A'),
+            ('ABC', '3', 'b', 'wit', '1', 'A')
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
         # Overlapping n-grams are trickier. Take the intersection of
         # two texts:
         #     ABABABCABDA and ABABABEABFA
@@ -661,12 +734,14 @@ class ResultsTestCase (TaclTestCase):
             ['BA', '2', 'text1', 'base', '2', 'C1'],
             ['A', '1', 'text1', 'base', '5', 'C1'],
             ['B', '1', 'text1', 'base', '4', 'C1'])
-        expected_rows = set(
-            (('ABABAB', '6', 'text1', 'base', '1', 'C1'),
-             ('AB', '2', 'text1', 'base', '1', 'C1'),
-             ('A', '1', 'text1', 'base', '1', 'C1')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('ABABAB', '6', 'text1', 'base', '1', 'C1'),
+            ('AB', '2', 'text1', 'base', '1', 'C1'),
+            ('A', '1', 'text1', 'base', '1', 'C1')
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
         # An n-gram that consists of a single repeated token is a form
         # of overlapping. Take the intersection of two texts:
         #     AAAAABAAAACAAADAAEA and AAAAAFAAAAGAAAHAAIA
@@ -681,19 +756,21 @@ class ResultsTestCase (TaclTestCase):
             ['AAA', '3', 'text2', 'base', '6', 'C2'],
             ['AA', '2', 'text2', 'base', '10', 'C2'],
             ['A', '1', 'text2', 'base', '15', 'C2'])
-        expected_rows = set(
-            (('AAAAA', '5', 'text1', 'base', '1', 'C1'),
-             ('AAAA', '4', 'text1', 'base', '1', 'C1'),
-             ('AAA', '3', 'text1', 'base', '1', 'C1'),
-             ('AA', '2', 'text1', 'base', '1', 'C1'),
-             ('A', '1', 'text1', 'base', '1', 'C1'),
-             ('AAAAA', '5', 'text2', 'base', '1', 'C2'),
-             ('AAAA', '4', 'text2', 'base', '1', 'C2'),
-             ('AAA', '3', 'text2', 'base', '1', 'C2'),
-             ('AA', '2', 'text2', 'base', '1', 'C2'),
-             ('A', '1', 'text2', 'base', '1', 'C2')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('AAAAA', '5', 'text1', 'base', '1', 'C1'),
+            ('AAAA', '4', 'text1', 'base', '1', 'C1'),
+            ('AAA', '3', 'text1', 'base', '1', 'C1'),
+            ('AA', '2', 'text1', 'base', '1', 'C1'),
+            ('A', '1', 'text1', 'base', '1', 'C1'),
+            ('AAAAA', '5', 'text2', 'base', '1', 'C2'),
+            ('AAAA', '4', 'text2', 'base', '1', 'C2'),
+            ('AAA', '3', 'text2', 'base', '1', 'C2'),
+            ('AA', '2', 'text2', 'base', '1', 'C2'),
+            ('A', '1', 'text2', 'base', '1', 'C2')
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
         # If the token is more than a single character, the case is
         # even more pathological. [...] is a single token.
         #     [A][A][A]B[A][A]C[A] and [A][A][A]D[A][A]E[A]
@@ -701,15 +778,17 @@ class ResultsTestCase (TaclTestCase):
             ['[A][A][A]', '3', 'text1', 'base', '1', 'C1'],
             ['[A][A]', '2', 'text1', 'base', '3', 'C1'],
             ['[A]', '1', 'text1', 'base', '6', 'C1'])
-        expected_rows = set(
-            (('[A][A][A]', '3', 'text1', 'base', '1', 'C1'),
-             ('[A][A]', '2', 'text1', 'base', '1', 'C1'),
-             ('[A]', '1', 'text1', 'base', '1', 'C1')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('[A][A][A]', '3', 'text1', 'base', '1', 'C1'),
+            ('[A][A]', '2', 'text1', 'base', '1', 'C1'),
+            ('[A]', '1', 'text1', 'base', '1', 'C1')
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reduce_empty_results(self):
-        expected_rows = []
+        expected_rows = [tacl.constants.QUERY_FIELDNAMES]
         actual_rows = self._perform_reduce([], self._tokenizer)
         self.assertEqual(actual_rows, expected_rows)
 
@@ -721,10 +800,12 @@ class ResultsTestCase (TaclTestCase):
             ['nan', '1', 'text1', 'base', '2', 'A'],
             ['nan dus', '2', 'text1', 'base', '1', 'A'],
             ['pa', '1', 'text2', 'base', '1', 'B'])
-        expected_rows = (
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('nan', '1', 'text1', 'base', '1', 'A'),
             ('nan dus', '2', 'text1', 'base', '1', 'A'),
-            ('pa', '1', 'text2', 'base', '1', 'B'))
+            ('pa', '1', 'text2', 'base', '1', 'B')
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
@@ -738,11 +819,12 @@ class ResultsTestCase (TaclTestCase):
             ['pa dus', '2', 'text1', 'wit', '2', 'B'],
             ['pa dus gcig', '3', 'text1', 'wit', '1', 'B'],
         )
-        expected_rows = (
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('pa dus', '2', 'text1', 'wit', '1', 'B'),
             ('pa dus gcig', '3', 'text1', 'wit', '1', 'B'),
             ('pa dus gcig na', '4', 'text1', 'base', '1', 'B'),
-        )
+        ]
         actual_rows = self._perform_reduce(input_data, tokenizer)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
@@ -775,6 +857,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.remove_label('B')
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '4', 'A'),
             ('AB', '2', 'a', 'wit', '3', 'A'),
             ('ABC', '3', 'a', 'base', '2', 'A'),
@@ -784,7 +867,8 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_remove_label_empty_results(self):
-        self._test_empty_results('remove_label', 'B')
+        self._test_empty_results(
+            'remove_label', tacl.constants.QUERY_FIELDNAMES, 'B')
 
     def test_remove_label_missing_label(self):
         """Test removing a label that doesn't exist in the results."""
@@ -796,6 +880,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.remove_label('C')
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('AB', '2', 'a', 'base', '4', 'A'),
             ('AB', '2', 'a', 'wit', '3', 'A'),
             ('ABC', '3', 'a', 'base', '2', 'A')]
@@ -821,6 +906,7 @@ class ResultsTestCase (TaclTestCase):
         results = tacl.Results(fh, self._tokenizer)
         results.sort()
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('ABCD', '4', 'a', 'base', '2', 'B'),
             ('ABC', '3', 'c', 'base', '3', 'A'),
             ('ABC', '3', 'a', 'base', '2', 'A'),
@@ -834,7 +920,7 @@ class ResultsTestCase (TaclTestCase):
         self.assertEqual(actual_rows, expected_rows)
 
     def test_sort_empty_results(self):
-        self._test_empty_results('sort')
+        self._test_empty_results('sort', tacl.constants.QUERY_FIELDNAMES)
 
     def test_sort_malformed_results(self):
         fieldnames = [

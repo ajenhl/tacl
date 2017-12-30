@@ -584,42 +584,44 @@ class DataStoreTestCase (TaclTestCase):
             ['abcde', '5', 'b', 'base', '1', 'B'],
             ['bcdef', '5', 'b', 'base', '1', 'B'],
             ['cdefg', '5', 'b', 'base', '1', 'B'])
-        expected_rows = set(
-            (('cA', '2', 'a', 'base', '1', 'A'),
-             ('AB', '2', 'a', 'base', '1', 'A'),
-             ('B[C]', '2', 'a', 'base', '1', 'A'),
-             ('[C]D', '2', 'a', 'base', '1', 'A'),
-             ('DE', '2', 'a', 'base', '1', 'A'),
-             ('EF', '2', 'a', 'base', '1', 'A'),
-             ('Fd', '2', 'a', 'base', '1', 'A'),
-             ('dG', '2', 'a', 'base', '1', 'A'),
-             ('GH', '2', 'a', 'base', '1', 'A'),
-             ('HI', '2', 'a', 'base', '1', 'A'),
-             ('Ie', '2', 'a', 'base', '1', 'A'),
-             ('cd', '2', 'b', 'base', '1', 'B'),
-             ('de', '2', 'b', 'base', '1', 'B'),
-             ('cAB', '3', 'a', 'base', '1', 'A'),
-             ('AB[C]', '3', 'a', 'base', '1', 'A'),
-             ('B[C]D', '3', 'a', 'base', '1', 'A'),
-             ('[C]DE', '3', 'a', 'base', '1', 'A'),
-             ('DEF', '3', 'a', 'base', '1', 'A'),
-             ('EFd', '3', 'a', 'base', '1', 'A'),
-             ('FdG', '3', 'a', 'base', '1', 'A'),
-             ('dGH', '3', 'a', 'base', '1', 'A'),
-             ('GHI', '3', 'a', 'base', '1', 'A'),
-             ('HIe', '3', 'a', 'base', '1', 'A'),
-             ('cde', '3', 'b', 'base', '1', 'B'),
-             ('cAB[C]', '4', 'a', 'base', '1', 'A'),
-             ('AB[C]D', '4', 'a', 'base', '1', 'A'),
-             ('B[C]DE', '4', 'a', 'base', '1', 'A'),
-             ('[C]DEF', '4', 'a', 'base', '1', 'A'),
-             ('DEFd', '4', 'a', 'base', '1', 'A'),
-             ('EFdG', '4', 'a', 'base', '1', 'A'),
-             ('FdGH', '4', 'a', 'base', '1', 'A'),
-             ('dGHI', '4', 'a', 'base', '1', 'A'),
-             ('GHIe', '4', 'a', 'base', '1', 'A')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('cA', '2', 'a', 'base', '1', 'A'),
+            ('AB', '2', 'a', 'base', '1', 'A'),
+            ('B[C]', '2', 'a', 'base', '1', 'A'),
+            ('[C]D', '2', 'a', 'base', '1', 'A'),
+            ('DE', '2', 'a', 'base', '1', 'A'),
+            ('EF', '2', 'a', 'base', '1', 'A'),
+            ('Fd', '2', 'a', 'base', '1', 'A'),
+            ('dG', '2', 'a', 'base', '1', 'A'),
+            ('GH', '2', 'a', 'base', '1', 'A'),
+            ('HI', '2', 'a', 'base', '1', 'A'),
+            ('Ie', '2', 'a', 'base', '1', 'A'),
+            ('cd', '2', 'b', 'base', '1', 'B'),
+            ('de', '2', 'b', 'base', '1', 'B'),
+            ('cAB', '3', 'a', 'base', '1', 'A'),
+            ('AB[C]', '3', 'a', 'base', '1', 'A'),
+            ('B[C]D', '3', 'a', 'base', '1', 'A'),
+            ('[C]DE', '3', 'a', 'base', '1', 'A'),
+            ('DEF', '3', 'a', 'base', '1', 'A'),
+            ('EFd', '3', 'a', 'base', '1', 'A'),
+            ('FdG', '3', 'a', 'base', '1', 'A'),
+            ('dGH', '3', 'a', 'base', '1', 'A'),
+            ('GHI', '3', 'a', 'base', '1', 'A'),
+            ('HIe', '3', 'a', 'base', '1', 'A'),
+            ('cde', '3', 'b', 'base', '1', 'B'),
+            ('cAB[C]', '4', 'a', 'base', '1', 'A'),
+            ('AB[C]D', '4', 'a', 'base', '1', 'A'),
+            ('B[C]DE', '4', 'a', 'base', '1', 'A'),
+            ('[C]DEF', '4', 'a', 'base', '1', 'A'),
+            ('DEFd', '4', 'a', 'base', '1', 'A'),
+            ('EFdG', '4', 'a', 'base', '1', 'A'),
+            ('FdGH', '4', 'a', 'base', '1', 'A'),
+            ('dGHI', '4', 'a', 'base', '1', 'A'),
+            ('GHIe', '4', 'a', 'base', '1', 'A')
+        ]
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reduce_diff_no_overlap(self):
         # An n-gram that does not overlap at all with any (n-1)-gram
@@ -648,14 +650,16 @@ class DataStoreTestCase (TaclTestCase):
             ['abcbde', '6', 'b', 'base', '1', 'B'],
             ['bcbdef', '6', 'b', 'base', '1', 'B'],
             ['abcbdef', '7', 'b', 'base', '1', 'B'])
-        expected_rows = set(
-            (('ef', '2', 'a', 'base', '1', 'A'),
-             ('abd', '3', 'a', 'base', '1', 'A'),
-             ('bc', '2', 'b', 'base', '1', 'B'),
-             ('cb', '2', 'b', 'base', '1', 'B'),
-             ('bcb', '3', 'b', 'base', '1', 'B')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('ef', '2', 'a', 'base', '1', 'A'),
+            ('abd', '3', 'a', 'base', '1', 'A'),
+            ('bc', '2', 'b', 'base', '1', 'B'),
+            ('cb', '2', 'b', 'base', '1', 'B'),
+            ('bcb', '3', 'b', 'base', '1', 'B')
+        ]
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
     def test_reduce_diff_size(self):
         # Consider a diff where the smallest gram for a witness is
@@ -681,13 +685,15 @@ class DataStoreTestCase (TaclTestCase):
             ['abcbde', '6', 'b', 'base', '1', 'B'],
             ['bcbdef', '6', 'b', 'base', '1', 'B'],
             ['abcbdef', '7', 'b', 'base', '1', 'B'])
-        expected_rows = set(
-            (('abd', '3', 'a', 'base', '1', 'A'),
-             ('bc', '2', 'b', 'base', '1', 'B'),
-             ('cb', '2', 'b', 'base', '1', 'B'),
-             ('bcb', '3', 'b', 'base', '1', 'B')))
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('abd', '3', 'a', 'base', '1', 'A'),
+            ('bc', '2', 'b', 'base', '1', 'B'),
+            ('cb', '2', 'b', 'base', '1', 'B'),
+            ('bcb', '3', 'b', 'base', '1', 'B')
+        ]
         actual_rows = self._reduce_diff(store, input_data, tokenizer)
-        self.assertEqual(set(actual_rows), expected_rows)
+        self.assertEqual(set(actual_rows), set(expected_rows))
 
     def _reduce_diff(self, store, input_data, tokenizer):
         in_fh = self._create_csv(input_data)

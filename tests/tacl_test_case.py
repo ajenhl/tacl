@@ -36,7 +36,7 @@ class TaclTestCase (unittest.TestCase):
         reader = csv.reader(fh)
         for row in reader:
             rows.append(tuple(row))
-        return rows[1:]
+        return rows
 
     def _get_rows_from_file(self, path):
         with open(path, newline='') as fh:

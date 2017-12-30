@@ -36,6 +36,7 @@ class StatisticsReportIntegrationTestCase (TaclTestCase):
         actual_results = self._get_rows_from_csv(report.csv(
             io.StringIO(newline='')))
         expected_results = [
+            tacl.constants.STATISTICS_FIELDNAMES,
             ('a', 'base', '3', '3', '100.0', 'A'),
             ('a', 'v1', '5', '6', str(5 / 6 * 100), 'A'),
             ('b', 'base', '13', '14', str(13 / 14 * 100), 'B'),

@@ -156,6 +156,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(self._store.counts(
                 self._catalogue, io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.COUNTS_FIELDNAMES,
             ('T1', 'base', '1', '5', '10', '10', 'A'),
             ('T1', 'base', '2', '7', '9', '10', 'A'),
             ('T1', 'base', '3', '8', '8', '10', 'A'),
@@ -181,6 +182,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(self._store.diff(
                 self._catalogue, tokenizer, io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('s', '1', 'T2', 'base', '2', 'B'),
             ('s', '1', 'T2', 'a', '2', 'B'),
             ('a', '1', 'T3', 'base', '1', 'C'),
@@ -201,6 +203,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(self._store.diff_asymmetric(
                 self._catalogue, 'A', tokenizer, io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('l', '1', 'T5', 'base', '2', 'A'),
             ('nw', '2', 'T1', 'base', '1', 'A'),
             ('we', '2', 'T1', 'base', '2', 'A'),
@@ -223,6 +226,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             self._store.diff_supplied(results, labels, tokenizer,
                                       io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('過失', '2', 'T0005', 'base', '5', 'A'),
             ('過失', '2', 'T0003', '大', '2', 'A'),
             ('皆不', '2', 'T0004', 'base', '1', 'A'),
@@ -253,6 +257,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_csv(self._store.intersection(
                 self._catalogue, io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('t', '1', 'T1', 'base', '2', 'A'),
             ('t', '1', 'T1', 'a', '2', 'A'),
             ('t', '1', 'T2', 'base', '2', 'B'),
@@ -280,6 +285,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             self._store.intersection_supplied(results, labels,
                                               io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('龍皆起前', '4', 'T0033', '元', '1', 'A'),
             ('龍皆起前', '4', 'T0034', '明', '2', 'A'),
             ('龍皆起前', '4', 'T0002', 'base', '3', 'B'),
@@ -309,6 +315,7 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             self._store.search(self._catalogue, ngrams,
                                io.StringIO(newline='')))
         expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
             ('the', '3', 'T1', 'base', '1', 'A'),
             ('the', '3', 'T1', 'a', '1', 'A'),
             ('the', '3', 'T2', 'base', '1', 'B'),

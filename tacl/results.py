@@ -51,10 +51,6 @@ class Results:
 
         """
         self._logger.info('Adding label count')
-        if self._matches.empty:
-            self._matches[constants.LABEL_COUNT_FIELDNAME] = 0
-        else:
-            self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
 
         def add_label_count(df):
             # For each n-gram and label pair, we need the maximum count
@@ -66,9 +62,13 @@ class Results:
                 constants.COUNT_FIELDNAME].sum()
             return df
 
-        self._matches = self._matches.groupby(
-            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
-            sort=False).apply(add_label_count)
+        if self._matches.empty:
+            self._matches[constants.LABEL_COUNT_FIELDNAME] = 0
+        else:
+            self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
+            self._matches = self._matches.groupby(
+                [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
+                sort=False).apply(add_label_count)
         self._logger.info('Finished adding label count')
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
@@ -86,10 +86,6 @@ class Results:
 
         """
         self._logger.info('Adding label work count')
-        if self._matches.empty:
-            self._matches[constants.LABEL_WORK_COUNT_FIELDNAME] = 0
-        else:
-            self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
 
         def add_label_text_count(df):
             work_maxima = df.groupby(constants.WORK_FIELDNAME,
@@ -98,9 +94,13 @@ class Results:
                 constants.COUNT_FIELDNAME].sum()
             return df
 
-        self._matches = self._matches.groupby(
-            [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
-            sort=False).apply(add_label_text_count)
+        if self._matches.empty:
+            self._matches[constants.LABEL_WORK_COUNT_FIELDNAME] = 0
+        else:
+            self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
+            self._matches = self._matches.groupby(
+                [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
+                sort=False).apply(add_label_text_count)
         self._logger.info('Finished adding label work count')
 
     def _annotate_bifurcated_extend_data(self, row, smaller, larger, tokenize,
@@ -538,6 +538,14 @@ class Results:
 
         """
         if self._matches.empty:
+            # Ensure that the right columns are used, even though the
+            # results are empty.
+            self._matches = pd.DataFrame(
+                {}, columns=[
+                    constants.NGRAM_FIELDNAME,
+                    constants.SIZE_FIELDNAME,
+                    constants.LABEL_FIELDNAME,
+                    constants.WORK_COUNTS_FIELDNAME])
             return
         label_order_col = 'label order'
 
@@ -585,6 +593,15 @@ class Results:
         the n-grams found in it, a count of their number, and the count of
         their combined occurrences."""
         if self._matches.empty:
+            # Ensure that the right columns are used, even though the
+            # results are empty.
+            self._matches = pd.DataFrame(
+                {}, columns=[constants.WORK_FIELDNAME,
+                             constants.SIGLUM_FIELDNAME,
+                             constants.LABEL_FIELDNAME,
+                             constants.NGRAMS_FIELDNAME,
+                             constants.NUMBER_FIELDNAME,
+                             constants.TOTAL_COUNT_FIELDNAME])
             return
 
         def witness_summary(group):
@@ -859,11 +876,8 @@ class Results:
                          constants.SIGLUM_FIELDNAME: siglum,
                          constants.COUNT_FIELDNAME: count,
                          constants.LABEL_FIELDNAME: labels[work]})
-        if rows:
-            self._matches = pd.DataFrame(
-                rows, columns=constants.QUERY_FIELDNAMES)
-        else:
-            self._matches = pd.DataFrame()
+        self._matches = pd.DataFrame(
+            rows, columns=constants.QUERY_FIELDNAMES)
 
     def _reduce_by_ngram(self, data, ngram):
         """Lowers the counts of all n-grams in `data` that are

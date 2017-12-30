@@ -1,4 +1,4 @@
-ngram,size,work,siglum,count,label
+work,siglum,label,ngrams,number of n-grams,total count
 T1,wit1,A,"AB, ABC, BC",3,9
 T1,wit2,A,AB,1,3
 T2,wit1,A,AB,1,2

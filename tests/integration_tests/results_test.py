@@ -44,7 +44,9 @@ class ResultsIntegrationTestCase (TaclTestCase):
         command = 'tacl results -b {} --max-be-count 10 {}'.format(
             corpus, results)
         actual_rows = self._get_rows_from_command(command)
-        expected_rows = self._get_rows_from_file(results)
+        fieldnames = tuple(list(tacl.constants.QUERY_FIELDNAMES[:]) +
+                           [tacl.constants.LABEL_COUNT_FIELDNAME])
+        expected_rows = [fieldnames]
         self.assertEqual(actual_rows, expected_rows)
 
     def test_bifurcated_extend_malformed_results(self):
