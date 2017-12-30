@@ -792,7 +792,7 @@ class DataStore:
                         '{} has changed since its n-grams were '
                         'added to the database'.format(filename))
             if count == 0:
-                self._logger.error('Catalogue references work {} that does '
+                self._logger.error('Catalogue references work "{}" that does '
                                    'not exist in the corpus'.format(name))
                 raise FileNotFoundError
         return is_valid
