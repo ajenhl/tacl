@@ -160,6 +160,18 @@ class ResultsIntegrationTestCase (TaclTestCase):
             results._matches.index.has_duplicates,
             'Results._matches DataFrame is left with duplicate index values.')
 
+    def test_extend_no_extension(self):
+        # Extend should return the original results when there are no
+        # extensions to make.
+        input_data = os.path.join(self._data_dir, 'extend-no-extensions.csv')
+        corpus = tacl.Corpus(os.path.join(self._stripped_dir, 'cbeta'),
+                             self._tokenizer)
+        results = tacl.Results(input_data, self._tokenizer)
+        results.extend(corpus)
+        actual_rows = self._get_rows_from_results(results)
+        expected_rows = self._get_rows_from_file(input_data)
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_group_by_ngram(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         catalogue = os.path.join(data_dir, 'catalogue3.txt')

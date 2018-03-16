@@ -318,7 +318,7 @@ class Results:
         # n-grams.
         matches = self._matches[
             self._matches[constants.SIZE_FIELDNAME] == highest_n]
-        extended_matches = pd.DataFrame()
+        extended_matches = pd.DataFrame(columns=constants.QUERY_FIELDNAMES)
         cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
                 constants.LABEL_FIELDNAME]
         for index, (work, siglum, label) in \
