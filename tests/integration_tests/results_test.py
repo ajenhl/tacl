@@ -126,21 +126,6 @@ class ResultsIntegrationTestCase (TaclTestCase):
         expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 
-    def test_extend_duplicate_index(self):
-        # When adding rows to a DataFrame, it is possible to have
-        # duplicate index values, which then may cause problems
-        # (ValueError: cannot reindex from a duplicate axis) with
-        # subsequent operations.
-        results = os.path.join(self._data_dir, 'cbeta-non-extend-results.csv')
-        command = 'tacl results -e {} -t {} --min-count 2 {}'.format(
-            os.path.join(self._stripped_dir, 'cbeta'),
-            tacl.constants.TOKENIZER_CHOICE_CBETA, results)
-        actual_rows = self._get_rows_from_command(command)
-        expected_results = os.path.join(self._data_dir,
-                                        'cbeta-extend-results.csv')
-        expected_rows = self._get_rows_from_file(expected_results)
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
     def test_extend_empty_results(self):
         results = os.path.join(self._data_dir, 'empty-results.csv')
         command = 'tacl results -e {} {}'.format(
@@ -159,6 +144,21 @@ class ResultsIntegrationTestCase (TaclTestCase):
         corpus = tacl.Corpus(os.path.join(data_dir, 'stripped'),
                              self._tokenizer)
         self._test_required_columns(fieldnames, 'extend', corpus)
+
+    def test_extend_no_duplicate_index_values(self):
+        # Extend should not leave the matches with duplicate values in
+        # the index, potentially raising a "cannot reindex from a
+        # duplicate axis" ValueError when followed by another
+        # operation.
+        input_data = os.path.join(self._data_dir,
+                                  'cbeta-non-extend-results.csv')
+        corpus = tacl.Corpus(os.path.join(self._stripped_dir, 'cbeta'),
+                             self._tokenizer)
+        results = tacl.Results(input_data, self._tokenizer)
+        results.extend(corpus)
+        self.assertFalse(
+            results._matches.index.has_duplicates,
+            'Results._matches DataFrame is left with duplicate index values.')
 
     def test_group_by_ngram(self):
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -201,21 +201,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
         expected_rows = self._get_rows_from_file(results)
         self.assertEqual(actual_rows, expected_rows)
 
-    def test_zero_fill_min_count(self):
-        # Zero fill followed by pruning by minimum count should not
-        # raise a "cannot reindex from a duplicate axis" ValueError.
-        data_dir = os.path.join(os.path.dirname(__file__), 'data')
-        corpus = os.path.join(data_dir, 'stripped')
-        results = os.path.join(self._data_dir, 'non-zero-fill-results.csv')
-        command = 'tacl results --max-count 2 -z {} {}'.format(
-            corpus, results)
-        actual_rows = self._get_rows_from_command(command)
-        expected_results = os.path.join(
-            self._data_dir, 'zero-fill-max-count-results.csv')
-        expected_rows = self._get_rows_from_file(expected_results)
-        self.assertEqual(set(actual_rows), set(expected_rows))
-
-    def test_zero_file_malformed_results(self):
+    def test_zero_fill_malformed_results(self):
         fieldnames = [
             tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
             tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
@@ -225,6 +211,21 @@ class ResultsIntegrationTestCase (TaclTestCase):
         corpus = tacl.Corpus(os.path.join(data_dir, 'stripped'),
                              self._tokenizer)
         self._test_required_columns(fieldnames, 'zero_fill', corpus)
+
+    def test_zero_fill_no_duplicate_index_values(self):
+        # Zero fill should not leave the matches with duplicate values
+        # in the index, potentially raising a "cannot reindex from a
+        # duplicate axis" ValueError when followed by another
+        # operation.
+        data_dir = os.path.join(os.path.dirname(__file__), 'data')
+        corpus = tacl.Corpus(os.path.join(data_dir, 'stripped'),
+                             self._tokenizer)
+        input_file = os.path.join(self._data_dir, 'non-zero-fill-results.csv')
+        results = tacl.Results(input_file, self._tokenizer)
+        results.zero_fill(corpus)
+        self.assertFalse(
+            results._matches.index.has_duplicates,
+            'Results._matches DataFrame is left with duplicate index values.')
 
 
 if __name__ == '__main__':

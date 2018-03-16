@@ -23,6 +23,24 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_results(results)
         self.assertEqual(actual_rows, expected_rows)
 
+    def _test_no_duplicate_index_values(self, cmd, *args, **kwargs):
+        # No Results method should leave the matches with duplicate
+        # values in the index, potentially raising a "cannot reindex
+        # from a duplicate axis" ValueError when followed by another
+        # operation.
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'a', 'wit1', '5', 'A'],
+            ['AB', '2', 'b', 'base', '3', 'A'],
+            ['AB', '2', 'b', 'wit1', '3', 'A'],
+            ['AB', '2', 'c', 'base', '2', 'B'],
+            ['BC', '2', 'a', 'base', '2', 'A']
+        )
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        getattr(results, cmd)(*args, **kwargs)
+        self.assertFalse(results._matches.index.has_duplicates)
+
     def test_add_label_count(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
@@ -60,6 +78,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'add_label_count')
+
+    def test_add_label_count_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('add_label_count')
 
     def test_add_label_work_count(self):
         input_data = (
@@ -100,6 +121,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'add_label_work_count')
+
+    def test_add_label_work_count_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('add_label_work_count')
 
     def test_bifurcated_extend(self):
         self.maxDiff = None
@@ -196,6 +220,9 @@ class ResultsTestCase (TaclTestCase):
         ]
         self._test_required_columns(fieldnames, 'collapse_witnesses')
 
+    def test_collapse_witnesses_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('collapse_witnesses')
+
     def test_excise(self):
         input_results = (
             ['AB', '2', 'T1', 'wit1', '4', 'A'],
@@ -226,6 +253,9 @@ class ResultsTestCase (TaclTestCase):
     def test_excise_malformed_results(self):
         fieldnames = [tacl.constants.NGRAM_FIELDNAME]
         self._test_required_columns(fieldnames, 'excise', 'A')
+
+    def test_excise_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('excise', 'A')
 
     def test_group_by_ngram(self):
         input_results = (
@@ -267,6 +297,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.LABEL_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'group_by_ngram', ['A', 'B'])
+
+    def test_group_by_ngram_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('group_by_ngram', ['A', 'B'])
 
     def test_group_by_witness(self):
         input_results = (
@@ -311,6 +344,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.COUNT_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'group_by_witness')
+
+    def test_group_by_witness_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('group_by_witness')
 
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
@@ -359,6 +395,9 @@ class ResultsTestCase (TaclTestCase):
     def test_prune_by_ngram_malformed_results(self):
         fieldnames = [tacl.constants.NGRAM_FIELDNAME]
         self._test_required_columns(fieldnames, 'prune_by_ngram', ['A'])
+
+    def test_prune_by_ngram_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('prune_by_ngram', ['A'])
 
     def test_prune_by_ngram_count(self):
         input_data = (
@@ -410,6 +449,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
             tacl.constants.COUNT_FIELDNAME]
         self._test_required_columns(fieldnames, 'prune_by_ngram_count', 1, 3)
+
+    def test_prune_by_ngram_count_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('prune_by_ngram_count', 1, 3)
 
     def test_prune_by_ngram_count_per_work(self):
         input_data = (
@@ -486,6 +528,10 @@ class ResultsTestCase (TaclTestCase):
         self._test_required_columns(
             fieldnames, 'prune_by_ngram_count_per_work', 1, 3)
 
+    def test_prune_by_ngram_count_per_work_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('prune_by_ngram_count_per_work',
+                                             1, 3)
+
     def test_prune_by_ngram_size(self):
         input_data = (
             ['AB', '2', 'a', 'base', '4', 'A'],
@@ -536,6 +582,9 @@ class ResultsTestCase (TaclTestCase):
     def test_prune_by_ngram_size_malformed_results(self):
         fieldnames = [tacl.constants.SIZE_FIELDNAME]
         self._test_required_columns(fieldnames, 'prune_by_ngram_size', 1, 3)
+
+    def test_prune_by_ngram_size_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('prune_by_ngram_size', 1, 3)
 
     def test_prune_by_work_count(self):
         input_data = (
@@ -607,6 +656,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.COUNT_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'prune_by_work_count', 1, 3)
+
+    def test_prune_by_work_count_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('prune_by_work_count', 1, 3)
 
     def test_reciprocal_remove(self):
         input_data = (
@@ -696,6 +748,9 @@ class ResultsTestCase (TaclTestCase):
             tacl.constants.LABEL_FIELDNAME
         ]
         self._test_required_columns(fieldnames, 'reciprocal_remove')
+
+    def test_reciprocal_remove_no_duplicate_index_values(self):
+        self._test_no_duplicate_index_values('reciprocal_remove')
 
     def test_reduce_cbeta(self):
         tokenizer = self._tokenizer
