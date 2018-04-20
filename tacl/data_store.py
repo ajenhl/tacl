@@ -144,9 +144,10 @@ class DataStore:
         self._logger.info('Adding record for text {}'.format(filename))
         checksum = witness.get_checksum()
         token_count = len(witness.get_tokens())
-        cursor = self._conn.execute(constants.INSERT_TEXT_SQL,
-                                    [name, siglum, checksum, token_count, ''])
-        self._conn.commit()
+        with self._conn:
+            cursor = self._conn.execute(
+                constants.INSERT_TEXT_SQL,
+                [name, siglum, checksum, token_count, ''])
         return cursor.lastrowid
 
     def _add_text_size_ngrams(self, text_id, size, ngrams):
@@ -167,10 +168,10 @@ class DataStore:
             unique_ngrams, size))
         parameters = [[text_id, ngram, size, count]
                       for ngram, count in ngrams.items()]
-        self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
-                           [text_id, size, unique_ngrams])
-        self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
-        self._conn.commit()
+        with self._conn:
+            self._conn.execute(constants.INSERT_TEXT_HAS_NGRAM_SQL,
+                               [text_id, size, unique_ngrams])
+            self._conn.executemany(constants.INSERT_NGRAM_SQL, parameters)
 
     def _analyse(self, table=''):
         """Analyses the database, or `table` if it is supplied.
@@ -304,9 +305,9 @@ class DataStore:
         :type text_id: `int`
 
         """
-        self._conn.execute(constants.DELETE_TEXT_NGRAMS_SQL, [text_id])
-        self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
-        self._conn.commit()
+        with self._conn:
+            self._conn.execute(constants.DELETE_TEXT_NGRAMS_SQL, [text_id])
+            self._conn.execute(constants.DELETE_TEXT_HAS_NGRAMS_SQL, [text_id])
 
     def _diff(self, cursor, tokenizer, output_fh):
         """Returns output_fh with diff results that have been reduced.
@@ -717,15 +718,15 @@ class DataStore:
         :rtype: `dict`
 
         """
-        self._conn.execute(constants.UPDATE_LABELS_SQL, [''])
-        labels = {}
-        for work, label in catalogue.items():
-            self._conn.execute(constants.UPDATE_LABEL_SQL, [label, work])
-            cursor = self._conn.execute(constants.SELECT_TEXT_TOKEN_COUNT_SQL,
-                                        [work])
-            token_count = cursor.fetchone()['token_count']
-            labels[label] = labels.get(label, 0) + token_count
-        self._conn.commit()
+        with self._conn:
+            self._conn.execute(constants.UPDATE_LABELS_SQL, [''])
+            labels = {}
+            for work, label in catalogue.items():
+                self._conn.execute(constants.UPDATE_LABEL_SQL, [label, work])
+                cursor = self._conn.execute(
+                    constants.SELECT_TEXT_TOKEN_COUNT_SQL, [work])
+                token_count = cursor.fetchone()['token_count']
+                labels[label] = labels.get(label, 0) + token_count
         return labels
 
     @staticmethod
@@ -755,9 +756,9 @@ class DataStore:
         """
         checksum = witness.get_checksum()
         token_count = len(witness.get_tokens())
-        self._conn.execute(constants.UPDATE_TEXT_SQL,
-                           [checksum, token_count, text_id])
-        self._conn.commit()
+        with self._conn:
+            self._conn.execute(constants.UPDATE_TEXT_SQL,
+                               [checksum, token_count, text_id])
 
     def validate(self, corpus, catalogue):
         """Returns True if all of the files labelled in `catalogue`

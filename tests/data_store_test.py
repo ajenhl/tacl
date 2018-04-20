@@ -155,7 +155,6 @@ class DataStoreTestCase (TaclTestCase):
             tacl.constants.INSERT_TEXT_SQL,
             [sentinel.name, sentinel.siglum, sentinel.checksum,
              len(tokens), ''])
-        store._conn.commit.assert_called_once_with()
         self.assertEqual(actual_text_id, sentinel.text_id)
 
     def test_add_text_size_ngrams(self):
@@ -164,14 +163,13 @@ class DataStoreTestCase (TaclTestCase):
         size = 1
         ngrams = collections.OrderedDict([('a', 2), ('b', 1)])
         store._add_text_size_ngrams(sentinel.text_id, size, ngrams)
-        self.assertEqual(
-            store._conn.mock_calls,
-            [call.execute(tacl.constants.INSERT_TEXT_HAS_NGRAM_SQL,
-                          [sentinel.text_id, size, len(ngrams)]),
-             call.executemany(tacl.constants.INSERT_NGRAM_SQL,
-                              [[sentinel.text_id, 'a', size, 2],
-                               [sentinel.text_id, 'b', size, 1]]),
-             call.commit()])
+        store._conn.execute.assert_called_once_with(
+            tacl.constants.INSERT_TEXT_HAS_NGRAM_SQL,
+            [sentinel.text_id, size, len(ngrams)])
+        store._conn.executemany.assert_called_once_with(
+            tacl.constants.INSERT_NGRAM_SQL,
+            [[sentinel.text_id, 'a', size, 2],
+             [sentinel.text_id, 'b', size, 1]])
 
     def test_analyse(self):
         store = tacl.DataStore(':memory:')
@@ -215,13 +213,10 @@ class DataStoreTestCase (TaclTestCase):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
         store._delete_text_ngrams(sentinel.text_id)
-        expected_calls = [
-            call.execute(tacl.constants.DELETE_TEXT_NGRAMS_SQL,
-                         [sentinel.text_id]),
-            call.execute(tacl.constants.DELETE_TEXT_HAS_NGRAMS_SQL,
-                         [sentinel.text_id]),
-            call.commit()]
-        self.assertEqual(store._conn.mock_calls, expected_calls)
+        store._conn.execute.has_calls(
+            call(tacl.constants.DELETE_TEXT_NGRAMS_SQL, [sentinel.text_id]),
+            call(tacl.constants.DELETE_TEXT_HAS_NGRAMS_SQL, [sentinel.text_id])
+        )
 
     def test_diff(self):
         labels = {sentinel.label: 2, sentinel.label2: 1}
@@ -727,7 +722,7 @@ class DataStoreTestCase (TaclTestCase):
                          [sentinel.label1, sentinel.text3]),
             call.execute(tacl.constants.SELECT_TEXT_TOKEN_COUNT_SQL,
                          [sentinel.text3]),
-            call.commit()]
+        ]
         for connection_call in connection_calls:
             self.assertIn(connection_call, store._conn.mock_calls)
         self.assertEqual(actual_labels, expected_labels)
@@ -753,7 +748,6 @@ class DataStoreTestCase (TaclTestCase):
         store._conn.execute.assert_called_once_with(
             tacl.constants.UPDATE_TEXT_SQL,
             [sentinel.checksum, len(tokens), sentinel.text_id])
-        store._conn.commit.assert_called_once_with()
 
     def test_validate_true(self):
         corpus = MagicMock(spec_set=tacl.Corpus)
