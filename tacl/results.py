@@ -254,7 +254,7 @@ class Results:
                              inplace=True)
 
     def csv(self, fh):
-        """Writes the report data to `fh` in CSV format and returns it.
+        """Writes the results data to `fh` in CSV format and returns `fh`.
 
         :param fh: file to write data to
         :type fh: file object
