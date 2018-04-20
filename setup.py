@@ -8,7 +8,7 @@ with open('README.rst') as fh:
 
 setup(
     name='tacl',
-    version='3.0.0',
+    version='4.0.0',
     description='Text analyser for corpus linguistics',
     long_description=long_description,
     author='Jamie Norrish',

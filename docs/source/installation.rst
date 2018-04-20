@@ -9,7 +9,7 @@ instructions.
 Requirements
 ------------
 
-* `Python 3`_ (minimum version 3.4)
+* `Python 3`_ (minimum version 3.5)
 * `lxml`_
 * `pandas`_
 * `SQLite3`_

@@ -1,3 +1,42 @@
+4.0.0  2017-12-30  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Refactored search to output results with the same columns as for
+    diff/intersect, and added grouping options to tacl results.
+
+  * Added add-label-work-count option to tacl results to add a column
+    to results giving the count of works per label.
+
+  * Moved label-count from tacl-helper to tacl results as the option
+    --add-label-count.
+
+  * Added tacl excise command (and excise method on Text) to remove
+    n-grams from a text.
+
+  * Added --excise option to tacl results, to remove any results whose
+    n-gram contains the supplied n-gram.
+
+  * Removed tacl-helper command. Its remaining functionality could be
+    duplicated through simple scripts (mostly concatenation of tacl
+    commands).
+
+  * Added reference to tacl-catalogue-manager project in
+    documentation.
+
+  * Removed support for CBETA 2011 files.
+
+  * Changed witness handling so that all witnesses are explicit.
+
+  * Added "latin" tokenizer for whitespace delimited sequences of
+    non-punctuation characters.
+
+  * Added check for each Result method that the supplied results have
+    the required columns.
+
+  * Improved error handling when tacl results is supplied either
+    results without the necessary columns (eg, after
+    collapse-witnesses), or an empty set of results.
+
+
 3.0.0  2016-12-12  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Moved useful script functions to tacl.command.utils, and added

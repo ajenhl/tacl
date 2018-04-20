@@ -13,7 +13,7 @@ documentation is available at http://pythonhosted.org/tacl/.
 Installation
 ------------
 
-Using `Python 3`_ (minimum version 3.3), either run ``pip install
+Using `Python 3`_ (minimum version 3.5), either run ``pip install
 tacl`` or download the code manually and run ``python setup.py
 install``. The dependencies are installed automatically when tacl is
 installed with ``pip``. Note however that on Windows (and perhaps Mac
