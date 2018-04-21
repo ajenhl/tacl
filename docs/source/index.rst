@@ -15,7 +15,6 @@ Contents:
    guide
    scripts/tacl
    scripts/tacl-jitc
-   API <api/tacl>
 
 
 Introduction
