@@ -1,4 +1,17 @@
-4.0.0  2017-12-30  Jamie Norrish  <jamie@artefact.org.nz>
+4.0.2  2018-04-21  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Corrected release date for version 4.0.0.
+
+
+4.0.1  2018-04-21  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * UNRELEASED
+
+  * Updated references to documentation, pointing now to
+    tacl.readthedocs.io.
+
+
+4.0.0  2018-04-21  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Refactored search to output results with the same columns as for
     diff/intersect, and added grouping options to tacl results.
