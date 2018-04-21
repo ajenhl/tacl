@@ -12,8 +12,6 @@
 # serve to show the default.
 
 
-autodoc_mock_imports = ['colorlog', 'lxml', 'pandas']
-
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

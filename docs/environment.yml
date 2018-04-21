@@ -1,0 +1,9 @@
+name: tacl_docs
+
+dependencies:
+  - python=3
+  - pandas
+  - biopython
+  - colorlog
+  - lxml
+  - Jinja2
