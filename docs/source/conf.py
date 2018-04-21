@@ -12,7 +12,8 @@
 # serve to show the default.
 
 
-autodoc_mock_imports = ['colorlog', 'lxml', 'pandas', 'pandas._libs']
+autodoc_mock_imports = ['colorlog', 'lxml', 'pandas', 'pandas._libs',
+                        'pandas._libs.tslib']
 
 # -- General configuration -----------------------------------------------------
 
