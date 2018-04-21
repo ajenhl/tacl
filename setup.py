@@ -14,6 +14,10 @@ setup(
     author='Jamie Norrish',
     author_email='jamie@artefact.org.nz',
     url='https://github.com/ajenhl/tacl',
+    project_urls={
+        'Documentation': 'http://tacl.readthedocs.io/en/latest/',
+    },
+    python_requires='~=3.5',
     license='GPLv3+',
     packages=['tacl', 'tacl.command'],
     entry_points={

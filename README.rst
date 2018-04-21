@@ -7,7 +7,7 @@ available from the `Chinese Buddhist Electronic Text Association`_
 modifications on other corpora.
 
 The code is developed at https://github.com/ajenhl/tacl/ and the
-documentation is available at http://pythonhosted.org/tacl/.
+documentation is available at http://tacl.readthedocs.io/en/latest/.
 
 
 Installation
