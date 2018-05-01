@@ -23,7 +23,6 @@ setup(
     entry_points={
         'console_scripts': [
             'tacl=tacl.command.tacl_script:main',
-            'tacl-helper=tacl.command.tacl_helper_script:main',
             'tacl-jitc=tacl.command.jitc_script:main',
         ],
     },
