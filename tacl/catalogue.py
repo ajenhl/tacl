@@ -67,6 +67,22 @@ class Catalogue (dict):
                             CATALOGUE_WORK_RELABELLED_ERROR.format(work))
                     self[work] = label
 
+    def remove_label(self, label):
+        """Removes `label` from the catalogue.
+
+        :param label: label to remove
+        :type label: `str`
+
+        """
+        works_to_delete = []
+        for work, work_label in self.items():
+            if work_label == label:
+                works_to_delete.append(work)
+        for work in works_to_delete:
+            del self[work]
+        if self._ordered_labels:
+            self._ordered_labels.remove(label)
+
     def save(self, path):
         """Saves this catalogue's data to `path`.
 

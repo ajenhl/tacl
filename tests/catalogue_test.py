@@ -46,6 +46,16 @@ class CatalogueTestCase (TaclTestCase):
         m.assert_called_once_with(sentinel.path, 'r', encoding='utf-8',
                                   newline='')
 
+    def test_remove_label(self):
+        catalogue = tacl.Catalogue()
+        catalogue['T0123'] = 'label1'
+        catalogue['T3210'] = 'label1'
+        catalogue['T2301'] = 'label2'
+        catalogue.remove_label('label1')
+        self.assertEqual(catalogue.labels, ['label2'])
+        self.assertNotIn('T0123', catalogue)
+        self.assertNotIn('T3210', catalogue)
+
     def test_save(self):
         with patch('builtins.open', mock_open(), create=True) as m:
             catalogue = tacl.Catalogue()

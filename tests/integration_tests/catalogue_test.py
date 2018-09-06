@@ -27,6 +27,13 @@ class CatalogueIntegrationTest (unittest.TestCase):
         expected_labels = ['B', 'C', 'A']
         self.assertEqual(catalogue.ordered_labels, expected_labels)
 
+    def test_ordered_labels_remove(self):
+        catalogue = tacl.Catalogue()
+        catalogue.load(os.path.join(self._data_dir, 'catalogue2.txt'))
+        catalogue.remove_label('C')
+        self.assertEqual(catalogue.ordered_labels, ['B', 'A'])
+
+
 
 if __name__ == '__main__':
     unittest.main()
