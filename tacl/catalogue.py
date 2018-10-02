@@ -1,3 +1,4 @@
+import copy
 import csv
 import os
 
@@ -67,8 +68,33 @@ class Catalogue (dict):
                             CATALOGUE_WORK_RELABELLED_ERROR.format(work))
                     self[work] = label
 
+    def relabel(self, label_map):
+        """Returns a copy of the catalogue with the labels remapped according
+        to `label_map`.
+
+        `label_map` is a dictionary mapping existing labels to new
+        labels. Any existing label that is not given a mapping is
+        deleted from the resulting catalogue.
+
+        :param label_map: mapping of labels to new labels
+        :type label_map: `dict`
+        :rtype: `tacl.Catalogue`
+
+        """
+        catalogue = copy.copy(self)
+        to_delete = set()
+        for work, old_label in self.items():
+            if old_label in label_map:
+                catalogue[work] = label_map[old_label]
+            else:
+                to_delete.add(catalogue[work])
+        for label in to_delete:
+            catalogue.remove_label(label)
+        return catalogue
+
     def remove_label(self, label):
-        """Removes `label` from the catalogue.
+        """Removes `label` from the catalogue, by removing all works carrying
+        it.
 
         :param label: label to remove
         :type label: `str`

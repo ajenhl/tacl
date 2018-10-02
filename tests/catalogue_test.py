@@ -46,6 +46,25 @@ class CatalogueTestCase (TaclTestCase):
         m.assert_called_once_with(sentinel.path, 'r', encoding='utf-8',
                                   newline='')
 
+    def test_relabel(self):
+        catalogue = tacl.Catalogue()
+        catalogue['T0123'] = 'label1'
+        catalogue['T3210'] = 'label1'
+        catalogue['T2301'] = 'label2'
+        catalogue['T1230'] = 'label3'
+        catalogue['T3012'] = 'label4'
+        relabelling = {
+            'label1': 'label3',
+            'label2': 'label1',
+            'label3': 'label2',
+        }
+        relabelled_catalogue = catalogue.relabel(relabelling)
+        self.assertEqual(relabelled_catalogue['T0123'], 'label3')
+        self.assertEqual(relabelled_catalogue['T3210'], 'label3')
+        self.assertEqual(relabelled_catalogue['T2301'], 'label1')
+        self.assertEqual(relabelled_catalogue['T1230'], 'label2')
+        self.assertNotIn('T3012', relabelled_catalogue)
+
     def test_remove_label(self):
         catalogue = tacl.Catalogue()
         catalogue['T0123'] = 'label1'

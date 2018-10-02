@@ -27,12 +27,28 @@ class CatalogueIntegrationTest (unittest.TestCase):
         expected_labels = ['B', 'C', 'A']
         self.assertEqual(catalogue.ordered_labels, expected_labels)
 
+    def test_ordered_labels_relabel(self):
+        catalogue = tacl.Catalogue()
+        catalogue.load(os.path.join(self._data_dir, 'catalogue4.txt'))
+        relabelling = {
+            'label1': 'label3',
+            'label2': 'label1',
+            'label3': 'label2',
+        }
+        relabelled_catalogue = catalogue.relabel(relabelling)
+        self.assertEqual(relabelled_catalogue['T0123'], 'label3')
+        self.assertEqual(relabelled_catalogue['T3210'], 'label3')
+        self.assertEqual(relabelled_catalogue['T2301'], 'label1')
+        self.assertEqual(relabelled_catalogue['T1230'], 'label2')
+        self.assertNotIn('T3012', relabelled_catalogue)
+        self.assertNotIn('T1234', relabelled_catalogue)
+        self.assertNotIn('T2341', relabelled_catalogue)
+
     def test_ordered_labels_remove(self):
         catalogue = tacl.Catalogue()
         catalogue.load(os.path.join(self._data_dir, 'catalogue2.txt'))
         catalogue.remove_label('C')
         self.assertEqual(catalogue.ordered_labels, ['B', 'A'])
-
 
 
 if __name__ == '__main__':
