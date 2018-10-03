@@ -81,9 +81,9 @@ class Catalogue (dict):
         :rtype: `tacl.Catalogue`
 
         """
-        catalogue = copy.copy(self)
+        catalogue = copy.deepcopy(self)
         to_delete = set()
-        for work, old_label in self.items():
+        for work, old_label in catalogue.items():
             if old_label in label_map:
                 catalogue[work] = label_map[old_label]
             else:
