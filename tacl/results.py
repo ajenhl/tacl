@@ -902,6 +902,22 @@ class Results:
             else:
                 substring_data['count'] -= count
 
+    @requires_columns([constants.WORK_FIELDNAME, constants.LABEL_FIELDNAME])
+    def relabel(self, catalogue):
+        """Relabels results rows according to `catalogue`.
+
+        A row whose work is labelled in the catalogue will have its
+        label set to the label in the catalogue. Rows whose works are
+        not labelled in the catalogue will be unchanged.
+
+        :param catalogue: mapping of work names to labels
+        :type catalogue: `Catalogue`
+
+        """
+        for work, label in catalogue.items():
+            self._matches.loc[self._matches[constants.WORK_FIELDNAME] == work,
+                              constants.LABEL_FIELDNAME] = label
+
     @requires_columns([constants.LABEL_FIELDNAME])
     def remove_label(self, label):
         """Removes all results rows associated with `label`.

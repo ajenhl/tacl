@@ -326,6 +326,8 @@ def generate_results_subparser(subparsers):
                         help=constants.RESULTS_RECIPROCAL_HELP)
     parser.add_argument('--reduce', action='store_true',
                         help=constants.RESULTS_REDUCE_HELP)
+    parser.add_argument('--relabel', help=constants.RESULTS_RELABEL_HELP,
+                        metavar='CATALOGUE')
     parser.add_argument('--remove', help=constants.RESULTS_REMOVE_HELP,
                         metavar='LABEL', type=str)
     parser.add_argument('--sort', action='store_true',
@@ -546,6 +548,10 @@ def results(args, parser):
                                               args.max_count_work)
     if args.remove:
         results.remove_label(args.remove)
+    if args.relabel:
+        catalogue = tacl.Catalogue()
+        catalogue.load(args.relabel)
+        results.relabel(catalogue)
     if args.sort:
         results.sort()
     # Run format-changing operations last.

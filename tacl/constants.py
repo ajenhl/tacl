@@ -332,8 +332,8 @@ RESULTS_EPILOG = '''\
     following order: --extend, --bifurcated-extend, --reduce,
     --reciprocal, --excise, --zero-fill, --ngrams, --min/max-works,
     --min/max-size, --min/max-count, --min/max-count-work, --remove,
-    --sort. All of the options that modify the format are performed at
-    the end, and only one should be specified.
+    --relabel, --sort. All of the options that modify the format are
+    performed at the end, and only one should be specified.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
@@ -357,6 +357,11 @@ RESULTS_EPILOG = '''\
     If both --min-count-work and --max-count-work are specified, only
     those n-grams are kept that have at least one witness whose count
     falls within that range.
+
+    --relabel sets the label for each result row to the label for that
+    row's work as specified in the supplied catalogue. If the work is
+    not labelled in the catalogue, the label in the results is not
+    changed.
 
     Since this command outputs a valid results file (except when using
     one of those options listed as changing the format), its output
@@ -410,6 +415,7 @@ RESULTS_RECIPROCAL_HELP = '''\
     labelled set of works. This can be useful after reducing a set of
     intersection results.'''
 RESULTS_REDUCE_HELP = 'Remove n-grams that are contained in larger n-grams.'
+RESULTS_RELABEL_HELP = 'Relabel results according to the supplied catalogue.'
 RESULTS_REMOVE_HELP = 'Remove labelled results.'
 RESULTS_RESULTS_HELP = 'Path to CSV results; use - for stdin.'
 RESULTS_SORT_HELP = 'Sort the results.'
@@ -485,7 +491,7 @@ CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
 EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
                                  'existing files may be overwritten.')
 INSUFFICIENT_LABELS_QUERY_ERROR = (
-    'Not running query with less than two defined labels')
+    'Not running query with fewer than two defined labels')
 LABEL_NOT_IN_CATALOGUE_ERROR = (
     'Supplied label is not present in the supplied catalogue')
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = (

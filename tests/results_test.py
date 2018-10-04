@@ -896,6 +896,47 @@ class ResultsTestCase (TaclTestCase):
         results.reduce()
         return self._get_rows_from_results(results)
 
+    def test_relabel(self):
+        """Test relabelling results according to a catalogue."""
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'a', 'wit', '3', 'A'],
+            ['ABC', '3', 'a', 'base', '2', 'A'],
+            ['ABD', '3', 'a', 'base', '1', 'B'],
+            ['ABCD', '4', 'a', 'base', '2', 'B'],
+            ['AB', '2', 'b', 'base', '2', 'AB'],
+            ['ABC', '3', 'b', 'base', '2', 'AB'],
+            ['AB', '2', 'c', 'wit', '1', 'B'])
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        catalogue = tacl.Catalogue({'a': 'B', 'b': 'C'})
+        results.relabel(catalogue)
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('AB', '2', 'a', 'base', '4', 'B'),
+            ('AB', '2', 'a', 'wit', '3', 'B'),
+            ('ABC', '3', 'a', 'base', '2', 'B'),
+            ('ABD', '3', 'a', 'base', '1', 'B'),
+            ('ABCD', '4', 'a', 'base', '2', 'B'),
+            ('AB', '2', 'b', 'base', '2', 'C'),
+            ('ABC', '3', 'b', 'base', '2', 'C'),
+            ('AB', '2', 'c', 'wit', '1', 'B')
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+
+    def test_relabel_empty_results(self):
+        catalogue = tacl.Catalogue({'a': 'B', 'b': 'C'})
+        self._test_empty_results('relabel', tacl.constants.QUERY_FIELDNAMES,
+                                 catalogue)
+
+    def test_relabel_malformed_results(self):
+        fieldnames = [
+            tacl.constants.WORK_FIELDNAME, tacl.constants.LABEL_FIELDNAME
+        ]
+        catalogue = tacl.Catalogue({'a': 'B', 'b': 'C'})
+        self._test_required_columns(fieldnames, 'relabel', catalogue)
+
     def test_remove_label(self):
         """Test removing labelled results."""
         input_data = (
