@@ -43,6 +43,8 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="cb:mulu" />
+
   <xsl:template match="tei:note" />
 
   <xsl:template match="tei:note[@place = 'inline']">

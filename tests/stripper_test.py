@@ -76,6 +76,13 @@ class StripTestCase (unittest.TestCase):
                                tacl.constants.BASE_WITNESS_ID)]
         self.assertEqual(actual_witnesses, expected_witnesses)
 
+    def test_mulu(self):
+        """Tests that cb:mulu elements are stripped."""
+        input_xml = '<cb:mulu xmlns:cb="http://www.cbeta.org/ns/1.0">1 大本經</cb:mulu>'
+        expected_output = ''
+        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
+        self.assertEqual(expected_output, actual_output)
+
     def test_no_header(self):
         """Tests that the TEI header is stripped."""
         input_xml = '''
