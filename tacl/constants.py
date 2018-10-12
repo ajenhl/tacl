@@ -431,9 +431,6 @@ SEARCH_DESCRIPTION = '''\
     Output results of searching the database for the supplied n-grams
     that occur within labelled witnesses.'''
 SEARCH_HELP = 'List witnesses containing at least one of the supplied n-grams.'
-SEARCH_DELETE_HELP = 'Do not include results for unlabelled witnesses.'
-SEARCH_MODE_CHOICES = ['ngram', 'witness']
-SEARCH_MODE_HELP = 'The mode or organising principle of the search results.'
 SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''

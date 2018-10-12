@@ -673,35 +673,6 @@ class DataStore:
         cursor = self._conn.execute(query, labels)
         return self._csv(cursor, constants.QUERY_FIELDNAMES, output_fh)
 
-    def search_witness(self, catalogue, ngrams, labelled_only, output_fh):
-        """Returns `output_fh` populated with CSV results for each witness
-        that contains at least one of the n-grams in `ngrams`.
-
-        :param catalogue: catalogue matching filenames to labels
-        :type catalogue: `Catalogue`
-        :param ngrams: n-grams to search for
-        :type ngrams: `list`
-        :param labelled_only: whether to only return labelled results
-        :type labelled_only: `bool`
-        :param output_fh: object to write results to
-        :type output_fh: file-like object
-        :rtype: file-like object
-
-        """
-        self._set_labels(catalogue)
-        self._add_temporary_ngrams(ngrams)
-        extra_query = ''
-        if labelled_only:
-            extra_query = constants.SELECT_SEARCH_LABELLED_ONLY_SQL
-        query = constants.SELECT_SEARCH_WITNESS_SQL.format(extra_query)
-        self._logger.info('Running search witness query')
-        self._logger.debug('Query: {}\nN-grams: {}'.format(
-            query, ', '.join(ngrams)))
-        self._log_query_plan(query, [])
-        cursor = self._conn.execute(query)
-        return self._csv(cursor, constants.SEARCH_WITNESS_FIELDNAMES,
-                         output_fh)
-
     def _set_labels(self, catalogue):
         """Returns a dictionary of the unique labels in `catalogue` and the
         count of all tokens associated with each, and sets the record
