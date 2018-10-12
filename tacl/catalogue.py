@@ -25,6 +25,16 @@ class Catalogue (dict):
         for filename in os.listdir(path):
             self[filename] = label
 
+    def get_works_by_label(self, label):
+        """Returns a list of works associated with `label`.
+
+        :param label: label of works to be returned
+        :type label: `str`
+        :rtype: `list` of `str`
+
+        """
+        return [work for work, c_label in self.items() if c_label == label]
+
     @property
     def ordered_labels(self):
         """Returns the labels in their order of first occurrence from loading.

@@ -19,15 +19,14 @@ class CatalogueTestCase (TaclTestCase):
         self.assertEqual(catalogue.get(sentinel.filename2), sentinel.label)
         self.assertEqual(catalogue.get(sentinel.filename3), None)
 
-    def test_ordered_labels_not_load(self):
-        # When a catalogue is populated by means other than its load
-        # method, the ordered labels are in string sort order.
+    def test_get_works_by_label(self):
         catalogue = tacl.Catalogue()
-        catalogue['T1'] = 'label2'
-        catalogue['T2'] = 'label3'
+        catalogue['T1'] = 'label1'
+        catalogue['T2'] = 'label2'
         catalogue['T3'] = 'label1'
-        self.assertEqual(catalogue.ordered_labels,
-                         ['label1', 'label2', 'label3'])
+        actual_works = catalogue.get_works_by_label('label1')
+        expected_works = ['T1', 'T3']
+        self.assertEqual(set(actual_works), set(expected_works))
 
     def test_labels(self):
         catalogue = tacl.Catalogue()
@@ -45,6 +44,16 @@ class CatalogueTestCase (TaclTestCase):
             catalogue.load(sentinel.path)
         m.assert_called_once_with(sentinel.path, 'r', encoding='utf-8',
                                   newline='')
+
+    def test_ordered_labels_not_load(self):
+        # When a catalogue is populated by means other than its load
+        # method, the ordered labels are in string sort order.
+        catalogue = tacl.Catalogue()
+        catalogue['T1'] = 'label2'
+        catalogue['T2'] = 'label3'
+        catalogue['T3'] = 'label1'
+        self.assertEqual(catalogue.ordered_labels,
+                         ['label1', 'label2', 'label3'])
 
     def test_relabel(self):
         catalogue = tacl.Catalogue()
