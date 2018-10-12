@@ -31,12 +31,24 @@ class Results:
     """
 
     def __init__(self, matches, tokenizer):
+        """Initialise a Results object.
+
+        :param matches: results data
+        :type matches: either filepath or buffer, or pandas DataFrame
+        :param tokenizer: tokenizer used for the n-grams in the results
+        :type tokenizer: `Tokenizer`
+
+        """
         self._logger = logging.getLogger(__name__)
-        self._matches = pd.read_csv(matches, encoding='utf-8', na_filter=False)
-        # Work around a problem with CSV files produced on Windows
-        # being read by pandas and creating an empty row for each
-        # actual row.
-        self._matches = self._matches.dropna(how='all')
+        if isinstance(matches, pd.DataFrame):
+            self._matches = matches
+        else:
+            self._matches = pd.read_csv(matches, encoding='utf-8',
+                                        na_filter=False)
+            # Work around a problem with CSV files produced on Windows
+            # being read by pandas and creating an empty row for each
+            # actual row.
+            self._matches = self._matches.dropna(how='all')
         self._tokenizer = tokenizer
         if self._matches.empty:
             self._logger.info('Supplied results file is empty')

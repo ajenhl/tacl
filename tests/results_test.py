@@ -3,6 +3,8 @@
 import io
 import unittest
 
+import pandas as pd
+
 import tacl
 from .tacl_test_case import TaclTestCase
 
@@ -346,6 +348,26 @@ class ResultsTestCase (TaclTestCase):
 
     def test_group_by_witness_no_duplicate_index_values(self):
         self._test_no_duplicate_index_values('group_by_witness')
+
+    def test_init_from_dataframe(self):
+        """Tests that a Results object can be initialised with a pandas
+        DataFrame instead of a path or buffer."""
+        data = [{
+            tacl.constants.NGRAM_FIELDNAME: 'C',
+            tacl.constants.SIZE_FIELDNAME: '1',
+            tacl.constants.WORK_FIELDNAME: 'A',
+            tacl.constants.SIGLUM_FIELDNAME: 'wit1',
+            tacl.constants.COUNT_FIELDNAME: 2,
+            tacl.constants.LABEL_FIELDNAME: 'B',
+        }]
+        df = pd.DataFrame(data, columns=tacl.constants.QUERY_FIELDNAMES)
+        results = tacl.Results(df, self._tokenizer)
+        actual_rows = self._get_rows_from_results(results)
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('C', '1', 'A', 'wit1', '2', 'B'),
+        ]
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
