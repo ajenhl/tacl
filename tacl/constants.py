@@ -430,6 +430,13 @@ RESULTS_ZERO_FILL_HELP = '''\
 SEARCH_DESCRIPTION = '''\
     Output results of searching the database for the supplied n-grams
     that occur within labelled witnesses.'''
+SEARCH_EPILOG = '''\
+    If multiple paths to files containing n-grams are given, the
+    combined set of n-grams from all files will be searched for.
+
+    If no path is given, the results will include all n-grams found
+    for all of the labelled witnesses in the catalogue.\n\n''' \
+        + ENCODING_EPILOG
 SEARCH_HELP = 'List witnesses containing at least one of the supplied n-grams.'
 SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
@@ -625,6 +632,11 @@ SELECT_SEARCH_SQL = (
     'FROM Text, TextNGram '
     'WHERE Text.label IN ({}) AND Text.id = TextNGram.text '
     'AND TextNGram.ngram IN (SELECT ngram FROM temp.InputNGram)')
+SELECT_SEARCH_ALL_SQL = (
+    'SELECT TextNGram.ngram, TextNGram.size, Text.work, Text.siglum, '
+    'TextNGram.count, Text.label '
+    'FROM Text, TextNGram '
+    'WHERE Text.label IN ({}) AND Text.id = TextNGram.text')
 SELECT_TEXT_TOKEN_COUNT_SQL = (
     'SELECT Text.token_count FROM Text WHERE Text.work = ?')
 SELECT_TEXT_SQL = 'SELECT id, checksum FROM Text WHERE work = ? AND siglum = ?'

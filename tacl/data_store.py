@@ -653,19 +653,24 @@ class DataStore:
         """Returns `output_fh` populated with CSV results for each n-gram in
         `ngrams` that occurs within labelled witnesses in `catalogue`.
 
+        If `ngrams` is empty, include all n-grams.
+
         :param catalogue: catalogue matching filenames to labels
         :type catalogue: `Catalogue`
         :param ngrams: n-grams to search for
-        :type ngrams: `list`
+        :type ngrams: `list` of `str`
         :param output_fh: object to write results to
         :type output_fh: file-like object
         :rtype: file-like object
 
         """
-        self._add_temporary_ngrams(ngrams)
         labels = list(self._set_labels(catalogue))
         label_placeholders = self._get_placeholders(labels)
-        query = constants.SELECT_SEARCH_SQL.format(label_placeholders)
+        if ngrams:
+            self._add_temporary_ngrams(ngrams)
+            query = constants.SELECT_SEARCH_SQL.format(label_placeholders)
+        else:
+            query = constants.SELECT_SEARCH_ALL_SQL.format(label_placeholders)
         self._logger.info('Running search query')
         self._logger.debug('Query: {}\nN-grams: {}'.format(
             query, ', '.join(ngrams)))

@@ -359,14 +359,15 @@ def generate_search_subparser(subparsers):
     results for a set of n-grams."""
     parser = subparsers.add_parser(
         'search', description=constants.SEARCH_DESCRIPTION,
-        formatter_class=ParagraphFormatter, help=constants.SEARCH_HELP)
+        epilog=constants.SEARCH_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.SEARCH_HELP)
     parser.set_defaults(func=search_texts)
     utils.add_common_arguments(parser)
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
     parser.add_argument('ngrams', help=constants.SEARCH_NGRAMS_HELP,
-                        metavar='NGRAMS')
+                        nargs='*', metavar='NGRAMS')
 
 
 def generate_statistics(args, parser):
@@ -576,7 +577,9 @@ def search_texts(args, parser):
     corpus = utils.get_corpus(args)
     catalogue = utils.get_catalogue(args)
     store.validate(corpus, catalogue)
-    ngrams = utils.get_ngrams(args.ngrams)
+    ngrams = []
+    for ngram_file in args.ngrams:
+        ngrams.extend(utils.get_ngrams(ngram_file))
     store.search(catalogue, ngrams, sys.stdout)
 
 

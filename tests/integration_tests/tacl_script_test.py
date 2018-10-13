@@ -427,6 +427,139 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_search_multiple(self):
+        """Tests that search can take multiple n-gram file paths."""
+        subprocess.call(self._ngrams_command_args)
+        ngrams_path2 = os.path.join(self._data_dir, 'search_ngrams2.txt')
+        command = 'tacl search {} {} {} {} {}'.format(
+            self._db_path, self._corpus_dir, self._catalogue_path,
+            self._ngrams_path, ngrams_path2)
+        actual_rows = self._get_rows_from_command(command)
+        expected_rows = [
+            constants.QUERY_FIELDNAMES,
+            ('ll', '2', 'T5', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'a', '1', 'A'),
+            ('th', '2', 'T2', 'base', '1', 'B'),
+            ('th', '2', 'T2', 'a', '1', 'B'),
+            ('th', '2', 'T3', 'base', '1', 'C'),
+            ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
+            ('we', '2', 'T5', 'base', '1', 'A'),
+            ('sen', '3', 'T2', 'base', '1', 'B'),
+            ('sen', '3', 'T2', 'a', '1', 'B'),
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_search_no_ngrams(self):
+        """Tests that search with no n-gram file paths supplied returns all
+        n-grams."""
+        subprocess.call(self._ngrams_command_args)
+        command = 'tacl search {} {} {}'.format(
+            self._db_path, self._corpus_dir, self._catalogue_path)
+        actual_rows = self._get_rows_from_command(command)
+        expected_rows = [
+            constants.QUERY_FIELDNAMES,
+            ('a', '1', 'T3', 'base', '1', 'C'),
+            ('e', '1', 'T1', 'base', '3', 'A'),
+            ('e', '1', 'T1', 'a', '3', 'A'),
+            ('e', '1', 'T2', 'base', '4', 'B'),
+            ('e', '1', 'T2', 'a', '3', 'B'),
+            ('e', '1', 'T5', 'base', '1', 'A'),
+            ('h', '1', 'T1', 'base', '1', 'A'),
+            ('h', '1', 'T1', 'a', '1', 'A'),
+            ('h', '1', 'T2', 'base', '2', 'B'),
+            ('h', '1', 'T2', 'a', '2', 'B'),
+            ('h', '1', 'T3', 'base', '1', 'C'),
+            ('l', '1', 'T5', 'base', '2', 'A'),
+            ('n', '1', 'T1', 'base', '2', 'A'),
+            ('n', '1', 'T1', 'a', '1', 'A'),
+            ('n', '1', 'T2', 'base', '1', 'B'),
+            ('n', '1', 'T2', 'a', '1', 'B'),
+            ('s', '1', 'T2', 'base', '2', 'B'),
+            ('s', '1', 'T2', 'a', '2', 'B'),
+            ('t', '1', 'T1', 'base', '2', 'A'),
+            ('t', '1', 'T1', 'a', '2', 'A'),
+            ('t', '1', 'T2', 'base', '2', 'B'),
+            ('t', '1', 'T2', 'a', '2', 'B'),
+            ('t', '1', 'T3', 'base', '2', 'C'),
+            ('w', '1', 'T1', 'base', '2', 'A'),
+            ('w', '1', 'T1', 'a', '2', 'A'),
+            ('w', '1', 'T2', 'a', '1', 'B'),
+            ('w', '1', 'T5', 'base', '1', 'A'),
+            ('at', '2', 'T3', 'base', '1', 'C'),
+            ('eh', '2', 'T2', 'base', '1', 'B'),
+            ('el', '2', 'T5', 'base', '1', 'A'),
+            ('en', '2', 'T1', 'base', '2', 'A'),
+            ('en', '2', 'T1', 'a', '1', 'A'),
+            ('en', '2', 'T2', 'base', '1', 'B'),
+            ('en', '2', 'T2', 'a', '1', 'B'),
+            ('es', '2', 'T2', 'base', '2', 'B'),
+            ('es', '2', 'T2', 'a', '1', 'B'),
+            ('ew', '2', 'T1', 'base', '1', 'A'),
+            ('ew', '2', 'T1', 'a', '2', 'A'),
+            ('ew', '2', 'T2', 'a', '1', 'B'),
+            ('ha', '2', 'T3', 'base', '1', 'C'),
+            ('he', '2', 'T1', 'base', '1', 'A'),
+            ('he', '2', 'T1', 'a', '1', 'A'),
+            ('he', '2', 'T2', 'base', '2', 'B'),
+            ('he', '2', 'T2', 'a', '2', 'B'),
+            ('ll', '2', 'T5', 'base', '1', 'A'),
+            ('nt', '2', 'T1', 'base', '1', 'A'),
+            ('nt', '2', 'T1', 'a', '1', 'A'),
+            ('nt', '2', 'T2', 'base', '1', 'B'),
+            ('nt', '2', 'T2', 'a', '1', 'B'),
+            ('nw', '2', 'T1', 'base', '1', 'A'),
+            ('se', '2', 'T2', 'base', '2', 'B'),
+            ('se', '2', 'T2', 'a', '1', 'B'),
+            ('sh', '2', 'T2', 'a', '1', 'B'),
+            ('th', '2', 'T1', 'base', '1', 'A'),
+            ('th', '2', 'T1', 'a', '1', 'A'),
+            ('th', '2', 'T2', 'base', '1', 'B'),
+            ('th', '2', 'T2', 'a', '1', 'B'),
+            ('th', '2', 'T3', 'base', '1', 'C'),
+            ('we', '2', 'T1', 'base', '2', 'A'),
+            ('we', '2', 'T1', 'a', '2', 'A'),
+            ('we', '2', 'T5', 'base', '1', 'A'),
+            ('ws', '2', 'T2', 'a', '1', 'B'),
+            ('ehe', '3', 'T2', 'base', '1', 'B'),
+            ('ell', '3', 'T5', 'base', '1', 'A'),
+            ('ent', '3', 'T1', 'base', '1', 'A'),
+            ('ent', '3', 'T1', 'a', '1', 'A'),
+            ('ent', '3', 'T2', 'base', '1', 'B'),
+            ('ent', '3', 'T2', 'a', '1', 'B'),
+            ('enw', '3', 'T1', 'base', '1', 'A'),
+            ('ese', '3', 'T2', 'base', '2', 'B'),
+            ('ese', '3', 'T2', 'a', '1', 'B'),
+            ('ewe', '3', 'T1', 'base', '1', 'A'),
+            ('ewe', '3', 'T1', 'a', '2', 'A'),
+            ('ews', '3', 'T2', 'a', '1', 'B'),
+            ('hat', '3', 'T3', 'base', '1', 'C'),
+            ('hen', '3', 'T1', 'base', '1', 'A'),
+            ('hes', '3', 'T2', 'base', '2', 'B'),
+            ('hes', '3', 'T2', 'a', '1', 'B'),
+            ('hew', '3', 'T1', 'a', '1', 'A'),
+            ('hew', '3', 'T2', 'a', '1', 'B'),
+            ('nwe', '3', 'T1', 'base', '1', 'A'),
+            ('seh', '3', 'T2', 'base', '1', 'B'),
+            ('sen', '3', 'T2', 'base', '1', 'B'),
+            ('sen', '3', 'T2', 'a', '1', 'B'),
+            ('she', '3', 'T2', 'a', '1', 'B'),
+            ('tha', '3', 'T3', 'base', '1', 'C'),
+            ('the', '3', 'T1', 'base', '1', 'A'),
+            ('the', '3', 'T1', 'a', '1', 'A'),
+            ('the', '3', 'T2', 'base', '1', 'B'),
+            ('the', '3', 'T2', 'a', '1', 'B'),
+            ('wel', '3', 'T5', 'base', '1', 'A'),
+            ('wen', '3', 'T1', 'base', '1', 'A'),
+            ('wen', '3', 'T1', 'a', '1', 'A'),
+            ('wew', '3', 'T1', 'base', '1', 'A'),
+            ('wew', '3', 'T1', 'a', '1', 'A'),
+            ('wsh', '3', 'T2', 'a', '1', 'B'),
+
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
 
 if __name__ == '__main__':
     unittest.main()
