@@ -72,13 +72,46 @@ class DataStoreTestCase (TaclTestCase):
     def test_add_temporary_ngrams(self):
         store = tacl.DataStore(':memory:')
         store._conn = MagicMock(spec_set=sqlite3.Connection)
-        store._add_temporary_ngrams([sentinel.ngram1, sentinel.ngram2])
+        store._add_temporary_ngrams(['A', 'B'])
         self.assertEqual(
             store._conn.mock_calls,
             [call.execute(tacl.constants.DROP_TEMPORARY_NGRAMS_TABLE_SQL),
              call.execute(tacl.constants.CREATE_TEMPORARY_NGRAMS_TABLE_SQL),
              call.executemany(tacl.constants.INSERT_TEMPORARY_NGRAM_SQL,
-                              [(sentinel.ngram1,), (sentinel.ngram2,)])])
+                              [('A',), ('B',)])])
+
+    def test_add_temporary_ngrams_empty(self):
+        """Tests that n-grams that are empty strings are not added to the
+        temporary table."""
+        store = tacl.DataStore(':memory:')
+        input_ngrams = ['', 'A']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = ['A']
+        actual_ngrams = ([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
+
+    def test_add_temporary_ngrams_not_duplicate(self):
+        """Tests that duplicates n-grams are added only once to the temporary
+        table."""
+        store = tacl.DataStore(':memory:')
+        input_ngrams = ['A', 'A']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = ['A']
+        actual_ngrams = ([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
+
+    def test_add_temporary_ngrams_not_string(self):
+        """Tests that n-grams that are not strings are not added to the
+        temporary table."""
+        store = tacl.DataStore(':memory:')
+        input_ngrams = [2, 'A']
+        store._add_temporary_ngrams(input_ngrams)
+        cursor = store._conn.execute('SELECT * FROM InputNGram')
+        expected_ngrams = ['A']
+        actual_ngrams = ([row['ngram'] for row in cursor.fetchall()])
+        self.assertEqual(actual_ngrams, expected_ngrams)
 
     def test_add_temporary_ngrams_twice(self):
         # Test that multiple calls to the method succeed.

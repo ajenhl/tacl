@@ -70,6 +70,12 @@ class DataStore:
 
     def _add_temporary_ngrams(self, ngrams):
         """Adds `ngrams` to a temporary table."""
+        # Remove duplicate n-grams, empty n-grams, and non-string n-grams.
+        ngrams = [ngram for ngram in ngrams if ngram and
+                  isinstance(ngram, str)]
+        # Deduplicate while preserving order (useful for testing).
+        seen = {}
+        ngrams = [seen.setdefault(x, x) for x in ngrams if x not in seen]
         self._conn.execute(constants.DROP_TEMPORARY_NGRAMS_TABLE_SQL)
         self._conn.execute(constants.CREATE_TEMPORARY_NGRAMS_TABLE_SQL)
         self._conn.executemany(constants.INSERT_TEMPORARY_NGRAM_SQL,
