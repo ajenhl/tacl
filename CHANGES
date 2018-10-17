@@ -1,3 +1,25 @@
+4.1.0  2018-10-18  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added remove_label method to Catalogue.
+
+  * Added method to relable a catalogue.
+
+  * Added --relabel option to tacl results, to relabel results
+    according to a su pplied catalogue.
+
+  * Added stripping of cb:mulu contents from prepared TEI.
+
+  * Modified Results to also accept a pandas DataFrame as well as a
+    path or buffer of results.
+
+  * Added get_works_by_label method to Catalogue.
+
+  * Modified tacl search to allow both for multiple n-gram files and
+    no n-gram f ile, in which case all n-grams are returned.
+
+  * Added get_works method to Corpus to return a list of work names.
+
+
 4.0.3  2018-05-01  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Removed obsolete reference to tacl-helper command in setup.py.
