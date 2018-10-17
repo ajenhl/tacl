@@ -9,7 +9,7 @@ from .text import WitnessText
 
 class Corpus:
 
-    """A Corpus represents a collection of `WitnessText`\s.
+    """A Corpus represents a collection of `WitnessText`s.
 
     A Corpus is built from a directory that contains the text files
     that become `WitnessText` objects.
@@ -55,7 +55,7 @@ class Corpus:
         return text_class(work, siglum, content, self._tokenizer)
 
     def get_witnesses(self, name='*'):
-        """Returns a generator supplying `WitnessText` objects for each file
+        """Returns a generator supplying `WitnessText` objects for each work
         in the corpus.
 
         :rtype: `generator` of `WitnessText`
@@ -66,3 +66,13 @@ class Corpus:
                 name = os.path.split(os.path.split(filepath)[0])[1]
                 siglum = os.path.splitext(os.path.basename(filepath))[0]
                 yield self.get_witness(name, siglum)
+
+    def get_works(self):
+        """Returns a list of the names of all works in the corpus.
+
+        :rtype: `list` of `str`
+
+        """
+        return [os.path.split(filepath)[1] for filepath in
+                glob.glob(os.path.join(self._path, '*'))
+                if os.path.isdir(filepath)]

@@ -50,6 +50,12 @@ class CorpusIntegrationTestCase (unittest.TestCase):
             self.assertEqual(actual_text.get_checksum(),
                              expected_text.get_checksum(), message)
 
+    def test_get_works(self):
+        corpus = tacl.Corpus(self._data_dir, self._tokenizer)
+        expected_works = ['T1', 'T2', 'T3', 'T4', 'T5']
+        actual_works = sorted(corpus.get_works())
+        self.assertEqual(actual_works, expected_works)
+
 
 if __name__ == '__main__':
     unittest.main()
