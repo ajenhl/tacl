@@ -492,6 +492,8 @@ VERBOSE_HELP = '''\
 
 # Error messages.
 CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+CATALOGUE_WORK_NOT_IN_CORPUS_ERROR = (
+    'Catalogue references work "{}" that does not exist in the corpus')
 EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
                                  'existing files may be overwritten.')
 INSUFFICIENT_LABELS_QUERY_ERROR = (
