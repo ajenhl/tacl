@@ -213,8 +213,8 @@ class Results:
             new_results.append(group[~group['delete']])
         all_cols = list(constants.QUERY_FIELDNAMES[:]) + \
             [constants.LABEL_COUNT_FIELDNAME, DELETE_FIELDNAME]
-        self._matches = pd.concat(new_results, ignore_index=True).reindex(
-            columns=all_cols)
+        self._matches = pd.concat(new_results, ignore_index=True,
+                                  sort=False).reindex(columns=all_cols)
         del self._matches[DELETE_FIELDNAME]
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
@@ -339,7 +339,8 @@ class Results:
                 matches, work, siglum, label, corpus, highest_n)
             extended_matches = pd.concat(
                 [extended_matches, self._generate_extended_matches(
-                    extended_ngrams, highest_n, work, siglum, label)])
+                    extended_ngrams, highest_n, work, siglum, label)],
+                sort=False)
             extended_ngrams = None
         if is_intersect:
             extended_matches = self._reciprocal_remove(extended_matches)
@@ -994,4 +995,5 @@ class Results:
                     row_data[constants.SIGLUM_FIELDNAME] = siglum
                     zero_rows.append(row_data)
         zero_df = pd.DataFrame(zero_rows, columns=constants.QUERY_FIELDNAMES)
-        self._matches = pd.concat([self._matches, zero_df], ignore_index=True)
+        self._matches = pd.concat([self._matches, zero_df], ignore_index=True,
+                                  sort=False)
