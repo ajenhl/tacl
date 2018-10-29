@@ -61,10 +61,13 @@ class DataStore:
 
         """
         self._initialise_database()
-        for witness in corpus.get_witnesses():
-            if catalogue and not catalogue.get(witness.get_names()[0]):
-                continue
-            self._add_text_ngrams(witness, minimum, maximum)
+        if catalogue:
+            for work in catalogue:
+                for witness in corpus.get_witnesses(work):
+                    self._add_text_ngrams(witness, minimum, maximum)
+        else:
+            for witness in corpus.get_witnesses():
+                self._add_text_ngrams(witness, minimum, maximum)
         self._add_indices()
         self._analyse()
 

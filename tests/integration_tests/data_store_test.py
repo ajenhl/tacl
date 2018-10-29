@@ -152,6 +152,32 @@ class DataStoreIntegrationTestCase (TaclTestCase):
             ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_add_ngrams_with_catalogue(self):
+        catalogue = tacl.Catalogue({'T1': 'A', 'T5': 'B'})
+        store = tacl.DataStore(':memory:')
+        store.add_ngrams(self._corpus, 1, 1, catalogue)
+        store._conn.row_factory = None
+        actual_rows = store._conn.execute(
+            'SELECT Text.work, Text.siglum, Text.checksum, Text.label, '
+            'TextNGram.ngram, TextNGram.size, TextNGram.count '
+            'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
+        expected_rows = [
+            ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 't', 1, 2),
+            ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'h', 1, 1),
+            ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'e', 1, 3),
+            ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'n', 1, 2),
+            ('T1', 'base', '705c89d665a5300516fe7314f84ebce0', '', 'w', 1, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 't', 1, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'h', 1, 1),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'e', 1, 3),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'w', 1, 2),
+            ('T1', 'a', 'e898b184b8d4d3ab5fea9d79fd645135', '', 'n', 1, 1),
+            ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'w', 1, 1),
+            ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'e', 1, 1),
+            ('T5', 'base', '1b42a11f5f647e53d20da8c8f57a9f02', '', 'l', 1, 2),
+        ]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_counts(self):
         actual_rows = self._get_rows_from_csv(self._store.counts(
                 self._catalogue, io.StringIO(newline='')))

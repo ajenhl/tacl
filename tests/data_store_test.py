@@ -50,22 +50,20 @@ class DataStoreTestCase (TaclTestCase):
         initialise = self._create_patch('tacl.DataStore._initialise_database')
         text1 = MagicMock(spec_set=tacl.WitnessText)
         text1.get_names = MagicMock(name='get_names')
-        text1.get_names.return_value = ['T1', 'base']
+        text1.get_names.return_value = ['T1', 'wit1']
         text2 = MagicMock(spec_set=tacl.WitnessText)
         text2.get_names = MagicMock(name='get_names')
-        text2.get_names.return_value = ['T2', 'base']
+        text2.get_names.return_value = ['T1', 'wit2']
         corpus = MagicMock(spec_set=tacl.Corpus)
         corpus.get_witnesses = MagicMock(name='get_witnesses')
         corpus.get_witnesses.return_value = iter([text1, text2])
         store = tacl.DataStore(':memory:')
-        catalogue = tacl.Catalogue()
-        catalogue['T1'] = 'A'
+        catalogue = tacl.Catalogue({'T1': 'A'})
         store.add_ngrams(corpus, 2, 3, catalogue)
         initialise.assert_called_once_with(store)
-        corpus.get_witnesses.assert_called_once_with()
-        text1.get_names.assert_called_once_with()
-        text2.get_names.assert_called_once_with()
-        add_text_ngrams.assert_called_once_with(store, text1, 2, 3)
+        corpus.get_witnesses.assert_called_once_with('T1')
+        add_text_ngrams.assert_has_calls([call(store, text1, 2, 3),
+                                          call(store, text2, 2, 3)])
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
