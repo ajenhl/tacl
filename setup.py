@@ -32,7 +32,7 @@ setup(
                  'assets/xslt/*.xsl'],
     },
     install_requires=['biopython', 'colorlog', 'Jinja2', 'lxml',
-                      'pandas>=0.21.0'],
+                      'pandas>=0.23.0'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
