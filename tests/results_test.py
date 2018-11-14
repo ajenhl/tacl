@@ -258,6 +258,25 @@ class ResultsTestCase (TaclTestCase):
     def test_excise_no_duplicate_index_values(self):
         self._test_no_duplicate_index_values('excise', 'A')
 
+    def test_get_raw_data(self):
+        input_results = (
+            ['BC', '2', 'T1', 'wit1', '3', 'A'],
+            ['AB', '2', 'T3', 'wit1', '2', 'B'],
+        )
+        fh = self._create_csv(input_results)
+        results = tacl.Results(fh, self._tokenizer)
+        raw_data = results.get_raw_data()
+        self.assertIsInstance(raw_data, pd.DataFrame)
+        fh = io.StringIO(newline='')
+        raw_data.to_csv(fh, encoding='utf-8', index=False)
+        actual_results = self._get_rows_from_csv(fh)
+        expected_results = [
+            tacl.constants.QUERY_FIELDNAMES[:],
+            ('BC', '2', 'T1', 'wit1', '3', 'A'),
+            ('AB', '2', 'T3', 'wit1', '2', 'B'),
+        ]
+        self.assertEqual(actual_results, expected_results)
+
     def test_group_by_ngram(self):
         input_results = (
             ['AB', '2', 'T1', 'wit1', '4', 'A'],

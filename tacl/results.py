@@ -10,7 +10,7 @@ import pandas as pd
 
 from . import constants
 from .decorators import requires_columns
-from .text import Text, FilteredWitnessText
+from .text import FilteredWitnessText, Text
 
 
 DELETE_FIELDNAME = 'delete'
@@ -536,6 +536,14 @@ class Results:
             for sub_ngram, count in ngrams.items():
                 substrings.extend([sub_ngram] * count)
         return substrings
+
+    def get_raw_data(self):
+        """Returns the underlying data as a `pandas.DataFrame`.
+
+        :rtype: `pandas.DataFrame`
+
+        """
+        return self._matches
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                        constants.SIGLUM_FIELDNAME, constants.COUNT_FIELDNAME,
