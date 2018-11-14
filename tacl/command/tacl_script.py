@@ -9,10 +9,10 @@ import sys
 import colorlog
 
 import tacl
-from tacl import constants
-from tacl.exceptions import TACLError
-from tacl.command.formatters import ParagraphFormatter
 import tacl.command.utils as utils
+from tacl import constants
+from tacl.command.formatters import ParagraphFormatter
+from tacl.exceptions import TACLError
 
 
 def main():
@@ -62,8 +62,7 @@ def excise(args, parser):
         try:
             os.mkdir(os.path.join(args.output, work))
         except FileExistsError:
-            logger.warn(constants.EXCISE_OVERWRITE_WORK_WARNING.format(
-                work))
+            logger.warning(constants.EXCISE_OVERWRITE_WORK_WARNING, work)
         for witness in corpus.get_witnesses(work):
             path = os.path.join(args.output, witness.get_filename())
             content = witness.excise(ngrams, args.replacement)
