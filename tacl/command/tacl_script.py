@@ -83,6 +83,7 @@ def generate_parser():
     generate_excise_subparser(subparsers)
     generate_highlight_subparser(subparsers)
     generate_intersect_subparser(subparsers)
+    generate_lifetime_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_prepare_subparser(subparsers)
     generate_results_subparser(subparsers)
@@ -222,6 +223,24 @@ def generate_intersect_subparser(subparsers):
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
+
+
+def generate_lifetime_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to make a lifetime report."""
+    parser = subparsers.add_parser(
+        'lifetime', description=constants.LIFETIME_DESCRIPTION,
+        epilog=constants.LIFETIME_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.LIFETIME_HELP)
+    parser.set_defaults(func=lifetime_report)
+    utils.add_tokenizer_argument(parser)
+    utils.add_common_arguments(parser)
+    utils.add_query_arguments(parser)
+    parser.add_argument('results', help=constants.LIFETIME_RESULTS_HELP,
+                        metavar='RESULTS')
+    parser.add_argument('label', help=constants.LIFETIME_LABEL_HELP,
+                        metavar='LABEL')
+    parser.add_argument('output', help=constants.REPORT_OUTPUT_HELP,
+                        metavar='OUTPUT')
 
 
 def generate_ngrams(args, parser):
@@ -458,6 +477,17 @@ def highlight_text(args, parser):
     else:
         report = tacl.ResultsHighlightReport(corpus, tokenizer)
         report.generate(args.output, args.base_name, args.results)
+
+
+def lifetime_report(args, parser):
+    """Generates a lifetime report."""
+    catalogue = utils.get_catalogue(args)
+    tokenizer = utils.get_tokenizer(args)
+    results = tacl.Results(args.results, tokenizer)
+    output_dir = os.path.abspath(args.output)
+    os.makedirs(output_dir, exist_ok=True)
+    report = tacl.LifetimeReport()
+    report.generate(output_dir, catalogue, results, args.label)
 
 
 def ngram_counts(args, parser):

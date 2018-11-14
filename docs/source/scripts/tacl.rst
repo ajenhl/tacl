@@ -13,6 +13,7 @@ Subcommands:
    tacl-excise
    tacl-highlight
    tacl-intersect
+   tacl-lifetime
    tacl-ngrams
    tacl-prepare
    tacl-results

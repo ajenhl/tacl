@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lifetime Report (focus on {{ focus_label }})</title>
+    <link rel="stylesheet" href="report_assets{{ sep }}report.css" />
+  </head>
+  <body>
+    <h1>Lifetime Report (focus on {{ focus_label }})</h1>
+
+    <p>The tables in this report show the lifetime of n-grams within
+    the following labelled corpora (bolded corpus being the
+    focus):</p>
+
+    <ul>
+      {% for label in labels %}
+      <li>{% if label == focus_label %}<strong>{% endif %}{{ label }}{% if label == focus_label %}</strong>{% endif %}</li>
+      {% endfor %}
+    </ul>
+
+    <p>Tables in this report:</p>
+
+    <ul>
+      <li><a href="#ngram-table">Occurrences of each n-gram across corpora</a></li>
+      <li><a href="#corpus-table">N-grams occurring for the first, last, or only time in each corpus</a></li>
+    </ul>
+
+    <h2>Occurrences of each n-gram across corpora</h2>
+
+    <p>The counts given after each work are the range attested across
+    all witnesses of the work.</p>
+
+    <table id="ngram-table">
+      <thead>
+        <tr>
+          <th scope="col">N-gram</th>
+          {% for label in labels %}
+          <th scope="col">{{ label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {{ ngram_table }}
+      </tbody>
+    </table>
+
+    <h2>N-grams occurring for the first, last, or only time in each corpus</h2>
+
+    <table id="corpus-table">
+      <thead>
+        <tr>
+          <th scope="col">Corpus</th>
+          <th scope="col">First occurred</th>
+          <th scope="col">Only occurred</th>
+          <th scope="col">Last occurred</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ corpus_table }}
+      </tbody>
+    </table>
+  </body>
+</html>

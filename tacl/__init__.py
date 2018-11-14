@@ -5,6 +5,7 @@ from .data_store import DataStore
 from .highlighter import NgramHighlightReport
 from .highlighter import ResultsHighlightReport
 from .jitc import JitCReport
+from .lifetime_report import LifetimeReport
 from .results import Results
 from .sequence import SequenceReport
 from .statistics_report import StatisticsReport

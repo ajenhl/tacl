@@ -241,6 +241,32 @@ JITC_DESCRIPTION = '''\
     set of works.'''
 JITC_LABEL_HELP = 'Label of works to compare with each other'
 
+LIFETIME_DESCRIPTION = '''\
+    Generate a report on the lifetime of n-grams in a results file.'''
+LIFETIME_EPILOG = '''\
+    A lifetime report consists of:
+
+    * an HTML table showing the disposition of each n-gram across the
+      ordered corpora (with texts and count ranges);
+
+    * an HTML table showing, for each corpus, the n-grams that first
+      occurred, only occurred, and last occurred in that corpus; and
+
+    * results files for each category (first occurred in, only
+      occurred in , last occurred in) for each corpus.
+
+    This report may be generated from any results file, but is most
+    usefully applied to the output of the lifetime script (in the
+    tacl-extra package).
+
+    The focus label is informative only, since often multiple lifetime
+    reports will be generated, one per corpus, from the same master
+    results file, but with specific filtering for the corpus in
+    focus.'''
+LIFETIME_HELP = 'Generate a report on the lifetime of n-grams.'
+LIFETIME_LABEL_HELP = 'Label to mark as the focus of the report.'
+LIFETIME_RESULTS_HELP = 'Path to a results file to report on.'
+
 NGRAMS_CATALOGUE_HELP = '''\
     Path to a catalogue file used to restrict which works in the
     corpus are added.'''
