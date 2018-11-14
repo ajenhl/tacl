@@ -2,6 +2,7 @@ import os.path
 import shutil
 
 from jinja2 import Environment, PackageLoader
+
 from pkg_resources import resource_filename, resource_listdir
 
 
@@ -54,7 +55,7 @@ class Report:
     def _write(self, context, report_dir, report_name, assets_dir=None,
                template=None):
         """Writes the data in `context` in the report's template to
-        `report_file` in `report_dir`.
+        `report_name` in `report_dir`.
 
         If `assets_dir` is supplied, copies all assets for this report
         to the specified directory.
