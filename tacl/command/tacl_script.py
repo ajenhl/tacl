@@ -314,6 +314,8 @@ def generate_results_subparser(subparsers):
                         help=constants.RESULTS_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--excise', help=constants.RESULTS_EXCISE_HELP,
                         metavar='NGRAM', type=str)
+    parser.add_argument('-l', '--label', dest='label',
+                        help=constants.RESULTS_LABEL_HELP, metavar='LABEL')
     parser.add_argument('--min-count', dest='min_count',
                         help=constants.RESULTS_MINIMUM_COUNT_HELP,
                         metavar='COUNT', type=int)
@@ -567,15 +569,16 @@ def results(args, parser):
         with open(args.ngrams, encoding='utf-8') as fh:
             ngrams = fh.read().split()
         results.prune_by_ngram(ngrams)
+    label = args.label or None
     if args.min_works or args.max_works:
-        results.prune_by_work_count(args.min_works, args.max_works)
+        results.prune_by_work_count(args.min_works, args.max_works, label)
     if args.min_size or args.max_size:
         results.prune_by_ngram_size(args.min_size, args.max_size)
     if args.min_count or args.max_count:
-        results.prune_by_ngram_count(args.min_count, args.max_count)
+        results.prune_by_ngram_count(args.min_count, args.max_count, label)
     if args.min_count_work or args.max_count_work:
         results.prune_by_ngram_count_per_work(args.min_count_work,
-                                              args.max_count_work)
+                                              args.max_count_work, label)
     if args.remove:
         results.remove_label(args.remove)
     if args.relabel:

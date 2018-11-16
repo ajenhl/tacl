@@ -713,7 +713,7 @@ class Results:
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                        constants.COUNT_FIELDNAME])
-    def prune_by_ngram_count(self, minimum=None, maximum=None):
+    def prune_by_ngram_count(self, minimum=None, maximum=None, label=None):
         """Removes results rows whose total n-gram count (across all
         works bearing this n-gram) is outside the range specified by
         `minimum` and `maximum`.
@@ -721,10 +721,15 @@ class Results:
         For each text, the count used as part of the sum across all
         works is the maximum count across the witnesses for that work.
 
+        If `label` is specified, the works checked are restricted to
+        those associated with `label`.
+
         :param minimum: minimum n-gram count
         :type minimum: `int`
         :param maximum: maximum n-gram count
         :type maximum: `int`
+        :param label: optional label to restrict requirement to
+        :type label: `str`
 
         """
         self._logger.info('Pruning results by n-gram count')
@@ -742,18 +747,28 @@ class Results:
         # won't have been added. Therefore just return immediately.
         if self._matches.empty:
             return
-        self._matches = self._matches.groupby(
+        matches = self._matches
+        if label is not None:
+            matches = matches[matches[constants.LABEL_FIELDNAME] == label]
+        matches = matches.groupby(
             constants.NGRAM_FIELDNAME, sort=False).apply(calculate_total)
+        ngrams = None
         if minimum:
-            self._matches = self._matches[
-                self._matches['total_count'] >= minimum]
+            ngrams = matches[matches['total_count'] >= minimum][
+                constants.NGRAM_FIELDNAME].unique()
         if maximum:
-            self._matches = self._matches[
-                self._matches['total_count'] <= maximum]
-        del self._matches['total_count']
+            max_ngrams = matches[matches['total_count'] <= maximum][
+                constants.NGRAM_FIELDNAME].unique()
+            if ngrams is None:
+                ngrams = max_ngrams
+            else:
+                ngrams = list(set(ngrams) & set(max_ngrams))
+        self._matches = self._matches[
+            self._matches[constants.NGRAM_FIELDNAME].isin(ngrams)]
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME])
-    def prune_by_ngram_count_per_work(self, minimum=None, maximum=None):
+    def prune_by_ngram_count_per_work(self, minimum=None, maximum=None,
+                                      label=None):
         """Removes results rows if the n-gram count for all works bearing that
         n-gram is outside the range specified by `minimum` and
         `maximum`.
@@ -762,32 +777,37 @@ class Results:
         count that falls within the specified range, all result rows
         for that n-gram are kept.
 
+        If `label` is specified, the works checked are restricted to
+        those associated with `label`.
+
         :param minimum: minimum n-gram count
         :type minimum: `int`
         :param maximum: maximum n-gram count
         :type maximum: `int`
+        :param label: optional label to restrict requirement to
+        :type label: `str`
 
         """
         self._logger.info('Pruning results by n-gram count per work')
+        matches = self._matches
+        keep_ngrams = matches[constants.NGRAM_FIELDNAME].unique()
+        if label is not None:
+            matches = matches[matches[constants.LABEL_FIELDNAME] == label]
         if minimum and maximum:
-            keep_ngrams = set(self._matches[
-                (self._matches[constants.COUNT_FIELDNAME] >= minimum) &
-                (self._matches[constants.COUNT_FIELDNAME] <= maximum)][
-                    constants.NGRAM_FIELDNAME])
-            self._matches = self._matches[self._matches[
-                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+            keep_ngrams = matches[
+                (matches[constants.COUNT_FIELDNAME] >= minimum) &
+                (matches[constants.COUNT_FIELDNAME] <= maximum)][
+                    constants.NGRAM_FIELDNAME].unique()
         elif minimum:
-            keep_ngrams = set(self._matches[
-                self._matches[constants.COUNT_FIELDNAME] >= minimum][
-                    constants.NGRAM_FIELDNAME])
-            self._matches = self._matches[self._matches[
-                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+            keep_ngrams = matches[
+                matches[constants.COUNT_FIELDNAME] >= minimum][
+                    constants.NGRAM_FIELDNAME].unique()
         elif maximum:
-            keep_ngrams = set(self._matches[
+            keep_ngrams = matches[
                 self._matches[constants.COUNT_FIELDNAME] <= maximum][
-                    constants.NGRAM_FIELDNAME])
-            self._matches = self._matches[self._matches[
-                constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
+                    constants.NGRAM_FIELDNAME].unique()
+        self._matches = self._matches[self._matches[
+            constants.NGRAM_FIELDNAME].isin(keep_ngrams)]
 
     @requires_columns([constants.SIZE_FIELDNAME])
     def prune_by_ngram_size(self, minimum=None, maximum=None):
@@ -810,7 +830,7 @@ class Results:
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                        constants.COUNT_FIELDNAME])
-    def prune_by_work_count(self, minimum=None, maximum=None):
+    def prune_by_work_count(self, minimum=None, maximum=None, label=None):
         """Removes results rows for n-grams that are not attested in a
         number of works in the range specified by `minimum` and
         `maximum`.
@@ -819,15 +839,23 @@ class Results:
         appearing in multiple witnesses of the same work are counted
         as a single work.
 
+        If `label` is specified, the works counted are restricted to
+        those associated with `label`.
+
         :param minimum: minimum number of works
         :type minimum: `int`
         :param maximum: maximum number of works
         :type maximum: `int`
+        :param label: optional label to restrict requirement to
+        :type label: `str`
 
         """
         self._logger.info('Pruning results by work count')
         count_fieldname = 'tmp_count'
-        filtered = self._matches[self._matches[constants.COUNT_FIELDNAME] > 0]
+        matches = self._matches
+        if label is not None:
+            matches = matches[matches[constants.LABEL_FIELDNAME] == label]
+        filtered = matches[matches[constants.COUNT_FIELDNAME] > 0]
         grouped = filtered.groupby(constants.NGRAM_FIELDNAME, sort=False)
         counts = pd.DataFrame(grouped[constants.WORK_FIELDNAME].nunique())
         counts.rename(columns={constants.WORK_FIELDNAME: count_fieldname},

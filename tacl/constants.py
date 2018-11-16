@@ -384,6 +384,12 @@ RESULTS_EPILOG = '''\
     those n-grams are kept that have at least one witness whose count
     falls within that range.
 
+    -l/--label causes --min/max-count, --min/max-count-work, and
+    --min/max-works to have their requirements apply within that
+    labelled subset of results. N-grams that meet the criteria within
+    that subset are kept (including those outside the subset), while
+    all other n-grams are removed.
+
     --relabel sets the label for each result row to the label for that
     row's work as specified in the supplied catalogue. If the work is
     not labelled in the catalogue, the label in the results is not
@@ -418,6 +424,7 @@ RESULTS_GROUP_BY_WITNESS_HELP = '''\
     Group results by witness, providing summary information of which
     n-grams appear in each witness.'''
 RESULTS_HELP = 'Modify a query results file.'
+RESULTS_LABEL_HELP = 'Label to restrict prune requirements to'
 RESULTS_MINIMUM_COUNT_HELP = 'Minimum total count per n-gram to include.'
 RESULTS_MINIMUM_COUNT_WORK_HELP = '''\
     Minimum count per n-gram per work to include; if a single witness

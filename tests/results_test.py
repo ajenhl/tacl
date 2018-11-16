@@ -484,6 +484,34 @@ class ResultsTestCase (TaclTestCase):
         self._test_empty_results(
             'prune_by_ngram_count', tacl.constants.QUERY_FIELDNAMES, minimum=3)
 
+    def test_prune_by_ngram_count_label(self):
+        input_data = (
+            ['A', '1', 'a', 'wit1', '2', 'A'],
+            ['A', '1', 'a', 'wit2', '1', 'A'],
+            ['A', '1', 'b', 'wit1', '1', 'A'],
+            ['A', '1', 'c', 'wit1', '4', 'B'],
+        )
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_ngram_count(minimum=4, label='A')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_ngram_count(maximum=3, label='A')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('A', '1', 'a', 'wit1', '2', 'A'),
+            ('A', '1', 'a', 'wit2', '1', 'A'),
+            ('A', '1', 'b', 'wit1', '1', 'A'),
+            ('A', '1', 'c', 'wit1', '4', 'B'),
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+
     def test_prune_by_ngram_count_malformed_results(self):
         fieldnames = [
             tacl.constants.NGRAM_FIELDNAME, tacl.constants.WORK_FIELDNAME,
@@ -560,6 +588,36 @@ class ResultsTestCase (TaclTestCase):
         self._test_empty_results('prune_by_ngram_count_per_work',
                                  tacl.constants.QUERY_FIELDNAMES,
                                  minimum=3, maximum=4)
+
+    def test_prune_by_ngram_count_per_work_label(self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '7', 'A'],
+            ['AB', '2', 'a', 'wit', '1', 'A'],
+            ['AB', '2', 'b', 'base', '1', 'B'],
+            ['BA', '2', 'a', 'base', '2', 'A'],
+            ['BA', '2', 'a', 'wit', '3', 'A'],
+            ['BA', '2', 'b', 'base', '3', 'B'],
+            ['BA', '2', 'b', 'wit', '1', 'B'])
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_ngram_count_per_work(minimum=4, label='B')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_ngram_count_per_work(minimum=2, maximum=4, label='B')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('BA', '2', 'a', 'base', '2', 'A'),
+            ('BA', '2', 'a', 'wit', '3', 'A'),
+            ('BA', '2', 'b', 'base', '3', 'B'),
+            ('BA', '2', 'b', 'wit', '1', 'B'),
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_ngram_count_per_work_malformed_results(self):
         fieldnames = [
@@ -689,6 +747,57 @@ class ResultsTestCase (TaclTestCase):
         self._test_empty_results(
             'prune_by_work_count', tacl.constants.QUERY_FIELDNAMES, minimum=2,
             maximum=3)
+
+    def test_prune_by_work_count_label(self):
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['AB', '2', 'b', 'base', '7', 'A'],
+            ['AB', '2', 'c', 'base', '1', 'B'],
+            ['AB', '2', 'd', 'base', '3', 'B'],
+            ['ABC', '3', 'a', 'base', '3', 'A'],
+            ['ABC', '3', 'b', 'base', '5', 'A'],
+            ['ABC', '3', 'c', 'base', '1', 'B'],
+            ['BA', '2', 'a', 'base', '6', 'A'],
+            ['B', '1', 'a', 'base', '5', 'A'],
+            ['B', '1', 'b', 'base', '3', 'A'],
+            ['B', '1', 'b', 'wit', '3', 'A'],
+            ['B', '1', 'c', 'base', '0', 'B'])
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_work_count(minimum=3, label='A')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_work_count(maximum=1, label='A')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('BA', '2', 'a', 'base', '6', 'A'),
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
+        fh = self._create_csv(input_data)
+        results = tacl.Results(fh, self._tokenizer)
+        results.prune_by_work_count(minimum=2, maximum=2, label='A')
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('AB', '2', 'a', 'base', '4', 'A'),
+            ('AB', '2', 'b', 'base', '7', 'A'),
+            ('AB', '2', 'c', 'base', '1', 'B'),
+            ('AB', '2', 'd', 'base', '3', 'B'),
+            ('ABC', '3', 'a', 'base', '3', 'A'),
+            ('ABC', '3', 'b', 'base', '5', 'A'),
+            ('ABC', '3', 'c', 'base', '1', 'B'),
+            ('B', '1', 'a', 'base', '5', 'A'),
+            ('B', '1', 'b', 'base', '3', 'A'),
+            ('B', '1', 'b', 'wit', '3', 'A'),
+            ('B', '1', 'c', 'base', '0', 'B'),
+        ]
+        actual_rows = self._get_rows_from_results(results)
+        self.assertEqual(actual_rows, expected_rows)
 
     def test_prune_by_work_count_malformed_results(self):
         fieldnames = [
