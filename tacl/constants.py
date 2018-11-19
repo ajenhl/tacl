@@ -386,9 +386,10 @@ RESULTS_EPILOG = '''\
 
     -l/--label causes --min/max-count, --min/max-count-work, and
     --min/max-works to have their requirements apply within that
-    labelled subset of results. N-grams that meet the criteria within
-    that subset are kept (including those outside the subset), while
-    all other n-grams are removed.
+    labelled subset of results. All n-grams, both within the subset
+    and outside it, that meet the criteria are kept, while all other
+    n-grams are removed. Note that when applied to diff results, no
+    n-grams outside those in the labelled subset will be kept.
 
     --relabel sets the label for each result row to the label for that
     row's work as specified in the supplied catalogue. If the work is
