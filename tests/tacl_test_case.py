@@ -17,7 +17,7 @@ class TaclTestCase (unittest.TestCase):
         for common_file in dircmp.common_files:
             actual_path = os.path.join(dircmp.left, common_file)
             expected_path = os.path.join(dircmp.right, common_file)
-            if os.path.splitext(common_file)[0] == '.csv':
+            if os.path.splitext(common_file)[1] == '.csv':
                 self._compare_results_files(actual_path, expected_path)
             else:
                 self._compare_non_results_files(actual_path, expected_path)
