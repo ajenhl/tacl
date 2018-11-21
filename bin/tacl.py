@@ -9,9 +9,9 @@ import sys
 import colorlog
 
 import tacl
-import tacl.command.utils as utils
+import tacl.cli.utils as utils
 from tacl import constants
-from tacl.command.formatters import ParagraphFormatter
+from tacl.cli.formatters import ParagraphFormatter
 from tacl.exceptions import TACLError
 
 

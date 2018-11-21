@@ -19,10 +19,10 @@ setup(
     },
     python_requires='~=3.5',
     license='GPLv3+',
-    packages=['tacl', 'tacl.command'],
+    packages=['tacl', 'tacl.cli'],
     entry_points={
         'console_scripts': [
-            'tacl=tacl.command.tacl_script:main',
+            'tacl=bin.tacl:main',
         ],
     },
     package_data={
