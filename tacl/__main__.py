@@ -635,3 +635,7 @@ def supplied_intersect(args, parser):
     results = args.supplied
     store = utils.get_data_store(args)
     store.intersection_supplied(results, labels, sys.stdout)
+
+
+if __name__ == '__main__':
+    main()

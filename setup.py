@@ -22,7 +22,7 @@ setup(
     packages=['tacl', 'tacl.cli'],
     entry_points={
         'console_scripts': [
-            'tacl=bin.tacl:main',
+            'tacl=tacl.__main__:main',
         ],
     },
     package_data={
