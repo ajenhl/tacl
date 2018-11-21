@@ -23,7 +23,6 @@ setup(
     entry_points={
         'console_scripts': [
             'tacl=tacl.command.tacl_script:main',
-            'tacl-jitc=tacl.command.jitc_script:main',
         ],
     },
     package_data={
@@ -36,7 +35,8 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: GNU General Public License v3 or later '
+        '(GPLv3+)',
         'Programming Language :: Python :: 3',
         'Topic :: Text Processing :: Linguistic',
     ],

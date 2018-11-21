@@ -235,12 +235,6 @@ INTERSECT_EPILOG = '''\
 ''' + ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
-JITC_DESCRIPTION = '''\
-    Generate a report showing the amount of overlap between a set of
-    works, ignoring those parts that overlap with works in a second
-    set of works.'''
-JITC_LABEL_HELP = 'Label of works to compare with each other'
-
 LIFETIME_DESCRIPTION = '''\
     Generate a report on the lifetime of n-grams in a results file.'''
 LIFETIME_EPILOG = '''\
@@ -310,15 +304,15 @@ PREPARE_EPILOG = '''\
 
     * {}: The CBETA TEI files as distributed on their GitHub repository
       at https://github.com/cbeta-org/xml-p5.git.'''.format(
-          TEI_SOURCE_CBETA_GITHUB)
+    TEI_SOURCE_CBETA_GITHUB)
 PREPARE_HELP = '''\
     Convert CBETA TEI XML files into an XML form suitable for
     stripping.'''
 PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
-PREPARE_SOURCE_HELP = 'Source of TEI files'
+PREPARE_SOURCE_HELP = 'Source of TEI files.'
 
-REPORT_OUTPUT_HELP = 'Directory to output report to'
+REPORT_OUTPUT_HELP = 'Directory to output report to.'
 
 RESULTS_ADD_LABEL_COUNT_HELP = '''\
     Output the supplied results with an additional column, "{}",

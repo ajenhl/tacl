@@ -23,6 +23,7 @@ class Report:
 
     """
 
+    _package_name = 'tacl'
     _report_name = ''
 
     def _copy_static_assets(self, output_dir):
@@ -33,9 +34,9 @@ class Report:
 
         """
         base_directory = 'assets/{}'.format(self._report_name)
-        for asset in resource_listdir(__name__, base_directory):
+        for asset in resource_listdir(self._package_name, base_directory):
             filename = resource_filename(
-                __name__, '{}/{}'.format(base_directory, asset))
+                self._package_name, '{}/{}'.format(base_directory, asset))
             shutil.copy2(filename, output_dir)
 
     def generate(self, output_dir):
@@ -48,7 +49,7 @@ class Report:
         :rtype: `jinja2.Template`
 
         """
-        loader = PackageLoader('tacl', 'assets/templates')
+        loader = PackageLoader(self._package_name, 'assets/templates')
         env = Environment(extensions=['jinja2.ext.with_'], loader=loader)
         return env.get_template('{}.html'.format(self._report_name))
 
