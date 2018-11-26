@@ -59,6 +59,8 @@ class Text:
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
+        :param skip_sizes: sizes to not generate n-grams for
+        :type skip_sizes: `list` of `int`
         :rtype: `generator`
 
         """
