@@ -26,8 +26,7 @@ setup(
         ],
     },
     package_data={
-        'tacl': ['assets/jitc/*.js', 'assets/jitc/*.css',
-                 'assets/results_highlight/*.js', 'assets/templates/*.html',
+        'tacl': ['assets/results_highlight/*.js', 'assets/templates/*.html',
                  'assets/xslt/*.xsl'],
     },
     install_requires=['biopython', 'colorlog', 'Jinja2', 'lxml',
