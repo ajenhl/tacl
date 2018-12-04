@@ -1,3 +1,16 @@
+4.2.0              Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Added option to restrict Results prune requirements to a labelled
+    subset of results.
+
+  * Added a lifetime report, showing details about in which labelled
+    corpora n-grams occurred in.
+
+  * Moved the jitc command to the tacl-extra repository.
+
+  * Renamed the tacl.command package to tacl.cli.
+
+
 4.1.0  2018-10-18  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Added remove_label method to Catalogue.
