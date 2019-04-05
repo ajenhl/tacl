@@ -601,6 +601,7 @@ class Results:
         del matches[constants.SIGLUM_FIELDNAME]
         del matches[constants.COUNT_FIELDNAME]
         matches = matches.apply(add_label_order, axis=1, args=(labels,))
+        matches.reset_index(drop=True, inplace=True)
         matches.sort_values(by=[constants.NGRAM_FIELDNAME, label_order_col],
                             ascending=True, inplace=True)
         del matches[label_order_col]
