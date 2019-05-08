@@ -82,7 +82,7 @@ class Stripper:
         work = os.path.splitext(os.path.basename(filename))[0]
         stripped_file_path = os.path.join(self._output_dir, work)
         self._logger.info('Stripping file {} into {}'.format(
-                file_path, stripped_file_path))
+            file_path, stripped_file_path))
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError:
