@@ -2,7 +2,7 @@
 
 import glob
 import logging
-import os.path
+import os
 
 from .text import WitnessText
 
@@ -58,6 +58,11 @@ class Corpus:
         """Returns a generator supplying `WitnessText` objects for each work
         in the corpus.
 
+        If `name` is specified, return a generator for only those
+        witnesses of the specified work.
+
+        :param name: optional name of work to limit witnesses to
+        :type name: `str`
         :rtype: `generator` of `WitnessText`
 
         """
@@ -76,3 +81,25 @@ class Corpus:
         return [os.path.split(filepath)[1] for filepath in
                 glob.glob(os.path.join(self._path, '*'))
                 if os.path.isdir(filepath)]
+
+    def normalise(self, mapping, output_dir):
+        """Creates a normalised copy of this corpus in `output_dir`.
+
+        `output_dir` must not already exist.
+
+        :param mapping: mapping between variant and normalised forms
+        :type mapping: `tacl.VariantMapping`
+        :param output_dir: directory to output normalised corpus to
+        :type output_dir: `str`
+
+        """
+        os.makedirs(output_dir)
+        for work in self.get_works():
+            work_dir = os.path.join(output_dir, work)
+            os.mkdir(work_dir)
+            for witness in self.get_witnesses(work):
+                witness_path = os.path.join(output_dir, witness.get_filename())
+                content = witness.get_token_content()
+                normalised_content = mapping.normalise(content)
+                with open(witness_path, 'w') as fh:
+                    fh.write(normalised_content)

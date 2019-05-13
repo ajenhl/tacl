@@ -10,7 +10,7 @@ import colorlog
 
 import tacl
 import tacl.cli.utils as utils
-from tacl import constants
+from tacl import constants, normaliser
 from tacl.cli.formatters import ParagraphFormatter
 from tacl.exceptions import TACLError
 
@@ -85,6 +85,7 @@ def generate_parser():
     generate_intersect_subparser(subparsers)
     generate_lifetime_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
+    generate_normalise_subparser(subparsers)
     generate_prepare_subparser(subparsers)
     generate_results_subparser(subparsers)
     generate_supplied_diff_subparser(subparsers)
@@ -274,6 +275,24 @@ def generate_ngrams_subparser(subparsers):
                         metavar='MAXIMUM', type=int)
 
 
+def generate_normalise_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to generate a normalised
+    corpus from an unnormalised corpus."""
+    parser = subparsers.add_parser(
+        'normalise', description=constants.NORMALISE_DESCRIPTION,
+        epilog=constants.NORMALISE_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.NORMALISE_HELP)
+    parser.set_defaults(func=normalise_corpus)
+    utils.add_tokenizer_argument(parser)
+    utils.add_common_arguments(parser)
+    parser.add_argument('corpus', help=constants.NORMALISE_CORPUS_HELP,
+                        metavar='CORPUS')
+    parser.add_argument('mapping', help=constants.NORMALISE_MAPPING_HELP,
+                        metavar='MAPPING')
+    parser.add_argument('output', help=constants.NORMALISE_OUTPUT_HELP,
+                        metavar='OUTPUT')
+
+
 def generate_prepare_subparser(subparsers):
     """Adds a sub-command parser to `subparsers` to prepare source XML
     files for stripping."""
@@ -310,6 +329,13 @@ def generate_results_subparser(subparsers):
     be_group.add_argument('--max-be-count', dest='bifurcated_extend_size',
                           help=constants.RESULTS_BIFURCATED_EXTEND_MAX_HELP,
                           metavar='COUNT', type=int)
+    normalise_group = parser.add_argument_group('denormalise')
+    normalise_group.add_argument(
+        '--denormalise', dest='denormalise_mapping',
+        help=constants.RESULTS_DENORMALISE_MAPPING_HELP, metavar='MAPPING')
+    normalise_group.add_argument(
+        '--denormalised-corpus', dest='denormalised_corpus',
+        help=constants.RESULTS_DENORMALISE_CORPUS_HELP, metavar='CORPUS')
     parser.add_argument('-e', '--extend', dest='extend',
                         help=constants.RESULTS_EXTEND_HELP, metavar='CORPUS')
     parser.add_argument('--excise', help=constants.RESULTS_EXCISE_HELP,
@@ -524,6 +550,18 @@ def ngram_intersection(args, parser):
     store.intersection(catalogue, sys.stdout)
 
 
+def normalise_corpus(args, parser):
+    """Outputs a normalised version of a corpus."""
+    corpus = utils.get_corpus(args)
+    tokenizer = utils.get_tokenizer(args)
+    output_dir = os.path.abspath(args.output)
+    if os.path.exists(output_dir):
+        parser.exit(status=3, message='Output directory already exists, '
+                    'aborting.\n')
+    mapping = normaliser.VariantMapping(args.mapping, tokenizer)
+    corpus.normalise(mapping, output_dir)
+
+
 def prepare_xml(args, parser):
     """Prepares XML files for stripping.
 
@@ -556,6 +594,13 @@ def results(args, parser):
                          '--max-be-count option also be supplied')
         corpus = tacl.Corpus(args.bifurcated_extend, tokenizer)
         results.bifurcated_extend(corpus, args.bifurcated_extend_size)
+    if args.denormalised_corpus and args.denormalise_mapping:
+        unnormalised_corpus = tacl.Corpus(args.denormalised_corpus, tokenizer)
+        mapping = tacl.VariantMapping(args.denormalise_mapping, tokenizer)
+        results.denormalise(unnormalised_corpus, mapping)
+    elif args.denormalised_corpus or args.denormalise_mapping:
+        parser.error('Both --denormalised-corpus and --denormalise-mapping '
+                     'must be specified in order to denormalise results')
     if args.reduce:
         results.reduce()
     if args.reciprocal:

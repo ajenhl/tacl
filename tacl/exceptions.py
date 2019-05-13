@@ -1,3 +1,6 @@
+from tacl import constants
+
+
 class TACLError (Exception):
 
     def __init__(self, msg):
@@ -20,3 +23,13 @@ class MalformedQueryError (TACLError):
 class MalformedResultsError (TACLError):
 
     pass
+
+
+class MalformedNormaliserMappingError(TACLError):
+
+    def __init__(self, form, msg):
+        self._form = form
+        self._msg = msg
+
+    def __str__(self):
+        return self._msg.format(self._form)

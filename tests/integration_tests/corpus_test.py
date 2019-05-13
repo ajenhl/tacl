@@ -1,10 +1,12 @@
 import os.path
+import tempfile
 import unittest
 
 import tacl
+from ..tacl_test_case import TaclTestCase
 
 
-class CorpusIntegrationTestCase (unittest.TestCase):
+class CorpusIntegrationTestCase (TaclTestCase):
 
     def setUp(self):
         self._data_dir = os.path.join(os.path.dirname(__file__), 'data',
@@ -55,6 +57,19 @@ class CorpusIntegrationTestCase (unittest.TestCase):
         expected_works = ['T1', 'T2', 'T3', 'T4', 'T5']
         actual_works = sorted(corpus.get_works())
         self.assertEqual(actual_works, expected_works)
+
+    def test_normalise(self):
+        data_dir = os.path.join(os.path.dirname(__file__), 'normaliser_data')
+        corpus_dir = os.path.join(data_dir, 'corpora')
+        corpus = tacl.Corpus(os.path.join(corpus_dir, 'unnormalised'),
+                             self._tokenizer)
+        expected_dir = os.path.join(corpus_dir, 'normalised')
+        mapping = tacl.VariantMapping(
+            os.path.join(data_dir, 'mappings', 'map2.csv'), self._tokenizer)
+        with tempfile.TemporaryDirectory() as output_dir:
+            actual_dir = os.path.join(output_dir, 'corpus')
+            corpus.normalise(mapping, actual_dir)
+            self._compare_results_dirs(actual_dir, expected_dir)
 
 
 if __name__ == '__main__':

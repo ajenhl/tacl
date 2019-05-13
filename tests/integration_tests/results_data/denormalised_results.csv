@@ -1,0 +1,14 @@
+ngram,size,work,siglum,count,label,normalised ngram
+AB,2,A,wit1,2,A,AB
+ABABC,5,A,wit1,1,A,AB
+ABCD,4,A,wit1,1,A,BD
+DM,2,A,wit1,1,A,DM
+MNH,3,A,wit1,1,A,AB
+AB,2,A,wit2,2,A,AB
+ABABC,5,A,wit2,1,A,AB
+AH,2,A,wit2,1,A,AB
+AB,2,B,wit1,2,B,AB
+ABB,3,B,wit1,1,B,AB
+ADB,3,B,wit1,1,B,AB
+AXY,3,B,wit1,1,B,AB
+MNABC,5,B,wit1,1,B,AB

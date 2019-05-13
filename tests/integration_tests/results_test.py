@@ -11,8 +11,8 @@ from ..tacl_test_case import TaclTestCase
 class ResultsIntegrationTestCase (TaclTestCase):
 
     def setUp(self):
-        base_dir = os.path.dirname(__file__)
-        self._data_dir = os.path.join(base_dir, 'results_data')
+        self._base_dir = os.path.dirname(__file__)
+        self._data_dir = os.path.join(self._base_dir, 'results_data')
         self._stripped_dir = os.path.join(self._data_dir, 'stripped')
         self._tokenizer = tacl.Tokenizer(
             tacl.constants.TOKENIZER_PATTERN_CBETA,
@@ -67,6 +67,19 @@ class ResultsIntegrationTestCase (TaclTestCase):
         actual_rows = self._get_rows_from_command(command)
         expected_results = os.path.join(self._data_dir,
                                         'collapse-witnesses-results.csv')
+        expected_rows = self._get_rows_from_file(expected_results)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_denormalise(self):
+        normaliser_dir = os.path.join(self._base_dir, 'normaliser_data')
+        corpus = os.path.join(normaliser_dir, 'corpora', 'results')
+        mapping = os.path.join(normaliser_dir, 'mappings', 'results.csv')
+        results = os.path.join(self._data_dir, 'normalised_results.csv')
+        command = 'tacl results --denormalise {} ' \
+            '--denormalised-corpus {} {}'.format(mapping, corpus, results)
+        actual_rows = self._get_rows_from_command(command)
+        expected_results = os.path.join(self._data_dir,
+                                        'denormalised_results.csv')
         expected_rows = self._get_rows_from_file(expected_results)
         self.assertEqual(set(actual_rows), set(expected_rows))
 

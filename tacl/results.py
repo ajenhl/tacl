@@ -277,6 +277,74 @@ class Results:
                              index=False)
         return fh
 
+    @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
+                       constants.SIGLUM_FIELDNAME, constants.COUNT_FIELDNAME,
+                       constants.LABEL_FIELDNAME])
+    def denormalise(self, corpus, mapping):
+        """Replaces n-grams with their denormalised forms.
+
+        Keeps the normalised form in a new column.
+
+        """
+        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME]
+        fieldnames = list(constants.QUERY_FIELDNAMES) + [
+            constants.NORMALISED_FIELDNAME]
+
+        def denormalise_ngram(row, text, work, siglum):
+            """Return result rows containing all of the denormalised n-grams
+            derived from the normalised n-gram in `row`.
+
+            Note that it is possible for no rows to be returned, if
+            the mapping contains multi-token entries, because the
+            n-gram in `row` may not include the full entry, and thus
+            not denormalise.
+
+            :param row: result row to generate denormalised result rows from
+            :type row: `tuple`
+            :param text: text of the unnormalised witness (in the form
+                         of tokens and separators only)
+            :type text: `str`
+            :param work: name of work
+            :type work: `str`
+            :param siglum: siglum of witness
+            :type siglum: `str`
+            :rtype: `list` of `dict`
+
+            """
+            normalised_ngram = row[0]
+            label = row[5]
+            denormalised_ngrams = mapping.denormalise(normalised_ngram)
+            rows = []
+            for ngram in denormalised_ngrams:
+                count = len(re.findall(r'(?={})'.format(ngram), text))
+                if count:
+                    size = len(self._tokenizer.tokenize(ngram))
+                    rows.append({
+                        constants.NGRAM_FIELDNAME: ngram,
+                        constants.SIZE_FIELDNAME: size,
+                        constants.WORK_FIELDNAME: work,
+                        constants.SIGLUM_FIELDNAME: siglum,
+                        constants.COUNT_FIELDNAME: count,
+                        constants.LABEL_FIELDNAME: label,
+                        constants.NORMALISED_FIELDNAME: normalised_ngram
+                    })
+            return rows
+
+        def denormalise_witness_ngrams(group):
+            match = group.iloc[0]
+            work = match[constants.WORK_FIELDNAME]
+            siglum = match[constants.SIGLUM_FIELDNAME]
+            witness = corpus.get_witness(work, siglum)
+            text = witness.get_token_content()
+            rows = []
+            for row in group.itertuples(index=False, name=None):
+                rows.extend(denormalise_ngram(row, text, work, siglum))
+            return pd.DataFrame(rows, columns=fieldnames)
+
+        matches = self._matches.groupby(group_cols, sort=False).apply(
+            denormalise_witness_ngrams)
+        self._matches = matches
+
     @requires_columns([constants.NGRAM_FIELDNAME])
     def excise(self, ngram):
         """Removes all rows whose n-gram contains `ngram`.

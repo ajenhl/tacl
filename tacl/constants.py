@@ -55,6 +55,7 @@ LABEL_COUNT_FIELDNAME = 'label count'
 LABEL_WORK_COUNT_FIELDNAME = 'label work count'
 NGRAM_FIELDNAME = 'ngram'
 NGRAMS_FIELDNAME = 'ngrams'
+NORMALISED_FIELDNAME = 'normalised ngram'
 NUMBER_FIELDNAME = 'number of n-grams'
 PERCENTAGE_FIELDNAME = 'percentage'
 SIGLA_FIELDNAME = 'sigla'
@@ -295,6 +296,38 @@ NGRAMS_HELP = 'Generate n-grams from a corpus.'
 NGRAMS_MAXIMUM_HELP = 'Maximum size of n-gram to generate (integer).'
 NGRAMS_MINIMUM_HELP = 'Minimum size of n-gram to generate (integer).'
 
+NORMALISE_CORPUS_HELP = 'Directory containing corpus to be normalised.'
+NORMALISE_DESCRIPTION = '''\
+    Create a copy of a corpus normalised according to a supplied mapping.'''
+NORMALISE_EPILOG = '''\
+    This is a generic normalisation process that is constrained only
+    by the possibilities of the mapping format. Lemmatisation could be
+    performed in the same way as normalisation of variant characters
+    and words.
+
+    LIMITATIONS
+
+    Because the normalised forms in the mapping may only consist of a
+    single token, the normalisation and denormalisation processes are
+    not able to handle context. Eg, it is not possible to reflect
+    "ABA" -> "ACA", where the surrounding "A"s are themselves able to
+    be normalised.
+
+    FILES
+
+    The mapping file follows a simple format of comma-separated
+    values, with each line having at least two values. The first is
+    the normalised form, and all subsequent values on the line being
+    the unnormalised forms. During processing, longer unnormalised
+    forms are converted first.
+
+    The normalised form is mostly used internally, and so may be
+    arbitrary. It may never consist of more than a single token,
+    however.'''
+NORMALISE_HELP = 'Create a normalised copy of a corpus.'
+NORMALISE_MAPPING_HELP = 'Path to mapping file.'
+NORMALISE_OUTPUT_HELP = 'Directory to output normalised corpus to.'
+
 PREPARE_DESCRIPTION = '''\
     Convert CBETA TEI XML files (which may have multiple files per
     work) into XML suitable for processing via the tacl strip
@@ -324,7 +357,7 @@ RESULTS_ADD_LABEL_WORK_COUNT_HELP = '''\
     giving the total count of works that contain the n-gram within the
     label. For each work, any number of positive counts across all of
     that work's witnesses is counted as one in the sum.'''.format(
-        LABEL_WORK_COUNT_FIELDNAME)
+    LABEL_WORK_COUNT_FIELDNAME)
 RESULTS_BIFURCATED_EXTEND_HELP = '''\
     Extend results to bifurcation points. Generates results containing
     those n-grams, derived from the original n-grams, that have a
@@ -337,6 +370,14 @@ RESULTS_COLLAPSE_WITNESSES_HELP = '''\
     for an n-gram. Instead of the "{}" column, all of the witnesses
     (per work) with the same n-gram count are listed, comma separated,
     in the "{}" column.'''.format(SIGLUM_FIELDNAME, SIGLA_FIELDNAME)
+RESULTS_DENORMALISE_CORPUS_HELP = '''\
+    Path to directory containing the original (unnormalised)
+    corpus. This option must be given along with --denormalise-mapping
+    in order for denormalisation to be performed.'''
+RESULTS_DENORMALISE_MAPPING_HELP = '''\
+    Denormalise result n-grams using mapping at the supplied path. The
+    unnormalised corpus must also be specified in the
+    --denormalise-corpus option.'''
 RESULTS_DESCRIPTION = '''\
     Modify a query results file by adding, removing or otherwise
     manipulating result rows. Outputs the new set of results.'''
@@ -349,17 +390,26 @@ RESULTS_EXTEND_HELP = '''\
     database. This has no effect if the results contain only 1-grams.'''
 RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --extend, --bifurcated-extend, --reduce,
+    following order: --extend, --bifurcated-extend,
+    --denormalise-corpus, --denormalise_mapping, --reduce,
     --reciprocal, --excise, --zero-fill, --ngrams, --min/max-works,
     --min/max-size, --min/max-count, --min/max-count-work, --remove,
     --relabel, --sort. All of the options that modify the format are
-    performed at the end, and only one should be specified.
+    performed at the end, and only one should be specified. The one
+    exception to this is denormalisation, which adds a column to the
+    results without disrupting any other operations.
 
     It is important to be careful with the use of --reduce. Coupled
     with --max-size, many results may be discarded without trace
     (since the reduce occurs first). Note too that performing "reduce"
     on a set of results more than once will make the results
-    inaccurate!
+    inaccurate! Denormalisation should always be done before reducing
+    results.
+
+    The denormalisation options together produce a set of results with
+    all denormalised forms that occur in each witness presented, along
+    with an extra column, "{}", giving the normalised form each was
+    derived from.
 
     --extend applies before --reduce because it may generate results
     that are also amenable to reduction.
@@ -409,7 +459,7 @@ RESULTS_EPILOG = '''\
       Reduce Pagel results.
         tacl results --reduce -t pagel output.csv > mod-output.csv
 
-''' + ENCODING_EPILOG
+'''.format(NORMALISED_FIELDNAME) + ENCODING_EPILOG
 RESULTS_GROUP_BY_NGRAM_HELP = '''\
     Group results by n-gram, providing summary information of the
     works each n-gram appears in. Results are sorted by n-gram and
@@ -519,20 +569,28 @@ VERBOSE_HELP = '''\
 
 
 # Error messages.
-CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once'
+CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once.'
 CATALOGUE_WORK_NOT_IN_CORPUS_ERROR = (
-    'Catalogue references work "{}" that does not exist in the corpus')
+    'Catalogue references work "{}" that does not exist in the corpus.')
+DUPLICATE_NORMALISED_FORM_ERROR = 'Normalised form "{}" is repeatd in mapping.'
+EMPTY_NORMALISED_FORM_ERROR = 'Mapping contains an empty normalised form.'
+EMPTY_VARIANT_FORM_ERROR = 'Mapping contains an empty variant form for "{}".'
 EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
                                  'existing files may be overwritten.')
 INSUFFICIENT_LABELS_QUERY_ERROR = (
-    'Not running query with fewer than two defined labels')
+    'Not running query with fewer than two defined labels.')
 LABEL_NOT_IN_CATALOGUE_ERROR = (
-    'Supplied label is not present in the supplied catalogue')
+    'Supplied label is not present in the supplied catalogue.')
+MISSING_REQUIRED_COLUMNS_ERROR = (
+    'Results file is missing required column(s) {}.')
+MULTIPLE_NORMALISED_FORM_ERROR = ('Variant form "{}" has multiple normalised '
+                                  'forms.')
+NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = (
     'The number of labels supplied does not match the number of results files.'
 )
-MISSING_REQUIRED_COLUMNS_ERROR = (
-    'Results file is missing required column(s) {}')
+TOO_LONG_NORMALISED_FORM_ERROR = ('Normalised form "{}" is longer than one '
+                                  'token, which is prohibited.')
 
 
 # SQL statements.

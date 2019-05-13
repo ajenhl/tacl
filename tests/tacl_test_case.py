@@ -35,7 +35,10 @@ class TaclTestCase (unittest.TestCase):
         `expected_path` are the same."""
         with open(actual_path) as actual_fh:
             with open(expected_path) as expected_fh:
-                self.assertEqual(actual_fh.read(), expected_fh.read())
+                self.assertEqual(
+                    actual_fh.read(), expected_fh.read(),
+                    'Differing content between "{}" and "{}"'.format(
+                        actual_path, expected_path))
 
     def _compare_results_dirs(self, actual_dir, expected_dir):
         # First check that the two directories contain only the same
