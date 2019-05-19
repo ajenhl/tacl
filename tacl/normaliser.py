@@ -13,18 +13,11 @@ class VariantMapping:
     The two processes make use of a supplied mapping between each
     variant and its normalised form.
 
-    The two processes do not have any sophisticated handling of
-    context. The provided mapping may include surrounding contextual
-    elements in the variant, but these are not treated any differently
-    from non-contextual elements. So, for example, if the variant of
-    "A" is "B" only when followed immediately by "C", the mapping
-    would need to specify that "AC" normalises to "BC". Further, since
-    the "C" is not known to be context, it will not be able to
-    participate further in any other normalisation.
-
-    Eg, if in addition to the above rules about "A" there is a rule
-    that "D" normalises to "E" when preceded by "C", the string "ACD"
-    will transform to "BCD" and not "BCE".
+    Because the normalised forms in the mapping may only consist of a
+    single token, the normalisation and denormalisation processes are
+    not able to handle context. Eg, it is not possible to reflect
+    "ABA" -> "ACA", where the surrounding "A"s are themselves able to
+    be normalised.
 
     """
 
@@ -110,50 +103,52 @@ class VariantMapping:
         normal_to_variant_map = {}
         variant_to_normal_map = {}
         ordered_map = OrderedDict()
-        seen_normalised_forms = []
+        seen_forms = []
         with open(self._mapping_path, newline='') as csv_file:
             reader = csv.reader(csv_file)
             for row in reader:
-                normalised_form = row[0]
-                if normalised_form in seen_normalised_forms:
-                    raise exceptions.MalformedNormaliserMappingError(
-                        normalised_form,
-                        constants.DUPLICATE_NORMALISED_FORM_ERROR)
-                normalised_form_token_count = len(self._tokenizer.tokenize(
-                    normalised_form))
-                if normalised_form_token_count == 0:
-                    raise exceptions.MalformedNormaliserMappingError(
-                        '', constants.EMPTY_NORMALISED_FORM_ERROR)
-                elif normalised_form_token_count > 1:
-                    raise exceptions.MalformedNormaliserMappingError(
-                        normalised_form,
-                        constants.TOO_LONG_NORMALISED_FORM_ERROR)
-                seen_normalised_forms.append(normalised_form)
-                variant_forms = row[1:]
-                if not variant_forms:
-                    raise exceptions.MalformedNormaliserMappingError(
-                        normalised_form, constants.NO_VARIANTS_DEFINED_ERROR)
-                substitute_forms = []
-                for variant_form in variant_forms:
-                    if variant_form in variant_to_normal_map:
-                        raise exceptions.MalformedNormaliserMappingError(
-                            variant_form,
-                            constants.MULTIPLE_NORMALISED_FORM_ERROR)
-                    if not self._tokenizer.tokenize(variant_form):
-                        raise exceptions.MalformedNormaliserMappingError(
-                            normalised_form,
-                            constants.EMPTY_VARIANT_FORM_ERROR)
-                    substitute = self._get_substitute(normalised_form)
-                    variant_to_normal_map[variant_form] = substitute
-                    substitute_forms.append(self._get_substitute(variant_form))
+                normalised_form = self._get_normalised_form(row, seen_forms)
+                variant_forms = self._get_variant_forms(row, normalised_form)
+                substitute_forms = self._get_variant_substitute_forms(
+                    normalised_form, variant_forms, seen_forms,
+                    variant_to_normal_map)
                 normal_to_variant_map[normalised_form] = substitute_forms
         sorted_keys = sorted(variant_to_normal_map.keys(),
                              key=lambda x: len(x), reverse=True)
-        for normalised_form in sorted_keys:
-            ordered_map[normalised_form] = variant_to_normal_map[
-                normalised_form]
+        for variant_form in sorted_keys:
+            ordered_map[variant_form] = variant_to_normal_map[variant_form]
         self._normal_to_variant_map = normal_to_variant_map
         self._variant_to_normal_map = ordered_map
+
+    def _get_normalised_form(self, row, seen_forms):
+        """Returns the normalised form from `row`.
+
+        Checks that the normalised form is valid (hasn't already been
+        specified in the mapping, consists of a single token).
+
+        :param row: mapping row
+        :type row: `list` of `str`
+        :param seen_forms: forms already specified in the mapping
+        :type seen_forms: `list` of `str`
+        :rtype: `str`
+
+        """
+        tokenized_form = self._tokenizer.tokenize(row[0])
+        normalised_form = self._tokenizer.joiner.join(tokenized_form)
+        if normalised_form in seen_forms:
+            raise exceptions.MalformedNormaliserMappingError(
+                normalised_form,
+                constants.DUPLICATE_VARIANT_MAPPING_FORM_ERROR)
+        normalised_form_token_count = len(tokenized_form)
+        if normalised_form_token_count == 0:
+            raise exceptions.MalformedNormaliserMappingError(
+                '', constants.EMPTY_NORMALISED_FORM_ERROR)
+        elif normalised_form_token_count > 1:
+            raise exceptions.MalformedNormaliserMappingError(
+                normalised_form,
+                constants.TOO_LONG_NORMALISED_FORM_ERROR)
+        seen_forms.append(normalised_form)
+        return normalised_form
 
     def _get_substitute(self, token):
         """Returns the character used as a substitute for `token`.
@@ -176,6 +171,59 @@ class VariantMapping:
             self._pua_char_code += 1
             self._pua_to_token_map[char] = token
         return substitute
+
+    def _get_variant_forms(self, row, normalised_form):
+        """Returns the variants forms specified in `row`.
+
+        :param row: mapping row
+        :type row: `list` of `str`
+        :param normalised_form: normalised form specified in this row
+        :type normalised_form: `str`
+        :rtype: `list` of `str`
+
+        """
+        variant_forms = row[1:]
+        if not variant_forms:
+            raise exceptions.MalformedNormaliserMappingError(
+                normalised_form, constants.NO_VARIANTS_DEFINED_ERROR)
+        return variant_forms
+
+    def _get_variant_substitute_forms(self, normalised_form, variant_forms,
+                                      seen_forms, variant_to_normal_map):
+        """Returns a list of substitute forms for `variant_forms`.
+
+        Checks that each variant form is valid (not previously
+        specified in the mapping, consisting of one or more tokens).
+
+        :param normalised_form: normalised form for the variants
+        :type normalised_form: `str`
+        :param variant_forms: variant forms to generate substitutes for
+        :type variant_forms: `list` of `str`
+        :param seen_forms: forms already specified in the mapping
+        :type seen_forms: `list` of `str`
+        :param variant_to_normal_map: mapping between variant form and
+                                      normalised form
+        :type variant_to_normal_map: `dict`
+        :rtype: `list` of `str`
+
+        """
+        substitute_forms = []
+        for variant_form in variant_forms:
+            tokenized_form = self._tokenizer.tokenize(variant_form)
+            variant_form = self._tokenizer.joiner.join(tokenized_form)
+            if variant_form in seen_forms:
+                raise exceptions.MalformedNormaliserMappingError(
+                    variant_form,
+                    constants.DUPLICATE_VARIANT_MAPPING_FORM_ERROR)
+            if not tokenized_form:
+                raise exceptions.MalformedNormaliserMappingError(
+                    normalised_form,
+                    constants.EMPTY_VARIANT_FORM_ERROR)
+            seen_forms.append(variant_form)
+            substitute = self._get_substitute(normalised_form)
+            variant_to_normal_map[variant_form] = substitute
+            substitute_forms.append(self._get_substitute(variant_form))
+        return substitute_forms
 
     def normalise(self, text):
         """Returns the normalised form of `text`.

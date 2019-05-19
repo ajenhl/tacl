@@ -572,7 +572,8 @@ VERBOSE_HELP = '''\
 CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once.'
 CATALOGUE_WORK_NOT_IN_CORPUS_ERROR = (
     'Catalogue references work "{}" that does not exist in the corpus.')
-DUPLICATE_NORMALISED_FORM_ERROR = 'Normalised form "{}" is repeatd in mapping.'
+DUPLICATE_VARIANT_MAPPING_FORM_ERROR = (
+    'Variant mapping lists "{}" more than once.')
 EMPTY_NORMALISED_FORM_ERROR = 'Mapping contains an empty normalised form.'
 EMPTY_VARIANT_FORM_ERROR = 'Mapping contains an empty variant form for "{}".'
 EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
@@ -583,8 +584,6 @@ LABEL_NOT_IN_CATALOGUE_ERROR = (
     'Supplied label is not present in the supplied catalogue.')
 MISSING_REQUIRED_COLUMNS_ERROR = (
     'Results file is missing required column(s) {}.')
-MULTIPLE_NORMALISED_FORM_ERROR = ('Variant form "{}" has multiple normalised '
-                                  'forms.')
 NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = (
     'The number of labels supplied does not match the number of results files.'

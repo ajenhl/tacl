@@ -69,8 +69,8 @@ class VariantMappingTestCase(TaclTestCase):
             'then the thatched anthem hit bees',
             'then that thatched anthem hit the ant',
             'then the thatched anthem hit the ant',
-            "then Mozart's thatched anthem hit bees",
-            "then Mozart's thatched anthem hit the ant",
+            "then Mozart s thatched anthem hit bees",
+            "then Mozart s thatched anthem hit the ant",
         ]
         actual = mapping.denormalise(text)
         self.assertEqual(set(actual), set(expected))
@@ -111,6 +111,19 @@ class VariantMappingTestCase(TaclTestCase):
 
     def test_mapping_no_variants(self):
         mapping_path = os.path.join(self._mapping_dir, 'no_variants.csv')
+        mapping = VariantMapping(mapping_path, self._tokenizer)
+        self.assertRaises(exceptions.MalformedNormaliserMappingError,
+                          mapping.normalise, 'foo')
+
+    def test_mapping_non_token_content(self):
+        mapping_path = os.path.join(self._mapping_dir, 'non_token_content.csv')
+        mapping = VariantMapping(mapping_path, self._tokenizer)
+        self.assertRaises(exceptions.MalformedNormaliserMappingError,
+                          mapping.normalise, 'foo')
+
+    def test_mapping_duplicate_forms_in_row(self):
+        mapping_path = os.path.join(self._mapping_dir,
+                                    'normalised_same_variant.csv')
         mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
                           mapping.normalise, 'foo')
