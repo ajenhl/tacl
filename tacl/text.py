@@ -108,8 +108,8 @@ class Text:
         # The extra split and join are due to having to handle
         # whitespace within a CBETA token (eg, [(禾*尤)\n/上/日]).
         return [self._tokenizer.joiner.join(
-            self._tokenizer.joiner.join(sequence[i:i+degree]).split())
-                for i in range(count)]
+            self._tokenizer.joiner.join(sequence[i:i + degree]).split())
+            for i in range(count)]
 
 
 class WitnessText (Text):
@@ -117,15 +117,15 @@ class WitnessText (Text):
     """Class for the text of a witness. A witness has a work name and a
     siglum, and has a corresponding filename."""
 
-    def __init__(self, name, siglum, content, tokenizer):
+    def __init__(self, work, siglum, content, tokenizer):
         super().__init__(content, tokenizer)
-        self._name = name
+        self._work = work
         self._siglum = siglum
-        self._filename = self.assemble_filename(name, siglum)
+        self._filename = self.assemble_filename(work, siglum)
 
     @staticmethod
-    def assemble_filename(name, siglum):
-        return os.path.join(name, siglum + '.txt')
+    def assemble_filename(work, siglum):
+        return os.path.join(work, siglum + '.txt')
 
     def get_checksum(self):
         """Returns the checksum for the content of this text.
@@ -144,12 +144,12 @@ class WitnessText (Text):
         return self._filename
 
     def get_names(self):
-        """Returns the name and siglum of this text.
+        """Returns the name and siglum of this witness.
 
         :rtype: `tuple`
 
         """
-        return self._name, self._siglum
+        return self._work, self._siglum
 
 
 class FilteredWitnessText (WitnessText):
