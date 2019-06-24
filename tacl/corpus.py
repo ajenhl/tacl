@@ -51,7 +51,12 @@ class Corpus:
             filename))
         with open(os.path.join(self._path, filename), encoding='utf-8') \
                 as fh:
-            content = fh.read()
+            try:
+                content = fh.read()
+            except Exception:
+                self._logger.error('Failed to read witness text {}'.format(
+                    filename))
+                raise
         return text_class(work, siglum, content, self._tokenizer)
 
     def get_witnesses(self, name='*'):
