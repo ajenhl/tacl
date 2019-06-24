@@ -142,7 +142,7 @@ class VariantMapping:
         normalised_form_token_count = len(tokenized_form)
         if normalised_form_token_count == 0:
             raise exceptions.MalformedNormaliserMappingError(
-                '', constants.EMPTY_NORMALISED_FORM_ERROR)
+                ','.join(row), constants.EMPTY_NORMALISED_FORM_ERROR)
         elif normalised_form_token_count > 1:
             raise exceptions.MalformedNormaliserMappingError(
                 normalised_form,

@@ -206,7 +206,8 @@ HIGHLIGHT_EPILOG = '''\
       tacl highlight -n author_markers.csv corpus/stripped/ T0001 report_dir
 
       tacl highlight -n Dhr_markers.csv -n ZQ_markers.csv corpus/stripped/ -l Dharmaraksa -l "Zhi Qian" T0474 report_dir'''
-HIGHLIGHT_HELP = 'Output a witness with its matches visually highlighted.'
+HIGHLIGHT_HELP = '''\
+    Output a witness with specified n-grams visually highlighted.'''
 HIGHLIGHT_LABEL_HELP = '''\
     Label used to identify the n-grams from a file specified by
     -n/--ngrams. This option may be specified multiple times, and
@@ -573,9 +574,11 @@ CATALOGUE_WORK_RELABELLED_ERROR = 'Catalogue file labels "{}" more than once.'
 CATALOGUE_WORK_NOT_IN_CORPUS_ERROR = (
     'Catalogue references work "{}" that does not exist in the corpus.')
 DUPLICATE_VARIANT_MAPPING_FORM_ERROR = (
-    'Variant mapping lists "{}" more than once.')
-EMPTY_NORMALISED_FORM_ERROR = 'Mapping contains an empty normalised form.'
-EMPTY_VARIANT_FORM_ERROR = 'Mapping contains an empty variant form for "{}".'
+    'Normaliser mapping lists "{}" more than once.')
+EMPTY_NORMALISED_FORM_ERROR = (
+    'Mapping contains an empty normalised form in the row "{}".')
+EMPTY_VARIANT_FORM_ERROR = (
+    'Normaliser mapping contains an empty variant form for "{}".')
 EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
                                  'existing files may be overwritten.')
 INSUFFICIENT_LABELS_QUERY_ERROR = (
