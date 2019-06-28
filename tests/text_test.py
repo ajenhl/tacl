@@ -43,7 +43,7 @@ class TextTestCase (TaclTestCase):
     def test_get_token_content_cbeta(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬強阿闍世耶。又'
         text = tacl.WitnessText('test', 'base', content, self._tokenizer)
-        expected_content = '阿闍世[(禾*尤)\n/上/日]首佛足敬強阿闍世耶又'
+        expected_content = '阿闍世[(禾*尤)/上/日]首佛足敬強阿闍世耶又'
         actual_content = text.get_token_content()
         self.assertEqual(actual_content, expected_content)
 
@@ -59,7 +59,7 @@ class TextTestCase (TaclTestCase):
     def test_get_tokens_cbeta(self):
         content = '阿闍世[(禾*尤)\n/上/日]首佛足。敬\n強耶。又'
         text = tacl.Text(content, self._tokenizer)
-        expected_tokens = ['阿', '闍', '世', '[(禾*尤)\n/上/日]', '首', '佛',
+        expected_tokens = ['阿', '闍', '世', '[(禾*尤)/上/日]', '首', '佛',
                            '足', '敬', '強', '耶', '又']
         actual_tokens = text.get_tokens()
         self.assertEqual(actual_tokens, expected_tokens)

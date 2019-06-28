@@ -86,7 +86,8 @@ class Text:
         :rtype: `list` of `str`
 
         """
-        return self._tokenizer.tokenize(self._content)
+        return self._tokenizer.tokenize(self._content.replace(
+            '\n', self._tokenizer.joiner))
 
     def _ngrams(self, sequence, degree):
         """Returns the n-grams generated from `sequence`.
@@ -105,11 +106,8 @@ class Text:
 
         """
         count = max(0, len(sequence) - degree + 1)
-        # The extra split and join are due to having to handle
-        # whitespace within a CBETA token (eg, [(禾*尤)\n/上/日]).
-        return [self._tokenizer.joiner.join(
-            self._tokenizer.joiner.join(sequence[i:i + degree]).split())
-            for i in range(count)]
+        return [self._tokenizer.joiner.join(sequence[i:i + degree])
+                for i in range(count)]
 
 
 class WitnessText (Text):
