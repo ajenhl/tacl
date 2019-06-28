@@ -11,6 +11,7 @@ import pandas as pd
 
 from . import constants
 from .exceptions import MalformedQueryError
+from .text import WitnessText
 
 
 class DataStore:
@@ -47,7 +48,8 @@ class DataStore:
         self._conn.execute(constants.CREATE_INDEX_TEXTNGRAM_SQL)
         self._logger.info('Indices added')
 
-    def add_ngrams(self, corpus, minimum, maximum, catalogue=None):
+    def add_ngrams(self, corpus, minimum, maximum, catalogue=None,
+                   text_class=WitnessText):
         """Adds n-gram data from `corpus` to the data store.
 
         :param corpus: corpus of works
@@ -58,15 +60,18 @@ class DataStore:
         :type maximum: `int`
         :param catalogue: optional catalogue to limit corpus to
         :type catalogue: `Catalogue`
+        :param text_class: class to use to represent each witness
+        :type text_class: subclass of `Text`
 
         """
         self._initialise_database()
         if catalogue:
             for work in catalogue:
-                for witness in corpus.get_witnesses(work):
+                for witness in corpus.get_witnesses(
+                        work, text_class=text_class):
                     self._add_text_ngrams(witness, minimum, maximum)
         else:
-            for witness in corpus.get_witnesses():
+            for witness in corpus.get_witnesses(text_class=text_class):
                 self._add_text_ngrams(witness, minimum, maximum)
         self._add_indices()
         self._analyse()

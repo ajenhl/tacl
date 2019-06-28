@@ -43,7 +43,9 @@ class Corpus:
         :type work: `str`
         :param siglum: siglum of witness
         :type siglum: `str`
-        :rtype: `WitnessText`
+        :param text_class: class to use to represent the witness
+        :type text_class: subclass of `Text`
+        :rtype: `text_class`
 
         """
         filename = os.path.join(work, siglum + '.txt')
@@ -59,7 +61,7 @@ class Corpus:
                 raise
         return text_class(work, siglum, content, self._tokenizer)
 
-    def get_witnesses(self, name='*'):
+    def get_witnesses(self, name='*', text_class=WitnessText):
         """Returns a generator supplying `WitnessText` objects for each work
         in the corpus.
 
@@ -68,14 +70,16 @@ class Corpus:
 
         :param name: optional name of work to limit witnesses to
         :type name: `str`
-        :rtype: `generator` of `WitnessText`
+        :param text_class: class to use to represent the witness
+        :type text_class: subclass of `Text`
+        :rtype: `generator` of `text_class` objects
 
         """
         for filepath in glob.glob(os.path.join(self._path, name, '*.txt')):
             if os.path.isfile(filepath):
                 name = os.path.split(os.path.split(filepath)[0])[1]
                 siglum = os.path.splitext(os.path.basename(filepath))[0]
-                yield self.get_witness(name, siglum)
+                yield self.get_witness(name, siglum, text_class)
 
     def get_works(self):
         """Returns a list of the names of all works in the corpus.

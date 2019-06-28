@@ -37,7 +37,8 @@ class DataStoreTestCase (TaclTestCase):
         store = tacl.DataStore(':memory:')
         store.add_ngrams(corpus, 2, 3)
         initialise.assert_called_once_with(store)
-        corpus.get_witnesses.assert_called_once_with()
+        corpus.get_witnesses.assert_called_once_with(
+            text_class=tacl.WitnessText)
         self.assertEqual(add_text_ngrams.mock_calls,
                          [call(store, text1, 2, 3), call(store, text2, 2, 3)])
         add_indices.assert_called_once_with(store)
@@ -61,7 +62,8 @@ class DataStoreTestCase (TaclTestCase):
         catalogue = tacl.Catalogue({'T1': 'A'})
         store.add_ngrams(corpus, 2, 3, catalogue)
         initialise.assert_called_once_with(store)
-        corpus.get_witnesses.assert_called_once_with('T1')
+        corpus.get_witnesses.assert_called_once_with(
+            'T1', text_class=tacl.WitnessText)
         add_text_ngrams.assert_has_calls([call(store, text1, 2, 3),
                                           call(store, text2, 2, 3)])
         add_indices.assert_called_once_with(store)

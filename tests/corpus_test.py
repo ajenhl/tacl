@@ -64,9 +64,9 @@ class CorpusTestCase (TaclTestCase):
             assert isinstance(text, tacl.WitnessText)
         glob.assert_called_once_with(os.path.join(path, '*/*.txt'))
         self.assertEqual(get_witness.mock_calls,
-                         [call(corpus, name1, siglum1),
-                          call(corpus, name1, siglum2),
-                          call(corpus, name2, siglum1)])
+                         [call(corpus, name1, siglum1, tacl.WitnessText),
+                          call(corpus, name1, siglum2, tacl.WitnessText),
+                          call(corpus, name2, siglum1, tacl.WitnessText)])
 
 
 if __name__ == '__main__':
