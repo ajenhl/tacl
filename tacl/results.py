@@ -316,7 +316,8 @@ class Results:
             denormalised_ngrams = mapping.denormalise(normalised_ngram)
             rows = []
             for ngram in denormalised_ngrams:
-                count = len(re.findall(r'(?={})'.format(ngram), text))
+                count = len(re.findall(r'(?={})'.format(re.escape(ngram)),
+                                       text))
                 if count:
                     size = len(self._tokenizer.tokenize(ngram))
                     rows.append({
@@ -331,9 +332,7 @@ class Results:
             return rows
 
         def denormalise_witness_ngrams(group):
-            match = group.iloc[0]
-            work = match[constants.WORK_FIELDNAME]
-            siglum = match[constants.SIGLUM_FIELDNAME]
+            work, siglum = group.name
             witness = corpus.get_witness(work, siglum)
             text = witness.get_token_content()
             rows = []
