@@ -20,6 +20,7 @@ Subcommands:
    tacl-sdiff
    tacl-search
    tacl-sintersect
+   tacl-split
    tacl-stats
    tacl-strip
 
