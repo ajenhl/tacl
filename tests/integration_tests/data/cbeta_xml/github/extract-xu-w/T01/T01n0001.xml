@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T01n0001">
+  <teiHeader/>
+  <text>
+    <body>
+      <div>
+        <p>D1</p>
+      </div>
+      <cb:div type="w">
+        <p>W1</p>
+      </cb:div>
+      <cb:div type="w">
+        <p>W2</p>
+        <cb:div type="xu">
+          <p>Xu 1</p>
+          <cb:div type="xu">
+            <p>Xu 2</p>
+          </cb:div>
+          <cb:div type="xu">
+            <p>Xu 3</p>
+          </cb:div>
+        </cb:div>
+      </cb:div>
+    </body>
+  </text>
+</TEI>

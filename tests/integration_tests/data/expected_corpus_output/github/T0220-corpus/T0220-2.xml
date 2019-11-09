@@ -1,0 +1,36 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body/>
+    </text>
+  </TEI>
+  <TEI xml:id="T07n0220c">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div n="02" type="hui">
+          <cb:mulu level="1" n="1" type="&#x6703;">2 會</cb:mulu>
+          <head><title>大般若經</title>第二會</head>
+          <cb:div type="pin">
+            <p>HUI 2</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

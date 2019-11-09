@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T05n0220a">
+  <teiHeader>
+  </teiHeader>
+  <text>
+    <body>
+      <milestone n="1" unit="juan"/>
+      <pb n="0001a" ed="T" xml:id="T05.0220a.0001a"/>
+      <lb n="0001a01" ed="T"/>
+      <lb n="0001a02" ed="T"/><cb:docNumber>No. 220</cb:docNumber>
+      <lb n="0001a03" ed="T"/><cb:div type="hui"><cb:mulu level="1" n="1" type="會">1 會</cb:mulu><cb:div type="xu"><cb:mulu level="2" type="序">初會序</cb:mulu><head><title>大般若經</title>初會序</head>
+      <lb n="0001a06" ed="T"/><p xml:id="pT05p0001a0601">XU 1</p></cb:div>
+      <cb:div type="pin"><p>HUI 1</p></cb:div>
+    </cb:div>
+    </body>
+  </text>
+</TEI>

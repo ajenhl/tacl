@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<splits>
+  <work>
+    <name>existing</name>
+    <parts>
+      <witnesses>ALL</witnesses>
+      <start>This</start>
+      <end>test</end>
+    </parts>
+  </work>
+</splits>

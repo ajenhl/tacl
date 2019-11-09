@@ -1,58 +1,32 @@
 #!/usr/bin/env python3
 
+import filecmp
 import os
-import shutil
+import tempfile
 import unittest
 
 import tacl
+from ..tacl_test_case import TaclTestCase
 
 
-class TEICorpusIntegrationTestCase (unittest.TestCase):
+class TEICorpusIntegrationTestCase (TaclTestCase):
 
     def setUp(self):
         base_dir = os.path.dirname(__file__)
         self._data_dir = os.path.join(base_dir, 'data')
         self._cbeta_xml_dir = os.path.join(self._data_dir, 'cbeta_xml',
                                            self._corpus_name)
-        self._xml_dir = os.path.join(self._data_dir, 'xml')
-        self._actual_output_dir = os.path.join(
-            self._data_dir, 'actual_corpus_output')
         self._expected_output_dir = os.path.join(
             self._data_dir, 'expected_corpus_output', self._corpus_name)
-        for path in (self._xml_dir, self._actual_output_dir):
-            if os.path.exists(path):
-                raise Exception('{} exists; aborting test that would create '
-                                'this directory'.format(path))
-        # Copy the source XML files. This is necessary since the
-        # splitting process must sometimes modify the source CBETA
-        # files to pass validation.
-        shutil.copytree(self._cbeta_xml_dir, self._xml_dir)
         self.maxDiff = None
 
-    def tearDown(self):
-        for path in (self._xml_dir, self._actual_output_dir):
-            if os.path.exists(path):
-                shutil.rmtree(path)
-
-    def check_tidy_results(self, expected_files):
-        for filename in expected_files:
-            actual_path = os.path.join(self._actual_output_dir, filename)
-            expected_path = os.path.join(self._expected_output_dir, filename)
-            self.assertTrue(
-                os.path.exists(actual_path),
-                'Expected file {} to exist, but it does not'.format(
-                    actual_path))
-            with open(actual_path, 'r') as fh:
-                actual_content = fh.read()
-            with open(expected_path) as fh:
-                expected_content = fh.read()
-            self.assertEqual(
-                actual_content, expected_content,
-                'Expected transformed contents of {} to match {}'.format(
-                    actual_path, expected_path))
-        # Check that no extra files are created.
-        self.assertEqual(set(os.listdir(self._actual_output_dir)),
-                         set(expected_files))
+    def _test_tidy(self, corpus_name):
+        corpus_dir = os.path.join(self._cbeta_xml_dir, corpus_name)
+        expected_dir = os.path.join(self._expected_output_dir, corpus_name)
+        with tempfile.TemporaryDirectory() as actual_dir:
+            corpus = tacl.TEICorpusCBETAGitHub(corpus_dir, actual_dir)
+            corpus.tidy()
+            self._compare_dirs(actual_dir, expected_dir)
 
 
 class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):
@@ -61,9 +35,26 @@ class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):
         self._corpus_name = 'github'
         super().setUp()
 
-    def test_tidy(self):
-        corpus = tacl.TEICorpusCBETAGitHub(self._xml_dir,
-                                           self._actual_output_dir)
-        corpus.tidy()
-        expected_files = ['T0001.xml', 'T0002.xml']
-        self.check_tidy_results(expected_files)
+    def test_tidy_basic(self):
+        self._test_tidy('basic')
+
+    def test_tidy_extract_commentary(self):
+        self._test_tidy('extract-commentary')
+
+    def test_tidy_extract_verse(self):
+        self._test_tidy('extract-verse')
+
+    def test_extract_xu_w(self):
+        """Tests that cb:div[@type='xu'] and cb:div[@type='w'] are extracted
+        correctly."""
+        self._test_tidy('extract-xu-w')
+
+    def test_tidy_no_join_texts(self):
+        """Tests that works ending in A/B etc are not joined."""
+        self._test_tidy('no-join-texts-corpus')
+
+    def test_tidy_T0001(self):
+        self._test_tidy('T0001-corpus')
+
+    def test_tidy_T0220(self):
+        self._test_tidy('T0220-corpus')

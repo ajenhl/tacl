@@ -1,0 +1,6 @@
+that serves as a test for splitting a text into
+multiple parts based on simple rules involving non-regular expression
+matching of substringsEntire substrings may
+be marked as elements of a part, or for long sections a unique start
+string and unique end string may be specified, with everything in
+between also being included

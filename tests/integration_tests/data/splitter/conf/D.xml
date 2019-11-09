@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<splits>
+  <work>
+    <name>broken</name>
+    <parts>
+      <part>
+        <witnesses>ALL</witnesses>
+        <whole>missing</whole>
+      </part>
+    </parts>
+  </work>
+</splits>

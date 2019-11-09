@@ -1,0 +1,76 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taisho Tripitaka, Electronic version, No. 0220d 大般若波羅蜜多經(第401卷-第600卷)</title>
+        <author>唐 玄奘譯</author>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T07n0220d">
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Taisho Tripitaka, Electronic version, No. 0220d 大般若波羅蜜多經(第401卷-第600卷)</title>
+          <author>唐 玄奘譯</author>
+          <respStmt>
+            <resp>Electronic Version by</resp>
+            <name>CBETA</name>
+          </respStmt>
+        </titleStmt>
+        <editionStmt>
+          <edition>$Revision: 1.28 $<date>$Date: 2012/08/27 03:14:13 $</date>新式標點版</edition>
+        </editionStmt>
+        <extent>28卷</extent>
+        <publicationStmt>
+          <distributor>
+            <name>中華電子佛典協會 (CBETA)</name>
+            <address>
+              <addrLine>service@cbeta.org</addrLine>
+            </address>
+          </distributor>
+          <availability>
+            <p>Available for non-commercial use when distributed with this header intact.</p>
+          </availability>
+          <date>$Date: 2012/08/27 03:14:13 $</date>
+        </publicationStmt>
+        <sourceDesc>
+          <bibl>Taisho Tripitaka Vol. 07, No. 220d</bibl>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <projectDesc>
+          <p xml:lang="en" cb:type="ly">Text as provided by Miao-Yuan Aranya, Text as provided by Chung Sheng Publishing Company, Text as provided by SAT, Japan, Punctuated text as provided by Chung Sheng Publishing Company</p>
+          <p xml:lang="zh" cb:type="ly">妙雲蘭若提供，眾生出版社提供，日本 SAT 組織提供，眾生出版社提供新式標點</p>
+        </projectDesc>
+      </encodingDesc>
+      <profileDesc>
+        <langUsage>
+          <language ident="en">English</language>
+          <language ident="zh">Chinese</language>
+        </langUsage>
+      </profileDesc>
+      <revisionDesc>
+        <change when="2013-05-20"><name>CW</name><name>Ray Chou 周邦信</name>P4 to P5 conversion by p4top5a.py, intended for publication</change>
+      </revisionDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <pb n="0763a" ed="T" xml:id="T07.0220d.0763a"/>
+        <lb n="0763a01" ed="T"/>
+        <milestone n="538" unit="juan"/>
+        <lb n="0763a02" ed="T"/>
+        <cb:div n="04" type="hui">
+          <cb:mulu level="1" n="3" type="&#x6703;">4 會</cb:mulu>
+          <head><title>大般若經</title>第四會</head>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

@@ -10,13 +10,12 @@ from pkg_resources import resource_filename
 from . import constants
 
 
-TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0"
-           xmlns:cb="http://www.cbeta.org/ns/1.0">
+TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title></title>
-        <author></author>
+        <title/>
+        <author/>
       </titleStmt>
       <publicationStmt>
         <p>Compiled from source TEI document(s) published by CBETA.</p>
@@ -80,6 +79,7 @@ class TEICorpus:
         # representations of the XML files at once, before joining the
         # parts together, assemble the filenames into groups and then
         # process them one by one.
+        self._logger.debug('Assembling all parts into coherent works.')
         works = {}
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
             for filename in filenames:
@@ -93,6 +93,7 @@ class TEICorpus:
                         work_parts = works.setdefault(work, {})
                         work_parts[part_label] = os.path.join(
                             dirpath, filename)
+        self._logger.debug('Finished assembling parts.')
         return works
 
     def _extract_work(self, filename):
@@ -104,7 +105,7 @@ class TEICorpus:
 
         :param source_tree: XML tree of source document
         :type source_tree: `etree._ElementTree`
-        :rtype: `tuple` of `list`\s
+        :rtype: `tuple` of `list`s
 
         """
         witnesses = set()
@@ -131,18 +132,18 @@ class TEICorpus:
         wit_list = etree.SubElement(source_desc, TEI + 'listWit')
         for index, siglum in enumerate(witnesses):
             wit = etree.SubElement(wit_list, TEI + 'witness')
-            xml_id = 'wit{}'.format(index+1)
+            xml_id = 'wit{}'.format(index + 1)
             wit.set(constants.XML + 'id', xml_id)
             wit.text = siglum
             full_siglum = '【{}】'.format(siglum)
             self._update_refs(root, bearers, 'wit', full_siglum, xml_id)
         return root
 
-    def _output_work(self, work, root):
-        """Saves the TEI XML document `root` at the path `work`."""
-        output_filename = os.path.join(self._output_dir, work)
-        tree = etree.ElementTree(root)
-        tree.write(output_filename, encoding='utf-8', pretty_print=True)
+    def _output_tree(self, filename, tree):
+        """Saves the TEI XML document `tree` as `filename` in the output
+        directory."""
+        output_path = os.path.join(self._output_dir, filename)
+        tree.write(output_path, encoding='utf-8', pretty_print=True)
 
     def _populate_header(self, root):
         """Populate the teiHeader of the teiCorpus with useful information
@@ -167,6 +168,10 @@ class TEICorpus:
             pass
         return root
 
+    def _postprocess(self, work, tree):
+        """Post-process the XML document `tree`."""
+        raise NotImplementedError
+
     def tidy(self):
         if not os.path.exists(self._output_dir):
             try:
@@ -177,11 +182,15 @@ class TEICorpus:
                 raise
         works = self._assemble_part_list()
         for work, paths in works.items():
-            root = self._assemble_parts(work, paths)
-            root = self._populate_header(root)
-            root = self._handle_resps(root)
-            root = self._handle_witnesses(root)
-            self._output_work(work, root)
+            output_filename = os.path.join(self._output_dir, work)
+            if not os.path.exists(output_filename):
+                root = self._assemble_parts(work, paths)
+                root = self._populate_header(root)
+                root = self._handle_resps(root)
+                root = self._handle_witnesses(root)
+                tree = etree.ElementTree(root)
+                self._output_tree(work, tree)
+                self._postprocess(os.path.splitext(work)[0], tree)
 
     def _tidy(self, *args, **kwargs):
         raise NotImplementedError
@@ -214,8 +223,37 @@ class TEICorpusCBETAGitHub (TEICorpus):
     https://github.com/cbeta-org/xml-p5.git (TEI P5)"""
 
     work_pattern = re.compile(
-        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<work>[A-Z]?\d+)(?P<part>[A-Za-z]?)$')
+        r'^(?P<prefix>[A-Z]{1,2})\d+n(?P<number>[A-Z]?\d+)(?P<part>[A-Za-z]?)$')
     xslt = 'prepare_tei_cbeta_github.xsl'
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        div_xslt = resource_filename(
+            __name__, 'assets/xslt/CBETA_extract_div.xsl')
+        self._transform_div = etree.XSLT(etree.parse(div_xslt))
+        remove_divs_xslt = resource_filename(
+            __name__, 'assets/xslt/CBETA_remove_divs.xsl')
+        self._remove_divs = etree.XSLT(etree.parse(remove_divs_xslt))
+
+    def _extract_divs(self, work, tree, div_types):
+        """Writes out to files the individual parts of a work corresponding to
+        various types of cb:div.
+
+        After a div type has been extracted, it must be removed from
+        the tree so that future extractions/manipulations do not
+        include that material.
+
+        """
+        for div_type, label in div_types:
+            divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
+                              namespaces=constants.NAMESPACES)
+            for position, div in enumerate(divs):
+                subtree = self._transform_div(tree, position=str(position),
+                                              div_type='"{}"'.format(div_type))
+                filename = '{}-{}-{}.xml'.format(work, label, position + 1)
+                self._output_tree(filename, subtree)
+            tree = self._remove_divs(tree, div_type='"{}"'.format(div_type))
+        return tree
 
     def _extract_work(self, filename):
         """Returns the name of the work in `filename`.
@@ -234,8 +272,19 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._logger.warning('Found an anomalous filename "{}"'.format(
                 filename))
             return None, None
-        work = '{}{}'.format(match.group('prefix'), match.group('work'))
-        return work, match.group('part')
+        work = '{}{}'.format(match.group('prefix'), match.group('number'))
+        if work == 'T0220':
+            part = match.group('part')
+        else:
+            work = '{}{}'.format(work, match.group('part'))
+            part = None
+        return work, part
+
+    def _get_mulu(self, element, xpath):
+        mulu = element.xpath(xpath, namespaces=constants.NAMESPACES)[0]
+        mulu = mulu.replace(' ', '-')
+        mulu = mulu.replace(os.path.sep, '|')
+        return mulu
 
     def get_resps(self, source_tree):
         """Returns a sorted list of all resps in `source_tree`, and the
@@ -268,7 +317,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         file_desc.insert(1, edition_stmt)
         for index, (resp_resp, resp_name) in enumerate(resps):
             resp_stmt = etree.SubElement(edition_stmt, TEI + 'respStmt')
-            xml_id = 'resp{}'.format(index+1)
+            xml_id = 'resp{}'.format(index + 1)
             resp_stmt.set(constants.XML + 'id', xml_id)
             resp = etree.SubElement(resp_stmt, TEI + 'resp')
             resp.text = resp_resp
@@ -278,11 +327,271 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._update_refs(root, bearers, 'resp', resp_data, xml_id)
         return root
 
-    def _tidy(self, work, file_path):
-        """Transforms the file at `file_path` into simpler XML and returns
-        that.
+    def _postprocess(self, work, tree):
+        """Post-process the XML document `root`."""
+        div_types = [('xu', 'xu'), ('w', 'endmatter')]
+        tree = self._extract_divs(work, tree, div_types)
+        self._output_tree('{}.xml'.format(work), tree)
+        pp_func = '_postprocess_{}'.format(work)
+        if hasattr(self, pp_func):
+            getattr(self, pp_func)(work, tree)
+
+    def _postprocess_div_mulu(self, work, tree, div_type):
+        divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
+                          namespaces=constants.NAMESPACES)
+        for position, div in enumerate(divs):
+            div_tree = self._transform_div(tree, position=str(position),
+                                           div_type='"{}"'.format(div_type))
+            try:
+                mulu = div.xpath('cb:mulu[1]/text()',
+                                 namespaces=constants.NAMESPACES)[0]
+                mulu = mulu.replace(' ', '-')
+                mulu = mulu.replace(os.path.sep, '|')
+            except IndexError:
+                mulu = 'unnamed-{}'.format(position + 1)
+            div_filename = '{}-{}.xml'.format(work, mulu)
+            self._output_tree(div_filename, div_tree)
+
+    def _postprocess_T0001(self, work, tree):
+        """Post-process the XML document T0001.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
 
         """
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T0026(self, work, tree):
+        """Post-process the XML document T0026.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T0101(self, work, tree):
+        """Post-process the XML document T0101.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T0125(self, work, tree):
+        """Post-process the XML document T0125.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div and the
+        cb:mulu of its containing cb:div[@type='pin']. Where a
+        cb:div[@type='pin'] does not have any subdivisions, that div
+        will be its own file.
+
+        """
+        pin_divs = tree.xpath('//cb:div[@type="pin"]',
+                              namespaces=constants.NAMESPACES)
+        for position, div in enumerate(pin_divs):
+            if div.xpath('cb:div[@type="jing"]',
+                         namespaces=constants.NAMESPACES):
+                continue
+            div_tree = self._transform_div(tree, position=str(position),
+                                           div_type='"pin"')
+            mulu = self._get_mulu(div, 'cb:mulu[1]/text()')
+            div_filename = '{}-{}.xml'.format(work, mulu)
+            self._output_tree(div_filename, div_tree)
+        jing_divs = tree.xpath('//cb:div[@type="jing"]',
+                               namespaces=constants.NAMESPACES)
+        for position, div in enumerate(jing_divs):
+            div_tree = self._transform_div(tree, position=str(position),
+                                           div_type='"jing"')
+            pin_mulu = self._get_mulu(div, '../cb:mulu[1]/text()')
+            jing_mulu = self._get_mulu(div, 'cb:mulu[1]/text()')
+            div_filename = '{}-{}-{}.xml'.format(work, pin_mulu, jing_mulu)
+            self._output_tree(div_filename, div_tree)
+
+    def _postprocess_T0150A(self, work, tree):
+
+        """Post-process the XML document T0150A.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T0152(self, work, tree):
+        """Post-process the XML document T0152.xml.
+
+        Extract the first (should be only) cb:div[@type='other'] into
+        its own file.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
+
+        """
+        div_tree = self._transform_div(tree, position='0', div_type='"other"')
+        div_filename = '{}-0.xml'.format(work)
+        self._output_tree(div_filename, div_tree)
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T0154(self, work, tree):
+        """Post-process the XML document T0154.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu number and the head.
+
+        """
+        divs = tree.xpath('//cb:div[@type="jing"]',
+                          namespaces=constants.NAMESPACES)
+        for position, div in enumerate(divs):
+            div_tree = self._transform_div(tree, position=str(position),
+                                           div_type='"jing"')
+            number = div.xpath('cb:mulu[1]/@n',
+                               namespaces=constants.NAMESPACES)[0]
+            title = div.xpath('tei:head[1]/text()',
+                              namespaces=constants.NAMESPACES)[0]
+            div_filename = '{}-{}-{}.xml'.format(work, number, title)
+            self._output_tree(div_filename, div_tree)
+
+    def _postprocess_T0186(self, work, tree):
+        """Post-process the XML document T0186.xml.
+
+        Divide into two files, one containing all of the tei:l
+        material, and one the rest.
+
+        """
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
+        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        verse_tree = extract_verse(tree)
+        verse_filename = '{}-verses.xml'.format(work)
+        self._output_tree(verse_filename, verse_tree)
+        prose_tree = extract_verse(tree, inverse='1')
+        prose_filename = '{}-ex-verses.xml'.format(work)
+        self._output_tree(prose_filename, prose_tree)
+
+    def _postprocess_T0220(self, work, tree):
+        """Post-process the XML document T0220.xml.
+
+        Divide into multiple files, one for each cb:div[@type='hui'],
+        named according to its position. This is complicated by the
+        fact that one of the parts (T0220b) is meant to be entirely
+        within the single hui of T0220a but does not have any
+        containing div.
+
+        """
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_T0220_reparent_divs.xsl')
+        move_non_hui_divs = etree.XSLT(etree.parse(xslt_filename))
+        tree = move_non_hui_divs(tree)
+        divs = tree.xpath('//cb:div[@type="hui"]',
+                          namespaces=constants.NAMESPACES)
+        for position, div in enumerate(divs):
+            div_tree = self._transform_div(tree, position=str(position),
+                                           div_type='"hui"')
+            div_filename = '{}-{}.xml'.format(work, position + 1)
+            self._output_tree(div_filename, div_tree)
+
+    def _postprocess_T0225(self, work, tree):
+        """Post-process the XML document T0225.xml.
+
+        Divide into two files, one containing all of the
+        tei:note[@place='inline'] material, and one the rest.
+
+        """
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_extract_commentary.xsl')
+        extract_commentary = etree.XSLT(etree.parse(xslt_filename))
+        commentary_tree = extract_commentary(tree)
+        commentary_filename = '{}-commentary.xml'.format(work)
+        self._output_tree(commentary_filename, commentary_tree)
+        ex_commentary_tree = extract_commentary(tree, inverse='1')
+        ex_commentary_filename = '{}-ex-commentary.xml'.format(work)
+        self._output_tree(ex_commentary_filename, ex_commentary_tree)
+
+    def _postprocess_T0310(self, work, tree):
+        """Post-process the XML document T0310.xml.
+
+        Divide into multiple files, one for each cb:div[@type='hui'],
+        named according to the cb:mulu content for that div.
+
+        The original markup has an extraneous cb:div[@type='hui'] that
+        does not have a cb:mulu child; this needs to first be removed
+        and its contents incorporated into the preceding
+        cb:div[@type='hui'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'hui')
+
+    def _postprocess_T0397(self, work, tree):
+        """Post-process the XML document T0397.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0418(self, work, tree):
+        """Post-process the XML document T0418.xml"
+
+        Divide into two files, one containing all of the tei:l
+        material, and one the rest.
+
+        """
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
+        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        verse_tree = extract_verse(tree)
+        verse_filename = '{}-verses.xml'.format(work)
+        self._output_tree(verse_filename, verse_tree)
+        prose_tree = extract_verse(tree, inverse='1')
+        prose_filename = '{}-ex-verses'.format(work)
+        self._output_tree(prose_filename, prose_tree)
+
+    def _postprocess_T0664(self, work, tree):
+        """Post-process the XML document T0664.xml.
+
+        Divide into multiple files, one for each cb:div[@type='pin'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'pin')
+
+    def _postprocess_T1331(self, work, tree):
+        """Post-process the XML document T1331.xml.
+
+        Divide into multiple files, one for each cb:div[@type='jing'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'jing')
+
+    def _postprocess_T1361(self, work, tree):
+        """Post-process the XML document T1361.xml.
+
+        Divide into two files: the cb:div[@type='jing'] and the
+        cb:div[@type='廣釋'].
+
+        """
+        div_tree = self._transform_div(tree, position='0', div_type='jing')
+        div_filename = '{}-root.xml'.format(work)
+        self._output_tree(div_filename, div_tree)
+        div_tree = self._transform_div(tree, position='0', div_type='廣釋')
+        div_filename = '{}-廣釋.xml'.format(work)
+        self._output_tree(div_filename, div_tree)
+
+    def _postprocess_T2102(self, work, tree):
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T2145(self, work, tree):
+        div_types = [('other', 'other')]
+        self._extract_divs(work, tree, div_types)
+
+    def _tidy(self, work, file_path):
+        """Transforms the file at `file_path` into simpler XML and returns
+        that."""
         output_file = os.path.join(self._output_dir, work)
         self._logger.info('Tidying file {} into {}'.format(
             file_path, output_file))

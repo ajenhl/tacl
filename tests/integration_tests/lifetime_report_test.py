@@ -22,7 +22,7 @@ class LifetimeReportTestCase (TaclTestCase):
             command = 'tacl lifetime {} {} {} {}'.format(
                 catalogue_path, results_path, label, temp_dir)
             subprocess.run(shlex.split(command))
-            self._compare_results_dirs(temp_dir, expected_dir)
+            self._compare_dirs(temp_dir, expected_dir)
 
     def test_generate(self):
         expected_dir = os.path.join(self._data_dir, 'expected')
@@ -35,4 +35,4 @@ class LifetimeReportTestCase (TaclTestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             report = tacl.LifetimeReport()
             report.generate(temp_dir, catalogue, results, label)
-            self._compare_results_dirs(temp_dir, expected_dir)
+            self._compare_dirs(temp_dir, expected_dir)

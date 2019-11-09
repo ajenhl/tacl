@@ -12,17 +12,28 @@ class StripTestCase (unittest.TestCase):
     def setUp(self):
         self.stripper = tacl.Stripper('.', '.')
 
+    def test_byline(self):
+        """Tests that byline elements are stripped without content."""
+        input_xml = '''
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T13n0397">
+<TEI><text><body>
+<byline cb:type="Translator">北涼天竺三藏曇無讖於姑臧譯</byline>
+</body></text></TEI>
+</teiCorpus>'''
+        expected_output = ''
+        self._transform_equality(input_xml, expected_output)
+
     def test_foreign(self):
-        """Tests that foreign elements with @place="foot" are stripped."""
+        """Tests that foreign elements with @place="foot" are stripped without
+        content."""
         foreign_data = (
             ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" '
              'resp="Taisho" lang="san">Saalva</foreign>', 'Saalva'),
             ('<foreign xmlns="http://www.tei-c.org/ns/1.0" n="0018011" '
              'resp="Taisho" lang="san" place="foot">Saalva</foreign>', ''),
-            )
+        )
         for input_xml, expected_output in foreign_data:
-            actual_output = str(self.stripper.transform(etree.XML(input_xml)))
-            self.assertEqual(expected_output, actual_output)
+            self._transform_equality(input_xml, expected_output)
 
     def test_get_witnesses(self):
         input_xml = '''
@@ -76,12 +87,28 @@ class StripTestCase (unittest.TestCase):
                                tacl.constants.BASE_WITNESS_ID)]
         self.assertEqual(actual_witnesses, expected_witnesses)
 
+    def test_jhead(self):
+        """Tests that cb:jhead elements are stripped without content."""
+        input_xml = '''
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T13n0397">
+<TEI><text><body>
+<cb:jhead>大方等大集經卷第一</cb:jhead>
+</body></text></TEI>
+</teiCorpus>'''
+        expected_output = ''
+        self._transform_equality(input_xml, expected_output)
+
+    def test_juan(self):
+        """Tests that cb:juan elements are stripped without content."""
+        input_xml = '<cb:juan xmlns:cb="http://www.cbeta.org/ns/1.0" n="001" fun="close">大方等大集經卷第一</cb:juan>'
+        expected_output = ''
+        self._transform_equality(input_xml, expected_output)
+
     def test_mulu(self):
         """Tests that cb:mulu elements are stripped."""
         input_xml = '<cb:mulu xmlns:cb="http://www.cbeta.org/ns/1.0">1 大本經</cb:mulu>'
         expected_output = ''
-        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output)
 
     def test_no_header(self):
         """Tests that the TEI header is stripped."""
@@ -123,8 +150,7 @@ class StripTestCase (unittest.TestCase):
   </TEI>
 </teiCorpus>'''
         expected_output = ''
-        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output)
 
     def test_note(self):
         """Tests that notes, unless inline, are stripped."""
@@ -136,8 +162,7 @@ class StripTestCase (unittest.TestCase):
         expected_output = '''
 苑。其為典也。淵博弘富。
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
-        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output)
 
     def test_tt(self):
         """Tests that tt is stripped down to the content of
@@ -148,8 +173,7 @@ class StripTestCase (unittest.TestCase):
             'xml:lang="sa" place="foot">Dīrgha-āgama</t><t resp="Taisho" '
             'xml:lang="pi" place="foot">Dīgha-nikāya</t></tt>')
         expected_output = '長阿含經'
-        actual_output = str(self.stripper.transform(etree.XML(input_xml)))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output)
 
     def test_variants(self):
         """Tests that lem/rdg is stripped when it doesn't match the supplied
@@ -160,29 +184,29 @@ class StripTestCase (unittest.TestCase):
         # With the base witness name provided (ie, use the lem).
         expected_output = '''
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
-        actual_output = str(
-            self.stripper.transform(etree.XML(input_xml),
-                                    witness_ref="'{}'".format(
-                                        tacl.constants.BASE_WITNESS_ID)))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output,
+                                 witness_ref="'{}'".format(
+                                     tacl.constants.BASE_WITNESS_ID))
         # With a witness ref provided that occurs in a rdg.
         expected_output = '''
 在直樹林故名釋懿'''
-        actual_output = str(self.stripper.transform(etree.XML(input_xml),
-                                                    witness_id="'wit2'"))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output,
+                                 witness_id="'wit2'")
         # With a witness name provided that occurs in a rdg.
         expected_output = '''
 佛法'''
-        actual_output = str(self.stripper.transform(etree.XML(input_xml),
-                                                    witness_id="'wit3'"))
-        self.assertEqual(expected_output, actual_output)
+        self._transform_equality(input_xml, expected_output,
+                                 witness_id="'wit3'")
         # A particular witness may not be listed either in the lem or
         # a rdg, in which case the lem must be used.
         expected_output = '''
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
+        self._transform_equality(input_xml, expected_output,
+                                 witness_id="'wit4'")
+
+    def _transform_equality(self, input_xml, expected_output, **kwargs):
         actual_output = str(self.stripper.transform(etree.XML(input_xml),
-                                                    witness_id="'wit4'"))
+                                                    **kwargs))
         self.assertEqual(expected_output, actual_output)
 
 

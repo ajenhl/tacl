@@ -1,0 +1,41 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="hui">
+          <cb:mulu level="1" n="1" type="&#x6703;">1 會</cb:mulu>
+          <cb:div type="pin">
+            <p>HUI 1</p>
+          </cb:div>
+          <cb:div type="pin">
+            <cb:mulu level="3">20</cb:mulu>
+            <head type="pin">初分難信解品第三十四之二十</head>
+            <lb n="0001a06" ed="T"/>
+            <p xml:id="pT06p0001a0601">Still HUI 1</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+  <TEI xml:id="T07n0220c">
+    <teiHeader/>
+    <text>
+      <body/>
+    </text>
+  </TEI>
+</teiCorpus>

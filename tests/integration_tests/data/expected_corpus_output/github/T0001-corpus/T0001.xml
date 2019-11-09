@@ -1,0 +1,51 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T01n0001">
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title/>
+        </titleStmt>
+      </fileDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <milestone n="1" unit="juan"/>
+        <pb n="0001a" ed="T" xml:id="T01.0001.0001a"/>
+        <lb n="0001a01" ed="T"/>
+        <cb:docNumber>No. 1</cb:docNumber>
+        <cb:div type="fen">
+          <cb:mulu level="1" type="&#x5206;">1 分</cb:mulu>
+          <cb:div type="jing">
+            <cb:mulu level="2" type="&#x7D93;">1 大本經</cb:mulu>
+            <head>（一）第一分初大本經第一</head>
+            <lb n="0001b12" ed="T"/>
+            <p xml:id="pT01p0001b1201">如是我聞：</p>
+            <p xml:id="pT01p0001b1205" cb:place="inline">一時，佛在</p>
+          </cb:div>
+          <lb n="0052c17" ed="T"/>
+          <cb:div type="jing">
+            <cb:mulu level="2" type="&#x7D93;">10 十上經</cb:mulu>
+            <head>（一〇）第二分十上經第六</head>
+            <lb n="0052c18" ed="T"/>
+            <p xml:id="pT01p0052c1801">如是我聞：</p>
+            <p xml:id="pT01p0052c1805" cb:place="inline">一時，佛遊鴦伽國，與大比丘眾</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

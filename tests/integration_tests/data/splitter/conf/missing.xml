@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<splits>
+  <work>foo</work>
+  <splits>
+    <split>
+      <witnesses>ALL</witnesses>
+      <whole>foo</whole>
+    </split>
+  </splits>
+</splits>

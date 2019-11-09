@@ -1,0 +1,69 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T03n0186">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="pin">
+          <lg xml:id="lgT03p0484c1001">
+            <l>「積功累德行，</l>
+            <l>宣布具足音；</l>
+            <lb n="0484c11" ed="T"/>
+            <l>其心普思道，</l>
+            <l>造智慧光明。</l>
+            <lb n="0484c12" ed="T"/>
+            <l>備無量勢力，</l>
+            <l>棄捐諸所有；</l>
+            <lb n="0484c13" ed="T"/>
+            <l>分別決眾疑，</l>
+            <l>諸天之本末。</l>
+            <lb n="0484c14" ed="T"/>
+            <l>意清淨無垢，</l>
+            <l>無雜眾瑕穢；</l>
+          </lg>
+          <lg xml:id="lgT03p0486a2801">
+            <l>「『清淨人喜法，</l>
+            <l>處法師子座；</l>
+            <lb n="0486a29" ed="T"/>
+            <l>自然天圍繞，</l>
+            <l>此菩薩惔怕。</l>
+            <lb n="0486b01" ed="T"/>
+            <l>普處講堂議，</l>
+            <l>何種至賢良？</l>
+            <lb n="0486b02" ed="T"/>
+            <l>菩薩應降神，</l>
+            <l>父母淳真正。</l>
+          </lg>
+        </cb:div>
+        <cb:div type="pin">
+          <lg xml:id="lgT03p0487c2501">
+            <l>「『其有樂清淨，</l>
+            <l>在天心思妙；</l>
+            <lb n="0487c26" ed="T"/>
+            <l>皆宿造德本，</l>
+            <l>故致此淨果。</l>
+            <lb n="0487c27" ed="T"/>
+            <l>是故報前世，</l>
+            <l>造行清淨品；</l>
+            <lb n="0487c28" ed="T"/>
+            <l>無德歸惡趣，</l>
+            <l>在苦痛不善。</l>
+          </lg>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

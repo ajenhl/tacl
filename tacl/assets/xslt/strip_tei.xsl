@@ -10,6 +10,12 @@
   <xsl:output encoding="UTF-8" method="text" />
   <xsl:strip-space elements="*" />
 
+  <!-- Transform a TEI file into plain text, removing all markup.
+
+       Some markup should not have its content included at
+       all. Whitespace is added or removed as needed to make the
+       output vaguely readable. -->
+
   <!-- For the edited/master text, pass BASE_WITNESS_ID. -->
   <xsl:param name="witness_id" />
   <xsl:variable name="witness_ref" select="concat(' #', $witness_id, ' ')" />
@@ -19,6 +25,8 @@
     <xsl:apply-templates select="node()" />
   </xsl:template>
 
+  <xsl:template match="tei:byline" />
+
   <xsl:template match="tei:foreign[@place='foot']" />
 
   <xsl:template match="cb:docNumber" />
@@ -27,6 +35,10 @@
     <xsl:text>   </xsl:text>
     <xsl:apply-templates select="node()" />
   </xsl:template>
+
+  <xsl:template match="cb:jhead" />
+
+  <xsl:template match="cb:juan" />
 
   <xsl:template match="tei:l">
     <xsl:text>   </xsl:text>

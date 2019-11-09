@@ -33,3 +33,8 @@ class MalformedNormaliserMappingError(TACLError):
 
     def __str__(self):
         return self._msg.format(self._form)
+
+
+class MalformedSplitConfigurationError(TACLError):
+
+    pass

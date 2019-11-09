@@ -21,6 +21,15 @@ class Corpus:
         self._path = os.path.abspath(path)
         self._tokenizer = tokenizer
 
+    @property
+    def path(self):
+        """Returns the absolute path to this corpus.
+
+        :rtype: `str`
+
+        """
+        return self._path
+
     def get_sigla(self, work):
         """Returns a list of all of the sigla for `work`.
 

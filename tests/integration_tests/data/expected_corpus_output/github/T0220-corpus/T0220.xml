@@ -1,0 +1,76 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body>
+        <milestone n="1" unit="juan"/>
+        <pb n="0001a" ed="T" xml:id="T05.0220a.0001a"/>
+        <lb n="0001a01" ed="T"/>
+        <lb n="0001a02" ed="T"/>
+        <cb:docNumber>No. 220</cb:docNumber>
+        <lb n="0001a03" ed="T"/>
+        <cb:div type="hui">
+          <cb:mulu level="1" n="1" type="&#x6703;">1 會</cb:mulu>
+          <cb:div type="pin">
+            <p>HUI 1</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+  <TEI xml:id="T06n0220b">
+    <teiHeader/>
+    <text>
+      <body>
+        <milestone n="201" unit="juan"/>
+        <pb n="0001a" ed="T" xml:id="T06.0220b.0001a"/>
+        <lb n="0001a01" ed="T"/>
+        <lb n="0001a02" ed="T"/>
+        <cb:juan n="201" fun="open">
+          <cb:mulu n="201" type="&#x5377;"/>
+          <cb:jhead><title>大般若波羅蜜多經</title>卷第二百一</cb:jhead>
+        </cb:juan>
+        <lb n="0001a03" ed="T"/>
+        <lb n="0001a05" ed="T"/>
+        <cb:div type="pin">
+          <cb:mulu level="3">20</cb:mulu>
+          <head type="pin">初分難信解品第三十四之二十</head>
+          <lb n="0001a06" ed="T"/>
+          <p xml:id="pT06p0001a0601">Still HUI 1</p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+  <TEI xml:id="T07n0220c">
+    <teiHeader/>
+    <text>
+      <body>
+        <milestone n="401" unit="juan"/>
+        <pb n="0001a" ed="T" xml:id="T07.0220c.0001a"/>
+        <lb n="0001a01" ed="T"/>
+        <lb n="0001a02" ed="T"/>
+        <cb:div n="02" type="hui">
+          <cb:mulu level="1" n="1" type="&#x6703;">2 會</cb:mulu>
+          <head><title>大般若經</title>第二會</head>
+          <cb:div type="pin">
+            <p>HUI 2</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

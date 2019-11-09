@@ -2,6 +2,7 @@
 
 import os
 import shlex
+import shutil
 import sqlite3
 import subprocess
 import tempfile
@@ -559,6 +560,18 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
 
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
+
+    def test_split(self):
+        splitter_dir = os.path.join(self._data_dir, 'splitter')
+        original_corpus_dir = os.path.join(splitter_dir, 'corpus')
+        expected_dir = os.path.join(splitter_dir, 'expected')
+        conf_path = os.path.join(splitter_dir, 'conf', 'A.xml')
+        with tempfile.TemporaryDirectory() as actual_dir:
+            corpus_dir = os.path.join(actual_dir, 'corpus')
+            shutil.copytree(original_corpus_dir, corpus_dir)
+            command = 'tacl split {} {}'.format(corpus_dir, conf_path)
+            subprocess.call(shlex.split(command))
+            self._compare_dirs(corpus_dir, expected_dir)
 
 
 if __name__ == '__main__':

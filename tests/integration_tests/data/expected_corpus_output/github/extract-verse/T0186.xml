@@ -1,0 +1,109 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T03n0186">
+    <teiHeader/>
+    <text>
+      <body>
+        <milestone n="1" unit="juan"/>
+        <lb n="0483a14" ed="T"/>
+        <lb n="0483a15" ed="T"/>
+        <lb n="0483a16" ed="T"/>
+        <cb:docNumber>No. 186 [No. 187]</cb:docNumber>
+        <lb n="0483a17" ed="T"/>
+        <cb:juan n="001" fun="open">
+          <cb:mulu n="001" type="&#x5377;"/>
+          <cb:jhead><title>佛說普曜經</title>卷第一<note place="inline">一名方等本起</note></cb:jhead>
+        </cb:juan>
+        <lb n="0483a18" ed="T"/>
+        <lb n="0483a19" ed="T"/>
+        <byline cb:type="Translator">西晉月氏三藏竺法護譯</byline>
+        <lb n="0483a20" ed="T"/>
+        <cb:div type="pin">
+          <cb:mulu level="1" n="1" type="&#x54C1;">1 論降神品</cb:mulu>
+          <head>論降神品第一</head>
+          <lb n="0483a21" ed="T"/>
+          <p xml:id="pT03p0483a2101">聞如是：</p>
+          <p xml:id="pT03p0483a2104" cb:place="inline">一時佛在舍衛國祇樹給孤獨園，
+        <lb n="0483a22" ed="T"/>與大比丘眾俱，比丘萬二千，菩薩三萬二
+        <lb n="0483a23" ed="T"/>千，一切大聖神智以暢，一生補處當成正</p>
+          <lb n="0484c10" ed="T"/>
+          <lg xml:id="lgT03p0484c1001">
+            <l>「積功累德行，</l>
+            <l>宣布具足音；</l>
+            <lb n="0484c11" ed="T"/>
+            <l>其心普思道，</l>
+            <l>造智慧光明。</l>
+            <lb n="0484c12" ed="T"/>
+            <l>備無量勢力，</l>
+            <l>棄捐諸所有；</l>
+            <lb n="0484c13" ed="T"/>
+            <l>分別決眾疑，</l>
+            <l>諸天之本末。</l>
+            <lb n="0484c14" ed="T"/>
+            <l>意清淨無垢，</l>
+            <l>無雜眾瑕穢；</l>
+          </lg>
+          <lb n="0485a25" ed="T"/>
+          <p xml:id="pT03p0485a2501">於是佛告諸比丘：「于時菩薩省諸伎樂，
+        <lb n="0485a26" ed="T"/>宣法音時出大宮殿，有大講堂號演施法，
+        <lb n="0485a27" ed="T"/>昇彼講堂坐師子床，其諸天子學大乘業
+        <lb n="0485a28" ed="T"/>行等慈者，亦復俱昇此大講堂，各從本位
+        <lb n="0485a29" ed="T"/>次第而坐。捨玉女眾及諸天子，咸從同學
+        <pb n="0485b" ed="T" xml:id="T03.0186.0485b"/><lb n="0485b01" ed="T"/>各來集會。諸眷屬眾各六十六億，咸共講議，
+        <lb n="0485b02" ed="T"/>當使菩薩現生何種，或有說言：『此維提種，</p>
+          <lb n="0486a28" ed="T"/>
+          <lg xml:id="lgT03p0486a2801">
+            <l>「『清淨人喜法，</l>
+            <l>處法師子座；</l>
+            <lb n="0486a29" ed="T"/>
+            <l>自然天圍繞，</l>
+            <l>此菩薩惔怕。</l>
+            <pb n="0486b" ed="T" xml:id="T03.0186.0486b"/>
+            <lb n="0486b01" ed="T"/>
+            <l>普處講堂議，</l>
+            <l>何種至賢良？</l>
+            <lb n="0486b02" ed="T"/>
+            <l>菩薩應降神，</l>
+            <l>父母淳真正。</l>
+          </lg>
+        </cb:div>
+        <lb n="0486c10" ed="T"/>
+        <cb:div type="pin">
+          <cb:mulu level="1" n="2" type="&#x54C1;">2 說法門品</cb:mulu>
+          <head><title>普曜經</title>說法門品第二</head>
+          <lb n="0486c11" ed="T"/>
+          <p xml:id="pT03p0486c1101">佛告比丘：「前選菩薩所降神土，其兜術天
+        <lb n="0486c12" ed="T"/>有大天宮，名曰高幢，廣長二千五百六十
+        <lb n="0486c13" ed="T"/>里，菩薩常坐，為諸天人敷演經典。於時菩</p>
+          <lb n="0487c25" ed="T"/>
+          <lg xml:id="lgT03p0487c2501">
+            <l>「『其有樂清淨，</l>
+            <l>在天心思妙；</l>
+            <lb n="0487c26" ed="T"/>
+            <l>皆宿造德本，</l>
+            <l>故致此淨果。</l>
+            <lb n="0487c27" ed="T"/>
+            <l>是故報前世，</l>
+            <l>造行清淨品；</l>
+            <lb n="0487c28" ed="T"/>
+            <l>無德歸惡趣，</l>
+            <l>在苦痛不善。</l>
+          </lg>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

@@ -1,0 +1,36 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T08n0225">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="pin">
+          <p xml:id="pT08p0478b2304" cb:place="inline">
+            <lb n="0478b27" ed="T"/>
+            <note place="inline">師云：請之以法，不以飲食
+        <lb n="0478b28" ed="T"/>也</note>
+          </p>
+          <p xml:id="pT08p0478b2907" cb:place="inline">
+            <lb n="0478c03" ed="T"/>
+            <note place="inline">法學，學法也，解空、不願、無想、寂定，謂之得法意。漏盡結解得道，謂之證。由言證已，當還本無矣</note>
+            <lb n="0478c04" ed="T"/>
+            <note place="inline">所說者，解說經義也。</note>
+          </p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

@@ -33,8 +33,11 @@ TOKENIZERS = {
 BASE_WITNESS = 'base'
 BASE_WITNESS_ID = ''
 # XML namespaces.
-NAMESPACES = {'tei': 'http://www.tei-c.org/ns/1.0',
-              'xml': 'http://www.w3.org/XML/1998/namespace'}
+NAMESPACES = {
+    'cb': 'http://www.cbeta.org/ns/1.0',
+    'tei': 'http://www.tei-c.org/ns/1.0',
+    'xml': 'http://www.w3.org/XML/1998/namespace'
+}
 XML = '{{{}}}'.format(NAMESPACES['xml'])
 
 # Sequencer scoring values.
@@ -334,6 +337,8 @@ PREPARE_DESCRIPTION = '''\
     work) into XML suitable for processing via the tacl strip
     command.'''
 PREPARE_EPILOG = '''\
+    Existing files are not overwritten by this command.
+
     The TEI source options are:
 
     * {}: The CBETA TEI files as distributed on their GitHub repository
@@ -521,6 +526,72 @@ SEARCH_NGRAMS_HELP = '''\
     Path to file containing list of n-grams to search for, with one
     n-gram per line.'''
 
+SPLIT_CONF_HELP = '''\
+    XML configuration file defining the contents of each witness split
+    from the source work.'''
+SPLIT_DESCRIPTION = '''\
+    Split an existing work into multiple works that are subsets of its
+    content.'''
+SPLIT_EPILOG = '''\
+
+    Each split configuration file must be named according to the work
+    that it defines the splits for (eg, T0278.xml). Its format is a
+    simple XML structure, as illustrated in the example below:
+
+    <splits>
+      <work>
+        <name>T0278-paralleled-earlier</name>
+        <parts>
+          <part>
+            <witnesses>大,宋,元,明,聖</witnesses>
+            <start>佛在摩竭提國寂滅道場初始得佛普光法</start>
+            <end>最勝或稱能度如是等稱佛名號其數一萬</end>
+          </part>
+          <part>
+            <witnesses>宮</witnesses>
+            <start>佛在摩竭提國寂滅道場初始得佛普光法</start>
+            <end>最勝或稱能度如是稱佛名號其數一萬</end>
+          </part>
+          <part>
+            <witnesses>ALL</witnesses>
+            <start>爾時世尊從兩足相輪放百億光明遍照</start>
+            <end>百億色究竟天此世界所有一切悉現</end>
+          </part>
+        </parts>
+      </work>
+      <work>
+        <name>T278-ex-earlier-parallels</name>
+        <parts>
+          <part>
+            <witnesses>ALL</witnesses>
+            <whole>如此見佛坐蓮華藏師子座上有十佛世界塵數菩薩眷屬圍遶百億閻浮提</whole>
+          </part>
+          <part>
+            <witnesses>ALL</witnesses>
+            <start>佛子是為菩薩身口意業能得一切勝妙功</start>
+            <end>善哉善哉真佛子快說是法我隨喜</end>
+          </part>
+        </parts>
+      </work>
+    </splits>
+
+    Each split work is created, under the supplied name, in the corpus
+    directory. Each of the original work's witnesses are recreated,
+    using the subset of its content defined in the parts. The parts
+    are processed in the order listed, and a witness includes a part
+    only if its siglum is listed in witnesses, or the keyword ALL is
+    given in witnesses.
+
+    Each part defines either a start and end piece of text, or a whole
+    piece of text. In the former case, the first remaining instance of
+    the start text, and everything following it until the first
+    remaining instance of the end text, is copied into each applicable
+    witness of the new work. In the latter case, the first instance of
+    the whole provided text is copied. In both cases, after the
+    specified text is copied, it is removed from consideration in the
+    future parts of this split work.'''
+SPLIT_HELP = 'Split an existing work into multiple works.'
+
 STATISTICS_DESCRIPTION = '''\
     Generate summary statistics for a set of results. This gives, for
     each witness, the total number of tokens and the count of matching
@@ -588,6 +659,17 @@ LABEL_NOT_IN_CATALOGUE_ERROR = (
 MISSING_REQUIRED_COLUMNS_ERROR = (
     'Results file is missing required column(s) {}.')
 NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
+SPLIT_INVALID_WITNESS = ('Part references witness "{}" that does not exist '
+                         'in work {}.')
+SPLIT_MISSING_END_STRING = 'End string "{}" not found in work {}.'
+SPLIT_MISSING_START_STRING = 'Start string "{}" not found in work {}'
+SPLIT_MISSING_WHOLE_STRING = 'Whole string "{}" not found in work {}.'
+SPLIT_MISSING_WITNESSES = 'No witnesses specified for part in work {}.'
+SPLIT_MIXED_START_END_STRINGS = ('Start string "{}" comes after end string '
+                                 '"{}" in work {}.')
+SPLIT_OUTPUT_DIRECTORY_EXISTS = ('Output directory for split work "{}" in '
+                                 'work {} already exists.')
+SPLIT_WORK_NOT_IN_CORPUS_ERROR = 'Work {} does not exist in corpus.'
 SUPPLIED_ARGS_LENGTH_MISMATCH_ERROR = (
     'The number of labels supplied does not match the number of results files.'
 )

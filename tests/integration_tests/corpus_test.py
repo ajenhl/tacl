@@ -69,7 +69,7 @@ class CorpusIntegrationTestCase (TaclTestCase):
         with tempfile.TemporaryDirectory() as output_dir:
             actual_dir = os.path.join(output_dir, 'corpus')
             corpus.normalise(mapping, actual_dir)
-            self._compare_results_dirs(actual_dir, expected_dir)
+            self._compare_dirs(actual_dir, expected_dir)
 
 
 if __name__ == '__main__':

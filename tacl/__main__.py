@@ -88,11 +88,12 @@ def generate_parser():
     generate_normalise_subparser(subparsers)
     generate_prepare_subparser(subparsers)
     generate_results_subparser(subparsers)
-    generate_supplied_diff_subparser(subparsers)
     generate_search_subparser(subparsers)
-    generate_supplied_intersect_subparser(subparsers)
+    generate_split_subparser(subparsers)
     generate_statistics_subparser(subparsers)
     generate_strip_subparser(subparsers)
+    generate_supplied_diff_subparser(subparsers)
+    generate_supplied_intersect_subparser(subparsers)
     return parser
 
 
@@ -416,6 +417,19 @@ def generate_search_subparser(subparsers):
                         nargs='*', metavar='NGRAMS')
 
 
+def generate_split_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to generate new corpus
+    files by splitting existing ones."""
+    parser = subparsers.add_parser(
+        'split', description=constants.SPLIT_DESCRIPTION,
+        epilog=constants.SPLIT_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.SPLIT_HELP)
+    parser.set_defaults(func=split_texts)
+    utils.add_corpus_arguments(parser)
+    parser.add_argument('splits', help=constants.SPLIT_CONF_HELP,
+                        nargs="+", metavar='CONF')
+
+
 def generate_statistics(args, parser):
     corpus = utils.get_corpus(args)
     tokenizer = utils.get_tokenizer(args)
@@ -658,6 +672,13 @@ def search_texts(args, parser):
     for ngram_file in args.ngrams:
         ngrams.extend(utils.get_ngrams(ngram_file))
     store.search(catalogue, ngrams, sys.stdout)
+
+
+def split_texts(args, parser):
+    corpus = utils.get_corpus(args)
+    splitter = tacl.Splitter(corpus)
+    for split_conf in args.splits:
+        splitter.split(split_conf)
 
 
 def strip_files(args, parser):

@@ -40,7 +40,7 @@ class TaclTestCase (unittest.TestCase):
                     'Differing content between "{}" and "{}"'.format(
                         actual_path, expected_path))
 
-    def _compare_results_dirs(self, actual_dir, expected_dir):
+    def _compare_dirs(self, actual_dir, expected_dir):
         # First check that the two directories contain only the same
         # files and subdirectories.
         dircmp = filecmp.dircmp(actual_dir, expected_dir)

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<splits>
+  <work>
+    <name>start_end</name>
+    <parts>
+      <part>
+        <witnesses>ALL</witnesses>
+        <start>text that</start>
+        <end>based on</end>
+      </part>
+    </parts>
+  </work>
+  <work>
+    <name>whole</name>
+    <parts>
+      <part>
+        <witnesses>ALL</witnesses>
+        <whole>definition of a part</whole>
+      </part>
+    </parts>
+  </work>
+  <work>
+    <name>multiple_parts</name>
+    <parts>
+      <part>
+        <witnesses>ALL</witnesses>
+        <start>that serves</start>
+        <end>of substrings</end>
+      </part>
+      <part>
+        <witnesses>ALL</witnesses>
+        <start>Entire substrings</start>
+        <end>being included</end>
+      </part>
+    </parts>
+  </work>
+  <work>
+    <name>witnesses</name>
+    <parts>
+      <part>
+        <witnesses>wit1,wit2</witnesses>
+        <start>This is</start>
+        <end>simple rules</end>
+      </part>
+      <part>
+        <witnesses>wit3</witnesses>
+        <start>This was</start>
+        <end>simple rules</end>
+      </part>
+    </parts>
+  </work>
+</splits>

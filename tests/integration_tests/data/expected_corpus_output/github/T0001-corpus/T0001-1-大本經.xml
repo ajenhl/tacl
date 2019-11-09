@@ -1,0 +1,36 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T01n0001">
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title/>
+        </titleStmt>
+      </fileDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <cb:div type="jing">
+          <cb:mulu level="2" type="&#x7D93;">1 大本經</cb:mulu>
+          <head>（一）第一分初大本經第一</head>
+          <lb n="0001b12" ed="T"/>
+          <p xml:id="pT01p0001b1201">如是我聞：</p>
+          <p xml:id="pT01p0001b1205" cb:place="inline">一時，佛在</p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

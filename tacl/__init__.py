@@ -9,6 +9,7 @@ from .lifetime_report import LifetimeReport
 from .normaliser import VariantMapping
 from .results import Results
 from .sequence import SequenceReport
+from .splitter import Splitter
 from .statistics_report import StatisticsReport
 from .stripper import Stripper
 from .tei_corpus import TEICorpusCBETAGitHub
