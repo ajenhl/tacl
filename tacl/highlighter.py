@@ -37,7 +37,7 @@ class HighlightReport(Report):
 
     def _generate_base(self, work, siglum):
         witness = self._corpus.get_witness(work, siglum)
-        content = witness.get_content().strip()
+        content = witness.content.strip()
         return self._prepare_text(content)
 
     def _get_regexp_pattern(self, ngram):

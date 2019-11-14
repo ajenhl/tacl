@@ -32,26 +32,25 @@
 </projectDesc>
 <charDecl>
 <char xml:id="CB00044">
-	<charName>CBETA CHARACTER CB00400</charName>
-	<charProp>
-		<localName>composition</localName>
-		<value>[泳-永+(而/而)]</value>
-	</charProp>
-	<charProp>
-		<localName>normalized form</localName>
-		<value>濡</value>
-	</charProp>
-	<mapping type="unicode">U+23F48</mapping>
-	<mapping cb:dec="983440" type="PUA">U+F0190</mapping>
+        <charName>CBETA CHARACTER CB00400</charName>
+        <charProp>
+                <localName>composition</localName>
+                <value>[泳-永+(而/而)]</value>
+        </charProp>
+        <charProp>
+                <localName>normalized form</localName>
+                <value>濡</value>
+        </charProp>
+        <mapping cb:dec="983440" type="PUA">U+F0190</mapping>
 </char>
 </charDecl>
 </encodingDesc>
 <profileDesc>
-		<langUsage>
-			<language ident="en">English</language>
-			<language ident="zh">Chinese</language>
-		</langUsage>
-	</profileDesc>
+        <langUsage>
+                <language ident="en">English</language>
+                <language ident="zh">Chinese</language>
+        </langUsage>
+</profileDesc>
         <revisionDesc>
                 <change when="2013-05-20"><name>CW</name><name>Ray Chou 周邦信</name>P4 to P5 conversion by p4top5a.py, intended for publication</change>
  </revisionDesc>

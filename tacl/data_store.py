@@ -154,14 +154,13 @@ class DataStore:
 
         """
         filename = witness.get_filename()
-        name, siglum = witness.get_names()
         self._logger.info('Adding record for text {}'.format(filename))
         checksum = witness.get_checksum()
         token_count = len(witness.get_tokens())
         with self._conn:
             cursor = self._conn.execute(
                 constants.INSERT_TEXT_SQL,
-                [name, siglum, checksum, token_count, ''])
+                [witness.work, witness.siglum, checksum, token_count, ''])
         return cursor.lastrowid
 
     def _add_text_size_ngrams(self, text_id, size, ngrams):
@@ -487,9 +486,9 @@ class DataStore:
         :rtype: `int`
 
         """
-        name, siglum = witness.get_names()
-        text_record = self._conn.execute(constants.SELECT_TEXT_SQL,
-                                         [name, siglum]).fetchone()
+        text_record = self._conn.execute(
+            constants.SELECT_TEXT_SQL,
+            [witness.work, witness.siglum]).fetchone()
         if text_record is None:
             text_id = self._add_text_record(witness)
         else:
@@ -768,10 +767,10 @@ class DataStore:
             # for each work, since that involves reading the file.
             for witness in corpus.get_witnesses(name):
                 count += 1
-                name, siglum = witness.get_names()
                 filename = witness.get_filename()
-                row = self._conn.execute(constants.SELECT_TEXT_SQL,
-                                         [name, siglum]).fetchone()
+                row = self._conn.execute(
+                    constants.SELECT_TEXT_SQL,
+                    [witness.work, witness.siglum]).fetchone()
                 if row is None:
                     is_valid = False
                     self._logger.warning(

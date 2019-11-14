@@ -40,7 +40,7 @@ class Splitter:
                 constants.SPLIT_WORK_NOT_IN_CORPUS_ERROR.format(in_work_name))
         config = etree.parse(conf_path)
         witnesses = list(self._corpus.get_witnesses(in_work_name))
-        sigla = [witness.get_names()[1] for witness in witnesses]
+        sigla = [witness.siglum for witness in witnesses]
         for out_work in config.xpath('/splits/work'):
             self.split_work(in_work_name, out_work, witnesses, sigla)
 
@@ -54,9 +54,9 @@ class Splitter:
         os.mkdir(out_work_path)
         parts = out_work[1][0:]
         for witness in witnesses:
-            siglum = witness.get_names()[1]
-            source_text = witness.get_content()
+            source_text = witness.content
             output_text = []
+            siglum = witness.siglum
             for part in parts:
                 if part[0].tag != 'witnesses':
                     raise MalformedSplitConfigurationError(

@@ -35,6 +35,7 @@ BASE_WITNESS_ID = ''
 # XML namespaces.
 NAMESPACES = {
     'cb': 'http://www.cbeta.org/ns/1.0',
+    'tacl': 'http://github.com/ajenhl/tacl/ns',
     'tei': 'http://www.tei-c.org/ns/1.0',
     'xml': 'http://www.w3.org/XML/1998/namespace'
 }

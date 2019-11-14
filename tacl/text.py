@@ -39,7 +39,8 @@ class Text:
             content = content.replace(ngram, replacement)
         return content
 
-    def get_content(self):
+    @property
+    def content(self):
         """Returns the content of this text.
 
         :rtype: `str`
@@ -141,13 +142,13 @@ class WitnessText (Text):
         """
         return self._filename
 
-    def get_names(self):
-        """Returns the name and siglum of this witness.
+    @property
+    def siglum(self):
+        return self._siglum
 
-        :rtype: `tuple`
-
-        """
-        return self._work, self._siglum
+    @property
+    def work(self):
+        return self._work
 
 
 class FilteredWitnessText (WitnessText):

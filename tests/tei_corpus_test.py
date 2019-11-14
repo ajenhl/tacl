@@ -66,12 +66,13 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         <charDecl><char xml:id="CB00178">
         <charName>CBETA CHARACTER CB00178</charName>
         {}
-        <mapping type="unicode">U+3B88</mapping>
         <mapping cb:dec="983218" type="PUA">U+F00B2</mapping>
         </char></charDecl>
         <p><g ref="#CB00178">㮈</g></p>
         </TEI>'''
         data = [
+            ('<mapping type="unicode">U+3B88</mapping>', '㮈'),
+            ('<mapping type="normal_unicode">U+3B88</mapping>', '㮈'),
             ('<charProp><localName>composition</localName><value>[木*奈]</value></charProp>',
              '[木*奈]'),
             ('<charProp><localName>Romanized form in CBETA transcription</localName><value>o.m</value></charProp><charProp><localName>Character in the Siddham font</localName><value>湡</value></charProp><charProp><localName>Romanized form in Unicode transcription</localName><value>oṃ</value></charProp>',

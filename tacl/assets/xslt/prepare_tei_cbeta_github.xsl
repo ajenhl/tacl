@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0"
                 xmlns:cb="http://www.cbeta.org/ns/1.0"
+                xmlns:tacl="http://github.com/ajenhl/tacl/ns"
                 xmlns:tei="http://www.tei-c.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -34,6 +35,12 @@
 
   <xsl:template match="tei:char" mode="nonunicode">
     <xsl:choose>
+      <xsl:when test="tei:mapping/@type='unicode'">
+        <xsl:value-of select="tacl:char_from_codepoint(string(tei:mapping[@type='unicode']))" />
+      </xsl:when>
+      <xsl:when test="tei:mapping/@type='normal_unicode'">
+        <xsl:value-of select="tacl:char_from_codepoint(string(tei:mapping[@type='normal_unicode']))" />
+      </xsl:when>
       <xsl:when test="tei:charProp/tei:localName='composition'">
         <xsl:value-of select="tei:charProp[tei:localName='composition']/tei:value" />
       </xsl:when>

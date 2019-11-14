@@ -14,6 +14,11 @@ class TextTestCase (TaclTestCase):
             tacl.constants.TOKENIZER_PATTERN_CBETA,
             tacl.constants.TOKENIZER_JOINER_CBETA)
 
+    def test_content(self):
+        content = 'test content'
+        text = tacl.Text(content, self._tokenizer)
+        self.assertEqual(text.content, content)
+
     def test_excise(self):
         content = 'abcd efgh. ije'
         excised_ngrams = ['b', 'de', 'je', 'hij']
@@ -101,11 +106,13 @@ class WitnessTextTestCase (TaclTestCase):
         expected_filename = 'test/base.txt'
         self.assertEqual(actual_filename, expected_filename)
 
-    def test_get_names(self):
+    def test_siglum(self):
         text = tacl.WitnessText('T1', 'base', 'test content', self._tokenizer)
-        actual_names = text.get_names()
-        expected_names = ('T1', 'base')
-        self.assertEqual(actual_names, expected_names)
+        self.assertEqual(text.siglum, 'base')
+
+    def test_work(self):
+        text = tacl.WitnessText('T1', 'base', 'test content', self._tokenizer)
+        self.assertEqual(text.work, 'T1')
 
 
 class FilteredWitnessTextTestCase (TaclTestCase):

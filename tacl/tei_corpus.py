@@ -29,6 +29,19 @@ TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="htt
 TEI = '{{{}}}'.format(constants.NAMESPACES['tei'])
 resp_splitter = re.compile(r'\{|\}')
 witnesses_splitter = re.compile(r'【|】')
+ns = etree.FunctionNamespace(constants.NAMESPACES['tacl'])
+
+
+@ns
+def char_from_codepoint(context, codepoint):
+    """XPath Extension function to return a Unicode character from a
+    Unicode codepoint.
+
+    The codepoint is provided as a string starting with U+ and
+    followed by a hexadecimal number.
+
+    """
+    return chr(int(codepoint[2:], base=16))
 
 
 class TEICorpus:
