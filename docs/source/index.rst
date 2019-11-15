@@ -122,6 +122,6 @@ to install `tacl-catalogue-manager`_.
 
 .. _Chinese Buddhist Electronic Text Association: http://www.cbeta.org/
 .. _n-grams: http://en.wikipedia.org/wiki/N-gram
-.. _user's guide: http://dazangthings.nz/documents/3/TACL_users_guide.pdf
+.. _user's guide: https://dazangthings.nz/tacl-guide/
 .. _GitHub repository: https://github.com/cbeta-org/xml-p5.git
 .. _tacl-catalogue-manager: https://github.com/ajenhl/tacl-catalogue-manager
