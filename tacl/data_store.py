@@ -64,6 +64,14 @@ class DataStore:
         :type text_class: subclass of `Text`
 
         """
+        if not isinstance(minimum, int) or not isinstance(maximum, int):
+            raise MalformedQueryError(
+                constants.NGRAM_SIZE_MUST_BE_INTEGER_ERROR)
+        if minimum < 1:
+            raise MalformedQueryError(constants.NGRAM_SIZE_TOO_SMALL_ERROR)
+        if minimum > maximum:
+            raise MalformedQueryError(
+                constants.NGRAM_MINIMUM_SIZE_GREATER_THAN_MAXIMUM_ERROR)
         self._initialise_database()
         if catalogue:
             for work in catalogue:

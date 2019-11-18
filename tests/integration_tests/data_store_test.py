@@ -178,6 +178,25 @@ class DataStoreIntegrationTestCase (TaclTestCase):
         ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_add_ngrams_min_greater_than_max(self):
+        store = tacl.DataStore(':memory:')
+        self.assertRaises(MalformedQueryError, store.add_ngrams, self._corpus,
+                          2, 1)
+
+    def test_add_ngrams_negative_size(self):
+        store = tacl.DataStore(':memory:')
+        self.assertRaises(MalformedQueryError, store.add_ngrams, self._corpus,
+                          -1, 2)
+        self.assertRaises(MalformedQueryError, store.add_ngrams, self._corpus,
+                          0, 1)
+
+    def test_add_ngrams_non_integer_size(self):
+        store = tacl.DataStore(':memory:')
+        self.assertRaises(MalformedQueryError, store.add_ngrams, self._corpus,
+                          '1', 2)
+        self.assertRaises(MalformedQueryError, store.add_ngrams, self._corpus,
+                          1.2, 2)
+
     def test_counts(self):
         actual_rows = self._get_rows_from_csv(self._store.counts(
                 self._catalogue, io.StringIO(newline='')))
