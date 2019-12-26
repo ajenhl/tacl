@@ -667,12 +667,12 @@ NGRAM_SIZE_TOO_SMALL_ERROR = 'Minimum n-gram size is 1.'
 NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
 SPLIT_INVALID_WITNESS = ('Part references witness "{}" that does not exist '
                          'in work {}.')
-SPLIT_MISSING_END_STRING = 'End string "{}" not found in work {}.'
-SPLIT_MISSING_START_STRING = 'Start string "{}" not found in work {}'
-SPLIT_MISSING_WHOLE_STRING = 'Whole string "{}" not found in work {}.'
-SPLIT_MISSING_WITNESSES = 'No witnesses specified for part in work {}.'
+SPLIT_MISSING_END_STRING = 'End string "{}" not found in work "{}" "{}".'
+SPLIT_MISSING_START_STRING = 'Start string "{}" not found in work "{}" "{}".'
+SPLIT_MISSING_WHOLE_STRING = 'Whole string "{}" not found in work "{}" "{}".'
+SPLIT_MISSING_WITNESSES = 'No witnesses specified for part in work "{}".'
 SPLIT_MIXED_START_END_STRINGS = ('Start string "{}" comes after end string '
-                                 '"{}" in work {}.')
+                                 '"{}" in work "{}".')
 SPLIT_OUTPUT_DIRECTORY_EXISTS = ('Output directory for split work "{}" in '
                                  'work {} already exists.')
 SPLIT_WORK_NOT_IN_CORPUS_ERROR = 'Work {} does not exist in corpus.'

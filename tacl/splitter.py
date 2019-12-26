@@ -69,12 +69,12 @@ class Splitter:
                                 witness_ref, in_work_name))
                 if witness_refs[0] == 'ALL' or siglum in witness_refs:
                     source_text, output_text = self._split_part(
-                        in_work_name, part, source_text, output_text)
+                        in_work_name, part, siglum, source_text, output_text)
             output_path = os.path.join(out_work_path, '{}.txt'.format(siglum))
             with open(output_path, 'w', encoding='utf-8') as fh:
                 fh.write(''.join(output_text))
 
-    def _split_part(self, source_work, part, source_text, output_text):
+    def _split_part(self, source_work, part, siglum, source_text, output_text):
         if part[1].tag == 'start':
             start_text = part[1].text
             end_text = part[2].text
@@ -83,17 +83,17 @@ class Splitter:
             except ValueError:
                 raise MalformedSplitConfigurationError(
                     constants.SPLIT_MISSING_START_STRING.format(
-                        start_text, source_work))
+                        start_text, source_work, siglum))
             try:
                 end_index = source_text.index(end_text)
             except ValueError:
                 raise MalformedSplitConfigurationError(
                     constants.SPLIT_MISSING_END_STRING.format(
-                        end_text, source_work))
+                        end_text, source_work, siglum))
             if end_index < start_index:
                 raise MalformedSplitConfigurationError(
                     constants.SPLIT_MIXED_START_END_STRINGS.format(
-                        start_text, end_text, source_work))
+                        start_text, end_text, source_work, siglum))
             end_index += len(end_text)
         elif part[1].tag == 'whole':
             whole_text = part[1].text
@@ -102,7 +102,7 @@ class Splitter:
             except ValueError:
                 raise MalformedSplitConfigurationError(
                     constants.SPLIT_MISSING_WHOLE_STRING.format(
-                        whole_text, source_work))
+                        whole_text, source_work, siglum))
             end_index = start_index + len(whole_text)
         output_text.append(source_text[start_index:end_index])
         source_text = source_text[:start_index] + \
