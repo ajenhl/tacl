@@ -672,7 +672,7 @@ SPLIT_MISSING_START_STRING = 'Start string "{}" not found in work "{}" "{}".'
 SPLIT_MISSING_WHOLE_STRING = 'Whole string "{}" not found in work "{}" "{}".'
 SPLIT_MISSING_WITNESSES = 'No witnesses specified for part in work "{}".'
 SPLIT_MIXED_START_END_STRINGS = ('Start string "{}" comes after end string '
-                                 '"{}" in work "{}".')
+                                 '"{}" in work "{}" "{}".')
 SPLIT_OUTPUT_DIRECTORY_EXISTS = ('Output directory for split work "{}" in '
                                  'work {} already exists.')
 SPLIT_WORK_NOT_IN_CORPUS_ERROR = 'Work {} does not exist in corpus.'
