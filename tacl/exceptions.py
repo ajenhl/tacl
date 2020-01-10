@@ -1,6 +1,3 @@
-from tacl import constants
-
-
 class TACLError (Exception):
 
     def __init__(self, msg):
