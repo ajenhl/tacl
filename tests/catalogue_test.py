@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-from unittest.mock import call, mock_open, patch, sentinel
+from unittest.mock import mock_open, patch, sentinel
 
 import tacl
 from .tacl_test_case import TaclTestCase
@@ -83,19 +83,6 @@ class CatalogueTestCase (TaclTestCase):
         self.assertEqual(catalogue.labels, ['label2'])
         self.assertNotIn('T0123', catalogue)
         self.assertNotIn('T3210', catalogue)
-
-    def test_save(self):
-        with patch('builtins.open', mock_open(), create=True) as m:
-            catalogue = tacl.Catalogue()
-            catalogue['filename1'] = 'label1'
-            catalogue['filename2'] = 'label1'
-            catalogue['filename3'] = 'label2'
-            catalogue.save(sentinel.path)
-        expected_calls = [call(sentinel.path, 'w', newline=''),
-                          call().write('filename1 label1\r\n'),
-                          call().write('filename2 label1\r\n'),
-                          call().write('filename3 label2\r\n')]
-        m.assert_has_calls(expected_calls, any_order=True)
 
 
 if __name__ == '__main__':

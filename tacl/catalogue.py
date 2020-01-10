@@ -126,7 +126,8 @@ class Catalogue (dict):
         :type path: `str`
 
         """
-        writer = csv.writer(open(path, 'w', newline=''), delimiter=' ')
-        rows = list(self.items())
-        rows.sort(key=lambda x: x[0])
-        writer.writerows(rows)
+        with open(path, 'w', encoding='utf-8', newline='') as fh:
+            writer = csv.writer(fh, delimiter=' ')
+            rows = list(self.items())
+            rows.sort(key=lambda x: x[0])
+            writer.writerows(rows)

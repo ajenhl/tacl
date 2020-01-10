@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 import unittest
 
 import tacl
@@ -75,6 +76,18 @@ class CatalogueIntegrationTest (unittest.TestCase):
         catalogue.load(os.path.join(self._data_dir, 'catalogue2.txt'))
         catalogue.remove_label('C')
         self.assertEqual(catalogue.ordered_labels, ['B', 'A'])
+
+    def test_save(self):
+        catalogue = tacl.Catalogue()
+        catalogue['T2102-辯惑論序'] = 'label1'
+        catalogue['T2102-通直郎庾黔婁答'] = 'label2'
+        catalogue['T2102-遠法師答'] = 'label1'
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            catalogue_path = os.path.join(tmp_dir, 'catalogue.txt')
+            catalogue.save(catalogue_path)
+            saved_catalogue = tacl.Catalogue()
+            saved_catalogue.load(catalogue_path)
+            self.assertEqual(catalogue.items(), saved_catalogue.items())
 
 
 if __name__ == '__main__':
