@@ -24,7 +24,7 @@
         <cb:docNumber>No. 186 [No. 187]</cb:docNumber>
         <lb n="0483a17" ed="T"/>
         <cb:juan n="001" fun="open">
-          <cb:mulu n="001" type="&#x5377;"/>
+          <cb:mulu n="001" type="卷"/>
           <cb:jhead><title>佛說普曜經</title>卷第一<note place="inline">一名方等本起</note></cb:jhead>
         </cb:juan>
         <lb n="0483a18" ed="T"/>
@@ -32,7 +32,7 @@
         <byline cb:type="Translator">西晉月氏三藏竺法護譯</byline>
         <lb n="0483a20" ed="T"/>
         <cb:div type="pin">
-          <cb:mulu level="1" n="1" type="&#x54C1;">1 論降神品</cb:mulu>
+          <cb:mulu level="1" n="1" type="品">1 論降神品</cb:mulu>
           <head>論降神品第一</head>
           <lb n="0483a21" ed="T"/>
           <p xml:id="pT03p0483a2101">聞如是：</p>
@@ -82,7 +82,7 @@
         </cb:div>
         <lb n="0486c10" ed="T"/>
         <cb:div type="pin">
-          <cb:mulu level="1" n="2" type="&#x54C1;">2 說法門品</cb:mulu>
+          <cb:mulu level="1" n="2" type="品">2 說法門品</cb:mulu>
           <head><title>普曜經</title>說法門品第二</head>
           <lb n="0486c11" ed="T"/>
           <p xml:id="pT03p0486c1101">佛告比丘：「前選菩薩所降神土，其兜術天

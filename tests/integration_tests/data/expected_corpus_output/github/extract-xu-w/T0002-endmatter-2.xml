@@ -13,12 +13,12 @@
       </sourceDesc>
     </fileDesc>
   </teiHeader>
-  <TEI xml:id="T01n0001">
+  <TEI xml:id="T01n0002">
     <teiHeader/>
     <text>
       <body>
-        <cb:div type="xu">
-          <p>Xu 2</p>
+        <cb:div type="w">
+          <p>W2</p>
         </cb:div>
       </body>
     </text>

@@ -24,7 +24,13 @@
         <cb:docNumber>No. 220</cb:docNumber>
         <lb n="0001a03" ed="T"/>
         <cb:div type="hui">
-          <cb:mulu level="1" n="1" type="&#x6703;">1 會</cb:mulu>
+          <cb:mulu level="1" n="1" type="會">1 會</cb:mulu>
+          <cb:div type="xu">
+            <cb:mulu level="2" type="序">初會序</cb:mulu>
+            <head><title>大般若經</title>初會序</head>
+            <lb n="0001a06" ed="T"/>
+            <p xml:id="pT05p0001a0601">XU 1</p>
+          </cb:div>
           <cb:div type="pin">
             <p>HUI 1</p>
           </cb:div>
@@ -41,7 +47,7 @@
         <lb n="0001a01" ed="T"/>
         <lb n="0001a02" ed="T"/>
         <cb:juan n="201" fun="open">
-          <cb:mulu n="201" type="&#x5377;"/>
+          <cb:mulu n="201" type="卷"/>
           <cb:jhead><title>大般若波羅蜜多經</title>卷第二百一</cb:jhead>
         </cb:juan>
         <lb n="0001a03" ed="T"/>
@@ -64,8 +70,15 @@
         <lb n="0001a01" ed="T"/>
         <lb n="0001a02" ed="T"/>
         <cb:div n="02" type="hui">
-          <cb:mulu level="1" n="1" type="&#x6703;">2 會</cb:mulu>
+          <cb:mulu level="1" n="1" type="會">2 會</cb:mulu>
           <head><title>大般若經</title>第二會</head>
+          <cb:div type="xu">
+            <cb:mulu level="2" type="序">序</cb:mulu>
+            <head>序</head>
+            <lb n="0001a03" ed="T"/>
+            <lb n="0001a05" ed="T"/>
+            <p xml:id="pT07p0001a0501">XU 2</p>
+          </cb:div>
           <cb:div type="pin">
             <p>HUI 2</p>
           </cb:div>

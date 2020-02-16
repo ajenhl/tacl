@@ -183,7 +183,11 @@ class TEICorpus:
 
     def _postprocess(self, work, tree):
         """Post-process the XML document `tree`."""
-        raise NotImplementedError
+        pp_func = '_postprocess_{}'.format(work)
+        if hasattr(self, pp_func):
+            getattr(self, pp_func)(work, tree)
+        else:
+            self._output_tree('{}.xml'.format(work), tree)
 
     def tidy(self):
         if not os.path.exists(self._output_dir):
@@ -194,16 +198,15 @@ class TEICorpus:
                     'Could not create output directory: {}'.format(err))
                 raise
         works = self._assemble_part_list()
-        for work, paths in works.items():
-            output_filename = os.path.join(self._output_dir, work)
-            if not os.path.exists(output_filename):
-                root = self._assemble_parts(work, paths)
-                root = self._populate_header(root)
-                root = self._handle_resps(root)
-                root = self._handle_witnesses(root)
-                tree = etree.ElementTree(root)
-                self._output_tree(work, tree)
-                self._postprocess(os.path.splitext(work)[0], tree)
+        for work_filename, paths in works.items():
+            work = os.path.splitext(work_filename)[0]
+            root = self._assemble_parts(work_filename, paths)
+            root = self._populate_header(root)
+            root = self._handle_resps(root)
+            root = self._handle_witnesses(root)
+            tree = etree.ElementTree(root)
+            self._output_tree('{}-original.xml'.format(work), tree)
+            self._postprocess(work, tree)
 
     def _tidy(self, *args, **kwargs):
         raise NotImplementedError
@@ -344,10 +347,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         """Post-process the XML document `root`."""
         div_types = [('xu', 'xu'), ('w', 'endmatter')]
         tree = self._extract_divs(work, tree, div_types)
-        self._output_tree('{}.xml'.format(work), tree)
-        pp_func = '_postprocess_{}'.format(work)
-        if hasattr(self, pp_func):
-            getattr(self, pp_func)(work, tree)
+        super()._postprocess(work, tree)
 
     def _postprocess_div_mulu(self, work, tree, div_type):
         divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
@@ -424,7 +424,6 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._output_tree(div_filename, div_tree)
 
     def _postprocess_T0150A(self, work, tree):
-
         """Post-process the XML document T0150A.xml.
 
         Divide into multiple files, one for each cb:div[@type='jing'],
