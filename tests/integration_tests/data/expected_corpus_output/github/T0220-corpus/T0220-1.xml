@@ -18,7 +18,7 @@
     <text>
       <body>
         <cb:div type="hui">
-          <cb:mulu level="1" n="1" type="&#x6703;">1 會</cb:mulu>
+          <cb:mulu level="1" n="1" type="會">1 會</cb:mulu>
           <cb:div type="pin">
             <p>HUI 1</p>
           </cb:div>

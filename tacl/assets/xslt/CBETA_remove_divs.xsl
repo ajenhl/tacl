@@ -3,6 +3,8 @@
                 xmlns:cb="http://www.cbeta.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:output encoding="UTF-8" method="xml" />
+
   <!-- Remove cb:div elements of the supplied type. -->
 
   <xsl:param name="div_type" />

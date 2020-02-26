@@ -3,6 +3,8 @@
                 xmlns:tei="http://www.tei-c.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:output encoding="UTF-8" method="xml" />
+
   <!-- Keep only text that occurs within tei:note[@place='inline'],
        unless the inverse parameter is true, in which case, keep only
        text that does not occur in tei:note[@place='inline']. Keep as

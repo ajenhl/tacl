@@ -4,6 +4,8 @@
                 xmlns:tei="http://www.tei-c.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:output encoding="UTF-8" method="xml" />
+
   <!-- Move the cb:div[@type='pin'] from T06n0220b to the end of the
        cb:div[@type='hui'] from T05n0220a. -->
 

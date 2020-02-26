@@ -3,6 +3,8 @@
                 xmlns:tei="http://www.tei-c.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:output encoding="UTF-8" method="xml" />
+
   <!-- Output the document with its contents only up to (but not
        including) tei:lb[@n='0861a08']. -->
 

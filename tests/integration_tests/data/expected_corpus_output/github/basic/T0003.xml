@@ -84,7 +84,7 @@
         <cb:docNumber>No. 1</cb:docNumber>
         <lb n="0001a02" ed="T"/>
         <cb:div type="hui">
-          <cb:mulu level="1" type="&#x5E8F;">序</cb:mulu>
+          <cb:mulu level="1" type="序">序</cb:mulu>
           <note n="0001001" resp="#resp2" type="orig" place="foot text">此序依宋元明三本ニ依テ載ス</note>
           <head><title>長阿含經</title>序</head>
           <lb n="0001a03" ed="T"/>
@@ -106,7 +106,7 @@
         <lb n="0001b07" ed="T"/>
         <lb n="0001b08" ed="T"/>
         <cb:juan n="001" fun="open">
-          <cb:mulu n="001" type="&#x5377;"/>
+          <cb:mulu n="001" type="卷"/>
           <cb:jhead><title>佛說<cb:tt type="app"><cb:t resp="#resp2" xml:lang="zh">長阿含經</cb:t><cb:t resp="#resp2" xml:lang="sa" place="foot">Dīrgha-āgama</cb:t><cb:t resp="#resp2" xml:lang="pi" place="foot">Dīgha-nikāya</cb:t></cb:tt></title>卷第一</cb:jhead>
         </cb:juan>
         <lb n="0001b09" ed="T"/>
@@ -114,12 +114,12 @@
         <byline cb:type="Translator"><note n="0001012" resp="#resp1" type="mod">後秦弘始年＝姚秦三藏法師【宋】【元】【明】</note><app><lem wit="#wit3">後秦弘始年</lem><rdg resp="#resp2" wit="#wit2 #wit4 #wit5">姚秦三藏法師</rdg></app>佛陀耶舍共竺佛念譯</byline>
         <lb n="0011a07" ed="T"/>
         <cb:div type="jing">
-          <cb:mulu level="2" type="&#x7D93;">2 遊行經</cb:mulu>
+          <cb:mulu level="2" type="經">2 遊行經</cb:mulu>
           <head>（二）第一分<note n="0011004" resp="#resp2" type="orig" place="foot text">遊行經～D. 10. Mahāparinibbānasuttanta.</note><note n="0011004" place="foot" type="equivalent">遊行經～D. 10. Mahāparinibbānasuttanta.</note>遊行經第二</head>
         </cb:div>
         <lb n="0030b10" ed="T"/>
         <cb:div type="jing">
-          <cb:mulu level="2" type="&#x7D93;">3 典尊經</cb:mulu>
+          <cb:mulu level="2" type="經">3 典尊經</cb:mulu>
           <head>（三）第一分<note n="0030012" resp="#resp2" type="orig" place="foot text">Mahāgovindīya(Mahāvastu)～D. 19. Mahāgovinda suttanta. [No. 8]</note><note n="0030012" resp="#resp1" type="mod">Mahāgovindīya(Mahāvastu)～D. 19. Mahāgovinda suttanta.，[No. 8]</note><note n="0030012" place="foot" type="equivalent">Mahāgovindīya(Mahāvastu)～D. 19. Mahāgovinda suttanta.</note><note n="0030012" place="foot" type="cf.">[No. 8]</note>典尊經第三</head>
         </cb:div>
       </body>
