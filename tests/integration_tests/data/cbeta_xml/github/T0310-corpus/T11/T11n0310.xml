@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T11n0310">
+  <teiHeader>
+  </teiHeader>
+  <text>
+    <body>
+      <milestone n="1" unit="juan"/>
+      <lb n="0002b10" ed="T"/>
+      <cb:juan n="001" fun="open">
+        <cb:mulu n="1" type="卷"></cb:mulu>
+        <cb:jhead>
+          <title>大寶積經</title>
+        </cb:jhead>
+      </cb:juan>
+      <cb:div type="hui">
+        <cb:mulu level="1" n="1" type="其他">1 三律儀會</cb:mulu>
+        <cb:mulu level="2">1</cb:mulu>
+        <head>三律儀會第一之一</head>
+        <byline cb:type="Translator">大唐三藏法師菩提流志奉　詔譯</byline>
+        <p xml:id="pT11p0002b1301">Hui with mulu</p>
+      </cb:div>
+      <milestone n="4" unit="juan"/>
+      <pb n="0020b" ed="T" xml:id="T11.0310.0020b"/>
+      <lb n="0020b01" ed="T"/>
+      <cb:div type="hui">
+        <p>Hui without mulu</p>
+        <cb:div type="pin">
+          <cb:mulu level="2" n="1" type="品">1 無上陀羅尼品</cb:mulu>
+          <cb:mulu level="3">1</cb:mulu>
+          <head type="pin">Sub-div</head>
+        </cb:div>
+        <milestone n="6" unit="juan"/>
+        <lb n="0031b11" ed="T"/>
+        <cb:div type="pin">
+          <lb n="0031b17" ed="T"/>
+          <p xml:id="pT11p0031b1701">Sub-div</p>
+        </cb:div>
+      </cb:div>
+      <milestone n="7" unit="juan"/>
+      <lb n="0036c03" ed="T"/>
+      <cb:div type="hui">
+        <cb:mulu level="1" n="4" type="其他">2 密跡金剛力士會</cb:mulu>
+        <cb:mulu level="2">1</cb:mulu>
+        <head>密迹金剛力士會第三之一</head>
+        <lb n="0042b08" ed="T"/>
+        <p xml:id="pT11p0042b0801">Hui with mulu</p>
+      </cb:div>
+      <cb:div type="hui">
+        <cb:mulu level="1" n="4" type="其他">2 密跡金剛力士會</cb:mulu>
+        <cb:mulu level="2">1</cb:mulu>
+        <head>密迹金剛力士會第三之一</head>
+        <lb n="0042b09" ed="T"/>
+        <p xml:id="pT11p0042b0802">Hui with duplicate mulu</p>
+      </cb:div>
+    </body>
+  </text>
+</TEI>

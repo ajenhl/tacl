@@ -8,8 +8,12 @@ from lxml import etree
 from pkg_resources import resource_filename
 
 from . import constants
+from .exceptions import TACLError
 
 
+LEAVE_UNNAMED_DIVS = 'leave'
+MERGE_UNNAMED_DIVS_TO_PRECEDING = 'merge_to_preceding'
+REMOVE_UNNAMED_DIVS = 'delete'
 TEI_CORPUS_XML = '''<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
   <teiHeader>
     <fileDesc>
@@ -152,11 +156,27 @@ class TEICorpus:
             self._update_refs(root, bearers, 'wit', full_siglum, xml_id)
         return root
 
-    def _output_tree(self, filename, tree):
+    def _output_tree(self, filename, tree, seen_filenames=None):
         """Saves the TEI XML document `tree` as `filename` in the output
         directory."""
+        if seen_filenames is None:
+            seen_filenames = {}
         output_path = os.path.join(self._output_dir, filename)
+        if output_path in seen_filenames:
+            root, ext = os.path.splitext(output_path)
+            if seen_filenames[output_path] == 1:
+                os.rename(output_path, '{}-{}{}'.format(
+                    root, str(seen_filenames[output_path]), ext))
+            seen_filenames[output_path] += 1
+            output_path = '{}-{}{}'.format(
+                root, str(seen_filenames[output_path]), ext)
+        else:
+            seen_filenames[output_path] = 1
+        if os.path.exists(output_path):
+            raise TACLError('Already created output file at {}.'.format(
+                output_path))
         tree.write(output_path, encoding='utf-8', pretty_print=True)
+        return seen_filenames
 
     def _populate_header(self, root):
         """Populate the teiHeader of the teiCorpus with useful information
@@ -198,7 +218,8 @@ class TEICorpus:
                     'Could not create output directory: {}'.format(err))
                 raise
         works = self._assemble_part_list()
-        for work_filename, paths in works.items():
+        for work_filename, paths in sorted(works.items()):
+            self._logger.debug('Tidying {}'.format(work_filename))
             work = os.path.splitext(work_filename)[0]
             root = self._assemble_parts(work_filename, paths)
             root = self._populate_header(root)
@@ -349,21 +370,28 @@ class TEICorpusCBETAGitHub (TEICorpus):
         tree = self._extract_divs(work, tree, div_types)
         super()._postprocess(work, tree)
 
-    def _postprocess_div_mulu(self, work, tree, div_type):
+    def _postprocess_div_mulu(self, work, tree, div_type,
+                              treatment=LEAVE_UNNAMED_DIVS):
         divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
                           namespaces=constants.NAMESPACES)
+        seen_filenames = {}
         for position, div in enumerate(divs):
             div_tree = self._transform_div(tree, position=str(position),
-                                           div_type='"{}"'.format(div_type))
+                                           div_type='"{}"'.format(div_type),
+                                           treatment='"{}"'.format(treatment))
             try:
                 mulu = div.xpath('cb:mulu[1]/text()',
                                  namespaces=constants.NAMESPACES)[0]
                 mulu = mulu.replace(' ', '-')
                 mulu = mulu.replace(os.path.sep, '|')
             except IndexError:
+                if treatment in (MERGE_UNNAMED_DIVS_TO_PRECEDING,
+                                 REMOVE_UNNAMED_DIVS):
+                    continue
                 mulu = 'unnamed-{}'.format(position + 1)
             div_filename = '{}-{}.xml'.format(work, mulu)
-            self._output_tree(div_filename, div_tree)
+            seen_filenames = self._output_tree(div_filename, div_tree,
+                                               seen_filenames)
 
     def _postprocess_T0001(self, work, tree):
         """Post-process the XML document T0001.xml.
@@ -404,6 +432,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         """
         pin_divs = tree.xpath('//cb:div[@type="pin"]',
                               namespaces=constants.NAMESPACES)
+        seen_filenames = {}
         for position, div in enumerate(pin_divs):
             if div.xpath('cb:div[@type="jing"]',
                          namespaces=constants.NAMESPACES):
@@ -412,7 +441,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
                                            div_type='"pin"')
             mulu = self._get_mulu(div, 'cb:mulu[1]/text()')
             div_filename = '{}-{}.xml'.format(work, mulu)
-            self._output_tree(div_filename, div_tree)
+            seen_filenames = self._output_tree(div_filename, div_tree,
+                                               seen_filenames)
         jing_divs = tree.xpath('//cb:div[@type="jing"]',
                                namespaces=constants.NAMESPACES)
         for position, div in enumerate(jing_divs):
@@ -456,6 +486,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         """
         divs = tree.xpath('//cb:div[@type="jing"]',
                           namespaces=constants.NAMESPACES)
+        seen_filenames = {}
         for position, div in enumerate(divs):
             div_tree = self._transform_div(tree, position=str(position),
                                            div_type='"jing"')
@@ -464,7 +495,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
             title = div.xpath('tei:head[1]/text()',
                               namespaces=constants.NAMESPACES)[0]
             div_filename = '{}-{}-{}.xml'.format(work, number, title)
-            self._output_tree(div_filename, div_tree)
+            seen_filenames = self._output_tree(div_filename, div_tree,
+                                               seen_filenames)
 
     def _postprocess_T0186(self, work, tree):
         """Post-process the XML document T0186.xml.
@@ -534,7 +566,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
         cb:div[@type='hui'].
 
         """
-        self._postprocess_div_mulu(work, tree, 'hui')
+        self._postprocess_div_mulu(work, tree, 'hui',
+                                   MERGE_UNNAMED_DIVS_TO_PRECEDING)
 
     def _postprocess_T0397(self, work, tree):
         """Post-process the XML document T0397.xml.
@@ -543,7 +576,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
         named according to the cb:mulu content for that div.
 
         """
-        self._postprocess_div_mulu(work, tree, 'other')
+        self._postprocess_div_mulu(work, tree, 'other',
+                                   MERGE_UNNAMED_DIVS_TO_PRECEDING)
 
     def _postprocess_T0418(self, work, tree):
         """Post-process the XML document T0418.xml"
@@ -595,7 +629,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         self._output_tree(div_filename, div_tree)
 
     def _postprocess_T2102(self, work, tree):
-        self._postprocess_div_mulu(work, tree, 'other')
+        self._postprocess_div_mulu(work, tree, 'other', REMOVE_UNNAMED_DIVS)
 
     def _postprocess_T2145(self, work, tree):
         div_types = [('other', 'other')]

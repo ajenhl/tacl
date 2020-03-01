@@ -1,0 +1,44 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T11n0310">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="hui">
+          <cb:mulu level="1" n="1" type="其他">1 三律儀會</cb:mulu>
+          <cb:mulu level="2">1</cb:mulu>
+          <head>三律儀會第一之一</head>
+          <byline cb:type="Translator">大唐三藏法師菩提流志奉　詔譯</byline>
+          <p xml:id="pT11p0002b1301">Hui with mulu</p>
+        </cb:div>
+        <cb:div type="hui">
+          <p>Hui without mulu</p>
+          <cb:div type="pin">
+            <cb:mulu level="2" n="1" type="品">1 無上陀羅尼品</cb:mulu>
+            <cb:mulu level="3">1</cb:mulu>
+            <head type="pin">Sub-div</head>
+          </cb:div>
+          <milestone n="6" unit="juan"/>
+          <lb n="0031b11" ed="T"/>
+          <cb:div type="pin">
+            <lb n="0031b17" ed="T"/>
+            <p xml:id="pT11p0031b1701">Sub-div</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

@@ -1,0 +1,27 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="other">
+          <cb:mulu level="1" type="其他">1 牟子</cb:mulu>
+          <p>Mulu, named output.</p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

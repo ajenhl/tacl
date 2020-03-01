@@ -58,3 +58,9 @@ class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):
 
     def test_tidy_T0220(self):
         self._test_tidy('T0220-corpus')
+
+    def test_tidy_T0310(self):
+        self._test_tidy('T0310-corpus')
+
+    def test_tidy_T2102(self):
+        self._test_tidy('T2102-corpus')

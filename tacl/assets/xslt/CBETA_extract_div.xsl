@@ -8,11 +8,19 @@
 
   <xsl:param name="position" />
   <xsl:param name="div_type" />
+  <xsl:param name="treatment" />
 
   <xsl:template match="tei:body">
     <xsl:copy>
       <xsl:apply-templates select="@*" />
-      <xsl:copy-of select=".//cb:div[@type=$div_type][count(ancestor::cb:div[@type=$div_type] | preceding::cb:div[@type=$div_type])=$position]" />
+      <xsl:variable name="div" select=".//cb:div[@type=$div_type][count(ancestor::cb:div[@type=$div_type] | preceding::cb:div[@type=$div_type])=$position]" />
+      <xsl:copy-of select="$div" />
+      <xsl:if test="$treatment = 'merge_to_preceding'">
+        <xsl:variable name="next-div" select="$div/following::cb:div[@type=$div_type][1]" />
+        <xsl:if test="not(normalize-space($next-div/cb:mulu/text()))">
+          <xsl:copy-of select="$next-div" />
+        </xsl:if>
+      </xsl:if>
     </xsl:copy>
   </xsl:template>
 

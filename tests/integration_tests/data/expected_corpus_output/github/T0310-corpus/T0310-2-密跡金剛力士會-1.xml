@@ -1,0 +1,30 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T11n0310">
+    <teiHeader/>
+    <text>
+      <body>
+        <cb:div type="hui">
+          <cb:mulu level="1" n="4" type="其他">2 密跡金剛力士會</cb:mulu>
+          <cb:mulu level="2">1</cb:mulu>
+          <head>密迹金剛力士會第三之一</head>
+          <lb n="0042b08" ed="T"/>
+          <p xml:id="pT11p0042b0801">Hui with mulu</p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>
