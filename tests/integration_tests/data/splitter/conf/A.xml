@@ -49,4 +49,7 @@
       </part>
     </parts>
   </work>
+  <work rename="true">
+    <name>renamed</name>
+  </work>
 </splits>

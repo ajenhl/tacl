@@ -52,24 +52,32 @@ class Splitter:
                 constants.SPLIT_OUTPUT_DIRECTORY_EXISTS.format(out_work_path,
                                                                in_work_name))
         os.mkdir(out_work_path)
-        parts = out_work[1][0:]
+        if out_work.get('rename', 'false') == 'true':
+            parts = None
+        else:
+            parts = out_work[1][0:]
         for witness in witnesses:
             source_text = witness.content
             output_text = []
             siglum = witness.siglum
-            for part in parts:
-                if part[0].tag != 'witnesses':
-                    raise MalformedSplitConfigurationError(
-                        constants.SPLIT_MISSING_WITNESSES.format(in_work_name))
-                witness_refs = part[0].text.split(',')
-                for witness_ref in witness_refs:
-                    if witness_ref != 'ALL' and witness_ref not in sigla:
+            if parts is None:
+                output_text.append(witness.content)
+            else:
+                for part in parts:
+                    if part[0].tag != 'witnesses':
                         raise MalformedSplitConfigurationError(
-                            constants.SPLIT_INVALID_WITNESS.format(
-                                witness_ref, in_work_name))
-                if witness_refs[0] == 'ALL' or siglum in witness_refs:
-                    source_text, output_text = self._split_part(
-                        in_work_name, part, siglum, source_text, output_text)
+                            constants.SPLIT_MISSING_WITNESSES.format(
+                                in_work_name))
+                    witness_refs = part[0].text.split(',')
+                    for witness_ref in witness_refs:
+                        if witness_ref != 'ALL' and witness_ref not in sigla:
+                            raise MalformedSplitConfigurationError(
+                                constants.SPLIT_INVALID_WITNESS.format(
+                                    witness_ref, in_work_name))
+                    if witness_refs[0] == 'ALL' or siglum in witness_refs:
+                        source_text, output_text = self._split_part(
+                            in_work_name, part, siglum, source_text,
+                            output_text)
             output_path = os.path.join(out_work_path, '{}.txt'.format(siglum))
             with open(output_path, 'w', encoding='utf-8') as fh:
                 fh.write(''.join(output_text))
