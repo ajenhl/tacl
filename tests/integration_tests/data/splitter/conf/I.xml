@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<splits delete="true">
+  <work rename="true">
+    <name>renamed</name>
+  </work>
+</splits>

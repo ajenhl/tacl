@@ -1,0 +1,43 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+        <listWit>
+          <witness xml:id="wit1">元</witness>
+          <witness xml:id="wit2">大</witness>
+          <witness xml:id="wit3">宋</witness>
+          <witness xml:id="wit4">明</witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader>
+      <encodingDesc>
+        <tagsDecl>
+          <namespace name="http://www.tei-c.org/ns/1.0">
+            <tagUsage gi="rdg"/>
+          </namespace>
+        </tagsDecl>
+      </encodingDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <cb:div type="jing">
+          <cb:mulu level="1" n="9" type="經">9 佛說旃闍摩暴志謗佛經</cb:mulu>
+          <head>佛說<note n="0076002" resp="" type="orig" place="foot text">旃＝栴【三】</note><note n="0076002" resp="" type="mod">旃【大】，栴【宋】【元】【明】</note><app><lem wit="#wit2">旃</lem><rdg resp="" wit="#wit1 #wit3 #wit4">栴</rdg></app>闍摩暴志謗佛經第九</head>
+          <lb n="0076a14" ed="T"/>
+          <p xml:id="pT03p0076a1401">聞如是：</p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

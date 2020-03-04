@@ -1,6 +1,8 @@
 """Module containing the Splitter class."""
 
+import logging
 import os
+import shutil
 
 from lxml import etree
 
@@ -17,6 +19,7 @@ class Splitter:
         :type corpus: `Corpus`
 
         """
+        self._logger = logging.getLogger(__name__)
         self._corpus = corpus
 
     def split(self, conf_path):
@@ -43,6 +46,13 @@ class Splitter:
         sigla = [witness.siglum for witness in witnesses]
         for out_work in config.xpath('/splits/work'):
             self.split_work(in_work_name, out_work, witnesses, sigla)
+        root = config.getroot()
+        if root.get('delete') == 'true':
+            try:
+                shutil.rmtree(in_work_path)
+            except OSError as e:
+                self._logger.error(constants.SPLIT_DELETE_FAILED.format(
+                    in_work_name, e))
 
     def split_work(self, in_work_name, out_work, witnesses, sigla):
         out_work_name = out_work[0].text

@@ -665,6 +665,7 @@ NGRAM_SIZE_MUST_BE_INTEGER_ERROR = (
     'N-gram sizes must be given as positive integers.')
 NGRAM_SIZE_TOO_SMALL_ERROR = 'Minimum n-gram size is 1.'
 NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
+SPLIT_DELETE_FAILED = 'Failed to delete work "{}" as directed: {}'
 SPLIT_INVALID_WITNESS = ('Part references witness "{}" that does not exist '
                          'in work {}.')
 SPLIT_MISSING_END_STRING = 'End string "{}" not found in work "{}" "{}".'

@@ -492,8 +492,9 @@ class TEICorpusCBETAGitHub (TEICorpus):
                                            div_type='"jing"')
             number = div.xpath('cb:mulu[1]/@n',
                                namespaces=constants.NAMESPACES)[0]
-            title = div.xpath('tei:head[1]/text()',
-                              namespaces=constants.NAMESPACES)[0]
+            title = ''.join(div.xpath(
+                'tei:head[1]/text() | tei:head[1]/tei:app/tei:lem/text()',
+                namespaces=constants.NAMESPACES))
             div_filename = '{}-{}-{}.xml'.format(work, number, title)
             seen_filenames = self._output_tree(div_filename, div_tree,
                                                seen_filenames)
@@ -593,7 +594,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         verse_filename = '{}-verses.xml'.format(work)
         self._output_tree(verse_filename, verse_tree)
         prose_tree = extract_verse(tree, inverse='1')
-        prose_filename = '{}-ex-verses'.format(work)
+        prose_filename = '{}-ex-verses.xml'.format(work)
         self._output_tree(prose_filename, prose_tree)
 
     def _postprocess_T0664(self, work, tree):

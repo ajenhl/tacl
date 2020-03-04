@@ -564,7 +564,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
     def test_split(self):
         splitter_dir = os.path.join(self._data_dir, 'splitter')
         original_corpus_dir = os.path.join(splitter_dir, 'corpus')
-        expected_dir = os.path.join(splitter_dir, 'expected')
+        expected_dir = os.path.join(splitter_dir, 'expected', 'A-conf')
         conf_path = os.path.join(splitter_dir, 'conf', 'A.xml')
         with tempfile.TemporaryDirectory() as actual_dir:
             corpus_dir = os.path.join(actual_dir, 'corpus')

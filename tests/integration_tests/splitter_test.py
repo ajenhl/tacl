@@ -36,8 +36,16 @@ class SplitterIntegrationTestCase(TaclTestCase):
     def test_splitter_correct(self):
         with tempfile.TemporaryDirectory() as actual_dir:
             splitter, corpus_dir = self._setup(actual_dir)
-            expected_dir = os.path.join(self._data_dir, 'expected')
+            expected_dir = os.path.join(self._data_dir, 'expected', 'A-conf')
             conf_path = os.path.join(self._conf_dir, 'A.xml')
+            splitter.split(conf_path)
+            self._compare_dirs(corpus_dir, expected_dir)
+
+    def test_splitter_delete(self):
+        with tempfile.TemporaryDirectory() as actual_dir:
+            splitter, corpus_dir = self._setup(actual_dir)
+            expected_dir = os.path.join(self._data_dir, 'expected', 'I-conf')
+            conf_path = os.path.join(self._conf_dir, 'I.xml')
             splitter.split(conf_path)
             self._compare_dirs(corpus_dir, expected_dir)
 

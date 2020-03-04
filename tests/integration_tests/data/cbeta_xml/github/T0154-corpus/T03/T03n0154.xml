@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T05n0220a">
+  <teiHeader>
+    <encodingDesc>
+      <tagsDecl>
+        <namespace name="http://www.tei-c.org/ns/1.0">
+          <tagUsage gi="rdg">
+            <listWit>
+              <witness xml:id="wit.cbeta">【CB】</witness>
+              <witness xml:id="wit.orig">【大】</witness>
+              <witness xml:id="wit1">【明】</witness>
+              <witness xml:id="wit2">【元】</witness>
+              <witness xml:id="wit3">【宋】</witness>
+              <witness xml:id="wit4">【麗-CB】</witness>
+            </listWit>
+          </tagUsage>
+        </namespace>
+      </tagsDecl>
+    </encodingDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <milestone n="1" unit="juan"/>
+      <lb n="0070a15" ed="T"/>
+      <cb:div type="jing">
+        <cb:mulu level="1" n="1" type="經">1 佛說那賴經</cb:mulu>
+        <head>佛說那賴經第一</head>
+        <lb n="0070a16" ed="T"/>
+        <p xml:id="pT03p0070a1601">聞如是：</p>
+      </cb:div>
+      <lb n="0076a13" ed="T"/>
+      <cb:div type="jing">
+        <cb:mulu level="1" n="9" type="經">9 佛說旃闍摩暴志謗佛經</cb:mulu>
+        <head>佛說<anchor xml:id="nkr_note_orig_0076002" n="0076002"/><anchor xml:id="nkr_note_mod_0076002" n="0076002"/><anchor xml:id="beg0076002" n="0076002"/>旃<anchor xml:id="end0076002"/>闍摩暴志謗佛經第九</head>
+        <lb n="0076a14" ed="T"/>
+        <p xml:id="pT03p0076a1401">聞如是：</p>
+      </cb:div>
+    </body>
+    <back>
+      <cb:div type="apparatus">
+        <head>校註</head>
+        <p>
+          <app from="#beg0076002" to="#end0076002"><lem wit="#wit.orig">旃</lem><rdg resp="#resp2" wit="#wit3 #wit2 #wit1">栴</rdg></app>
+        </p>
+      </cb:div>
+      <cb:div type="cbeta-notes">
+        <head>CBETA 校註</head>
+        <p>
+          <note n="0076002" resp="#resp1" type="mod" target="#nkr_note_mod_0076002">旃【大】，栴【宋】【元】【明】</note>
+        </p>
+      </cb:div>
+      <cb:div type="taisho-notes">
+        <head>大正 校註</head>
+        <p>
+          <note n="0076002" resp="#resp2" type="orig" place="foot text" target="#nkr_note_orig_0076002">旃＝栴【三】</note>
+        </p>
+      </cb:div>
+    </back>
+  </text>
+</TEI>
