@@ -17,3 +17,4 @@ from .text import FilteredWitnessText
 from .text import Text
 from .text import WitnessText
 from .tokenizer import Tokenizer
+from .work_joiner import WorkJoiner

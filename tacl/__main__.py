@@ -83,6 +83,7 @@ def generate_parser():
     generate_excise_subparser(subparsers)
     generate_highlight_subparser(subparsers)
     generate_intersect_subparser(subparsers)
+    generate_join_works_subparser(subparsers)
     generate_lifetime_subparser(subparsers)
     generate_ngrams_subparser(subparsers)
     generate_normalise_subparser(subparsers)
@@ -225,6 +226,22 @@ def generate_intersect_subparser(subparsers):
     utils.add_db_arguments(parser)
     utils.add_corpus_arguments(parser)
     utils.add_query_arguments(parser)
+
+
+def generate_join_works_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to join multiple prepared
+    works together."""
+    parser = subparsers.add_parser(
+        'join-works', description=constants.JOIN_WORKS_DESCRIPTION,
+        epilog=constants.JOIN_WORKS_EPILOG, formatter_class=ParagraphFormatter,
+        help=constants.JOIN_WORKS_HELP)
+    parser.set_defaults(func=join_works)
+    parser.add_argument('corpus', help=constants.JOIN_WORKS_CORPUS_HELP,
+                        metavar='CORPUS')
+    parser.add_argument('output', help=constants.JOIN_WORKS_OUTPUT_HELP,
+                        metavar='OUTPUT')
+    parser.add_argument('works', help=constants.JOIN_WORKS_WORK_HELP,
+                        metavar='WORK', nargs='+')
 
 
 def generate_lifetime_subparser(subparsers):
@@ -519,6 +536,12 @@ def highlight_text(args, parser):
     else:
         report = tacl.ResultsHighlightReport(corpus, tokenizer)
         report.generate(args.output, args.base_name, args.results)
+
+
+def join_works(args, parser):
+    """Joins works into a single work."""
+    joiner = tacl.WorkJoiner(args.corpus)
+    joiner.join(args.output, args.works)
 
 
 def lifetime_report(args, parser):

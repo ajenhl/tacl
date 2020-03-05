@@ -573,6 +573,17 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             subprocess.call(shlex.split(command))
             self._compare_dirs(corpus_dir, expected_dir)
 
+    def test_join_works(self):
+        base_dir = os.path.join(self._data_dir, 'work_joiner')
+        expected_dir = os.path.join(base_dir, 'expected')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            actual_dir = os.path.join(temp_dir, 'actual')
+            shutil.copytree(os.path.join(base_dir, 'corpus'), actual_dir)
+            command = 'tacl join-works {} output T0001-1 T0001-2'.format(
+                actual_dir)
+            subprocess.call(shlex.split(command))
+            self._compare_dirs(actual_dir, expected_dir)
+
 
 if __name__ == '__main__':
     unittest.main()

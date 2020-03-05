@@ -241,6 +241,30 @@ INTERSECT_EPILOG = '''\
 ''' + ENCODING_EPILOG
 INTERSECT_HELP = 'List n-grams common to all sub-corpora.'
 
+JOIN_WORKS_CORPUS_HELP = 'Path to corpus of prepared TEI XML texts.'
+JOIN_WORKS_DESCRIPTION = '''\
+    Join multiple TEI XML works split from the same original work into
+    a new single work.'''
+JOIN_WORKS_EPILOG = '''\
+    Join works is useful when a work has been split into multiple
+    parts (likely via tacl prepare) and a new work consisting of some
+    of those parts joined togther is wanted.
+
+    The order the works to join are specified determines the order
+    they are joined.
+
+    Works are specified via their name, not file path. For example,
+    T0006 and not T0006.xml or path/to/corpus/T0006. The same is true
+    for the output work name.
+
+    Due to the way witnesses are handled, joining works split from
+    different original works will almost certainly result in errors or
+    incorrect data at later points. Do not do this.'''
+JOIN_WORKS_EXISTING_OUTPUT_ERROR = 'Output work {} already exists.'
+JOIN_WORKS_HELP = 'Join multiple TEI XML works into a single new work.'
+JOIN_WORKS_OUTPUT_HELP = 'Name of work to output the joined works as.'
+JOIN_WORKS_WORK_HELP = 'Name of work to join.'
+
 LIFETIME_DESCRIPTION = '''\
     Generate a report on the lifetime of n-grams in a results file.'''
 LIFETIME_EPILOG = '''\
@@ -534,12 +558,11 @@ SPLIT_DESCRIPTION = '''\
     Split an existing work into multiple works that are subsets of its
     content.'''
 SPLIT_EPILOG = '''\
-
     Each split configuration file must be named according to the work
     that it defines the splits for (eg, T0278.xml). Its format is a
     simple XML structure, as illustrated in the example below:
 
-    <splits>
+    <splits delete="true">
       <work>
         <name>T0278-paralleled-earlier</name>
         <parts>
@@ -561,7 +584,7 @@ SPLIT_EPILOG = '''\
         </parts>
       </work>
       <work>
-        <name>T278-ex-earlier-parallels</name>
+        <name>T0278-ex-earlier-parallels</name>
         <parts>
           <part>
             <witnesses>ALL</witnesses>
@@ -573,6 +596,9 @@ SPLIT_EPILOG = '''\
             <end>善哉善哉真佛子快說是法我隨喜</end>
           </part>
         </parts>
+      </work>
+      <work rename="true">
+        <name>Renamed T0278</name>
       </work>
     </splits>
 
@@ -590,7 +616,15 @@ SPLIT_EPILOG = '''\
     witness of the new work. In the latter case, the first instance of
     the whole provided text is copied. In both cases, after the
     specified text is copied, it is removed from consideration in the
-    future parts of this split work.'''
+    future parts of this split work.
+
+    The source work can be output in its entirety under a new name, if
+    a "rename" attribute with the value "true" is added to a work
+    element, which must contain only a name.
+
+    The source work is left unchanged by the splitting process, unless
+    a "delete" attribute with the value "true" is added to the root
+    splits element, in which case the work is deleted.'''
 SPLIT_HELP = 'Split an existing work into multiple works.'
 
 STATISTICS_DESCRIPTION = '''\
