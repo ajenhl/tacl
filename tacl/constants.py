@@ -257,6 +257,9 @@ JOIN_WORKS_EPILOG = '''\
     T0006 and not T0006.xml or path/to/corpus/T0006. The same is true
     for the output work name.
 
+    The joined work is output within the specified corpus that
+    contains the works being joined.
+
     Due to the way witnesses are handled, joining works split from
     different original works will almost certainly result in errors or
     incorrect data at later points. Do not do this.'''
