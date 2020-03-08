@@ -17,9 +17,12 @@
     <teiHeader/>
     <text>
       <body>
-        <cb:div type="other">
-          <cb:mulu level="1" type="其他">5 宗</cb:mulu>
-          <head>Mulu, named output.</head>
+        <cb:div type="jing">
+          <cb:mulu level="2" n="1" type="經">1 〔菩薩本生〕</cb:mulu>
+          <head>（一）</head>
+          <p xml:id="pT03p0001a2102" cb:place="inline">「昔者菩薩，其心通真，覩世無常，榮命難
+          <lb n="0001a22" ed="T"/>保，盡財布施。天帝釋覩菩薩慈育群生布
+          <lb n="0001a23" ed="T"/>施濟眾，功勳巍巍，德重十方，懼奪己位，</p>
         </cb:div>
       </body>
     </text>

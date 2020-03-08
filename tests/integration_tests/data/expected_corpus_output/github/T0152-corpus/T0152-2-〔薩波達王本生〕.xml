@@ -17,9 +17,13 @@
     <teiHeader/>
     <text>
       <body>
-        <cb:div type="other">
-          <cb:mulu level="1" type="其他">5 宗</cb:mulu>
-          <head>Mulu, named output.</head>
+        <cb:div type="jing">
+          <cb:mulu level="2" n="2" type="經">2 〔薩波達王本生〕</cb:mulu>
+          <head>（二）</head>
+          <p xml:id="pT03p0001b1202" cb:place="inline">「昔者菩薩為大國王，號薩波達，布施眾
+          <lb n="0001b13" ed="T"/>生恣其所索，愍濟厄難常有悲愴。天帝釋
+          <lb n="0001b14" ed="T"/>覩王慈惠德被十方，天神鬼龍僉然而曰：『天
+          <lb n="0001b15" ed="T"/>帝尊位初無常人，戒具行高慈惠福隆，命盡</p>
         </cb:div>
       </body>
     </text>

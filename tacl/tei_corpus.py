@@ -272,7 +272,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
             __name__, 'assets/xslt/CBETA_remove_divs.xsl')
         self._remove_divs = etree.XSLT(etree.parse(remove_divs_xslt))
 
-    def _extract_divs(self, work, tree, div_types):
+    def _extract_divs(self, work, tree, div_types, exclude=None):
         """Writes out to files the individual parts of a work corresponding to
         various types of cb:div.
 
@@ -287,6 +287,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
             for position, div in enumerate(divs):
                 subtree = self._transform_div(tree, position=str(position),
                                               div_type='"{}"'.format(div_type))
+                subtree = self._remove_subdivs(subtree, exclude)
                 filename = '{}-{}-{}.xml'.format(work, label, position + 1)
                 self._output_tree(filename, subtree)
             tree = self._remove_divs(tree, div_type='"{}"'.format(div_type))
@@ -371,7 +372,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         super()._postprocess(work, tree)
 
     def _postprocess_div_mulu(self, work, tree, div_type,
-                              treatment=LEAVE_UNNAMED_DIVS):
+                              treatment=LEAVE_UNNAMED_DIVS, exclude=None):
         divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
                           namespaces=constants.NAMESPACES)
         seen_filenames = {}
@@ -379,6 +380,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
             div_tree = self._transform_div(tree, position=str(position),
                                            div_type='"{}"'.format(div_type),
                                            treatment='"{}"'.format(treatment))
+            div_tree = self._remove_subdivs(div_tree, exclude)
             try:
                 mulu = div.xpath('cb:mulu[1]/text()',
                                  namespaces=constants.NAMESPACES)[0]
@@ -473,6 +475,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
 
         """
         div_tree = self._transform_div(tree, position='0', div_type='"other"')
+        div_tree = self._remove_subdivs(div_tree, ['jing'])
         div_filename = '{}-0.xml'.format(work)
         self._output_tree(div_filename, div_tree)
         self._postprocess_div_mulu(work, tree, 'jing')
@@ -630,11 +633,21 @@ class TEICorpusCBETAGitHub (TEICorpus):
         self._output_tree(div_filename, div_tree)
 
     def _postprocess_T2102(self, work, tree):
-        self._postprocess_div_mulu(work, tree, 'other', REMOVE_UNNAMED_DIVS)
+        self._postprocess_div_mulu(
+            work, tree, 'other', treatment=REMOVE_UNNAMED_DIVS,
+            exclude=['other'])
 
     def _postprocess_T2145(self, work, tree):
         div_types = [('other', 'other')]
-        self._extract_divs(work, tree, div_types)
+        self._extract_divs(work, tree, div_types, exclude=['other'])
+
+    def _remove_subdivs(self, tree, exclude):
+        exclude = exclude or []
+        for div_type in exclude:
+            xpath = '//cb:div[@type="{}"][ancestor::cb:div]'.format(div_type)
+            for div in tree.xpath(xpath, namespaces=constants.NAMESPACES):
+                div.getparent().remove(div)
+        return tree
 
     def _tidy(self, work, file_path):
         """Transforms the file at `file_path` into simpler XML and returns
