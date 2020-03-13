@@ -307,10 +307,10 @@ NGRAMS_EPILOG = '''\
     from these new witnesses are added will be much less than to a new
     database, due to the existing indices.
 
-    If a witness has changed since a database was generated, this
-    command will not update the database. In this case, generate a new
-    database or manipulate the existing dataase directly to remove the
-    witness and its associated n-grams.
+    If a witness has changed or been deleted since a database was
+    generated, this command will not update the database. In this
+    case, generate a new database or manipulate the existing dataase
+    directly to remove the witness and its associated n-grams.
 
     examples:
 
