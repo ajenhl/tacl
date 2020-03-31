@@ -49,4 +49,14 @@
       </part>
     </parts>
   </work>
+  <work>
+    <name>one_attesting_witness</name>
+    <parts>
+      <part>
+        <witnesses>wit1</witnesses>
+        <start>This is</start>
+        <end>simple rules</end>
+      </part>
+    </parts>
+  </work>
 </splits>

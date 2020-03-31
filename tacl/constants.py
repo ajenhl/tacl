@@ -562,8 +562,9 @@ SPLIT_DESCRIPTION = '''\
     content.'''
 SPLIT_EPILOG = '''\
     Each split configuration file must be named according to the work
-    that it defines the splits for (eg, T0278.xml). Its format is a
-    simple XML structure, as illustrated in the example below:
+    that it defines the splits for (eg, T0278.xml is the name of the
+    configuration file for the work T0278). Its format is a simple XML
+    structure, as illustrated in the example below:
 
     <splits delete="true">
       <work>
@@ -606,11 +607,12 @@ SPLIT_EPILOG = '''\
     </splits>
 
     Each split work is created, under the supplied name, in the corpus
-    directory. Each of the original work's witnesses are recreated,
-    using the subset of its content defined in the parts. The parts
-    are processed in the order listed, and a witness includes a part
-    only if its siglum is listed in witnesses, or the keyword ALL is
-    given in witnesses.
+    directory - an error will be raised if there is already a work
+    with the same name as the split work. Each of the original work's
+    witnesses are recreated, using the subset of its content defined
+    in the parts. The parts are processed in the order listed, and a
+    witness includes a part only if its siglum is listed in witnesses,
+    or the keyword ALL is given in witnesses.
 
     Each part defines either a start and end piece of text, or a whole
     piece of text. In the former case, the first remaining instance of

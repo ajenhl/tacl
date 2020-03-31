@@ -88,9 +88,11 @@ class Splitter:
                         source_text, output_text = self._split_part(
                             in_work_name, part, siglum, source_text,
                             output_text)
-            output_path = os.path.join(out_work_path, '{}.txt'.format(siglum))
-            with open(output_path, 'w', encoding='utf-8') as fh:
-                fh.write(''.join(output_text))
+            if output_text:
+                output_path = os.path.join(out_work_path, '{}.txt'.format(
+                    siglum))
+                with open(output_path, 'w', encoding='utf-8') as fh:
+                    fh.write(''.join(output_text))
 
     def _split_part(self, source_work, part, siglum, source_text, output_text):
         if part[1].tag == 'start':
