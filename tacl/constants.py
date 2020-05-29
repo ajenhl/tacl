@@ -480,7 +480,7 @@ RESULTS_EPILOG = '''\
     chain commands together without creating an intermediate file,
     pipe the commands together and use - instead of a filename, as:
 
-        tacl results --recriprocal results.csv | tacl results --reduce -
+        tacl results --reciprocal results.csv | tacl results --reduce -
 
     examples:
 
