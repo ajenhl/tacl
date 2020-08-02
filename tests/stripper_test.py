@@ -164,6 +164,17 @@ class StripTestCase (unittest.TestCase):
 釋。秦言能在直樹林。故名釋。釋。秦言亦言直'''
         self._transform_equality(input_xml, expected_output)
 
+    def test_title(self):
+        """Tests that tei:title is stripped entirely."""
+        input_xml = (
+            '<body xmlns="http://www.tei-c.org/ns/1.0">'
+            '<head>（一一）<title><note n="0057008" resp="#resp4" type="orig" '
+            'place="foot text">〔佛說長阿含〕－【三】</note><note n="0057008" '
+            'resp="#resp1" type="mod">佛說長阿含【大】，〔－〕【宋】【元】【明】'
+            '</note>佛說長阿含</title>第二分增</head></body>')
+        expected_output = '（一一）第二分增'
+        self._transform_equality(input_xml, expected_output)
+
     def test_tt(self):
         """Tests that tt is stripped down to the content of
         t[@lang='chi']."""

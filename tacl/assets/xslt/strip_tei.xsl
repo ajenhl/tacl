@@ -72,6 +72,8 @@
 
   <xsl:template match="tei:teiHeader" />
 
+  <xsl:template match="tei:body//tei:title" />
+
   <xsl:template match="text()">
     <xsl:value-of select="normalize-space()" />
   </xsl:template>
