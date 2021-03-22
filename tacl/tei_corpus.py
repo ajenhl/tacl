@@ -288,7 +288,14 @@ class TEICorpusCBETAGitHub (TEICorpus):
                 subtree = self._transform_div(tree, position=str(position),
                                               div_type='"{}"'.format(div_type))
                 subtree = self._remove_subdivs(subtree, exclude)
-                filename = '{}-{}-{}.xml'.format(work, label, position + 1)
+                try:
+                    title = '-' + self._get_mulu(
+                        subtree.getroot(),
+                        '//tei:body/cb:div/cb:mulu[1]/text()')
+                except IndexError:
+                    title = ''
+                filename = '{}-{}-{}{}.xml'.format(work, label, position + 1,
+                                                   title)
                 self._output_tree(filename, subtree)
             tree = self._remove_divs(tree, div_type='"{}"'.format(div_type))
         return tree
@@ -382,16 +389,13 @@ class TEICorpusCBETAGitHub (TEICorpus):
                                            treatment='"{}"'.format(treatment))
             div_tree = self._remove_subdivs(div_tree, exclude)
             try:
-                mulu = div.xpath('cb:mulu[1]/text()',
-                                 namespaces=constants.NAMESPACES)[0]
-                mulu = mulu.replace(' ', '-')
-                mulu = mulu.replace(os.path.sep, '|')
+                title = self._get_mulu(div, 'cb:mulu[1]/text()')
             except IndexError:
                 if treatment in (MERGE_UNNAMED_DIVS_TO_PRECEDING,
                                  REMOVE_UNNAMED_DIVS):
                     continue
-                mulu = 'unnamed-{}'.format(position + 1)
-            div_filename = '{}-{}.xml'.format(work, mulu)
+                title = 'unnamed-{}'.format(position + 1)
+            div_filename = '{}-{}.xml'.format(work, title)
             seen_filenames = self._output_tree(div_filename, div_tree,
                                                seen_filenames)
 
