@@ -27,6 +27,10 @@
 
   <xsl:template match="tei:byline" />
 
+  <xsl:template match="tei:caesura">
+    <xsl:text>   </xsl:text>
+  </xsl:template>
+
   <xsl:template match="tei:foreign[@place='foot']" />
 
   <xsl:template match="cb:docNumber" />
