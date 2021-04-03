@@ -36,7 +36,7 @@ class DataStore:
         if ram:
             cache_size = ram * -1000000
             self._conn.execute(constants.PRAGMA_CACHE_SIZE_SQL.format(
-                    cache_size))
+                cache_size))
         self._conn.execute(constants.PRAGMA_COUNT_CHANGES_SQL)
         self._conn.execute(constants.PRAGMA_FOREIGN_KEYS_SQL)
         self._conn.execute(constants.PRAGMA_LOCKING_MODE_SQL)
@@ -75,20 +75,28 @@ class DataStore:
         self._initialise_database()
         if catalogue:
             for work in catalogue:
+                db_witnesses = self._get_text_ids(work)
                 for witness in corpus.get_witnesses(
                         work, text_class=text_class):
-                    self._add_text_ngrams(witness, minimum, maximum)
+                    text_id = self._add_text_ngrams(witness, minimum, maximum)
+                    db_witnesses.pop(text_id, None)
+                for text_id, names in db_witnesses:
+                    self._delete_text(text_id, *names)
         else:
+            db_witnesses = self._get_text_ids()
             for witness in corpus.get_witnesses(text_class=text_class):
-                self._add_text_ngrams(witness, minimum, maximum)
+                text_id = self._add_text_ngrams(witness, minimum, maximum)
+                db_witnesses.pop(text_id, None)
+            for text_id, names in db_witnesses.items():
+                self._delete_text(text_id, *names)
         self._add_indices()
         self._analyse()
 
     def _add_temporary_ngrams(self, ngrams):
         """Adds `ngrams` to a temporary table."""
         # Remove duplicate n-grams, empty n-grams, and non-string n-grams.
-        ngrams = [ngram for ngram in ngrams if ngram and
-                  isinstance(ngram, str)]
+        ngrams = [ngram for ngram in ngrams if ngram and isinstance(
+            ngram, str)]
         # Deduplicate while preserving order (useful for testing).
         seen = {}
         ngrams = [seen.setdefault(x, x) for x in ngrams if x not in seen]
@@ -140,6 +148,7 @@ class DataStore:
         :type minimum: `int`
         :param maximum: maximum n-gram size
         :type maximum: `int`
+        :rtype: `int`
 
         """
         text_id = self._get_text_id(witness)
@@ -153,6 +162,7 @@ class DataStore:
                 skip_sizes.append(size)
         for size, ngrams in witness.get_ngrams(minimum, maximum, skip_sizes):
             self._add_text_size_ngrams(text_id, size, ngrams)
+        return text_id
 
     def _add_text_record(self, witness):
         """Adds a Text record for `witness`.
@@ -318,6 +328,22 @@ class DataStore:
             self._csv(cursor, fieldnames, results_fh)
         return temp_path
 
+    def _delete_text(self, text_id, work, siglum):
+        """Deletes the text identified by `text_id` from the database.
+
+        :param text_id: database ID of text
+        :type text_id: `int`
+        :param work: name of text's work
+        :type work: `str`
+        :param siglum: text's siglum
+        :type siglum: `str`
+
+        """
+        self._logger.info('Deleting text {} {} from database'.format(
+            work, siglum))
+        with self._conn:
+            self._conn.execute(constants.DELETE_TEXT_SQL, [text_id])
+
     def _delete_text_ngrams(self, text_id):
         """Deletes all n-grams associated with `text_id` from the data
         store.
@@ -455,6 +481,9 @@ class DataStore:
         self._conn.execute(constants.DROP_TEXTNGRAM_INDEX_SQL)
         self._logger.info('Finished dropping database indices')
 
+    def _get_checksum(self, text_id):
+        """Returns the checksum for the text with `text_id`."""
+
     @staticmethod
     def _get_intersection_subquery(labels):
         # Create nested subselects.
@@ -510,7 +539,28 @@ class DataStore:
                 self._delete_text_ngrams(text_id)
         return text_id
 
+    def _get_text_ids(self, work=None):
+        """Returns a dictionary of IDs of texts in the database, with work and
+        siglum as values for each.
+
+        If `work` is supplied, returns IDs of texts that are
+        associated with the specified work.
+
+        :param work: optional name of work to limit texts to
+        :type work: `str`
+        :rtype: `dict`
+
+        """
+        if work is None:
+            query = constants.SELECT_TEXTS_SQL
+            rows = self._conn.execute(query).fetchall()
+        else:
+            query = constants.SELECT_WORK_TEXTS_SQL
+            rows = self._conn.execute(query, [work]).fetchall()
+        return {row['id']: [row['work'], row['siglum']] for row in rows}
+
     def _has_ngrams(self, text_id, size):
+
         """Returns True if a text has existing records for n-grams of
         size `size`.
 

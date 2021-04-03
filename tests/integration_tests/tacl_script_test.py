@@ -176,6 +176,99 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
             ]
         self.assertEqual(set(actual_rows), set(expected_rows))
 
+    def test_add_ngrams_cbeta_update(self):
+        subprocess.call(self._ngrams_command_args)
+        updated_corpus_dir = os.path.join(self._data_dir, 'stripped_update')
+        ngrams_command = 'tacl ngrams {} {} {} {}'.format(
+            self._db_path, updated_corpus_dir, 1, 3)
+        subprocess.call(shlex.split(ngrams_command))
+        conn = sqlite3.connect(self._db_path)
+        actual_rows = conn.execute(
+            'SELECT Text.work, Text.siglum, Text.checksum, Text.label, '
+            'TextNGram.ngram, TextNGram.size, TextNGram.count '
+            'FROM Text, TextNGram WHERE Text.id = TextNGram.text').fetchall()
+        expected_rows = [
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'U', 1, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'p', 1, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'd', 1, 2),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'a', 1, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 't', 1, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'e', 1, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'Up', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'pd', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'da', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'at', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'te', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'ed', 2, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'Upd', 3, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'pda', 3, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'dat', 3, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'ate', 3, 1),
+            ('T1', 'base', '6088163a82f63b6c9d15ca22cdb68a4b', '', 'ted', 3, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 't', 1, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'h', 1, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'e', 1, 4),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 's', 1, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'n', 1, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'th', 2, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'he', 2, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'es', 2, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'se', 2, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'eh', 2, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'en', 2, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'nt', 2, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'the', 3, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'hes', 3, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'ese', 3, 2),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'seh', 3, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'ehe', 3, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'sen', 3, 1),
+            ('T2', 'base', 'ccefdfb4379dd0829a8fa79a9e07f2e0', '', 'ent', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 't', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'h', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'e', 1, 3),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'w', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 's', 1, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'n', 1, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'th', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'he', 2, 2),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ew', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ws', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'sh', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'es', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'se', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'en', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'nt', 2, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'the', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'hew', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ews', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'wsh', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'she', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'hes', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ese', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'sen', 3, 1),
+            ('T2', 'a', '08e0878f03b63bdbc25d4cce082329e4', '', 'ent', 3, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 't', 1, 2),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'h', 1, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'a', 1, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'th', 2, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'ha', 2, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'at', 2, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'tha', 3, 1),
+            ('T3', 'base', 'bb34469a937a77ae77c2aeb67248c43c', '', 'hat', 3, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'h', 1, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'e', 1, 2),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'n', 1, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 's', 1, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'he', 2, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'en', 2, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'ns', 2, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'se', 2, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'hen', 3, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'ens', 3, 1),
+            ('T4', 'base', '3a0dede3266ed7d2e44cfd7ac38632d5', '', 'nse', 3, 1)]
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_add_ngrams_pagel(self):
         ngrams_command = 'tacl ngrams -t {} {} {} {} {}'.format(
             constants.TOKENIZER_CHOICE_PAGEL, self._db_path,
@@ -394,7 +487,7 @@ class TaclScriptIntegrationTestCase (TaclTestCase):
         results2 = os.path.join(supplied_dir, 'intersect_input_2.csv')
         results3 = os.path.join(supplied_dir, 'intersect_input_3.csv')
         command = 'tacl sintersect -d {} -l A B C -s {} {} {}'.format(
-                self._db_path, results1, results2, results3)
+            self._db_path, results1, results2, results3)
         actual_rows = self._get_rows_from_command(command)
         expected_rows = [
             constants.QUERY_FIELDNAMES,

@@ -28,6 +28,8 @@ class DataStoreTestCase (TaclTestCase):
         add_indices = self._create_patch('tacl.DataStore._add_indices')
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
+        delete_text = self._create_patch('tacl.DataStore._delete_text')
+        get_text_ids = self._create_patch('tacl.DataStore._get_text_ids')
         initialise = self._create_patch('tacl.DataStore._initialise_database')
         text1 = MagicMock(spec_set=tacl.WitnessText)
         text2 = MagicMock(spec_set=tacl.WitnessText)
@@ -41,6 +43,7 @@ class DataStoreTestCase (TaclTestCase):
             text_class=tacl.WitnessText)
         self.assertEqual(add_text_ngrams.mock_calls,
                          [call(store, text1, 2, 3), call(store, text2, 2, 3)])
+        get_text_ids.assert_called_once_with(store)
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
@@ -48,6 +51,8 @@ class DataStoreTestCase (TaclTestCase):
         add_indices = self._create_patch('tacl.DataStore._add_indices')
         add_text_ngrams = self._create_patch('tacl.DataStore._add_text_ngrams')
         analyse = self._create_patch('tacl.DataStore._analyse')
+        delete_text = self._create_patch('tacl.DataStore._delete_text')
+        get_text_ids = self._create_patch('tacl.DataStore._get_text_ids')
         initialise = self._create_patch('tacl.DataStore._initialise_database')
         text1 = MagicMock(spec_set=tacl.WitnessText)
         text2 = MagicMock(spec_set=tacl.WitnessText)
@@ -62,6 +67,7 @@ class DataStoreTestCase (TaclTestCase):
             'T1', text_class=tacl.WitnessText)
         add_text_ngrams.assert_has_calls([call(store, text1, 2, 3),
                                           call(store, text2, 2, 3)])
+        get_text_ids.assert_called_once_with(store, 'T1')
         add_indices.assert_called_once_with(store)
         analyse.assert_called_once_with(store)
 
