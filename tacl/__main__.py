@@ -264,7 +264,7 @@ def generate_lifetime_subparser(subparsers):
 
 def generate_ngrams(args, parser):
     """Adds n-grams data to the data store."""
-    store = utils.get_data_store(args)
+    store = utils.get_data_store(args, must_exist=False)
     corpus = utils.get_corpus(args)
     if args.catalogue:
         catalogue = utils.get_catalogue(args)
@@ -714,7 +714,7 @@ def strip_files(args, parser):
 def supplied_diff(args, parser):
     labels = args.labels
     results = args.supplied
-    store = utils.get_data_store(args)
+    store = utils.get_data_store(args, must_exist=False)
     tokenizer = utils.get_tokenizer(args)
     store.diff_supplied(results, labels, tokenizer, sys.stdout)
 
@@ -722,7 +722,7 @@ def supplied_diff(args, parser):
 def supplied_intersect(args, parser):
     labels = args.labels
     results = args.supplied
-    store = utils.get_data_store(args)
+    store = utils.get_data_store(args, must_exist=False)
     store.intersection_supplied(results, labels, sys.stdout)
 
 

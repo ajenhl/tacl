@@ -1,4 +1,4 @@
-class TACLError (Exception):
+class TACLError(Exception):
 
     def __init__(self, msg):
         self._msg = msg
@@ -7,17 +7,22 @@ class TACLError (Exception):
         return self._msg
 
 
-class MalformedCatalogueError (TACLError):
+class MalformedCatalogueError(TACLError):
 
     pass
 
 
-class MalformedQueryError (TACLError):
+class MalformedDataStoreError(TACLError):
 
     pass
 
 
-class MalformedResultsError (TACLError):
+class MalformedQueryError(TACLError):
+
+    pass
+
+
+class MalformedResultsError(TACLError):
 
     pass
 

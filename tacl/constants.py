@@ -696,6 +696,8 @@ INSUFFICIENT_LABELS_QUERY_ERROR = (
     'Not running query with fewer than two defined labels.')
 LABEL_NOT_IN_CATALOGUE_ERROR = (
     'Supplied label is not present in the supplied catalogue.')
+MISSING_DATA_STORE_ERROR = (
+    'Data store does not exist or is inaccessible at {}.')
 MISSING_REQUIRED_COLUMNS_ERROR = (
     'Results file is missing required column(s) {}.')
 NGRAM_MINIMUM_SIZE_GREATER_THAN_MAXIMUM_ERROR = (
@@ -704,6 +706,7 @@ NGRAM_SIZE_MUST_BE_INTEGER_ERROR = (
     'N-gram sizes must be given as positive integers.')
 NGRAM_SIZE_TOO_SMALL_ERROR = 'Minimum n-gram size is 1.'
 NO_VARIANTS_DEFINED_ERROR = 'No variant forms defined in mapping for "{}".'
+NON_UTF8_RESULTS_FILE_ERROR = 'Results file "{}" is not encoded as UTF-8.'
 SPLIT_DELETE_FAILED = 'Failed to delete work "{}" as directed: {}'
 SPLIT_INVALID_WITNESS = ('Part references witness "{}" that does not exist '
                          'in work {}.')

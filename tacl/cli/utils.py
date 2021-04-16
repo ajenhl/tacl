@@ -100,9 +100,10 @@ def get_corpus(args):
     return tacl.Corpus(args.corpus, tokenizer)
 
 
-def get_data_store(args):
+def get_data_store(args, must_exist=True):
     """Returns a `tacl.DataStore`."""
-    return tacl.DataStore(args.db, args.memory, args.ram)
+    return tacl.DataStore(args.db, args.memory, args.ram,
+                          must_exist=must_exist)
 
 
 def get_ngrams(path):

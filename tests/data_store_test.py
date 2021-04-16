@@ -2,6 +2,7 @@
 
 import collections
 import io
+import os.path
 import sqlite3
 import unittest
 from unittest.mock import call, MagicMock, PropertyMock, sentinel
@@ -9,7 +10,7 @@ from unittest.mock import call, MagicMock, PropertyMock, sentinel
 import pandas as pd
 
 import tacl
-from tacl.exceptions import MalformedQueryError
+from tacl.exceptions import MalformedDataStoreError, MalformedQueryError
 from .tacl_test_case import TaclTestCase
 
 
@@ -560,6 +561,15 @@ class DataStoreTestCase (TaclTestCase):
         matches = {'AB': 0, 'BC': 0, 'CD': 1}
         actual_row = store._check_diff_result(row, matches, tokenize, join)
         self.assertEqual(actual_row['count'], 0)
+
+    def test_query_no_db(self):
+        # Test that an error is raised if a db is required but the
+        # supplied path does not exist.
+        no_db_path = 'no-db-here.db'
+        self.assertTrue(not(os.path.exists(no_db_path)),
+                        'Test requires no file at {}'.format(no_db_path))
+        self.assertRaises(MalformedDataStoreError, tacl.DataStore,
+                          no_db_path)
 
     def test_reduce_diff_results_composed(self):
         # Consider the diff between a text "abcdefg" and

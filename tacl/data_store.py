@@ -10,7 +10,8 @@ import tempfile
 import pandas as pd
 
 from . import constants
-from .exceptions import MalformedQueryError
+from .exceptions import (MalformedDataStoreError, MalformedQueryError,
+                         MalformedResultsError)
 from .text import WitnessText
 
 
@@ -23,12 +24,15 @@ class DataStore:
 
     """
 
-    def __init__(self, db_name, use_memory=True, ram=0):
+    def __init__(self, db_name, use_memory=True, ram=0, must_exist=True):
         self._logger = logging.getLogger(__name__)
         if db_name == ':memory:':
             self._db_name = db_name
         else:
             self._db_name = os.path.abspath(db_name)
+            if must_exist and not os.path.exists(self._db_name):
+                raise MalformedDataStoreError(
+                    constants.MISSING_DATA_STORE_ERROR.format(self._db_name))
         self._conn = sqlite3.connect(self._db_name)
         self._conn.row_factory = sqlite3.Row
         if use_memory:
@@ -130,8 +134,15 @@ class DataStore:
         """
         NGRAM, SIZE, NAME, SIGLUM, COUNT, LABEL = constants.QUERY_FIELDNAMES
         reader = csv.DictReader(results)
-        data = [(row[NGRAM], row[SIZE], row[NAME], row[SIGLUM], row[COUNT],
-                 label) for row in reader]
+        try:
+            data = [(row[NGRAM], row[SIZE], row[NAME], row[SIGLUM], row[COUNT],
+                     label) for row in reader]
+        except KeyError:
+            missing_cols = [col for col in constants.QUERY_FIELDNAMES if col
+                            not in reader.fieldnames]
+            raise MalformedResultsError(
+                constants.MISSING_REQUIRED_COLUMNS_ERROR.format(
+                    ', '.join(missing_cols)))
         self._conn.executemany(constants.INSERT_TEMPORARY_RESULTS_SQL, data)
 
     def _add_temporary_results_index(self):

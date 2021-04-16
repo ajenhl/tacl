@@ -3,7 +3,7 @@ import os.path
 import unittest
 
 import tacl
-from tacl.exceptions import MalformedQueryError
+from tacl.exceptions import MalformedQueryError, MalformedResultsError
 from ..tacl_test_case import TaclTestCase
 
 
@@ -296,6 +296,17 @@ class DataStoreIntegrationTestCase (TaclTestCase):
                    os.path.join(supplied_dir, 'diff_input_3.csv')]
         labels = ('A', 'B')
         self.assertRaises(MalformedQueryError, self._store.diff_supplied,
+                          results, labels, tokenizer, io.StringIO(newline=''))
+
+    def test_diff_supplied_non_results(self):
+        """Supplying an invalid results file should raise an exception."""
+        tokenizer = tacl.Tokenizer(*tacl.constants.TOKENIZERS['cbeta'])
+        supplied_dir = os.path.join(self._data_dir, 'supplied_input')
+        results = [os.path.join(supplied_dir, 'diff_invalid_input_1.csv'),
+                   os.path.join(supplied_dir, 'diff_input_2.csv'),
+                   os.path.join(supplied_dir, 'diff_input_3.csv')]
+        labels = ('A', 'B', 'C')
+        self.assertRaises(MalformedResultsError, self._store.diff_supplied,
                           results, labels, tokenizer, io.StringIO(newline=''))
 
     def test_intersection(self):

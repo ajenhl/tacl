@@ -10,6 +10,7 @@ import pandas as pd
 
 from . import constants
 from .decorators import requires_columns
+from .exceptions import MalformedResultsError
 from .text import FilteredWitnessText, Text
 
 
@@ -43,8 +44,12 @@ class Results:
         if isinstance(matches, pd.DataFrame):
             self._matches = matches
         else:
-            self._matches = pd.read_csv(matches, encoding='utf-8',
-                                        na_filter=False)
+            try:
+                self._matches = pd.read_csv(matches, encoding='utf-8',
+                                            na_filter=False)
+            except UnicodeDecodeError:
+                raise MalformedResultsError(
+                    constants.NON_UTF8_RESULTS_FILE_ERROR.format(matches))
             # Work around a problem with CSV files produced on Windows
             # being read by pandas and creating an empty row for each
             # actual row.
