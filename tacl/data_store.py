@@ -659,6 +659,16 @@ class DataStore:
             query_plan += '|'.join([str(value) for value in row]) + '\n'
         self._logger.debug(query_plan)
 
+    def query(self, query, parameters, output_fh):
+        """Run `query` with `parameters`, outputting results to `output_fh`."""
+        self._logger.info('Running supplied query')
+        self._logger.debug('Query: {}\nParameters: {}'.format(
+            query, parameters))
+        self._log_query_plan(query, parameters)
+        cursor = self._conn.execute(query, parameters)
+        headers = [column[0] for column in cursor.description]
+        return self._csv(cursor, headers, output_fh)
+
     def _reduce_diff_results(self, matches_path, tokenizer, output_fh):
         """Returns `output_fh` populated with a reduced set of data from
         `matches_fh`.

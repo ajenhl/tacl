@@ -379,6 +379,14 @@ PREPARE_INPUT_HELP = 'Directory containing XML files to prepare.'
 PREPARE_OUTPUT_HELP = 'Directory to output prepared files to.'
 PREPARE_SOURCE_HELP = 'Source of TEI files.'
 
+QUERY_DESCRIPTION = '''\
+    Run a query specified in a file using supplied parameters,
+    outputting the results as CSV.'''
+QUERY_HELP = 'Run a query from a file.'
+QUERY_PARAMETERS_HELP = 'Parameters to be used in the query.'
+QUERY_QUERY_HELP = 'Path to file containing the SQL query to run.'
+
+
 REPORT_OUTPUT_HELP = 'Directory to output report to.'
 
 RESULTS_ADD_LABEL_COUNT_HELP = '''\

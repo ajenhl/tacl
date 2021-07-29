@@ -88,6 +88,7 @@ def generate_parser():
     generate_ngrams_subparser(subparsers)
     generate_normalise_subparser(subparsers)
     generate_prepare_subparser(subparsers)
+    generate_query_subparser(subparsers)
     generate_results_subparser(subparsers)
     generate_search_subparser(subparsers)
     generate_split_subparser(subparsers)
@@ -329,6 +330,22 @@ def generate_prepare_subparser(subparsers):
                         metavar='INPUT')
     parser.add_argument('output', help=constants.PREPARE_OUTPUT_HELP,
                         metavar='OUTPUT')
+
+
+def generate_query_subparser(subparsers):
+    """Adds a sub-command parser to `subparsers` to send SQL to the data
+    store and return the results."""
+    parser = subparsers.add_parser(
+        'query', description=constants.QUERY_DESCRIPTION,
+        formatter_class=ParagraphFormatter, help=constants.QUERY_HELP)
+    utils.add_common_arguments(parser)
+    utils.add_db_arguments(parser, True)
+    parser.add_argument('-q', '--query', help=constants.QUERY_QUERY_HELP,
+                        metavar='QUERY', required=True)
+    parser.add_argument('-p', '--parameters',
+                        help=constants.QUERY_PARAMETERS_HELP,
+                        metavar='PARAMETER', nargs='*')
+    parser.set_defaults(func=query_data_store)
 
 
 def generate_results_subparser(subparsers):
@@ -612,6 +629,15 @@ def prepare_xml(args, parser):
         raise Exception('Unsupported TEI source option provided')
     corpus = corpus_class(args.input, args.output)
     corpus.tidy()
+
+
+def query_data_store(args, parser):
+    """Query the data store using a query from a file."""
+    store = utils.get_data_store(args)
+    with open(args.query) as fh:
+        query = fh.read()
+    parameters = args.parameters or ()
+    store.query(query, parameters, sys.stdout)
 
 
 def results(args, parser):
