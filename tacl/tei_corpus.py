@@ -594,6 +594,13 @@ class TEICorpusCBETAGitHub (TEICorpus):
         material, and one the rest.
 
         """
+        # There are verse elements within tei:app/tei:rdg that occur
+        # within a prose context and have no markup specifying that
+        # they are verse, so add that in.
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_T0418_fix_verse.xsl')
+        fix_verse = etree.XSLT(etree.parse(xslt_filename))
+        tree = fix_verse(tree)
         xslt_filename = resource_filename(
             __name__, 'assets/xslt/CBETA_extract_verse.xsl')
         extract_verse = etree.XSLT(etree.parse(xslt_filename))

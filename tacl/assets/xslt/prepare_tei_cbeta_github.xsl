@@ -20,7 +20,8 @@
     <xsl:apply-templates select="key('anchored_start', @xml:id)" />
   </xsl:template>
 
-  <xsl:template match="tei:app/@from" />
+  <!-- Keep tei:app/@from in order to be able to text-specific
+       manipulations (eg, for T0418). -->
   <xsl:template match="tei:app/@to" />
 
   <xsl:template match="tei:back" />
