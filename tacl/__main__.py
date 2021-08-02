@@ -637,7 +637,14 @@ def query_data_store(args, parser):
     with open(args.query) as fh:
         query = fh.read()
     parameters = args.parameters or ()
-    store.query(query, parameters, sys.stdout)
+    # If the string parameter can be converted to an integer, do so.
+    converted_parameters = []
+    for parameter in parameters:
+        try:
+            converted_parameters.append(int(parameter))
+        except ValueError:
+            converted_parameters.append(parameter)
+    store.query(query, converted_parameters, sys.stdout)
 
 
 def results(args, parser):
