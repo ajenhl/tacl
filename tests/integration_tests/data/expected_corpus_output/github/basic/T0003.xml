@@ -90,12 +90,12 @@
           <lb n="0001a03" ed="T"/>
           <lb n="0001a03" ed="T"/>
           <lb n="0001a04" ed="T"/>
-          <byline cb:type="Author"><note n="0001002" resp="#resp2" type="orig" place="foot text">〔長安〕－【宋】</note><app><lem wit="#wit1 #wit3">長安</lem><rdg resp="#resp2" wit="#wit4"><space quantity="0"/></rdg></app>釋僧肇<note n="0001003" resp="#resp2" type="orig" place="foot text">〔述〕－【宋】</note><app><lem wit="#wit3">述</lem><rdg resp="#resp2" wit="#wit4"><space quantity="0"/></rdg></app></byline>
+          <byline cb:type="Author"><note n="0001002" resp="#resp2" type="orig" place="foot text">〔長安〕－【宋】</note><app from="#beg0001002"><lem wit="#wit1 #wit3">長安</lem><rdg resp="#resp2" wit="#wit4"><space quantity="0"/></rdg></app>釋僧肇<note n="0001003" resp="#resp2" type="orig" place="foot text">〔述〕－【宋】</note><app from="#beg0001003"><lem wit="#wit3">述</lem><rdg resp="#resp2" wit="#wit4"><space quantity="0"/></rdg></app></byline>
           <lb n="0001a05" ed="T"/>
           <p xml:id="pT01p0001a0501">夫宗極絕於稱謂，賢聖以之沖默；玄旨非言
       <lb n="0001a06" ed="T"/>不傳，釋迦所以致教。是以如來出世，大教
       <lb n="0001a07" ed="T"/>有三：約身口，則防之以禁律；明善惡，則導之
-      <lb n="0001a08" ed="T"/>以契經；演幽微，則<app><lem wit="#wit3">辨</lem><rdg resp="#resp2" wit="#wit4">辯</rdg></app>之以法相。然則三藏
+      <lb n="0001a08" ed="T"/>以契經；演幽微，則<app from="#beg0001004"><lem wit="#wit3">辨</lem><rdg resp="#resp2" wit="#wit4">辯</rdg></app>之以法相。然則三藏
       <lb n="0001a09" ed="T"/>之作也，本於殊應，會之有宗，則異途同趣矣。</p>
           <lb n="0001a10" ed="T"/>
           <p xml:id="pT01p0001a1001">禁律，律藏也，四分十誦。法相，阿毗曇藏也，四
@@ -111,7 +111,7 @@
         </cb:juan>
         <lb n="0001b09" ed="T"/>
         <lb n="0001b10" ed="T"/>
-        <byline cb:type="Translator"><note n="0001012" resp="#resp1" type="mod">後秦弘始年＝姚秦三藏法師【宋】【元】【明】</note><app><lem wit="#wit3">後秦弘始年</lem><rdg resp="#resp2" wit="#wit2 #wit4 #wit5">姚秦三藏法師</rdg></app>佛陀耶舍共竺佛念譯</byline>
+        <byline cb:type="Translator"><note n="0001012" resp="#resp1" type="mod">後秦弘始年＝姚秦三藏法師【宋】【元】【明】</note><app from="#beg0001012"><lem wit="#wit3">後秦弘始年</lem><rdg resp="#resp2" wit="#wit2 #wit4 #wit5">姚秦三藏法師</rdg></app>佛陀耶舍共竺佛念譯</byline>
         <lb n="0011a07" ed="T"/>
         <cb:div type="jing">
           <cb:mulu level="2" type="經">2 遊行經</cb:mulu>
