@@ -605,7 +605,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
             __name__, 'assets/xslt/CBETA_extract_verse.xsl')
         extract_verse = etree.XSLT(etree.parse(xslt_filename))
         verse_tree = extract_verse(tree)
-        verse_filename = '{}-verses.xml'.format(work)
+        verse_filename = '{}-revised-verses.xml'.format(work)
         self._output_tree(verse_filename, verse_tree)
         prose_tree = extract_verse(tree, inverse='1')
         prose_filename = '{}-ex-verses.xml'.format(work)
