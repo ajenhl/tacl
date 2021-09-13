@@ -8,4 +8,11 @@ bcd,3,t1,base,1,B
 bce,3,t1,base,1,B
 cef,3,t1,base,1,B
 abcd,4,t1,base,1,A
+bcde,4,t1,base,2,A
+cdeg,4,t1,base,1,A
+abcde,5,t1,base,1,A
+bcdeg,5,t1,base,1,A
 abcd,4,t1,base,1,B
+abce,4,t1,base,1,B
+bcef,4,t1,base,1,B
+abcef,5,t1,base,1,B

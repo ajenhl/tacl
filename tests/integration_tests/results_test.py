@@ -151,7 +151,7 @@ class ResultsIntegrationTestCase (TaclTestCase):
         fieldnames = [
             tacl.constants.NGRAM_FIELDNAME, tacl.constants.SIZE_FIELDNAME,
             tacl.constants.WORK_FIELDNAME, tacl.constants.SIGLUM_FIELDNAME,
-            tacl.constants.LABEL_FIELDNAME
+            tacl.constants.COUNT_FIELDNAME, tacl.constants.LABEL_FIELDNAME
         ]
         data_dir = os.path.join(os.path.dirname(__file__), 'data')
         corpus = tacl.Corpus(os.path.join(data_dir, 'stripped'),

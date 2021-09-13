@@ -391,6 +391,14 @@ class ResultsTestCase (TaclTestCase):
     def test_is_intersect_results(self):
         # Test that _is_intersect_results correctly identifies diff
         # and intersect results.
+        one_label_results = (
+            ['AB', '2', 'a', 'base', '7', 'A'],
+            ['AB', '2', 'b', 'base', '2', 'A'],
+            ['BA', '2', 'a', 'base', '1', 'A'],
+        )
+        fh = self._create_csv(one_label_results)
+        results = tacl.Results(fh, self._tokenizer)
+        self.assertFalse(results._is_intersect_results(results._matches))
         intersect_results = (
             ['AB', '2', 'a', 'base', '7', 'A'],
             ['AB', '2', 'b', 'base', '2', 'B'],
@@ -401,7 +409,7 @@ class ResultsTestCase (TaclTestCase):
         diff_results = (
             ['AB', '2', 'a', 'base', '7', 'A'],
             ['AB', '2', 'a', 'other', '1', 'A'],
-            ['AB', '2', 'b', 'base', '5', 'A'],
+            ['AB', '2', 'b', 'base', '5', 'B'],
             ['BA', '2', 'c', 'base', '2', 'B'])
         fh = self._create_csv(diff_results)
         results = tacl.Results(fh, self._tokenizer)

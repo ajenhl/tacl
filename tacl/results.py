@@ -57,6 +57,9 @@ class Results:
         self._tokenizer = tokenizer
         if self._matches.empty:
             self._logger.info('Supplied results file is empty')
+        for column in constants.STRING_FIELDNAMES:
+            if column in self._matches.columns:
+                self._matches = self._matches.astype({column: "string"})
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
                        constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
@@ -205,11 +208,11 @@ class Results:
         grouped = self._matches.groupby(group_cols, sort=False)
         for (work, siglum, size), group in grouped:
             try:
-                smaller_grams = grouped.get_group((work, siglum, size-1))
+                smaller_grams = grouped.get_group((work, siglum, size - 1))
             except KeyError:
                 smaller_grams = pd.DataFrame()
             try:
-                larger_grams = grouped.get_group((work, siglum, size+1))
+                larger_grams = grouped.get_group((work, siglum, size + 1))
             except KeyError:
                 larger_grams = pd.DataFrame()
             group = group.apply(self._annotate_bifurcated_extend_data, axis=1,
@@ -370,7 +373,7 @@ class Results:
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.SIZE_FIELDNAME,
                        constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
-                       constants.LABEL_FIELDNAME])
+                       constants.COUNT_FIELDNAME, constants.LABEL_FIELDNAME])
     def extend(self, corpus):
         """Adds rows for all longer forms of n-grams in the results that are
         present in the witnesses.
@@ -398,176 +401,54 @@ class Results:
         # removed are difference results, which will cause the results
         # to be potentially incorrect.
         is_intersect = self._is_intersect_results(self._matches)
-        # Supply the extender with only matches on the largest
-        # n-grams.
-        matches = self._matches[
-            self._matches[constants.SIZE_FIELDNAME] == highest_n]
-        extended_matches = pd.DataFrame(columns=constants.QUERY_FIELDNAMES)
-        cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
-                constants.LABEL_FIELDNAME]
-        for index, (work, siglum, label) in \
-                matches[cols].drop_duplicates().iterrows():
-            extended_ngrams = self._generate_extended_ngrams(
-                matches, work, siglum, label, corpus, highest_n)
-            extended_matches = pd.concat(
-                [extended_matches, self._generate_extended_matches(
-                    extended_ngrams, highest_n, work, siglum, label)],
-                sort=False)
-            extended_ngrams = None
-        if is_intersect:
-            extended_matches = self._reciprocal_remove(extended_matches)
-        self._matches = self._matches.append(
-            extended_matches, ignore_index=True).reindex(
-                columns=constants.QUERY_FIELDNAMES)
+        self._extend(corpus, highest_n, is_intersect)
 
-    def _generate_extended_matches(self, extended_ngrams, highest_n, work,
-                                   siglum, label):
-        """Returns extended match data derived from `extended_ngrams`.
+    def _extend(self, corpus, highest_n, is_intersect):
+        def extend_ngrams(df, corpus, current_n):
+            next_n = current_n + 1
+            first_row = df.iloc[0]
+            work = first_row[constants.WORK_FIELDNAME]
+            siglum = first_row[constants.SIGLUM_FIELDNAME]
+            label = first_row[constants.LABEL_FIELDNAME]
+            text = corpus.get_witness(work, siglum)
+            text_ngrams = next(text.get_ngrams(next_n, next_n))[1]
+            max_length_ngrams = list(
+                df[df[constants.SIZE_FIELDNAME] == current_n][
+                    constants.NGRAM_FIELDNAME])
+            ngrams = [tuple(self._tokenizer.tokenize(ngram))
+                      for ngram in max_length_ngrams]
+            extra_rows = []
+            for base_ngram in ngrams:
+                for extender_ngram in ngrams:
+                    if base_ngram[1:] == extender_ngram[:-1]:
+                        extended_ngram = self._tokenizer.joiner.join(
+                            base_ngram + extender_ngram[-1:])
+                        if extended_ngram in text_ngrams:
+                            extra_rows.append({
+                                constants.NGRAM_FIELDNAME: extended_ngram,
+                                constants.SIZE_FIELDNAME: next_n,
+                                constants.WORK_FIELDNAME: work,
+                                constants.SIGLUM_FIELDNAME: siglum,
+                                constants.COUNT_FIELDNAME: text_ngrams[
+                                    extended_ngram],
+                                constants.LABEL_FIELDNAME: label,
+                            })
+            extended_matches = pd.DataFrame(extra_rows)
+            return df.append(extended_matches, ignore_index=True)
 
-        This extended match data are the counts for all intermediate
-        n-grams within each extended n-gram.
-
-        :param extended_ngrams: extended n-grams
-        :type extended_ngrams: `list` of `str`
-        :param highest_n: the highest degree of n-grams in the original results
-        :type highest_n: `int`
-        :param work: name of the work bearing `extended_ngrams`
-        :type work: `str`
-        :param siglum: siglum of the text bearing `extended_ngrams`
-        :type siglum: `str`
-        :param label: label associated with the text
-        :type label: `str`
-        :rtype: `pandas.DataFrame`
-
-        """
-        # Add data for each n-gram within each extended n-gram. Since
-        # this treats each extended piece of text separately, the same
-        # n-gram may be generated more than once, so the complete set
-        # of new possible matches for this filename needs to combine
-        # the counts for such.
-        rows_list = []
-        for extended_ngram in extended_ngrams:
-            text = Text(extended_ngram, self._tokenizer)
-            for size, ngrams in text.get_ngrams(highest_n+1,
-                                                len(text.get_tokens())):
-                data = [{constants.WORK_FIELDNAME: work,
-                         constants.SIGLUM_FIELDNAME: siglum,
-                         constants.LABEL_FIELDNAME: label,
-                         constants.SIZE_FIELDNAME: size,
-                         constants.NGRAM_FIELDNAME: ngram,
-                         constants.COUNT_FIELDNAME: count}
-                        for ngram, count in ngrams.items()]
-                rows_list.extend(data)
-        self._logger.debug('Number of extended results: {}'.format(
-            len(rows_list)))
-        extended_matches = pd.DataFrame(rows_list)
-        rows_list = None
-        self._logger.debug('Finished generating intermediate extended matches')
-        # extended_matches may be an empty DataFrame, in which case
-        # manipulating it on the basis of non-existing columns is not
-        # going to go well.
-        groupby_fields = [constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
-                          constants.SIGLUM_FIELDNAME, constants.SIZE_FIELDNAME,
-                          constants.LABEL_FIELDNAME]
-        if constants.NGRAM_FIELDNAME in extended_matches:
-            extended_matches = extended_matches.groupby(
-                groupby_fields, sort=False).sum().reset_index()
-        return extended_matches
-
-    def _generate_extended_ngrams(self, matches, work, siglum, label, corpus,
-                                  highest_n):
-        """Returns the n-grams of the largest size that exist in `siglum`
-        witness to `work` under `label`, generated from adding
-        together overlapping n-grams in `matches`.
-
-        :param matches: n-gram matches
-        :type matches: `pandas.DataFrame`
-        :param work: name of work whose results are being processed
-        :type work: `str`
-        :param siglum: siglum of witness whose results are being processed
-        :type siglum: `str`
-        :param label: label of witness whose results are being processed
-        :type label: `str`
-        :param corpus: corpus to which `filename` belongs
-        :type corpus: `Corpus`
-        :param highest_n: highest degree of n-gram in `matches`
-        :type highest_n: `int`
-        :rtype: `list` of `str`
-
-        """
-        # For large result sets, this method may involve a lot of
-        # processing within the for loop, so optimise even small
-        # things, such as aliasing dotted calls here and below.
-        t_join = self._tokenizer.joiner.join
-        witness_matches = matches[
-            (matches[constants.WORK_FIELDNAME] == work) &
-            (matches[constants.SIGLUM_FIELDNAME] == siglum) &
-            (matches[constants.LABEL_FIELDNAME] == label)]
-        text = corpus.get_witness(work, siglum).get_token_content()
-        ngrams = [tuple(self._tokenizer.tokenize(ngram)) for ngram in
-                  list(witness_matches[constants.NGRAM_FIELDNAME])]
-        # Go through the list of n-grams, and create a list of
-        # extended n-grams by joining two n-grams together that
-        # overlap (a[-overlap:] == b[:-1]) and checking that the result
-        # occurs in text.
-        working_ngrams = ngrams[:]
-        extended_ngrams = set(ngrams)
-        new_working_ngrams = []
-        overlap = highest_n - 1
-        # Create an index of n-grams by their overlapping portion,
-        # pointing to the non-overlapping token.
-        ngram_index = {}
-        for ngram in ngrams:
-            values = ngram_index.setdefault(ngram[:-1], [])
-            values.append(ngram[-1:])
-        extended_add = extended_ngrams.add
-        new_working_append = new_working_ngrams.append
-        ngram_size = highest_n
-        while working_ngrams:
-            removals = set()
-            ngram_size += 1
-            self._logger.debug(
-                'Iterating over {} n-grams to produce {}-grams'.format(
-                    len(working_ngrams), ngram_size))
-            for base in working_ngrams:
-                remove_base = False
-                base_overlap = base[-overlap:]
-                for next_token in ngram_index.get(base_overlap, []):
-                    extension = base + next_token
-                    if t_join(extension) in text:
-                        extended_add(extension)
-                        new_working_append(extension)
-                        remove_base = True
-                if remove_base:
-                    # Remove base from extended_ngrams, because it is
-                    # now encompassed by extension.
-                    removals.add(base)
-            extended_ngrams -= removals
-            working_ngrams = new_working_ngrams[:]
-            new_working_ngrams = []
-            new_working_append = new_working_ngrams.append
-        extended_ngrams = sorted(extended_ngrams, key=len, reverse=True)
-        extended_ngrams = [t_join(ngram) for ngram in extended_ngrams]
-        self._logger.debug('Generated {} extended n-grams'.format(
-            len(extended_ngrams)))
-        self._logger.debug('Longest generated n-gram: {}'.format(
-            extended_ngrams[0]))
-        # In order to get the counts correct in the next step of the
-        # process, these n-grams must be overlaid over the text and
-        # repeated as many times as there are matches. N-grams that do
-        # not match (and they may not match on previously matched
-        # parts of the text) are discarded.
-        ngrams = []
-        for ngram in extended_ngrams:
-            # Remove from the text those parts that match. Replace
-            # them with a double space, which should prevent any
-            # incorrect match on the text from each side of the match
-            # that is now contiguous.
-            text, count = re.subn(re.escape(ngram), '  ', text)
-            ngrams.extend([ngram] * count)
-        self._logger.debug('Aligned extended n-grams with the text; '
-                           '{} distinct n-grams exist'.format(len(ngrams)))
-        return ngrams
+        num_rows = self._matches.shape[0]
+        grouping_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                         constants.LABEL_FIELDNAME]
+        self._logger.info("Extending to {}-grams".format(highest_n + 1))
+        self._matches = self._matches.groupby(
+            grouping_cols, as_index=False, group_keys=False, sort=False).apply(
+                extend_ngrams, corpus=corpus, current_n=highest_n)
+        if self._matches.shape[0] > num_rows:
+            self._extend(corpus, highest_n + 1, is_intersect)
+        else:
+            if is_intersect:
+                self._matches = self._reciprocal_remove(self._matches)
+            self._matches.reset_index(drop=True, inplace=True)
 
     def _generate_filter_ngrams(self, data, min_size):
         """Returns the n-grams in `data` that do not contain any other n-gram
@@ -583,7 +464,7 @@ class Results:
         max_size = data[constants.SIZE_FIELDNAME].max()
         kept_ngrams = list(data[data[constants.SIZE_FIELDNAME] == min_size][
             constants.NGRAM_FIELDNAME])
-        for size in range(min_size+1, max_size+1):
+        for size in range(min_size + 1, max_size + 1):
             pattern = FilteredWitnessText.get_filter_ngrams_pattern(
                 kept_ngrams)
             potential_ngrams = list(data[data[constants.SIZE_FIELDNAME] ==
@@ -604,7 +485,7 @@ class Results:
         """
         text = Text(ngram, self._tokenizer)
         substrings = []
-        for sub_size, ngrams in text.get_ngrams(1, size-1):
+        for sub_size, ngrams in text.get_ngrams(1, size - 1):
             for sub_ngram, count in ngrams.items():
                 substrings.extend([sub_ngram] * count)
         return substrings
@@ -721,20 +602,23 @@ class Results:
 
     @staticmethod
     def _is_intersect_results(results):
-        """Returns False if `results` has an n-gram that exists in only one
-        label, True otherwise.
+        """Returns True if all of the n-grams in `results` exist in all of
+        `results`'s labels, False otherwise.
+
+        If there is only a single label, return False.
 
         :param results: results to analyze
         :type results: `pandas.DataFrame`
         :rtype: `bool`
 
         """
-        sample = results.iloc[0]
-        ngram = sample[constants.NGRAM_FIELDNAME]
-        label = sample[constants.LABEL_FIELDNAME]
-        return not(results[
-            (results[constants.NGRAM_FIELDNAME] == ngram) &
-            (results[constants.LABEL_FIELDNAME] != label)].empty)
+        num_labels = results[constants.LABEL_FIELDNAME].nunique()
+        if num_labels == 1:
+            return False
+        cols = [constants.NGRAM_FIELDNAME, constants.LABEL_FIELDNAME]
+        data = results[cols].drop_duplicates()
+        counts = data.groupby(constants.NGRAM_FIELDNAME).count()
+        return counts[counts[constants.LABEL_FIELDNAME] != num_labels].empty
 
     def _prepare_bifurcated_extend_data(self, corpus, max_size, temp_path,
                                         temp_fd):
@@ -953,6 +837,8 @@ class Results:
 
     def _reciprocal_remove(self, matches):
         number_labels = matches[constants.LABEL_FIELDNAME].nunique()
+        if number_labels == 1:
+            return matches
         filtered = matches[matches[constants.COUNT_FIELDNAME] > 0]
         grouped = filtered.groupby(constants.NGRAM_FIELDNAME, sort=False)
         return grouped.filter(

@@ -82,6 +82,13 @@ STATISTICS_FIELDNAMES = (WORK_FIELDNAME, SIGLUM_FIELDNAME,
                          COUNT_TOKENS_FIELDNAME, TOTAL_TOKENS_FIELDNAME,
                          PERCENTAGE_FIELDNAME, LABEL_FIELDNAME)
 
+# Those fieldnames whose data in Pandas should be treated as a string
+# even if they are numeric.
+STRING_FIELDNAMES = (
+    LABEL_FIELDNAME, NGRAM_FIELDNAME, SIGLA_FIELDNAME, SIGLUM_FIELDNAME,
+    WORK_FIELDNAME
+)
+
 # Command-line documentation strings.
 ENCODING_EPILOG = '''\
     Due to encoding issues, you may need to set the environment
