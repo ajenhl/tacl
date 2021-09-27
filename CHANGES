@@ -1,4 +1,48 @@
-4.2.0              Jamie Norrish  <jamie@artefact.org.nz>
+5.0.0  2021-09-27  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Updated Corpus API and its use within DataStore to allow for
+    user-provided Text subclasses when getting witnesses.
+
+  * Changed some methods of Text and WitnessText to be properties:
+    get_content is now content, get_names is now siglum and work.
+
+  * Updated the process for generating a corpus from CBETA TEI XML
+    files. Certain parts of texts are extracted into new texts based
+    on the markup-defined properties (such as containing div/@type).
+
+  * Added the tacl split command to split texts based on user-supplied
+    configuration files.
+
+  * Added the tacl join-works command to join two or more prepared TEI
+    XML works together into a new work.
+
+  * Added the tacl query command to run supplied SQL commands on the
+    data store with supplied parameters.
+
+  * Added mulu title to prepared filename for extracted div where one
+    exists.
+
+  * Improved updating of the database when adding n-grams: all
+    witnesses that no longer exist in the corpus will be deleted.
+
+  * Added handling of some errors in order to provide useful error
+    messages.
+
+  * Reimplemented tacl results' extend operation to be faster and use
+    less RAM. Its determination of whether the initial results are
+    intersect results or not (and thus whether the results are
+    automatically run through reciprocal remove) has become
+    stricter. Only those results with more than one label and where
+    every n-gram occurs in every label now count as intersect results.
+
+  * Added the tacl normalise command, to normalise a corpus according
+    to a user-supplied mapping. This is an as yet unoptimised feature.
+
+  * Added options to tacl results to denormalise a set of
+    results. This is an as yet unoptimised feature.
+
+
+4.2.0  2018-12-04  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Added option to restrict Results prune requirements to a labelled
     subset of results.
