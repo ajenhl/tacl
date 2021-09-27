@@ -459,6 +459,7 @@ def generate_split_subparser(subparsers):
         epilog=constants.SPLIT_EPILOG, formatter_class=ParagraphFormatter,
         help=constants.SPLIT_HELP)
     parser.set_defaults(func=split_texts)
+    utils.add_common_arguments(parser)
     utils.add_corpus_arguments(parser)
     parser.add_argument('splits', help=constants.SPLIT_CONF_HELP,
                         nargs="+", metavar='CONF')

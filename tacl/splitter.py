@@ -36,6 +36,7 @@ class Splitter:
         :type conf_path: `str`
 
         """
+        self._logger.debug("Using split configuration {}".format(conf_path))
         in_work_name = os.path.splitext(os.path.basename(conf_path))[0]
         in_work_path = os.path.join(self._corpus.path, in_work_name)
         if not os.path.exists(in_work_path):
