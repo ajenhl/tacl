@@ -14,7 +14,6 @@ Contents:
    installation
    guide
    scripts/tacl
-   scripts/tacl-jitc
 
 
 Introduction

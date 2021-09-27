@@ -16,7 +16,9 @@ Subcommands:
    tacl-join-works
    tacl-lifetime
    tacl-ngrams
+   tacl-normalise
    tacl-prepare
+   tacl-query
    tacl-results
    tacl-sdiff
    tacl-search
