@@ -8,6 +8,9 @@ from .exceptions import MalformedCatalogueError
 
 class Catalogue (dict):
 
+    """Dictionary mapping works (keys) to labels (values). Each work may
+    have only one label."""
+
     def __init__(self, *args, **kwargs):
         self._ordered_labels = []
         super().__init__(*args, **kwargs)
