@@ -449,11 +449,11 @@ RESULTS_EPILOG = '''\
     results without disrupting any other operations.
 
     It is important to be careful with the use of --reduce. Coupled
-    with --max-size, many results may be discarded without trace
-    (since the reduce occurs first). Note too that performing "reduce"
-    on a set of results more than once will make the results
-    inaccurate! Denormalisation should always be done before reducing
-    results.
+    with filters such as --max-size, --min-count, etc, many results
+    may be discarded without trace (since the reduce occurs
+    first). Note too that performing "reduce" on a set of results more
+    than once will make the results inaccurate! Denormalisation should
+    always be done before reducing results.
 
     The denormalisation options together produce a set of results with
     all denormalised forms that occur in each witness presented, along
