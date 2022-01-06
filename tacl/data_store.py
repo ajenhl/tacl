@@ -80,10 +80,16 @@ class DataStore:
         if catalogue:
             for work in catalogue:
                 db_witnesses = self._get_text_ids(work)
+                has_witnesses = False
                 for witness in corpus.get_witnesses(
                         work, text_class=text_class):
+                    has_witnesses = True
                     text_id = self._add_text_ngrams(witness, minimum, maximum)
                     db_witnesses.pop(text_id, None)
+                if not has_witnesses:
+                    raise FileNotFoundError(
+                        constants.CATALOGUE_WORK_NOT_IN_CORPUS_ERROR.format(
+                            work))
                 for text_id, names in db_witnesses:
                     self._delete_text(text_id, *names)
         else:
