@@ -577,6 +577,23 @@ class TEICorpusCBETAGitHub (TEICorpus):
         self._postprocess_div_mulu(work, tree, 'hui',
                                    MERGE_UNNAMED_DIVS_TO_PRECEDING)
 
+    def _postprocess_T0328(self, work, tree):
+        """Post-process the XML document T0328.xml.
+
+        Divide into two files, one containing all of the tei:l
+        material, and one the rest.
+
+        """
+        xslt_filename = resource_filename(
+            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
+        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        verse_tree = extract_verse(tree)
+        verse_filename = '{}-verses.xml'.format(work)
+        self._output_tree(verse_filename, verse_tree)
+        prose_tree = extract_verse(tree, inverse='1')
+        prose_filename = '{}-ex-verses.xml'.format(work)
+        self._output_tree(prose_filename, prose_tree)
+
     def _postprocess_T0397(self, work, tree):
         """Post-process the XML document T0397.xml.
 
