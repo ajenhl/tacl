@@ -161,6 +161,10 @@ class TEICorpus:
         directory."""
         if seen_filenames is None:
             seen_filenames = {}
+        # Remove characters that Windows cannot handle in filenames,
+        # some of which may appear in CBETA's composition forms for
+        # characters not yet in Unicode.
+        filename = filename.translate(str.maketrans('', '', '\\/<>?*":|'))
         output_path = os.path.join(self._output_dir, filename)
         if output_path in seen_filenames:
             root, ext = os.path.splitext(output_path)
@@ -175,6 +179,8 @@ class TEICorpus:
         if os.path.exists(output_path):
             raise TACLError('Already created output file at {}.'.format(
                 output_path))
+        self._logger.debug('Serialising XML tree to output file at {}.'.format(
+            output_path))
         tree.write(output_path, encoding='utf-8', pretty_print=True)
         return seen_filenames
 
