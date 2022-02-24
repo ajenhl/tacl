@@ -1,0 +1,62 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T55n2145">
+  <teiHeader>
+    <encodingDesc>
+      <tagsDecl>
+        <namespace name="http://www.tei-c.org/ns/1.0">
+          <tagUsage gi="rdg">
+            <listWit>
+              <witness xml:id="wit.cbeta">【CB】</witness>
+              <witness xml:id="wit.orig">【大】</witness>
+              <witness xml:id="wit1">【宋】</witness>
+              <witness xml:id="wit2">【元】</witness>
+              <witness xml:id="wit3">【明】</witness>
+              <witness xml:id="wit4">【麗-CB】</witness>
+              <witness xml:id="wit5">【磧-CB】</witness>
+              <witness xml:id="wit6">【北藏-CB】</witness>
+            </listWit>
+          </tagUsage>
+        </namespace>
+      </tagsDecl>
+      <charDecl>
+        <char xml:id="CB00440">
+          <charName>CBETA CHARACTER CB00440</charName>
+          <charProp>
+            <localName>composition</localName>
+            <value>[門@視]</value>
+          </charProp>
+          <mapping type="unicode">U+28DB3</mapping>
+          <mapping cb:dec="983480" type="PUA">U+F01B8</mapping>
+        </char>
+      </charDecl>
+    </encodingDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <lb n="0069a27" ed="T"/>
+      <cb:div type="xu">
+        <cb:mulu level="3" type="其他">1 道地經序</cb:mulu>
+        <head>道地經序第一</head>
+        <byline cb:type="author">釋道安</byline>
+        <lb n="0069a28" ed="T"/>
+        <p xml:id="pT55p0069a2801">夫道地者。應真之玄堂。升仙之奧室也。無本
+        <lb n="0069a29" ed="T"/>之城杳然難<anchor xml:id="nkr_note_orig_0069009" n="0069009"/><anchor xml:id="nkr_note_mod_0069009" n="0069009"/><anchor xml:id="beg0069009" n="0069009"/>陵<anchor xml:id="end0069009"/>矣。無為之牆邈然難踰矣。微
+        <pb n="0069b" xml:id="T55.2145.0069b" ed="T"/>
+        <lb n="0069b01" ed="T"/>門妙闥少<anchor xml:id="nkr_note_orig_0069010" n="0069010"/><anchor xml:id="nkr_note_mod_0069010" n="0069010"/><anchor xml:id="beg0069010" n="0069010"/><g ref="#CB00440">𨶳</g><anchor xml:id="end0069010"/>其庭者也。蓋為器也。猶海與行
+        <lb n="0069b02" ed="T"/>者。日酌之而不竭。返精者無數而不滿。其為
+        <lb n="0069b03" ed="T"/>像也。含弘靜泊綿綿若存。寂寥無言。辯之者
+        <lb n="0069b04" ed="T"/>幾矣。恍惚無行。求矣漭乎其難測。聖人有以
+        <lb n="0069b05" ed="T"/>見因華可以成<anchor xml:id="nkr_note_orig_0069011" n="0069011"/><anchor xml:id="nkr_note_mod_0069011" n="0069011"/><anchor xml:id="beg0069011" n="0069011"/>實<anchor xml:id="end0069011"/>。覩末可以達本。乃為布不
+        </p>
+      </cb:div>
+    </body>
+    <back>
+      <cb:div type="apparatus">
+        <head>校註</head>
+        <p>
+          <app from="#beg0069010" to="#end0069010"><lem wit="#wit.orig"><g ref="#CB00440">𨶳</g></lem><rdg resp="#resp2" wit="#wit1 #wit2 #wit3">闚</rdg></app>
+          <app from="#beg0069011" to="#end0069011"><lem wit="#wit.orig">實</lem><rdg resp="#resp2" wit="#wit3">寔</rdg></app>
+        </p>
+      </cb:div>
+    </back>
+  </text>
+</TEI>

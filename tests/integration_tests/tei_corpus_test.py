@@ -36,6 +36,9 @@ class TEICorpusCBETAGitHubIntegrationTestCase (TEICorpusIntegrationTestCase):
     def test_tidy_basic(self):
         self._test_tidy('basic')
 
+    def test_tidy_g_in_app(self):
+        self._test_tidy('g-in-app')
+
     def test_tidy_extract_commentary(self):
         self._test_tidy('extract-commentary')
 

@@ -5,6 +5,11 @@
                 xmlns:tei="http://www.tei-c.org/ns/1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <!-- In order to handle app crit entries that are demarcated by
+       tei:anchor elements, every tei element and piece of text is
+       checked for being within a pair of anchors. If it is not, then
+       it is processed as normal by templates in the mode "copy". -->
+
   <xsl:output encoding="UTF-8" method="xml" />
 
   <xsl:strip-space elements="*" />
@@ -15,7 +20,7 @@
   <xsl:key name="anchored_start" match="*[@from]"
            use="substring-after(@from, '#')" />
 
-  <xsl:template match="tei:anchor">
+  <xsl:template match="tei:anchor" mode="copy">
     <xsl:apply-templates select="key('anchored', @xml:id)" />
     <xsl:apply-templates select="key('anchored_start', @xml:id)" />
   </xsl:template>
@@ -24,12 +29,12 @@
        manipulations (eg, for T0418). -->
   <xsl:template match="tei:app/@to" />
 
-  <xsl:template match="tei:back" />
+  <xsl:template match="tei:back" mode="copy" />
 
-  <xsl:template match="tei:charDecl" />
+  <xsl:template match="tei:charDecl" mode="copy" />
 
   <!-- Handling of characters not in Unicode. -->
-  <xsl:template match="tei:g[@ref]" priority="10">
+  <xsl:template match="tei:g[@ref]" mode="copy">
     <xsl:apply-templates select="id(substring-after(@ref, '#'))"
                          mode="nonunicode" />
   </xsl:template>
@@ -60,7 +65,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="tei:listWit" />
+  <xsl:template match="tei:listWit" mode="copy" />
 
   <xsl:template match="tei:note/@target" />
 
@@ -84,7 +89,7 @@
     </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="tei:editionStmt/tei:respStmt" />
+  <xsl:template match="tei:editionStmt/tei:respStmt" mode="copy" />
 
   <xsl:template match="cb:tt/@from" />
   <xsl:template match="cb:tt/@to" />
@@ -96,13 +101,17 @@
     <xsl:variable name="ending"
                   select="substring-after(following-sibling::tei:anchor[starts-with(@xml:id, 'end')][1]/@xml:id, 'end')" />
     <xsl:if test="not($beginning and $beginning = $ending)">
-      <xsl:copy>
-        <xsl:apply-templates select="@*|node()" />
-      </xsl:copy>
+      <xsl:apply-templates mode="copy" select="." />
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="@*|*">
+  <xsl:template match="@*|node()" mode="copy">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()" />
     </xsl:copy>

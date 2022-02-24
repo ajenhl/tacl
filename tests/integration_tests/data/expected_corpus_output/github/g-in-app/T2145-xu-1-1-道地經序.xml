@@ -1,0 +1,51 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+        <listWit>
+          <witness xml:id="wit1">元</witness>
+          <witness xml:id="wit2">大</witness>
+          <witness xml:id="wit3">宋</witness>
+          <witness xml:id="wit4">明</witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T55n2145">
+    <teiHeader>
+      <encodingDesc>
+        <tagsDecl>
+          <namespace name="http://www.tei-c.org/ns/1.0">
+            <tagUsage gi="rdg"/>
+          </namespace>
+        </tagsDecl>
+      </encodingDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <cb:div type="xu">
+          <cb:mulu level="3" type="其他">1 道地經序</cb:mulu>
+          <head>道地經序第一</head>
+          <byline cb:type="author">釋道安</byline>
+          <lb n="0069a28" ed="T"/>
+          <p xml:id="pT55p0069a2801">夫道地者。應真之玄堂。升仙之奧室也。無本
+        <lb n="0069a29" ed="T"/>之城杳然難矣。無為之牆邈然難踰矣。微
+        <pb n="0069b" xml:id="T55.2145.0069b" ed="T"/><lb n="0069b01" ed="T"/>門妙闥少<app from="#beg0069010"><lem wit="#wit2">𨶳</lem><rdg resp="" wit="#wit1 #wit3 #wit4">闚</rdg></app>其庭者也。蓋為器也。猶海與行
+        <lb n="0069b02" ed="T"/>者。日酌之而不竭。返精者無數而不滿。其為
+        <lb n="0069b03" ed="T"/>像也。含弘靜泊綿綿若存。寂寥無言。辯之者
+        <lb n="0069b04" ed="T"/>幾矣。恍惚無行。求矣漭乎其難測。聖人有以
+        <lb n="0069b05" ed="T"/>見因華可以成<app from="#beg0069011"><lem wit="#wit2">實</lem><rdg resp="" wit="#wit4">寔</rdg></app>。覩末可以達本。乃為布不
+        </p>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>
