@@ -1,3 +1,22 @@
+5.0.1  2022-02-24  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Fixed bug when preparing a CBETA TEI text that includes a tei:g
+    within anchors demarcating an apparatus criticus entry, such that
+    the tei:g was included after the tei:app.
+
+  * Added --version to tacl command to print out the version number.
+
+  * Bumped minimum Python version to 3.8.
+
+  * Added split of T0328 into verse and prose sub-works.
+
+  * Added raising an error when building a database from a catalogue
+    when a referenced work is not in the corpus.
+
+  * Removed all instances of characters that are illegal in Windows
+    filenames when preparing CBETA TEI texts.
+
+
 5.0.0  2021-09-27  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Updated Corpus API and its use within DataStore to allow for
