@@ -17,7 +17,7 @@ setup(
     project_urls={
         'Documentation': 'http://tacl.readthedocs.io/en/latest/',
     },
-    python_requires='~=3.6',
+    python_requires='~=3.8',
     license='GPLv3+',
     packages=['tacl', 'tacl.cli'],
     entry_points={
