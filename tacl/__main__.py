@@ -76,7 +76,6 @@ def generate_parser():
     parser = argparse.ArgumentParser(
         description=constants.TACL_DESCRIPTION,
         formatter_class=ParagraphFormatter)
-    version = distribution('tacl').version
     parser.add_argument('--version', action='version',
                         version=distribution('tacl').version)
     subparsers = parser.add_subparsers(title='subcommands')
