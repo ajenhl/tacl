@@ -163,8 +163,11 @@ class TEICorpus:
             seen_filenames = {}
         # Remove characters that Windows cannot handle in filenames,
         # some of which may appear in CBETA's composition forms for
-        # characters not yet in Unicode.
-        filename = filename.translate(str.maketrans('', '', '\\/<>?*":|'))
+        # characters not yet in Unicode. Further remove characters
+        # that will be interpreted as regular expression characters,
+        # which causes problems when used in
+        # tacl.Corpus.get_witnesses().
+        filename = filename.translate(str.maketrans('', '', '[]\\/<>?*+":|'))
         output_path = os.path.join(self._output_dir, filename)
         if output_path in seen_filenames:
             root, ext = os.path.splitext(output_path)
