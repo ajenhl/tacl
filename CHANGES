@@ -1,3 +1,10 @@
+5.0.3  2022-03-31  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Removed characters that are significant within regular expressions
+    when preparing CBETA TEI texts. These are used within regular
+    expression contexts and so are not safe.
+
+
 5.0.2  2022-02-26  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Rebuild wheel from clean.
