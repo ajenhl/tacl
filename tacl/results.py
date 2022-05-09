@@ -434,7 +434,8 @@ class Results:
                                 constants.LABEL_FIELDNAME: label,
                             })
             extended_matches = pd.DataFrame(extra_rows)
-            return df.append(extended_matches, ignore_index=True)
+            return pd.concat([df, extended_matches], ignore_index=True,
+                             sort=False)
 
         num_rows = self._matches.shape[0]
         grouping_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
