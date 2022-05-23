@@ -710,7 +710,7 @@ EXCISE_OVERWRITE_WORK_WARNING = ('Output work directory "{}" already exists;'
 INSUFFICIENT_LABELS_QUERY_ERROR = (
     'Not running query with fewer than two defined labels.')
 LABEL_NOT_IN_CATALOGUE_ERROR = (
-    'Supplied label is not present in the supplied catalogue.')
+    'Supplied label "{}" is not present in the supplied catalogue.')
 MISSING_DATA_STORE_ERROR = (
     'Data store does not exist or is inaccessible at {}.')
 MISSING_REQUIRED_COLUMNS_ERROR = (

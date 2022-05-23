@@ -453,7 +453,8 @@ class DataStore:
         try:
             labels.remove(prime_label)
         except ValueError:
-            raise MalformedQueryError(constants.LABEL_NOT_IN_CATALOGUE_ERROR)
+            raise MalformedQueryError(
+                constants.LABEL_NOT_IN_CATALOGUE_ERROR.format(prime_label))
         label_placeholders = self._get_placeholders(labels)
         query = constants.SELECT_DIFF_ASYMMETRIC_SQL.format(label_placeholders)
         parameters = [prime_label, prime_label] + labels
