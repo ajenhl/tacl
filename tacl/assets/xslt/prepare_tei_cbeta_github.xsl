@@ -95,7 +95,7 @@
   <xsl:template match="cb:tt/@to" />
 
   <!-- Handling moving the apparatus criticus etc into the body. -->
-  <xsl:template match="tei:*|text()">
+  <xsl:template match="tei:*|text()" priority="10">
     <xsl:variable name="beginning"
                   select="substring-after(preceding-sibling::tei:anchor[starts-with(@xml:id, 'beg')][1]/@xml:id, 'beg')" />
     <xsl:variable name="ending"
