@@ -669,6 +669,15 @@ class TEICorpusCBETAGitHub (TEICorpus):
         div_filename = '{}-廣釋.xml'.format(work)
         self._output_tree(div_filename, div_tree)
 
+    def _postprocess_T1646(self, work, tree):
+        """Post-process the XML document T0664.xml.
+
+        Divide into multiple files, one for each cb:div[@type='pin'],
+        named according to the cb:mulu content for that div.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'pin')
+
     def _postprocess_T2102(self, work, tree):
         self._postprocess_div_mulu(
             work, tree, 'other', treatment=REMOVE_UNNAMED_DIVS,
