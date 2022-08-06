@@ -90,14 +90,17 @@ class Corpus:
                 siglum = os.path.splitext(os.path.basename(filepath))[0]
                 yield self.get_witness(name, siglum, text_class)
 
-    def get_works(self):
-        """Returns a list of the names of all works in the corpus.
+    def get_works(self, pattern='*'):
+        """Returns a list of the names of all works in the corpus that match
+        `pattern`.
 
+        :param pattern: glob pattern of work names to match on
+        :type pattern: `str`
         :rtype: `list` of `str`
 
         """
         return [os.path.split(filepath)[1] for filepath in
-                glob.glob(os.path.join(self._path, '*'))
+                glob.glob(os.path.join(self._path, pattern))
                 if os.path.isdir(filepath)]
 
     def normalise(self, mapping, output_dir):
