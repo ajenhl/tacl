@@ -122,15 +122,18 @@ class Catalogue (dict):
         if self._ordered_labels:
             self._ordered_labels.remove(label)
 
-    def save(self, path):
+    def save(self, path, sort=True):
         """Saves this catalogue's data to `path`.
 
         :param path: file path to save catalogue data to
         :type path: `str`
+        :param sort: whether to sort by work name or not
+        :type sort: `bool`
 
         """
         with open(path, 'w', encoding='utf-8', newline='') as fh:
             writer = csv.writer(fh, delimiter=' ')
             rows = list(self.items())
-            rows.sort(key=lambda x: x[0])
+            if sort:
+                rows.sort(key=lambda x: x[0])
             writer.writerows(rows)
