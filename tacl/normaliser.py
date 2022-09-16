@@ -26,7 +26,10 @@ class VariantMapping:
         self._tokenizer = tokenizer
         self._variant_to_normal_map = None
         self._normal_to_variant_map = None
-        self._pua_char_code = 57344  # First character in Private Use Area
+        # First character in Supplementary Private Use Area-A. The
+        # Private Use Area is not large enough to hold all of the
+        # Chinese variants needed.
+        self._pua_char_code = 983040
         self._pua_to_token_map = {}
         self._token_to_pua_map = {}
 
@@ -52,8 +55,9 @@ class VariantMapping:
                 texts = self._denormalise(texts, normal_form, variants, joiner)
         denormalised_texts = []
         for text in texts:
-            for substitute, variant in self._pua_to_token_map.items():
-                text = text.replace(substitute, variant)
+            for char in text:
+                text = text.replace(
+                    char, self._pua_to_token_map.get(char, char))
             denormalised_texts.append(self._postprocess_text(
                 text, joiner_length))
         return denormalised_texts
@@ -208,6 +212,7 @@ class VariantMapping:
 
         """
         substitute_forms = []
+        substitute = self._get_substitute(normalised_form)
         for variant_form in variant_forms:
             tokenized_form = self._tokenizer.tokenize(variant_form)
             variant_form = self._tokenizer.joiner.join(tokenized_form)
@@ -220,7 +225,6 @@ class VariantMapping:
                     normalised_form,
                     constants.EMPTY_VARIANT_FORM_ERROR)
             seen_forms.append(variant_form)
-            substitute = self._get_substitute(normalised_form)
             variant_to_normal_map[variant_form] = substitute
             substitute_forms.append(self._get_substitute(variant_form))
         return substitute_forms
