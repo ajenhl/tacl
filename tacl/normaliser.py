@@ -32,6 +32,7 @@ class VariantMapping:
         self._pua_char_code = 983040
         self._pua_to_token_map = {}
         self._token_to_pua_map = {}
+        self._generate_mappings()
 
     def denormalise(self, text):
         """Returns `text` in all possible denormalised forms.
@@ -44,13 +45,10 @@ class VariantMapping:
         :rtype: `list` of `str`
 
         """
-        if self._normal_to_variant_map is None:
-            self._generate_mappings()
-        mapping = self._normal_to_variant_map.copy()
         joiner = self._tokenizer.joiner
         joiner_length = len(joiner)
         texts = set([self._preprocess_text(text, joiner)])
-        for normal_form, variants in mapping.items():
+        for normal_form, variants in self._normal_to_variant_map.items():
             if normal_form in text:
                 texts = self._denormalise(texts, normal_form, variants, joiner)
         denormalised_texts = []
@@ -82,7 +80,7 @@ class VariantMapping:
         variants = [normal_form] + ['{}{}{}'.format(joiner, variant, joiner)
                                     for variant in variants]
         for text in texts:
-            parts = re.split(r'({})'.format(normal_form), text)
+            parts = re.split(r'({})'.format(re.escape(normal_form)), text)
             for idx, part in enumerate(parts):
                 if part == normal_form:
                     parts[idx] = variants
@@ -241,8 +239,6 @@ class VariantMapping:
         :rtype: `str`
 
         """
-        if self._variant_to_normal_map is None:
-            self._generate_mappings()
         joiner = self._tokenizer.joiner
         text = self._preprocess_text(text, joiner)
         for variant, substitute in self._variant_to_normal_map.items():

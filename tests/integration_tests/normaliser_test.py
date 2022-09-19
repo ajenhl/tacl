@@ -78,55 +78,47 @@ class VariantMappingTestCase(TaclTestCase):
     def test_mapping_duplicate_normalised_forms(self):
         mapping_path = os.path.join(self._mapping_dir,
                                     'duplicate_normalised.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_empty_normalised_form(self):
         mapping_path = os.path.join(self._mapping_dir,
                                     'empty_normalised_form.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_empty_variant(self):
         mapping_path = os.path.join(self._mapping_dir, 'empty_variant.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_long_normalised_form(self):
         mapping_path = os.path.join(self._mapping_dir,
                                     'long_normalised_form.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_multiple_normalised_forms(self):
         mapping_path = os.path.join(self._mapping_dir,
                                     'multiple_normalised.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_no_variants(self):
         mapping_path = os.path.join(self._mapping_dir, 'no_variants.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_non_token_content(self):
         mapping_path = os.path.join(self._mapping_dir, 'non_token_content.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_mapping_duplicate_forms_in_row(self):
         mapping_path = os.path.join(self._mapping_dir,
                                     'normalised_same_variant.csv')
-        mapping = VariantMapping(mapping_path, self._tokenizer)
         self.assertRaises(exceptions.MalformedNormaliserMappingError,
-                          mapping.normalise, 'foo')
+                          VariantMapping, mapping_path, self._tokenizer)
 
     def test_normalise_simple(self):
         mapping_path = os.path.join(self._mapping_dir, 'map1.csv')
