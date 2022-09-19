@@ -46,7 +46,6 @@ class VariantMapping:
 
         """
         joiner = self._tokenizer.joiner
-        joiner_length = len(joiner)
         texts = set([self._preprocess_text(text, joiner)])
         for normal_form, variants in self._normal_to_variant_map.items():
             if normal_form in text:
@@ -56,8 +55,7 @@ class VariantMapping:
             for char in text:
                 text = text.replace(
                     char, self._pua_to_token_map.get(char, char))
-            denormalised_texts.append(self._postprocess_text(
-                text, joiner_length))
+            denormalised_texts.append(self._postprocess_text(text, joiner))
         return denormalised_texts
 
     def _denormalise(self, texts, normal_form, variants, joiner):
@@ -246,13 +244,10 @@ class VariantMapping:
                                 '{}{}{}'.format(joiner, substitute, joiner))
         for substitute, normal_form in self._pua_to_token_map.items():
             text = text.replace(substitute, normal_form)
-        joiner_length = len(joiner)
-        return self._postprocess_text(text, joiner_length)
+        return self._postprocess_text(text, joiner)
 
-    def _postprocess_text(self, text, joiner_length):
-        if joiner_length > 0:
-            text = text[joiner_length:][:-joiner_length]
-        return text
+    def _postprocess_text(self, text, joiner):
+        return text.strip(joiner)
 
     def _preprocess_text(self, text, joiner):
         return '{}{}{}'.format(joiner, text, joiner)
