@@ -293,59 +293,81 @@ class Results:
 
         Keeps the normalised form in a new column.
 
+        :param corpus: corpus of denormalised witnesses
+        :type corpus: `Corpus`
+        :param mapping: mapping of variant characters to normalised forms
+        :type mapping: `VariantMapping`
+
         """
-        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME]
+        group_cols = [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
+                      constants.LABEL_FIELDNAME]
         fieldnames = list(constants.QUERY_FIELDNAMES) + [
             constants.NORMALISED_FIELDNAME]
+        ngram_archive = {}
 
-        def denormalise_ngram(row, text, work, siglum):
-            """Return result rows containing all of the denormalised n-grams
-            derived from the normalised n-gram in `row`.
+        def create_denormalised_results(witness, work, siglum, label,
+                                        size_ngram_data):
+            """Return result rows for all denormalised n-grams found in
+            `witness`.
 
-            Note that it is possible for no rows to be returned, if
-            the mapping contains multi-token entries, because the
-            n-gram in `row` may not include the full entry, and thus
-            not denormalise.
-
-            :param row: result row to generate denormalised result rows from
-            :type row: `tuple`
-            :param text: text of the unnormalised witness (in the form
-                         of tokens and separators only)
-            :type text: `str`
-            :param work: name of work
+            :param witness: witness to generate result rows for
+            :type witness: `WitnessText`
+            :param work: name of witness' work
             :type work: `str`
             :param siglum: siglum of witness
             :type siglum: `str`
+            :param label: label for witness
+            :type label: `str`
+            :param size_ngram_data: all denormalised n-grams keyed by
+                                    normalised n-gram in witness and
+                                    n-gram degree
+            :type size_ngram_data: `dict`
             :rtype: `list` of `dict`
 
             """
-            normalised_ngram = row[0]
-            label = row[5]
-            denormalised_ngrams = mapping.denormalise(normalised_ngram)
+            sizes = list(size_ngram_data.keys())
+            min_size = min(sizes)
+            max_size = max(sizes)
+            skip_sizes = []
+            for i in range(min_size, max_size+1):
+                if i not in sizes:
+                    skip_sizes.append(i)
             rows = []
-            for ngram in denormalised_ngrams:
-                count = len(re.findall(r'(?={})'.format(re.escape(ngram)),
-                                       text))
-                if count:
-                    size = len(self._tokenizer.tokenize(ngram))
-                    rows.append({
-                        constants.NGRAM_FIELDNAME: ngram,
-                        constants.SIZE_FIELDNAME: size,
-                        constants.WORK_FIELDNAME: work,
-                        constants.SIGLUM_FIELDNAME: siglum,
-                        constants.COUNT_FIELDNAME: count,
-                        constants.LABEL_FIELDNAME: label,
-                        constants.NORMALISED_FIELDNAME: normalised_ngram
-                    })
+            for size, ngrams in witness.get_ngrams(min_size, max_size,
+                                                   skip_sizes):
+                for ngram in size_ngram_data.get(size, []):
+                    for denormalised_ngram in size_ngram_data[size][ngram]:
+                        count = ngrams.get(denormalised_ngram)
+                        if count is None:
+                            continue
+                        rows.append({
+                            constants.NGRAM_FIELDNAME: denormalised_ngram,
+                            constants.SIZE_FIELDNAME: size,
+                            constants.WORK_FIELDNAME: work,
+                            constants.SIGLUM_FIELDNAME: siglum,
+                            constants.COUNT_FIELDNAME: count,
+                            constants.LABEL_FIELDNAME: label,
+                            constants.NORMALISED_FIELDNAME: ngram,
+                        })
             return rows
 
         def denormalise_witness_ngrams(group):
-            work, siglum = group.name
+            work, siglum, label = group.name
             witness = corpus.get_witness(work, siglum)
-            text = witness.get_token_content()
-            rows = []
-            for row in group.itertuples(index=False, name=None):
-                rows.extend(denormalise_ngram(row, text, work, siglum))
+            ngram_data = {}
+            for ngram in group[constants.NGRAM_FIELDNAME]:
+                if ngram in ngram_archive:
+                    for size, ngrams in ngram_archive[ngram].items():
+                        ngram_data.setdefault(size, {})[ngram] = ngrams
+                    continue
+                for denormalised_ngram in mapping.denormalise(ngram):
+                    size = len(self._tokenizer.tokenize(denormalised_ngram))
+                    ngram_data.setdefault(size, {}).setdefault(
+                        ngram, []).append(denormalised_ngram)
+                    ngram_archive.setdefault(ngram, {}).setdefault(
+                        size, []).append(denormalised_ngram)
+            rows = create_denormalised_results(witness, work, siglum, label,
+                                               ngram_data)
             return pd.DataFrame(rows, columns=fieldnames)
 
         matches = self._matches.groupby(group_cols, sort=False).apply(

@@ -18,6 +18,7 @@ class Text:
     def __init__(self, content, tokenizer):
         self._content = content
         self._tokenizer = tokenizer
+        self._tokens = None
 
     def excise(self, ngrams, replacement):
         """Returns the token content of this text with every occurrence of
@@ -66,10 +67,9 @@ class Text:
 
         """
         skip_sizes = skip_sizes or []
-        tokens = self.get_tokens()
         for size in range(minimum, maximum + 1):
             if size not in skip_sizes:
-                ngrams = collections.Counter(self._ngrams(tokens, size))
+                ngrams = collections.Counter(self._ngrams(self.tokens, size))
                 yield (size, ngrams)
 
     def get_token_content(self):
@@ -79,7 +79,7 @@ class Text:
         :rtype: `str`
 
         """
-        return self._tokenizer.joiner.join(self.get_tokens())
+        return self._tokenizer.joiner.join(self.tokens)
 
     def get_tokens(self):
         """Returns a list of tokens in this text.
@@ -109,6 +109,12 @@ class Text:
         count = max(0, len(sequence) - degree + 1)
         return [self._tokenizer.joiner.join(sequence[i:i + degree])
                 for i in range(count)]
+
+    @property
+    def tokens(self):
+        if self._tokens is None:
+            self._tokens = self.get_tokens()
+        return self._tokens
 
 
 class WitnessText (Text):
@@ -187,11 +193,10 @@ class FilteredWitnessText (WitnessText):
         :rtype: `generator`
 
         """
-        tokens = self.get_tokens()
         filter_pattern = self.get_filter_ngrams_pattern(filter_ngrams)
         for size in range(minimum, maximum + 1):
             ngrams = collections.Counter(
-                self._ngrams(tokens, size, filter_pattern))
+                self._ngrams(self.tokens, size, filter_pattern))
             yield (size, ngrams)
 
     def _ngrams(self, sequence, degree, filter_ngrams):
