@@ -122,5 +122,5 @@ class Corpus:
                 witness_path = os.path.join(output_dir, witness.get_filename())
                 content = witness.get_token_content()
                 normalised_content = mapping.normalise(content)
-                with open(witness_path, 'w') as fh:
+                with open(witness_path, 'w', encoding='utf-8') as fh:
                     fh.write(normalised_content)

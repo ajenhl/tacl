@@ -47,7 +47,7 @@ def excise(args, parser):
     logger = colorlog.getLogger('tacl')
     tokenizer = utils.get_tokenizer(args)
     corpus = tacl.Corpus(args.corpus, tokenizer)
-    with open(args.ngrams) as fh:
+    with open(args.ngrams, encoding='utf-8') as fh:
         ngrams = [line.strip() for line in fh.readlines()]
     # It is no issue if the output directory already exists; it is a
     # reasonable use case to create an excised corpus from multiple
@@ -67,7 +67,7 @@ def excise(args, parser):
         for witness in corpus.get_witnesses(work):
             path = os.path.join(args.output, witness.get_filename())
             content = witness.excise(ngrams, args.replacement)
-            with open(path, 'w') as fh:
+            with open(path, 'w', encoding='utf-8') as fh:
                 fh.write(content)
 
 
@@ -638,7 +638,7 @@ def prepare_xml(args, parser):
 def query_data_store(args, parser):
     """Query the data store using a query from a file."""
     store = utils.get_data_store(args)
-    with open(args.query) as fh:
+    with open(args.query, encoding='utf-8') as fh:
         query = fh.read()
     parameters = args.parameters or ()
     # If the string parameter can be converted to an integer, do so.
