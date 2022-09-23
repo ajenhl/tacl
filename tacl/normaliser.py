@@ -104,7 +104,8 @@ class VariantMapping:
         variant_to_normal_map = {}
         ordered_map = OrderedDict()
         seen_forms = []
-        with open(self._mapping_path, newline='') as csv_file:
+        with open(self._mapping_path, encoding='utf-8', newline='') \
+             as csv_file:
             reader = csv.reader(csv_file)
             for row in reader:
                 normalised_form = self._get_normalised_form(row, seen_forms)
