@@ -439,26 +439,14 @@ RESULTS_EXTEND_HELP = '''\
     database. This has no effect if the results contain only 1-grams.'''
 RESULTS_EPILOG = '''\
     If more than one modifier is specified, they are applied in the
-    following order: --extend, --bifurcated-extend,
-    --denormalise-corpus, --denormalise_mapping, --reduce,
-    --reciprocal, --excise, --zero-fill, --ngrams, --min/max-works,
-    --min/max-size, --min/max-count, --min/max-count-work, --remove,
-    --relabel, --sort. All of the options that modify the format are
-    performed at the end, and only one should be specified. The one
-    exception to this is denormalisation, which adds a column to the
-    results without disrupting any other operations.
-
-    It is important to be careful with the use of --reduce. Coupled
-    with filters such as --max-size, --min-count, etc, many results
-    may be discarded without trace (since the reduce occurs
-    first). Note too that performing "reduce" on a set of results more
-    than once will make the results inaccurate! Denormalisation should
-    always be done before reducing results.
-
-    The denormalisation options together produce a set of results with
-    all denormalised forms that occur in each witness presented, along
-    with an extra column, "{}", giving the normalised form each was
-    derived from.
+    following order: --extend, --bifurcated-extend, --denormalise,
+    --reduce, --reciprocal, --excise, --zero-fill, --ngrams,
+    --min/max-works, --min/max-size, --min/max-count,
+    --min/max-count-work, --remove, --relabel, --sort. All of the
+    options that modify the format are performed at the end, and only
+    one should be specified. The one exception to this is
+    denormalisation, which adds a column to the results without
+    disrupting any other operations - but see below.
 
     --extend applies before --reduce because it may generate results
     that are also amenable to reduction.
@@ -466,6 +454,21 @@ RESULTS_EPILOG = '''\
     --extend applies before --remove because it depends on there being
     at least two labels in the results in order to give correct
     results.
+
+    The denormalisation options together produce a set of results with
+    all denormalised forms that occur in each witness presented, along
+    with an extra column, "{}", giving the normalised form each was
+    derived from. Since denormalised intersect results may no longer
+    conform to normal intersect rules (that each n-gram occurs at
+    least once within each label), running some further operations
+    (such as extend) is likely to cause unwanted removal of
+    results.
+
+    It is important to be careful with the use of --reduce. Coupled
+    with filters such as --max-size, --min-count, etc, many results
+    may be discarded without trace (since the reduce occurs
+    first). Note too that performing "reduce" on a set of results more
+    than once will make the results inaccurate!
 
     --min-count and --max-count set the range within which the total
     count of each n-gram, across all works, must fall. For each work,
@@ -549,7 +552,8 @@ RESULTS_SORT_HELP = 'Sort the results.'
 RESULTS_UNSAFE_GROUP_TITLE = 'format changing arguments'
 RESULTS_UNSAFE_GROUP_DESCRIPTION = '''\
     These arguments change the format of the results, making them
-    potentially unsafe to use other operations on.'''
+    potentially unsafe to use other operations on, or causing such
+    operations to fail.'''
 RESULTS_ZERO_FILL_HELP = '''\
     Add rows with a count of 0 for each n-gram in each witness of a
     work that has at least one witness bearing that n-gram.'''

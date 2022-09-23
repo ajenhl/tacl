@@ -673,8 +673,8 @@ def results(args, parser):
         mapping = tacl.VariantMapping(args.denormalise_mapping, tokenizer)
         results.denormalise(unnormalised_corpus, mapping)
     elif args.denormalised_corpus or args.denormalise_mapping:
-        parser.error('Both --denormalised-corpus and --denormalise-mapping '
-                     'must be specified in order to denormalise results')
+        parser.error('Both --denormalised-corpus and --denormalise must be '
+                     'specified in order to denormalise results')
     if args.reduce:
         results.reduce()
     if args.reciprocal:
