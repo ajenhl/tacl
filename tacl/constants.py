@@ -421,8 +421,8 @@ RESULTS_COLLAPSE_WITNESSES_HELP = '''\
     in the "{}" column.'''.format(SIGLUM_FIELDNAME, SIGLA_FIELDNAME)
 RESULTS_DENORMALISE_CORPUS_HELP = '''\
     Path to directory containing the original (unnormalised)
-    corpus. This option must be given along with --denormalise-mapping
-    in order for denormalisation to be performed.'''
+    corpus. This option must be given along with --denormalise in
+    order for denormalisation to be performed.'''
 RESULTS_DENORMALISE_MAPPING_HELP = '''\
     Denormalise result n-grams using mapping at the supplied path. The
     unnormalised corpus must also be specified in the
@@ -463,6 +463,11 @@ RESULTS_EPILOG = '''\
     least once within each label), running some further operations
     (such as extend) is likely to cause unwanted removal of
     results.
+
+    --denormalise should always be performed (if at all) before
+    --reduce. The counts of the denormalised n-grams will be the full
+    count of all instances in a witness, even if a --reduce on the
+    normalised results had reduced counts.
 
     It is important to be careful with the use of --reduce. Coupled
     with filters such as --max-size, --min-count, etc, many results
