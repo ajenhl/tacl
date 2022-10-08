@@ -389,8 +389,11 @@ class TEICorpusCBETAGitHub (TEICorpus):
 
     def _postprocess_div_mulu(self, work, tree, div_type,
                               treatment=LEAVE_UNNAMED_DIVS, exclude=None):
-        divs = tree.xpath('//cb:div[@type="{}"]'.format(div_type),
-                          namespaces=constants.NAMESPACES)
+        if not div_type:
+            xpath = '//cb:div[not(@type)]'
+        else:
+            xpath = '//cb:div[@type="{}"]'.format(div_type)
+        divs = tree.xpath(xpath, namespaces=constants.NAMESPACES)
         seen_filenames = {}
         for position, div in enumerate(divs):
             div_tree = self._transform_div(tree, position=str(position),
@@ -531,6 +534,80 @@ class TEICorpusCBETAGitHub (TEICorpus):
         prose_tree = extract_verse(tree, inverse='1')
         prose_filename = '{}-ex-verses.xml'.format(work)
         self._output_tree(prose_filename, prose_tree)
+
+    def _postprocess_T0201(self, work, tree):
+        """Post-process the XML document T0201.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0202(self, work, tree):
+        """Post-process the XML document T0202.xml.
+
+        Divide into multiple files, one for each cb:div[@type='pin'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'pin')
+
+    def _postprocess_T0203(self, work, tree):
+        """Post-process the XML document T0203.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0204(self, work, tree):
+        """Post-process the XML document T0204.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0205(self, work, tree):
+        """Post-process the XML document T0205.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0206(self, work, tree):
+        """Post-process the XML document T0206.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+
+    def _postprocess_T0207(self, work, tree):
+        """Post-process the XML document T0207.xml.
+
+        Divide into multiple files, one for each cb:div with no @type.
+
+        """
+        self._postprocess_div_mulu(work, tree, '')
+
+    def _postprocess_T0208(self, work, tree):
+        """Post-process the XML document T0208.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other']
+        and cb:div with no @type.
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
+        self._postprocess_div_mulu(work, tree, '')
+
+    def _postprocess_T0209(self, work, tree):
+        """Post-process the XML document T0209.xml.
+
+        Divide into multiple files, one for each cb:div[@type='other'].
+
+        """
+        self._postprocess_div_mulu(work, tree, 'other')
 
     def _postprocess_T0220(self, work, tree):
         """Post-process the XML document T0220.xml.
