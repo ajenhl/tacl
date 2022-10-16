@@ -88,7 +88,7 @@ class Results:
             self._matches.loc[:, constants.LABEL_COUNT_FIELDNAME] = 0
             self._matches = self._matches.groupby(
                 [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
-                sort=False).apply(add_label_count)
+                group_keys=False, sort=False).apply(add_label_count)
         self._logger.info('Finished adding label count')
 
     @requires_columns([constants.NGRAM_FIELDNAME, constants.WORK_FIELDNAME,
@@ -120,7 +120,7 @@ class Results:
             self._matches.loc[:, constants.LABEL_WORK_COUNT_FIELDNAME] = 0
             self._matches = self._matches.groupby(
                 [constants.LABEL_FIELDNAME, constants.NGRAM_FIELDNAME],
-                sort=False).apply(add_label_text_count)
+                group_keys=False, sort=False).apply(add_label_text_count)
         self._logger.info('Finished adding label work count')
 
     def _annotate_bifurcated_extend_data(self, row, smaller, larger, tokenize,
@@ -256,7 +256,7 @@ class Results:
         # same label.
         grouped = self._matches.groupby(
             [constants.WORK_FIELDNAME, constants.NGRAM_FIELDNAME,
-             constants.COUNT_FIELDNAME], sort=False)
+             constants.COUNT_FIELDNAME], group_keys=False, sort=False)
 
         def merge_sigla(df):
             # Take the first result row; only the siglum should differ
@@ -270,8 +270,7 @@ class Results:
         self._matches = grouped.apply(merge_sigla)
         del self._matches[constants.SIGLA_FIELDNAME]
         self._matches.rename(columns={constants.SIGLUM_FIELDNAME:
-                                      constants.SIGLA_FIELDNAME},
-                             inplace=True)
+                                      constants.SIGLA_FIELDNAME}, inplace=True)
 
     def csv(self, fh):
         """Writes the results data to `fh` in CSV format and returns `fh`.
@@ -370,7 +369,8 @@ class Results:
                                                ngram_data)
             return pd.DataFrame(rows, columns=fieldnames)
 
-        matches = self._matches.groupby(group_cols, sort=False).apply(
+        matches = self._matches.groupby(group_cols, group_keys=False,
+                                        sort=False).apply(
             denormalise_witness_ngrams)
         self._matches = matches
 
@@ -617,8 +617,8 @@ class Results:
         # Remove zero-count results.
         self._matches = self._matches[
             self._matches[constants.COUNT_FIELDNAME] != 0]
-        self._matches = self._matches.groupby(group_cols, sort=False).apply(
-            witness_summary)
+        self._matches = self._matches.groupby(group_cols, group_keys=False,
+                                              sort=False).apply(witness_summary)
         del self._matches[constants.NGRAM_FIELDNAME]
         del self._matches[constants.SIZE_FIELDNAME]
         del self._matches[constants.COUNT_FIELDNAME]
@@ -731,7 +731,8 @@ class Results:
         if label is not None:
             matches = matches[matches[constants.LABEL_FIELDNAME] == label]
         matches = matches.groupby(
-            constants.NGRAM_FIELDNAME, sort=False).apply(calculate_total)
+            constants.NGRAM_FIELDNAME, group_keys=False, sort=False).apply(
+                calculate_total)
         ngrams = None
         if minimum:
             ngrams = matches[matches['total_count'] >= minimum][
