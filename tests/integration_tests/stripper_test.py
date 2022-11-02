@@ -17,13 +17,19 @@ class StripperIntegrationTestCase (TaclTestCase):
         self._expected_output_dir = os.path.join(
             self._data_dir, 'expected_stripped_output')
 
-    def test_github_strip_files(self):
-        xml_dir = os.path.join(self._xml_dir, 'github', 'basic')
-        expected_dir = os.path.join(self._expected_output_dir, 'basic')
+    def _strip_and_compare(self, input_path, output_path):
+        xml_dir = os.path.join(self._xml_dir, input_path)
+        expected_dir = os.path.join(self._expected_output_dir, output_path)
         with tempfile.TemporaryDirectory() as actual_dir:
             stripper = tacl.Stripper(xml_dir, actual_dir)
             stripper.strip_files()
             self._compare_dirs(actual_dir, expected_dir)
+
+    def test_github_basic_strip_files(self):
+        self._strip_and_compare(os.path.join('github', 'basic'), 'basic')
+
+    def test_github_cb_tt_strip_files(self):
+        self._strip_and_compare(os.path.join('github', 'cb_tt'), 'cb_tt')
 
 
 if __name__ == '__main__':

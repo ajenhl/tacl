@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0" xml:id="T54n2132">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taishō Tripiṭaka, Electronic version, No. 2132 悉曇字記</title>
+        <title xml:lang="zh-Hant">大正新脩大藏經數位版, No. 2132 悉曇字記</title>
+        <author>唐 智廣撰</author>
+        <respStmt>
+          <resp>Electronic Version by</resp>
+          <name>CBETA</name>
+        </respStmt>
+      </titleStmt>
+      <extent>1卷</extent>
+      <sourceDesc>
+        <bibl>
+          <title level="s">Taishō Tripiṭaka</title>
+          <title level="s" xml:lang="zh-Hant">大正新脩大藏經</title>
+          <title level="m" xml:lang="zh-Hant">悉曇字記</title>
+        </bibl>
+      </sourceDesc>
+    </fileDesc>
+    <encodingDesc>
+      <projectDesc>
+        <p xml:lang="en" cb:type="ly">Text as provided by Mr. Hsiao Chen-Kuo, Text as provided by Anonymous from USA</p>
+        <p xml:lang="zh-Hant" cb:type="ly">蕭鎮國大德提供，北美某大德提供</p>
+      </projectDesc>
+      <tagsDecl>
+        <namespace name="http://www.tei-c.org/ns/1.0">
+          <tagUsage gi="rdg">
+            <listWit>
+              <witness xml:id="wit.orig">【大】</witness>
+              <witness xml:id="wit1">【甲】</witness>
+            </listWit>
+          </tagUsage>
+        </namespace>
+      </tagsDecl>
+      <charDecl>
+        <char xml:id="SD-CFC5">
+          <charName>CBETA CHARACTER SD-CFC5</charName>
+          <charProp>
+            <localName>Romanized form in CBETA transcription</localName>
+            <value>a</value>
+          </charProp>
+          <charProp>
+            <localName>Character in the Siddham font</localName>
+            <value>狣</value>
+          </charProp>
+          <charProp>
+            <localName>Romanized form in Unicode transcription</localName>
+            <value>a</value>
+          </charProp>
+          <mapping cb:dec="1077189" type="PUA">U+106FC5</mapping>
+        </char>
+        <char xml:id="SD-CFC6">
+          <charName>CBETA CHARACTER SD-CFC6</charName>
+          <charProp>
+            <localName>Romanized form in CBETA transcription</localName>
+            <value>aa</value>
+          </charProp>
+          <charProp>
+            <localName>Character in the Siddham font</localName>
+            <value>玅</value>
+          </charProp>
+          <charProp>
+            <localName>Romanized form in Unicode transcription</localName>
+            <value>ā</value>
+          </charProp>
+          <mapping cb:dec="1077190" type="PUA">U+106FC6</mapping>
+        </char>
+        <char xml:id="SD-CFCB">
+          <charName>CBETA CHARACTER SD-CFCB</charName>
+          <charProp>
+            <localName>Romanized form in CBETA transcription</localName>
+            <value>.r</value>
+          </charProp>
+          <charProp>
+            <localName>Character in the Siddham font</localName>
+            <value>玹</value>
+          </charProp>
+          <charProp>
+            <localName>Romanized form in Unicode transcription</localName>
+            <value>ṛ</value>
+          </charProp>
+          <mapping cb:dec="1077195" type="PUA">U+106FCB</mapping>
+        </char>
+      </charDecl>
+    </encodingDesc>
+    <profileDesc>
+      <langUsage>
+        <language ident="zh-x-yy">Chinese Yinyi(音譯)</language>
+        <language ident="sa-Sidd">Sanskrit-Siddam</language>
+        <language ident="en">English</language>
+        <language ident="zh-Hant">Chinese (Traditional)</language>
+      </langUsage>
+    </profileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <lb n="1186b04" ed="T"/>而字生焉。即<cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><anchor xml:id="nkr_note_orig_1186005" n="1186005"/><anchor xml:id="nkr_note_mod_1186005" n="1186005"/><anchor xml:id="beg1186005" n="1186005"/><g ref="#SD-CFC5">􆿅</g><anchor xml:id="end1186005"/></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>上聲短呼</cb:sg></cb:yin></cb:t></cb:tt><cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><anchor xml:id="beg_2" type="star"/><g ref="#SD-CFC6">􆿆</g><anchor xml:id="end_2"/></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>平聲長呼</cb:sg></cb:yin></cb:t></cb:tt>等是也。其
+      <lb n="1186b05" ed="T"/>中有<cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><g ref="#SD-CFCB">􆿋</g></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>紇里</cb:zi><cb:sg>二合</cb:sg></cb:yin></cb:t></cb:tt>等四文。悉曇有之非生字所
+    </body>
+    <back>
+      <cb:div type="apparatus">
+        <head>校註</head>
+        <p>
+          <app from="#beg1186005" to="#end1186005"><lem wit="#wit.orig"><g ref="#SD-CFC5">􆿅</g></lem><rdg wit="#wit1"><space quantity="0"/></rdg></app>
+          <app from="#beg_2" to="#end_2" corresp="#1186005"><lem wit="#wit.orig"><g ref="#SD-CFC6">􆿆</g></lem><rdg wit="#wit1"><space quantity="0"/></rdg></app>
+        </p>
+      </cb:div>
+      <cb:div type="cbeta-notes">
+        <head>CBETA 校註</head>
+        <p>
+          <note n="1186005" type="mod" target="#nkr_note_mod_1186005">甲本梵字無＊</note>
+        </p>
+      </cb:div>
+      <cb:div type="taisho-notes">
+        <head>大正 校註</head>
+        <p>
+          <note n="1186005" place="foot text" type="orig" target="#nkr_note_orig_1186005">甲本梵字無＊</note>
+        </p>
+      </cb:div>
+    </back>
+  </text>
+</TEI>

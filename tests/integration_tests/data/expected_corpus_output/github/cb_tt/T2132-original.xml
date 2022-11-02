@@ -1,0 +1,67 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Taishō Tripiṭaka, Electronic version, No. 2132 悉曇字記</title>
+        <author>唐 智廣撰</author>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+        <listWit>
+          <witness xml:id="wit1">大</witness>
+          <witness xml:id="wit2">甲</witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T54n2132">
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Taishō Tripiṭaka, Electronic version, No. 2132 悉曇字記</title>
+          <title xml:lang="zh-Hant">大正新脩大藏經數位版, No. 2132 悉曇字記</title>
+          <author>唐 智廣撰</author>
+          <respStmt>
+            <resp>Electronic Version by</resp>
+            <name>CBETA</name>
+          </respStmt>
+        </titleStmt>
+        <extent>1卷</extent>
+        <sourceDesc>
+          <bibl>
+            <title level="s">Taishō Tripiṭaka</title>
+            <title level="s" xml:lang="zh-Hant">大正新脩大藏經</title>
+            <title level="m" xml:lang="zh-Hant">悉曇字記</title>
+          </bibl>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <projectDesc>
+          <p xml:lang="en" cb:type="ly">Text as provided by Mr. Hsiao Chen-Kuo, Text as provided by Anonymous from USA</p>
+          <p xml:lang="zh-Hant" cb:type="ly">蕭鎮國大德提供，北美某大德提供</p>
+        </projectDesc>
+        <tagsDecl>
+          <namespace name="http://www.tei-c.org/ns/1.0">
+            <tagUsage gi="rdg"/>
+          </namespace>
+        </tagsDecl>
+      </encodingDesc>
+      <profileDesc>
+        <langUsage>
+          <language ident="zh-x-yy">Chinese Yinyi(音譯)</language>
+          <language ident="sa-Sidd">Sanskrit-Siddam</language>
+          <language ident="en">English</language>
+          <language ident="zh-Hant">Chinese (Traditional)</language>
+        </langUsage>
+      </profileDesc>
+    </teiHeader>
+    <text>
+      <body><lb n="1186b04" ed="T"/>而字生焉。即<cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><note n="1186005" place="foot text" type="orig">甲本梵字無＊</note><note n="1186005" type="mod">甲本梵字無＊</note><app from="#beg1186005"><lem wit="#wit1">a</lem><rdg wit="#wit2"><space quantity="0"/></rdg></app></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>上聲短呼</cb:sg></cb:yin></cb:t></cb:tt><cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><app from="#beg_2" corresp="#1186005"><lem wit="#wit1">ā</lem><rdg wit="#wit2"><space quantity="0"/></rdg></app></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>平聲長呼</cb:sg></cb:yin></cb:t></cb:tt>等是也。其
+      <lb n="1186b05" ed="T"/>中有<cb:tt place="inline"><cb:t xml:lang="sa-Sidd">ṛ</cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>紇里</cb:zi><cb:sg>二合</cb:sg></cb:yin></cb:t></cb:tt>等四文。悉曇有之非生字所
+    </body>
+    </text>
+  </TEI>
+</teiCorpus>

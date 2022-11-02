@@ -784,4 +784,15 @@ class TEICorpusCBETAGitHub (TEICorpus):
             self._logger.error('XML file "{}" is invalid: {}'.format(
                 file_path, err))
             raise
+        # Remove spanning anchors that point to something other than
+        # an item in the apparatus criticus.
+        xpath = '//tei:anchor[starts-with(@xml:id, "beg") or ' \
+            'starts-with(@xml:id, "end")]'
+        for anchor in tei_doc.xpath(xpath, namespaces=constants.NAMESPACES):
+            ref = "#{}".format(anchor.get(constants.XML + 'id'))
+            xpath = '/tei:TEI/tei:text/tei:back/cb:div[@type="apparatus"]//' \
+                'tei:app[@from = $ref or @to = $ref]'
+            if not tei_doc.xpath(xpath, namespaces=constants.NAMESPACES,
+                                 ref=ref):
+                anchor.attrib.clear()
         return self.transform(tei_doc).getroot()

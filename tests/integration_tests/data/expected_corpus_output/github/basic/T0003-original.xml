@@ -107,7 +107,7 @@
         <lb n="0001b08" ed="T"/>
         <cb:juan n="001" fun="open">
           <cb:mulu n="001" type="卷"/>
-          <cb:jhead><title>佛說<cb:tt type="app"><cb:t resp="#resp2" xml:lang="zh">長阿含經</cb:t><cb:t resp="#resp2" xml:lang="sa" place="foot">Dīrgha-āgama</cb:t><cb:t resp="#resp2" xml:lang="pi" place="foot">Dīgha-nikāya</cb:t></cb:tt></title>卷第一</cb:jhead>
+          <cb:jhead><title>佛說長阿含經</title>卷第一</cb:jhead>
         </cb:juan>
         <lb n="0001b09" ed="T"/>
         <lb n="0001b10" ed="T"/>

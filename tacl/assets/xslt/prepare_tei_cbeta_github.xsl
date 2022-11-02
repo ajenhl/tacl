@@ -17,7 +17,7 @@
   <xsl:key name="anchored" match="tei:note[@target]"
            use="substring-after(@target, '#')" />
 
-  <xsl:key name="anchored_start" match="*[@from]"
+  <xsl:key name="anchored_start" match="cb:div[@type='apparatus']//*[@from]"
            use="substring-after(@from, '#')" />
 
   <xsl:template match="tei:anchor" mode="copy">

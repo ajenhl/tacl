@@ -54,6 +54,9 @@
   </xsl:template>
 
   <xsl:template match="tei:lem">
+    <!-- Although sometimes witnesses are defined on the tei:lem,
+         sometimes they are not, and all that matters is that the
+         current witness is not associated with a tei:rdg. -->
     <xsl:if test="not(../tei:rdg[contains(concat(' ', @wit, ' '), $witness_ref)])">
       <xsl:apply-templates />
     </xsl:if>
@@ -74,6 +77,23 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="cb:sg">
+    <xsl:text>(</xsl:text>
+    <xsl:apply-templates/>
+    <xsl:text>)</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="cb:t">
+    <xsl:choose>
+      <xsl:when test="not(preceding-sibling::cb:t)">
+        <xsl:apply-templates/>
+      </xsl:when>
+      <xsl:when test="cb:yin">
+        <xsl:apply-templates/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="tei:teiHeader" />
 
   <xsl:template match="tei:body//tei:title" />
@@ -81,8 +101,6 @@
   <xsl:template match="text()">
     <xsl:value-of select="normalize-space()" />
   </xsl:template>
-
-  <xsl:template match="cb:t[not(@xml:lang='zh')]" />
 
   <xsl:template name="add_blank_line">
     <xsl:text>
