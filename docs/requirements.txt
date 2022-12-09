@@ -8,7 +8,7 @@ alabaster==0.7.12
     # via sphinx
 babel==2.10.3
     # via sphinx
-certifi==2022.9.14
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.1
     # via requests
@@ -36,7 +36,7 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==4.5.0
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   sphinxcontrib-programoutput
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -47,7 +47,7 @@ sphinxcontrib-htmlhelp==2.0.0
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-programoutput==0.17
-    # via -r docs/requirements.in
+    # via -r requirements.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
