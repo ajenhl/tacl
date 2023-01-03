@@ -92,5 +92,6 @@ class Stripper:
         for witness, witness_id in self.get_witnesses(tei_doc):
             witness_param = "'{}'".format(witness_id)
             text = str(self.transform(tei_doc, witness_id=witness_param))
-            witnesses[witness] = text
+            if text.strip():
+                witnesses[witness] = text
         return work, witnesses
