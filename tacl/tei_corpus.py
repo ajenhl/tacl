@@ -466,8 +466,15 @@ class TEICorpusCBETAGitHub (TEICorpus):
         for position, div in enumerate(jing_divs):
             div_tree = self._transform_div(tree, position=str(position),
                                            div_type='"jing"')
-            pin_mulu = self._get_mulu(div, '../cb:mulu[1]/text()')
-            jing_mulu = self._get_mulu(div, 'cb:mulu[1]/text()')
+            try:
+                pin_mulu = self._get_mulu(
+                    div, 'ancestor::cb:div[@type="pin"][1]/cb:mulu[1]/text()')
+            except IndexError:
+                pin_mulu = 'unnamed'
+            try:
+                jing_mulu = self._get_mulu(div, 'cb:mulu[1]/text()')
+            except IndexError:
+                jing_mulu = 'unnumbered'
             div_filename = '{}-{}-{}.xml'.format(work, pin_mulu, jing_mulu)
             self._output_tree(div_filename, div_tree)
 
