@@ -61,7 +61,7 @@
     <text>
       <body><lb n="1186b04" ed="T"/>而字生焉。即<cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><note n="1186005" place="foot text" type="orig">甲本梵字無＊</note><note n="1186005" type="mod">甲本梵字無＊</note><app from="#beg1186005"><lem wit="#wit1">a</lem><rdg wit="#wit2"><space quantity="0"/></rdg></app></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>上聲短呼</cb:sg></cb:yin></cb:t></cb:tt><cb:tt place="inline"><cb:t xml:lang="sa-Sidd"><app from="#beg_2" corresp="#1186005"><lem wit="#wit1">ā</lem><rdg wit="#wit2"><space quantity="0"/></rdg></app></cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>阿</cb:zi><cb:sg>平聲長呼</cb:sg></cb:yin></cb:t></cb:tt>等是也。其
       <lb n="1186b05" ed="T"/>中有<cb:tt place="inline"><cb:t xml:lang="sa-Sidd">ṛ</cb:t><cb:t xml:lang="zh-x-yy"><cb:yin><cb:zi>紇里</cb:zi><cb:sg>二合</cb:sg></cb:yin></cb:t></cb:tt>等四文。悉曇有之非生字所
-    </body>
+      <lb n="1186b06" ed="T"/><cb:tt place="inline"><cb:t xml:lang="sa-Sidd">「na</cb:t><cb:t xml:lang="zh-Hant">娜</cb:t></cb:tt></body>
     </text>
   </TEI>
 </teiCorpus>

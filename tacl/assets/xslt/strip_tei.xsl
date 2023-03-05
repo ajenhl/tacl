@@ -85,7 +85,10 @@
 
   <xsl:template match="cb:t">
     <xsl:choose>
-      <xsl:when test="not(preceding-sibling::cb:t)">
+      <xsl:when test="@xml:lang = 'zh-Hant'">
+        <xsl:apply-templates/>
+      </xsl:when>
+      <xsl:when test="not(preceding-sibling::cb:t) and not(../cb:t[@xml:lang='zh-Hant'])">
         <xsl:apply-templates/>
       </xsl:when>
       <xsl:when test="cb:yin">
