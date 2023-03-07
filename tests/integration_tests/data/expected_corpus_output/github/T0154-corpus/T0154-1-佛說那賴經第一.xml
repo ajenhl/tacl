@@ -11,10 +11,12 @@
       <sourceDesc>
         <bibl>CBETA TEI document(s).</bibl>
         <listWit>
-          <witness xml:id="wit1">元</witness>
-          <witness xml:id="wit2">大</witness>
-          <witness xml:id="wit3">宋</witness>
-          <witness xml:id="wit4">明</witness>
+          <witness xml:id="wit1">CB</witness>
+          <witness xml:id="wit2">元</witness>
+          <witness xml:id="wit3">大</witness>
+          <witness xml:id="wit4">宋</witness>
+          <witness xml:id="wit5">明</witness>
+          <witness xml:id="wit6">麗-CB</witness>
         </listWit>
       </sourceDesc>
     </fileDesc>

@@ -37,11 +37,7 @@
           <witness xml:id="wit2">【宋】</witness>
           <witness xml:id="wit3">【元】</witness>
           <witness xml:id="wit4">【明】</witness>
-          <witness xml:id="wit5">【聖】</witness>
           <witness xml:id="wit6">【CBETA】</witness>
-          <witness xml:id="wit7">【麗】</witness>
-          <witness xml:id="wit8">【unknown】</witness>
-          <witness xml:id="wit9">【磧砂】</witness>
         </listWit>
       </sourceDesc>
     </fileDesc>

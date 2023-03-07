@@ -128,10 +128,9 @@ class TEICorpus:
         witnesses = set()
         bearers = source_tree.xpath('//tei:app/tei:*[@wit]',
                                     namespaces=constants.NAMESPACES)
-        for bearer in bearers:
-            for witness in witnesses_splitter.split(bearer.get('wit')):
-                if witness:
-                    witnesses.add(witness)
+        for witness in source_tree.xpath("//tei:witness",
+                                         namespaces=constants.NAMESPACES):
+            witnesses.add(witness.text[1:-1])
         return sorted(witnesses), bearers
 
     def _handle_resps(self, root):
@@ -143,6 +142,9 @@ class TEICorpus:
         witnesses, bearers = self.get_witnesses(root)
         if not witnesses:
             return root
+        for wit_list in root.xpath("//tei:listWit",
+                                   namespaces=constants.NAMESPACES):
+            wit_list.getparent().remove(wit_list)
         source_desc = root.xpath(
             '/tei:teiCorpus/tei:teiHeader/tei:fileDesc/tei:sourceDesc',
             namespaces=constants.NAMESPACES)[0]

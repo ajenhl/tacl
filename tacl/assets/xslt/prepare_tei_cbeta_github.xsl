@@ -65,8 +65,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="tei:listWit" mode="copy" />
-
   <xsl:template match="tei:note/@target" />
 
   <xsl:template match="tei:*/@wit">
@@ -90,6 +88,15 @@
   </xsl:template>
 
   <xsl:template match="tei:editionStmt/tei:respStmt" mode="copy" />
+
+  <xsl:template match="tei:witness" mode="copy">
+    <xsl:copy>
+      <!-- We do not want the xml:id attribute, since this witness
+           list will be superceded by the witness list for the
+           teiCorpus. -->
+      <xsl:apply-templates select="node()"/>
+    </xsl:copy>
+  </xsl:template>
 
   <xsl:template match="cb:tt/@from" />
   <xsl:template match="cb:tt/@to" />

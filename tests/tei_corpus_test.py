@@ -16,25 +16,25 @@ class TEICorpusCBETAGitHubTestCase (unittest.TestCase):
         """Tests that all of the witnesses of variant readings are extracted
         from a text."""
         input_xml = '''
-<div xmlns="http://www.tei-c.org/ns/1.0">
-  <app>
-    <lem wit="【宋】">念</lem>
-    <rdg wit="【大】">忘</rdg>
-  </app>
-  <app n="0001008">
-    <lem wit="【大】">閹</lem>
-    <rdg resp="Taisho" wit="【宋】【元】">掩</rdg>
-  </app>
-  <app n="0001012">
-    <lem wit="【大】">後秦弘始年</lem>
-    <rdg resp="Taisho" wit="【宋】【元】【明】">姚秦三藏法師</rdg>
-  </app>
-  <app>
-    <lem wit="【三】">毗</lem>
-    <rdg wit="【大】">毘</rdg>
-  </app>
-</div>
-        '''
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <encodingDesc>
+      <tagsDecl>
+        <namespace name="http://www.tei-c.org/ns/1.0">
+          <tagUsage gi="rdg">
+            <listWit>
+              <witness xml:id="wit1">【宋】</witness>
+              <witness xml:id="wit2">【大】</witness>
+              <witness xml:id="wit3">【明】</witness>
+              <witness xml:id="wit4">【三】</witness>
+              <witness xml:id="wit5">【元】</witness>
+            </listWit>
+          </tagUsage>
+        </namespace>
+      </tagsDecl>
+    </encodingDesc>
+  </teiHeader>
+</TEI>'''
         expected_witnesses = ['三', '元', '大', '宋', '明']
         actual_witnesses = self.corpus.get_witnesses(etree.XML(input_xml))[0]
         self.assertEqual(expected_witnesses, actual_witnesses)

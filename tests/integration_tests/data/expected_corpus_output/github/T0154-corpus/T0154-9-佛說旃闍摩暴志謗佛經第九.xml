@@ -11,10 +11,12 @@
       <sourceDesc>
         <bibl>CBETA TEI document(s).</bibl>
         <listWit>
-          <witness xml:id="wit1">元</witness>
-          <witness xml:id="wit2">大</witness>
-          <witness xml:id="wit3">宋</witness>
-          <witness xml:id="wit4">明</witness>
+          <witness xml:id="wit1">CB</witness>
+          <witness xml:id="wit2">元</witness>
+          <witness xml:id="wit3">大</witness>
+          <witness xml:id="wit4">宋</witness>
+          <witness xml:id="wit5">明</witness>
+          <witness xml:id="wit6">麗-CB</witness>
         </listWit>
       </sourceDesc>
     </fileDesc>
@@ -33,7 +35,7 @@
       <body>
         <cb:div type="jing">
           <cb:mulu level="1" n="9" type="經">9 佛說旃闍摩暴志謗佛經</cb:mulu>
-          <head>佛說<note n="0076002" resp="" type="orig" place="foot text">旃＝栴【三】</note><note n="0076002" resp="" type="mod">旃【大】，栴【宋】【元】【明】</note><app from="#beg0076002"><lem wit="#wit2">旃</lem><rdg resp="" wit="#wit1 #wit3 #wit4">栴</rdg></app>闍摩暴志謗佛經第九</head>
+          <head>佛說<note n="0076002" resp="" type="orig" place="foot text">旃＝栴【三】</note><note n="0076002" resp="" type="mod">旃【大】，栴【宋】【元】【明】</note><app from="#beg0076002"><lem wit="#wit3">旃</lem><rdg resp="" wit="#wit2 #wit4 #wit5">栴</rdg></app>闍摩暴志謗佛經第九</head>
           <lb n="0076a14" ed="T"/>
           <p xml:id="pT03p0076a1401">聞如是：</p>
         </cb:div>
