@@ -492,8 +492,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
     def _postprocess_T0152(self, work, tree):
         """Post-process the XML document T0152.xml.
 
-        Extract the first (should be only) cb:div[@type='other'] into
-        its own file.
+        Extract the first cb:div[@type='other'] into its own file.
 
         Divide into multiple files, one for each cb:div[@type='jing'],
         named according to the cb:mulu content for that div.
@@ -595,9 +594,11 @@ class TEICorpusCBETAGitHub (TEICorpus):
     def _postprocess_T0207(self, work, tree):
         """Post-process the XML document T0207.xml.
 
-        Divide into multiple files, one for each cb:div with no @type.
+        Divide into multiple files, one for each cb:div[@type='other']
+        and cb:div with no @type.
 
         """
+        self._postprocess_div_mulu(work, tree, 'other')
         self._postprocess_div_mulu(work, tree, '')
 
     def _postprocess_T0208(self, work, tree):
@@ -627,6 +628,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
         within the single hui of T0220a but does not have any
         containing div.
 
+        Also divide into one file for each cb:div[@type='dharani'].
+
         """
         xslt_filename = resource_filename(
             __name__, 'assets/xslt/CBETA_T0220_reparent_divs.xsl')
@@ -639,6 +642,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
                                            div_type='"hui"')
             div_filename = '{}-{}.xml'.format(work, position + 1)
             self._output_tree(div_filename, div_tree)
+        self._postprocess_div_mulu(work, tree, 'dharani')
 
     def _postprocess_T0225(self, work, tree):
         """Post-process the XML document T0225.xml.
