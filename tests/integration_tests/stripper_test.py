@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os.path
 import tempfile
 import unittest
 
@@ -30,6 +30,13 @@ class StripperIntegrationTestCase (TaclTestCase):
 
     def test_github_cb_tt_strip_files(self):
         self._strip_and_compare(os.path.join('github', 'cb_tt'), 'cb_tt')
+
+    def test_github_strip_empty_file(self):
+        input_dir = os.path.join(self._xml_dir, 'github', 'empty')
+        output_dir = os.path.join(self._expected_output_dir, 'empty')
+        stripper = tacl.Stripper(input_dir, output_dir)
+        stripper.strip_files()
+        self.assertFalse(os.path.exists(os.path.join(output_dir, 'empty')))
 
 
 if __name__ == '__main__':

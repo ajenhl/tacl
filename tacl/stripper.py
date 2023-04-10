@@ -50,10 +50,13 @@ class Stripper:
 
     def _output_file(self, work, witnesses):
         work_dir = os.path.join(self._output_dir, work)
+        if not witnesses:
+            self._logger.warning('No text to output for {}'.format(work))
+            return
         try:
             os.makedirs(work_dir)
         except OSError as err:
-            logging.error('Could not create output directory: {}'.format(
+            self._logger.error('Could not create output directory: {}'.format(
                 err))
             raise
         for witness in witnesses.keys():
@@ -86,7 +89,7 @@ class Stripper:
         try:
             tei_doc = etree.parse(file_path)
         except etree.XMLSyntaxError:
-            logging.warning('XML file "{}" is invalid'.format(filename))
+            self._logger.warning('XML file "{}" is invalid'.format(filename))
             return
         witnesses = {}
         for witness, witness_id in self.get_witnesses(tei_doc):
