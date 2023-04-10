@@ -1,0 +1,58 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body>
+        <lb n="0001a02" ed="T"/>
+        <cb:docNumber>No. 152</cb:docNumber>
+        <cb:div type="other">
+          <lb n="0001a03" ed="T"/>
+          <cb:juan n="001" fun="open">
+            <cb:mulu n="001" type="卷"/>
+            <cb:jhead><title>六度集經</title>卷第一</cb:jhead>
+          </cb:juan>
+          <lb n="0001a04" ed="T"/>
+          <lb n="0001a05" ed="T"/>
+          <byline cb:type="Translator">吳康居國沙門康僧會譯</byline>
+          <lb n="0001a06" ed="T"/>
+          <cb:mulu level="1" n="1" type="其他">1 布施度無極章</cb:mulu>
+          <head>布施度無極章第一</head>
+          <lb n="0001a07" ed="T"/>
+          <p xml:id="pT03p0001a0701">聞如是：</p>
+          <p xml:id="pT03p0001a0704" cb:place="inline">一時佛在王舍國鷂山中。時，與五</p>
+          <lb n="0001a21" ed="T"/>
+          <cb:div type="jing">
+            <cb:mulu level="2" n="1" type="經">1 〔菩薩本生〕</cb:mulu>
+            <head>（一）</head>
+            <p xml:id="pT03p0001a2102" cb:place="inline">「昔者菩薩，其心通真，覩世無常，榮命難
+          <lb n="0001a22" ed="T"/>保，盡財布施。天帝釋覩菩薩慈育群生布
+          <lb n="0001a23" ed="T"/>施濟眾，功勳巍巍，德重十方，懼奪己位，</p>
+          </cb:div>
+          <lb n="0001b12" ed="T"/>
+          <cb:div type="jing">
+            <cb:mulu level="2" n="2" type="經">2 〔薩波達王本生〕</cb:mulu>
+            <head>（二）</head>
+            <p xml:id="pT03p0001b1202" cb:place="inline">「昔者菩薩為大國王，號薩波達，布施眾
+          <lb n="0001b13" ed="T"/>生恣其所索，愍濟厄難常有悲愴。天帝釋
+          <lb n="0001b14" ed="T"/>覩王慈惠德被十方，天神鬼龍僉然而曰：『天
+          <lb n="0001b15" ed="T"/>帝尊位初無常人，戒具行高慈惠福隆，命盡</p>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

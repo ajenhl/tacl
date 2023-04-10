@@ -1,0 +1,40 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T05n0220a">
+    <teiHeader/>
+    <text>
+      <body>
+        <milestone n="1" unit="juan"/>
+        <lb n="0001a28" ed="T"/>
+        <cb:div type="other">
+          <p>No mulu, no unnamed output.</p>
+        </cb:div>
+        <cb:div type="other">
+          <cb:mulu level="1" type="其他">1 牟子</cb:mulu>
+          <p>Mulu, named output.</p>
+        </cb:div>
+        <cb:div type="other">
+          <cb:mulu level="1" type="其他">5 宗</cb:mulu>
+          <head>Mulu, named output.</head>
+          <cb:div type="other">
+            <cb:mulu level="2" type="其他">何與宗書</cb:mulu>
+            <head>Nested div, mulu, named output.</head>
+          </cb:div>
+        </cb:div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

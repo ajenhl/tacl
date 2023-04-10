@@ -1,0 +1,42 @@
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cb="http://www.cbeta.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title/>
+        <author/>
+      </titleStmt>
+      <publicationStmt>
+        <p>Compiled from source TEI document(s) published by CBETA.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>CBETA TEI document(s).</bibl>
+        <listWit>
+          <witness xml:id="wit1">CB</witness>
+          <witness xml:id="wit2">元</witness>
+          <witness xml:id="wit3">北藏-CB</witness>
+          <witness xml:id="wit4">大</witness>
+          <witness xml:id="wit5">宋</witness>
+          <witness xml:id="wit6">明</witness>
+          <witness xml:id="wit7">磧-CB</witness>
+          <witness xml:id="wit8">麗-CB</witness>
+        </listWit>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <TEI xml:id="T55n2145">
+    <teiHeader>
+      <encodingDesc>
+        <tagsDecl>
+          <namespace name="http://www.tei-c.org/ns/1.0">
+            <tagUsage gi="rdg"/>
+          </namespace>
+        </tagsDecl>
+      </encodingDesc>
+    </teiHeader>
+    <text>
+      <body>
+        <lb n="0069a27" ed="T"/>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>

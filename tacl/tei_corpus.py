@@ -214,11 +214,10 @@ class TEICorpus:
 
     def _postprocess(self, work, tree):
         """Post-process the XML document `tree`."""
+        self._output_tree('{}.xml'.format(work), tree)
         pp_func = '_postprocess_{}'.format(work)
         if hasattr(self, pp_func):
             getattr(self, pp_func)(work, tree)
-        else:
-            self._output_tree('{}.xml'.format(work), tree)
 
     def tidy(self):
         if not os.path.exists(self._output_dir):
@@ -752,15 +751,15 @@ class TEICorpusCBETAGitHub (TEICorpus):
         cb:div[@type='廣釋'].
 
         """
-        div_tree = self._transform_div(tree, position='0', div_type='jing')
+        div_tree = self._transform_div(tree, position='0', div_type='"jing"')
         div_filename = '{}-root.xml'.format(work)
         self._output_tree(div_filename, div_tree)
-        div_tree = self._transform_div(tree, position='0', div_type='廣釋')
+        div_tree = self._transform_div(tree, position='0', div_type='"廣釋"')
         div_filename = '{}-廣釋.xml'.format(work)
         self._output_tree(div_filename, div_tree)
 
     def _postprocess_T1646(self, work, tree):
-        """Post-process the XML document T0664.xml.
+        """Post-process the XML document T0646.xml.
 
         Divide into multiple files, one for each cb:div[@type='pin'],
         named according to the cb:mulu content for that div.
