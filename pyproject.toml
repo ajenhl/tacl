@@ -1,3 +1,35 @@
 [build-system]
 requires = ["setuptools >= 42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "tacl"
+version = "5.0.5"
+authors = [
+  { name = "Jamie Norrish", email = "jamie@artefact.org.nz" },
+]
+description = "Text analyser for corpus linguistics"
+readme = "README.rst"
+license = { file = "LICENCE" }
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: Linguistic",
+]
+dependencies = [
+    "biopython",
+    "colorlog",
+    "Jinja2>3.1.0",
+    "lxml",
+    "pandas",
+]
+
+[project.urls]
+homepage = "https://github.com/ajenhl/tacl"
+documentation = "http://tacl.readthedocs.io/en/latest/"
+
+[project.scripts]
+tacl = "tacl.__main__:main"
