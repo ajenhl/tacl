@@ -1,3 +1,11 @@
+5.0.6  2023-05-10  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Reworked build configuration.
+
+  * Updated corpus preparation for Taisho, both markup handling and
+    further splits.
+
+
 5.0.5  2022-09-24  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Improved performance of denormalisation sufficiently to be useful

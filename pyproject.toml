@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tacl"
-version = "5.0.5"
+version = "5.0.6"
 authors = [
   { name = "Jamie Norrish", email = "jamie@artefact.org.nz" },
 ]
