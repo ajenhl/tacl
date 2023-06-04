@@ -262,7 +262,6 @@ class DataStore:
         ngram_tokens = tokenize(row[constants.NGRAM_FIELDNAME])
         sub_ngram1 = join(ngram_tokens[:-1])
         sub_ngram2 = join(ngram_tokens[1:])
-        count = constants.COUNT_FIELDNAME
         discard = False
         # For performance reasons, avoid searching through matches
         # unless necessary.
@@ -276,7 +275,7 @@ class DataStore:
             elif (status1 is None) ^ (status2 is None):
                 discard = True
         if discard:
-            row[count] = 0
+            row[constants.COUNT_FIELDNAME] = 0
         return row
 
     def counts(self, catalogue, output_fh):
@@ -703,19 +702,13 @@ class DataStore:
         results = []
         previous_witness = (None, None)
         previous_data = {}
-        # Calculate the index of ngram and count columns in a Pandas
-        # named tuple row, as used below. The +1 is due to the tuple
-        # having the row index as the first element.
-        ngram_index = constants.QUERY_FIELDNAMES.index(
-            constants.NGRAM_FIELDNAME) + 1
-        count_index = constants.QUERY_FIELDNAMES.index(
-            constants.COUNT_FIELDNAME) + 1
         # Operate over individual witnesses and sizes, so that there
         # is no possible results pollution between them.
         grouped = pd.read_csv(matches_path, encoding='utf-8',
                               na_filter=False).groupby(
             [constants.WORK_FIELDNAME, constants.SIGLUM_FIELDNAME,
              constants.SIZE_FIELDNAME])
+        cols = [constants.NGRAM_FIELDNAME, constants.COUNT_FIELDNAME]
         for (work, siglum, size), group in grouped:
             if (work, siglum) != previous_witness:
                 previous_matches = group
@@ -736,9 +729,7 @@ class DataStore:
                     reduced_count))
             # Put the previous matches into a form that is more
             # performant for the lookups made in _check_diff_result.
-            previous_data = {}
-            for row in previous_matches.itertuples():
-                previous_data[row[ngram_index]] = row[count_index]
+            previous_data = dict(previous_matches[cols].values)
             if not previous_matches.empty:
                 results.append(previous_matches[previous_matches[
                     constants.COUNT_FIELDNAME] != 0])
