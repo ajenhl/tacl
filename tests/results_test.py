@@ -1004,6 +1004,44 @@ class ResultsTestCase (TaclTestCase):
         actual_rows = self._perform_reduce([], self._tokenizer)
         self.assertEqual(actual_rows, expected_rows)
 
+    def test_reduce_multiple_labels(self):
+        """Test that witnesses are reduced per label."""
+        tokenizer = self._tokenizer
+        input_data = (
+            ['AB', '2', 'a', 'base', '4', 'A'],
+            ['ABC', '3', 'a', 'base', '2', 'A'],
+            ['ABD', '3', 'a', 'base', '1', 'A'],
+            ['ABCD', '4', 'a', 'base', '2', 'A'],
+            ['AB', '2', 'b', 'base', '2', 'A'],
+            ['ABC', '3', 'b', 'base', '2', 'A'],
+            ['AB', '2', 'b', 'wit', '3', 'A'],
+            ['ABC', '3', 'b', 'wit', '1', 'A'],
+            ['AB', '2', 'a', 'base', '4', 'B'],
+            ['ABC', '3', 'a', 'base', '2', 'B'],
+            ['ABD', '3', 'a', 'base', '1', 'B'],
+            ['ABCD', '4', 'a', 'base', '2', 'B'],
+            ['AB', '2', 'b', 'base', '2', 'B'],
+            ['ABC', '3', 'b', 'base', '2', 'B'],
+            ['AB', '2', 'b', 'wit', '3', 'B'],
+            ['ABC', '3', 'b', 'wit', '1', 'B'])
+        expected_rows = [
+            tacl.constants.QUERY_FIELDNAMES,
+            ('AB', '2', 'a', 'base', '1', 'A'),
+            ('ABD', '3', 'a', 'base', '1', 'A'),
+            ('ABCD', '4', 'a', 'base', '2', 'A'),
+            ('ABC', '3', 'b', 'base', '2', 'A'),
+            ('AB', '2', 'b', 'wit', '2', 'A'),
+            ('ABC', '3', 'b', 'wit', '1', 'A'),
+            ('AB', '2', 'a', 'base', '1', 'B'),
+            ('ABD', '3', 'a', 'base', '1', 'B'),
+            ('ABCD', '4', 'a', 'base', '2', 'B'),
+            ('ABC', '3', 'b', 'base', '2', 'B'),
+            ('AB', '2', 'b', 'wit', '2', 'B'),
+            ('ABC', '3', 'b', 'wit', '1', 'B')
+        ]
+        actual_rows = self._perform_reduce(input_data, tokenizer)
+        self.assertEqual(set(actual_rows), set(expected_rows))
+
     def test_reduce_nan(self):
         # Check that the n-gram "nan" is not interpreted as NaN.
         tokenizer = tacl.Tokenizer(tacl.constants.TOKENIZER_PATTERN_PAGEL,

@@ -878,13 +878,12 @@ class Results:
         # This does not make use of any pandas functionality; it
         # probably could, and if so ought to.
         data = {}
-        labels = {}
         # Derive a convenient data structure from the rows.
         for row_index, row in self._matches.iterrows():
             work = row[constants.WORK_FIELDNAME]
             siglum = row[constants.SIGLUM_FIELDNAME]
-            labels[work] = row[constants.LABEL_FIELDNAME]
-            witness_data = data.setdefault((work, siglum), {})
+            label = row[constants.LABEL_FIELDNAME]
+            witness_data = data.setdefault((work, siglum, label), {})
             witness_data[row[constants.NGRAM_FIELDNAME]] = {
                 'count': int(row[constants.COUNT_FIELDNAME]),
                 'size': int(row[constants.SIZE_FIELDNAME])}
@@ -897,7 +896,7 @@ class Results:
                     self._reduce_by_ngram(witness_data, ngram)
         # Recreate rows from the modified data structure.
         rows = []
-        for (work, siglum), witness_data in data.items():
+        for (work, siglum, label), witness_data in data.items():
             for ngram, ngram_data in witness_data.items():
                 count = ngram_data['count']
                 if count > 0:
@@ -907,7 +906,7 @@ class Results:
                          constants.WORK_FIELDNAME: work,
                          constants.SIGLUM_FIELDNAME: siglum,
                          constants.COUNT_FIELDNAME: count,
-                         constants.LABEL_FIELDNAME: labels[work]})
+                         constants.LABEL_FIELDNAME: label})
         self._matches = pd.DataFrame(
             rows, columns=constants.QUERY_FIELDNAMES)
 
