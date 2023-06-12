@@ -1,11 +1,11 @@
 """Module containing the TEICorpus class."""
 
+import importlib.resources
 import logging
 import os
 import re
 
 from lxml import etree
-from pkg_resources import resource_filename
 
 from . import constants
 from .exceptions import TACLError
@@ -69,9 +69,7 @@ class TEICorpus:
         self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
-        xslt_filename = resource_filename(__name__, 'assets/xslt/{}'.format(
-            self.xslt))
-        self.transform = etree.XSLT(etree.parse(xslt_filename))
+        self.transform = self._get_xslt('assets/xslt/{}'.format(self.xslt))
 
     def _assemble_parts(self, work, paths):
         parts = list(paths.keys())
@@ -115,6 +113,11 @@ class TEICorpus:
 
     def _extract_work(self, filename):
         raise NotImplementedError
+
+    def _get_xslt(self, path):
+        ref = importlib.resources.files('tacl') / path
+        with importlib.resources.as_file(ref) as xslt_path:
+            return etree.XSLT(etree.parse(xslt_path))
 
     def get_witnesses(self, source_tree):
         """Returns a sorted list of all witnesses of readings in
@@ -275,12 +278,9 @@ class TEICorpusCBETAGitHub (TEICorpus):
 
     def __init__(self, *args):
         super().__init__(*args)
-        div_xslt = resource_filename(
-            __name__, 'assets/xslt/CBETA_extract_div.xsl')
-        self._transform_div = etree.XSLT(etree.parse(div_xslt))
-        remove_divs_xslt = resource_filename(
-            __name__, 'assets/xslt/CBETA_remove_divs.xsl')
-        self._remove_divs = etree.XSLT(etree.parse(remove_divs_xslt))
+        self._transform_div = self._get_xslt(
+            'assets/xslt/CBETA_extract_div.xsl')
+        self._remove_divs = self._get_xslt('assets/xslt/CBETA_remove_divs.xsl')
 
     def _extract_divs(self, work, tree, div_types, exclude=None):
         """Writes out to files the individual parts of a work corresponding to
@@ -532,9 +532,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         material, and one the rest.
 
         """
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
-        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        extract_verse = self._get_xslt('assets/xslt/CBETA_extract_verse.xsl')
         verse_tree = extract_verse(tree)
         verse_filename = '{}-verses.xml'.format(work)
         self._output_tree(verse_filename, verse_tree)
@@ -630,9 +628,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
         Also divide into one file for each cb:div[@type='dharani'].
 
         """
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_T0220_reparent_divs.xsl')
-        move_non_hui_divs = etree.XSLT(etree.parse(xslt_filename))
+        move_non_hui_divs = self._get_xslt(
+            'assets/xslt/CBETA_T0220_reparent_divs.xsl')
         tree = move_non_hui_divs(tree)
         divs = tree.xpath('//cb:div[@type="hui"]',
                           namespaces=constants.NAMESPACES)
@@ -650,9 +647,8 @@ class TEICorpusCBETAGitHub (TEICorpus):
         tei:note[@place='inline'] material, and one the rest.
 
         """
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_extract_commentary.xsl')
-        extract_commentary = etree.XSLT(etree.parse(xslt_filename))
+        extract_commentary = self._get_xslt(
+            'assets/xslt/CBETA_extract_commentary.xsl')
         commentary_tree = extract_commentary(tree)
         commentary_filename = '{}-commentary.xml'.format(work)
         self._output_tree(commentary_filename, commentary_tree)
@@ -682,9 +678,7 @@ class TEICorpusCBETAGitHub (TEICorpus):
         material, and one the rest.
 
         """
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
-        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        extract_verse = self._get_xslt('assets/xslt/CBETA_extract_verse.xsl')
         verse_tree = extract_verse(tree)
         verse_filename = '{}-verses.xml'.format(work)
         self._output_tree(verse_filename, verse_tree)
@@ -712,13 +706,9 @@ class TEICorpusCBETAGitHub (TEICorpus):
         # There are verse elements within tei:app/tei:rdg that occur
         # within a prose context and have no markup specifying that
         # they are verse, so add that in.
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_T0418_fix_verse.xsl')
-        fix_verse = etree.XSLT(etree.parse(xslt_filename))
+        fix_verse = self._get_xslt('assets/xslt/CBETA_T0418_fix_verse.xsl')
         tree = fix_verse(tree)
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/CBETA_extract_verse.xsl')
-        extract_verse = etree.XSLT(etree.parse(xslt_filename))
+        extract_verse = self._get_xslt('assets/xslt/CBETA_extract_verse.xsl')
         verse_tree = extract_verse(tree)
         verse_filename = '{}-revised-verses.xml'.format(work)
         self._output_tree(verse_filename, verse_tree)

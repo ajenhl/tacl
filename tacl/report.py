@@ -1,9 +1,8 @@
+import importlib.resources
 import os.path
 import shutil
 
 from jinja2 import Environment, PackageLoader
-
-from pkg_resources import resource_filename, resource_listdir
 
 
 class Report:
@@ -33,11 +32,9 @@ class Report:
         :type output_dir: `str`
 
         """
-        base_directory = 'assets/{}'.format(self._report_name)
-        for asset in resource_listdir(self._package_name, base_directory):
-            filename = resource_filename(
-                self._package_name, '{}/{}'.format(base_directory, asset))
-            shutil.copy2(filename, output_dir)
+        base_directory = 'tacl.assets.{}'.format(self._report_name)
+        for asset in importlib.resources.files(base_directory).iterdir():
+            shutil.copy2(asset, output_dir)
 
     def generate(self, output_dir):
         """Generate the report, writing it to `output_dir`."""

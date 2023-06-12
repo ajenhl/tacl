@@ -1,10 +1,10 @@
 """Module containing the Stripper class."""
 
+import importlib.resources
 import logging
 import os
 
 from lxml import etree
-from pkg_resources import resource_filename
 
 from . import constants
 
@@ -24,9 +24,10 @@ class Stripper:
         self._logger = logging.getLogger(__name__)
         self._input_dir = os.path.abspath(input_dir)
         self._output_dir = os.path.abspath(output_dir)
-        xslt_filename = resource_filename(
-            __name__, 'assets/xslt/strip_tei.xsl')
-        self.transform = etree.XSLT(etree.parse(xslt_filename))
+        xslt_ref = importlib.resources.files('tacl') / \
+            'assets/xslt/strip_tei.xsl'
+        with importlib.resources.as_file(xslt_ref) as xslt_path:
+            self.transform = etree.XSLT(etree.parse(xslt_path))
 
     def get_witnesses(self, source_tree):
         """Returns a list of all witnesses of variant readings in
@@ -74,7 +75,7 @@ class Stripper:
                     'Could not create output directory: {}'.format(err))
                 raise
         for dirpath, dirnames, filenames in os.walk(self._input_dir):
-            for filename in filenames:
+            for filename in sorted(filenames):
                 if os.path.splitext(filename)[1] == '.xml':
                     work, witnesses = self.strip_file(
                         os.path.join(dirpath, filename))
