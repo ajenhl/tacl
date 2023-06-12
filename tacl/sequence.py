@@ -4,7 +4,7 @@ import logging
 import os
 import re
 
-from Bio import pairwise2
+from Bio import Align
 import pandas as pd
 
 from . import constants
@@ -131,18 +131,21 @@ class SequenceReport (Report):
             s1, span1 = self._get_text_sequence(t1, t1_span, context_length)
             s2, span2 = self._get_text_sequence(t2, t2_span, context_length)
             length = len(s1)
-            alignment = pairwise2.align.globalms(
-                s1, s2, constants.IDENTICAL_CHARACTER_SCORE,
-                constants.DIFFERENT_CHARACTER_SCORE,
-                constants.OPEN_GAP_PENALTY, constants.EXTEND_GAP_PENALTY)[0]
-            context_length = length
-            score = alignment[2] / length
+            aligner = Align.PairwiseAligner(
+                mode="global", match_score=constants.IDENTICAL_CHARACTER_SCORE,
+                mismatch_score=constants.DIFFERENT_CHARACTER_SCORE,
+                open_gap_score=constants.OPEN_GAP_PENALTY,
+                extend_gap_score=constants.EXTEND_GAP_PENALTY)
+            alignments = aligner.align(s1, s2)
+            score = alignments.score / length
+            alignment = alignments[0]
             if not alignment:
                 return None
             elif score < constants.SCORE_THRESHOLD or length == old_length:
                 break
             else:
                 self._logger.debug('Score: {}'.format(score))
+            context_length = length
             old_length = length
         covered_spans[0].append(span1)
         covered_spans[1].append(span2)

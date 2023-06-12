@@ -20,7 +20,7 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
 ]
 dependencies = [
-    "biopython",
+    "biopython=>=1.80",
     "colorlog",
     "Jinja2>3.1.0",
     "lxml",
