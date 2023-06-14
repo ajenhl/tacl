@@ -1,3 +1,17 @@
+5.1.0  2023-06-14  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Modified results reduce to properly handle the same witness under
+    different labels, namely to treat them as entirely distinct.
+
+  * Changed from deprecated pkg_resources code to importlib.resources
+    for handling package files.
+
+  * Changed from deprecated Bio.pairwise2 to Bio.Align.
+
+  * Added logging statement when about to output CSV results from tacl
+    results.
+
+
 5.0.6  2023-05-10  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Reworked build configuration.
