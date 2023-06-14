@@ -95,14 +95,17 @@ class Catalogue (dict):
 
         """
         catalogue = copy.deepcopy(self)
-        to_delete = set()
+        # The catalogue, as a dictionary, cannot have items deleted
+        # during iteration, so keep track of works to be deleted and
+        # delete them after the relabelling.
+        works_to_delete = []
         for work, old_label in catalogue.items():
             if old_label in label_map:
                 catalogue[work] = label_map[old_label]
             else:
-                to_delete.add(catalogue[work])
-        for label in to_delete:
-            catalogue.remove_label(label)
+                works_to_delete.append(work)
+        for work in works_to_delete:
+            del catalogue[work]
         return catalogue
 
     def remove_label(self, label):

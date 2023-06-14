@@ -74,6 +74,22 @@ class CatalogueTestCase (TaclTestCase):
         self.assertEqual(relabelled_catalogue['T1230'], 'label2')
         self.assertNotIn('T3012', relabelled_catalogue)
 
+    def test_relabel_to_deleted_label(self):
+        # If the relabel map changes a label to a label that is not in
+        # the map but which is in the catalogue, it should not delete
+        # the relabelled works.
+        #
+        # This test exists because the former implementation of
+        # relabel had as its last step deleting the labels that
+        # weren't in the map, not the works that bore those labels.
+        catalogue = tacl.Catalogue()
+        catalogue['T0123'] = 'label1'
+        catalogue['T3210'] = 'label2'
+        relabelling = {'label1': 'label2'}
+        relabelled_catalogue = catalogue.relabel(relabelling)
+        self.assertEqual(relabelled_catalogue['T0123'], 'label2')
+        self.assertNotIn('T3210', relabelled_catalogue)
+
     def test_remove_label(self):
         catalogue = tacl.Catalogue()
         catalogue['T0123'] = 'label1'
