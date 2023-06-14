@@ -3,7 +3,6 @@
 import csv
 import logging
 import os
-import re
 import tempfile
 
 import pandas as pd
@@ -280,6 +279,7 @@ class Results:
         :rtype: file object
 
         """
+        self._logger.info('Writing results to CSV')
         self._matches.to_csv(fh, encoding='utf-8', float_format='%d',
                              index=False)
         return fh
