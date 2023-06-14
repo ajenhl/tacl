@@ -1,3 +1,10 @@
+5.2.0  2023-06-15  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Fixed catalogue relabelling to not incorrectly delete relabelled
+    works when mapped to an existing label that is not included in the
+    relabel map.
+
+
 5.1.0  2023-06-14  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Modified results reduce to properly handle the same witness under
