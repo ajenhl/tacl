@@ -32,7 +32,8 @@ class Report:
         :type output_dir: `str`
 
         """
-        base_directory = 'tacl.assets.{}'.format(self._report_name)
+        base_directory = '{}.assets.{}'.format(
+            self._package_name, self._report_name)
         for asset in importlib.resources.files(base_directory).iterdir():
             shutil.copy2(asset, output_dir)
 
