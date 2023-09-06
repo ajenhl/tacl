@@ -1,3 +1,11 @@
+5.3.0  2023-09-06  Jamie Norrish  <jamie@artefact.org.nz>
+
+  * Fixed Report issue that prevented non-tacl assets from being
+    copied to an output directory.
+
+  * Updated docs build requirements.
+
+
 5.2.0  2023-06-15  Jamie Norrish  <jamie@artefact.org.nz>
 
   * Fixed catalogue relabelling to not incorrectly delete relabelled
